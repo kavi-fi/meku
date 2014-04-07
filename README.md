@@ -1,4 +1,4 @@
 meku
 ====
 
-Kuvaohjelmienluokittelu- ja valvontajärjestelmä
+Kuvaohjelmien luokittelu- ja valvontajärjestelmä

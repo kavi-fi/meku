@@ -6,10 +6,11 @@
     "start": "node server/app.js"
   },
   "dependencies": {
-    "express": "3.5.1"
+    "express": "3.5.1",
+    "mongoose": "3.8.8"
   },
   "devDependencies": {
-    "express-livereload": "0.0.24",
+    "express-livereload": "~0.0.24",
     "node-dev": "~2.3.0"
   }
 }

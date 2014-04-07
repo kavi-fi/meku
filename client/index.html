@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <link href="vendor/normalize-3.0.1.css" media="all" rel="stylesheet" />
+  <link href="style.css" media="all" rel="stylesheet" />
   <script src="vendor/jquery-2.1.0.min.js"></script>
+  <script src="meku.js"></script>
   <script src="http://localhost:35729/livereload.js"></script>
 </head>
 <body>
   <button class="new-movie">Uusi elokuvaluokittelu</button>
+  <div id="movie-details">
+    <div>Alkuperäinen nimi: <input name="name" type="text" /></div>
+    <div>Suomalainen nimi: <input class="name-fi" type="text" /></div>
+    <div>Ruotsalainen nimi: <input class="name-sv" type="text" /></div>
+  </div>
 </body>
 </html>

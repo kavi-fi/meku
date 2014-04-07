@@ -5,13 +5,35 @@ var liveReload = require('express-livereload')
 
 var app = express()
 
+app.use(express.json())
+
 mongoose.connect('mongodb://localhost/meku')
-var Movie = mongoose.model('movies', { name: String })
+
+var Movie = mongoose.model('movies', {
+  name: String,
+  'name-fi': String,
+  'name-sv': String,
+  country: String,
+  year: Number,
+  productionCompanies: [String],
+  directors: [String],
+  actors: [String],
+  synopsis: String
+})
+
+// clear on reboot: Movie.remove().exec()
 
 app.post('/movies/new', function(req, res, next) {
   (new Movie()).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
+  })
+})
+
+app.post('/movies/:id', function(req, res, next) {
+  Movie.findByIdAndUpdate(req.params.id, req.body, null, function(err) {
+    if (err) return next(err)
+    return res.send({})
   })
 })
 

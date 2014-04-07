@@ -9,10 +9,15 @@
 </head>
 <body>
   <button class="new-movie">Uusi elokuvaluokittelu</button>
-  <div id="movie-details">
+  <form id="movie-details" data-id="">
     <div>Alkuperäinen nimi: <input name="name" type="text" /></div>
-    <div>Suomalainen nimi: <input class="name-fi" type="text" /></div>
-    <div>Ruotsalainen nimi: <input class="name-sv" type="text" /></div>
-  </div>
+    <div>Suomalainen nimi: <input name="name-fi" type="text" /></div>
+    <div>Ruotsalainen nimi: <input name="name-sv" type="text" /></div>
+    <div>Maa: <input name="country" type="text" /></div>
+    <div>Valmistusvuosi: <input name="year" type="text" /></div>
+    <div>Tuotantoyhtiö: <input name="production-company" type="text" /></div>
+    <div>Ohjaaja: <input name="director" type="text" /></div>
+    <div>Synopsis: <input name="synopsis" type="text" /></div>
+  </form>
 </body>
 </html>

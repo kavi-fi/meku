@@ -17,8 +17,7 @@ function movieDetails() {
   $('.new-movie').click(function() {
     $.post('/movies/new').done(function(movie) {
       location.hash = '#/movies/'+movie._id
-      $('.new-movie').attr('disabled', 'true')
-      $form.show().data('id', movie._id)
+      show(movie)
     })
   })
 
@@ -27,8 +26,14 @@ function movieDetails() {
   })
 
   function show(movie) {
-    console.log(movie)
-    $form.show().data('id', movie._id)
+    $('.new-movie').attr('disabled', 'true')
+    $form.data('id', movie._id).show()
+      .find('input[name=name]').val(movie.name).end()
+      .find('input[name=name-fi]').val(movie['name-fi']).end()
+      .find('input[name=name-sv]').val(movie['name-sv']).end()
+      .find('input[name=country]').val(movie.country).end()
+      .find('input[name=year]').val(movie.year).end()
+      .find('input[name=synopsis]').val(movie.synopsis).end()
   }
 
   return { show: show }

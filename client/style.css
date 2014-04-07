@@ -1,2 +1,4 @@
+button[disabled=disabled], button:disabled { color: gray; }
+
 .new-movie { margin: 10px; }
-#movie-details { display: none; }
+#movie-details { display: none; margin: 10px; }

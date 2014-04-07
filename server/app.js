@@ -23,6 +23,10 @@ var Movie = mongoose.model('movies', {
 
 // clear on reboot: Movie.remove().exec()
 
+app.get('/movies/:id', function(req, res) {
+  Movie.findById(req.params.id, function(err, movie) { res.send(movie) })
+})
+
 app.post('/movies/new', function(req, res, next) {
   (new Movie()).save(function(err, movie) {
     if (err) return next(err)

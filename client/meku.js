@@ -3,22 +3,35 @@ $(setup)
 function setup() {
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
 
+  var details = movieDetails()
+
+  if (location.hash.indexOf('#/movies/') == 0) {
+    var _id = location.hash.substring(9)
+    $.get('/movies/' + _id).done(details.show)
+  }
+}
+
+function movieDetails() {
   var $form = $('#movie-details')
 
   $('.new-movie').click(function() {
     $.post('/movies/new').done(function(movie) {
-      $('.new-movie').hide()
+      location.hash = '#/movies/'+movie._id
+      $('.new-movie').attr('disabled', 'true')
       $form.show().data('id', movie._id)
     })
   })
 
-  $form.find("input").throttledInput(function(txt) {
-    $.ajax({
-      type: 'POST',
-      url: '/movies/' + $form.data('id'),
-      data: JSON.stringify(keyValue($(this).attr('name'), txt))
-    })
+  $form.find('input').throttledInput(function(txt) {
+    $.post('/movies/' + $form.data('id'), JSON.stringify(keyValue($(this).attr('name'), txt)))
   })
+
+  function show(movie) {
+    console.log(movie)
+    $form.show().data('id', movie._id)
+  }
+
+  return { show: show }
 }
 
 function keyValue(key, value) {

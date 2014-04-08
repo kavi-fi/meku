@@ -26,6 +26,9 @@ function movieDetails() {
     { name: 'countries', displayKey: 'value', source: countryMatcher() }
   )
 
+  $form.find('select').on('change', function() {
+    saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
+  })
   $form.find('input').throttledInput(function(txt) {
     saveMovieField($form.data('id'), $(this).attr('name'), txt)
   })
@@ -48,6 +51,7 @@ function movieDetails() {
       .find('input[name=name-sv]').val(movie['name-sv']).end()
       .find('input[name=country]').val(movie.country).end()
       .find('input[name=year]').val(movie.year).end()
+      .find('select[name=genre]').val(movie.genre).end()
       .find('input[name=synopsis]').val(movie.synopsis).end()
   }
 

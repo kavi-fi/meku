@@ -16,6 +16,7 @@ var Movie = mongoose.model('movies', {
   country: String,
   year: Number,
   productionCompanies: [String],
+  genre: String,
   directors: [String],
   actors: [String],
   synopsis: String

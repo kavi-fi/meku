@@ -12,8 +12,8 @@
   <button class="new-movie">Uusi elokuvaluokittelu</button>
   <form id="movie-details" data-id="">
     <h3>Elokuvan perustiedot</h3>
-    <div>Alkuperäinen nimi: <input name="name" type="text" /></div>
-    <div>Suomalainen nimi: <input name="name-fi" type="text" /></div>
+    <div>Alkuperäinen nimi: <input name="name" class="required" type="text" /></div>
+    <div>Suomalainen nimi: <input name="name-fi" class="required" type="text" /></div>
     <div>Ruotsalainen nimi: <input name="name-sv" type="text" /></div>
     <div>Maa: <input name="country" class="country" type="text" /></div>
     <div>Valmistusvuosi: <input name="year" type="text" data-type="number" /></div>
@@ -55,9 +55,9 @@
         <option>Videotaide</option>
       </select>
     </div>
-    <div>Ohjaaja: <input name="directors" class="multivalue" type="text" /></div>
+    <div>Ohjaaja: <input name="directors" class="multivalue required" type="text" /></div>
     <div>Näyttelijät: <input name="actors" class="multivalue" type="text" /></div>
-    <div>Synopsis: <input name="synopsis" type="text" /></div>
+    <div>Synopsis: <textarea name="synopsis" class="required" value=""></textarea></div>
     <h3>Luokittelu</h3>
     <div>Luokittelija: <span>Anne Lind</span></div>
     <div>Luokittelun tilaaja: <input name="buyer" type="text" /></div>
@@ -113,6 +113,7 @@
         <li>...</li>
       </ol>
     </div>
+    <button name="register" disabled=disabled>Rekisterõi</button>
   </form>
 </body>
 </html>

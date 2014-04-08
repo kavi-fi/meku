@@ -13,6 +13,8 @@ ol { list-style-type: none; }
 #movie-details .category-criteria ol { display: none;}
 #movie-details .category-criteria ol:first-of-type { display: block; }
 
+#movie-details .invalid { background-color: #f2dede; }
+
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

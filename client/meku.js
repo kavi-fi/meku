@@ -13,6 +13,7 @@ function setup() {
 
 function movieDetails() {
   var $form = $('#movie-details')
+  var $submit = $form.find('button[name=register]')
 
   $('.new-movie').click(function() {
     $.post('/movies/new').done(function(movie) {
@@ -27,7 +28,25 @@ function movieDetails() {
     saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
   })
 
-  $form.find('input').not('.multivalue').throttledInput(function(txt) {
+  $form.on('validation', function() {
+    if ($form.find(".required.invalid").length === 0) {
+      $submit.removeAttr('disabled')
+    } else {
+      $submit.attr('disabled', 'disabled')
+    }
+  })
+
+  $form.find('.required').on('keyup change', function(e) {
+    var $el = $(this)
+    if ($el.val().length > 0) {
+      $el.removeClass('invalid')
+    } else {
+      $el.addClass('invalid')
+    }
+    $el.trigger('validation')
+  })
+
+  $form.find('input, textarea').not('.multivalue').throttledInput(function(txt) {
     var value = $(this).data('type') == 'number' ? parseInt(txt) : txt
     saveMovieField($form.data('id'), $(this).attr('name'), value)
   })
@@ -54,7 +73,9 @@ function movieDetails() {
       .find('select[name=genre]').val(movie.genre).end()
       .find('input[name=directors]').val(movie.directors.join(', ')).end()
       .find('input[name=actors]').val(movie.actors.join(', ')).end()
-      .find('input[name=synopsis]').val(movie.synopsis).end()
+      .find('textarea[name=synopsis]').val(movie.synopsis).end()
+
+    $form.find('.required').trigger('change')
   }
 
   return { show: show }

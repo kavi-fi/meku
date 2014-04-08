@@ -13,7 +13,7 @@ ol { list-style-type: none; }
 #movie-details .category-criteria ol { display: none;}
 #movie-details .category-criteria ol:first-of-type { display: block; }
 
-#movie-details .invalid { background-color: #f2dede; }
+#movie-details .invalid { background-color: #f2dede !important; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

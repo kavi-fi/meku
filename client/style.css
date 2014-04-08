@@ -1,4 +1,14 @@
 button[disabled=disabled], button:disabled { color: gray; }
 
+ol { list-style-type: none; }
 .new-movie { margin: 10px; }
+
 #movie-details { display: none; margin: 10px; }
+#movie-details > div { margin: 10px; }
+
+#movie-details .categories { float:left; margin-right: 30px; }
+#movie-details .categories li { cursor: pointer; }
+#movie-details .categories .selected { font-weight: bold; cursor: default; }
+
+#movie-details .category-criteria ol { display: none;}
+#movie-details .category-criteria ol:first-of-type { display: block; }

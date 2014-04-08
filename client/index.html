@@ -10,14 +10,106 @@
 <body>
   <button class="new-movie">Uusi elokuvaluokittelu</button>
   <form id="movie-details" data-id="">
+    <h3>Elokuvan perustiedot</h3>
     <div>Alkuperäinen nimi: <input name="name" type="text" /></div>
     <div>Suomalainen nimi: <input name="name-fi" type="text" /></div>
     <div>Ruotsalainen nimi: <input name="name-sv" type="text" /></div>
     <div>Maa: <input name="country" type="text" /></div>
     <div>Valmistusvuosi: <input name="year" type="text" /></div>
     <div>Tuotantoyhtiö: <input name="production-company" type="text" /></div>
+    <div>Genre
+      <select name="genre">
+        <option>Valitse...</option>
+        <option>Fiktio</option>
+        <option>Animaatio</option>
+        <option>Viihde</option>
+        <option>Seksi / Erotiikka</option>
+        <option>Dokumentti</option>
+        <option>Lasten ohjelmat</option>
+        <option>Muut</option>
+        <option>Romantiikka</option>
+        <option>Draama</option>
+        <option>Historiallinen näytelmä</option>
+        <option>Trilleri</option>
+        <option>Seikkailu</option>
+        <option>Western</option>
+        <option>Sota</option>
+        <option>Kauhu</option>
+        <option>Tieteisseikkailu</option>
+        <option>Toimintaelokuva</option>
+        <option>Fantasia</option>
+        <option>Komedia ja farssi</option>
+        <option>Musiikki</option>
+        <option>Opetus</option>
+        <option>Urheilu</option>
+        <option>Matkailu</option>
+        <option>Henkilödokumentti</option>
+        <option>Luontodokumentti</option>
+        <option>Lasten animaatio</option>
+        <option>Lasten fiktio</option>
+        <option>Muu lastenelokuva</option>
+        <option>Mainonta</option>
+        <option>Tietoisku</option>
+        <option>Kokeiluelokuva</option>
+        <option>Videotaide</option>
+      </select>
+    </div>
     <div>Ohjaaja: <input name="director" type="text" /></div>
     <div>Synopsis: <input name="synopsis" type="text" /></div>
+    <h3>Luokittelu</h3>
+    <div>Luokittelija: <span>Anne Lind</span></div>
+    <div>Luokittelun tilaaja: <input name="buyer" type="text" /></div>
+    <div>Rekisteröinnistä laskutetaan: <input name="billing" type="text" /></div>
+    <div>Ohjelman formaatti:
+      <select name="format">
+        <option>DVD</option>
+        <option>HD DVD</option>
+        <option>Blu-ray Disc</option>
+        <option>VoD</option>
+        <option>CDkuva</option>
+        <option>VHS</option>
+        <option>8 mm</option>
+        <option>16 mm</option>
+        <option>70 mm</option>
+        <option>Televisio</option>
+      </select>
+    </div>
+    <div>Kesto: <input name="duration" type="text" /></div>
+    <h3>Luokittelun kriteerit</h3>
+    <div><input name="safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
+
+    <ol class="categories">
+      <li class="selected">Väkivalta</li>
+      <li>Seksi</li>
+      <li>Ahdistus</li>
+      <li>Päihteet</li>
+    </ol>
+    <div class="category-criteria">
+      <ol class="violence">
+        <li><input type="checkbox" />18 no.1: Väkivalta ...</li>
+        <li><input type="checkbox" />18 no.2: ...</li>
+        <li><input type="checkbox" />18 no.3: ...</li>
+        <li>...</li>
+      </ol>
+      <ol class="sex">
+        <li><input type="checkbox" />18 no.1: Seksi ...</li>
+        <li><input type="checkbox" />18 no.2: ...</li>
+        <li><input type="checkbox" />18 no.3: ...</li>
+        <li>...</li>
+      </ol>
+      <ol class="anxiety">
+        <li><input type="checkbox" />18 no.1: Ahdistus ...</li>
+        <li><input type="checkbox" />18 no.2: ...</li>
+        <li><input type="checkbox" />18 no.3: ...</li>
+        <li>...</li>
+      </ol>
+      <ol class="drugs">
+        <li><input type="checkbox" />18 no.1: Päihteet ...</li>
+        <li><input type="checkbox" />18 no.2: ...</li>
+        <li><input type="checkbox" />18 no.3: ...</li>
+        <li>...</li>
+      </ol>
+    </div>
   </form>
 </body>
 </html>

@@ -25,6 +25,12 @@ function movieDetails() {
     $.post('/movies/' + $form.data('id'), JSON.stringify(keyValue($(this).attr('name'), txt)))
   })
 
+  $form.find('.categories li').click(function() {
+    $(this).addClass('selected').siblings().removeClass('selected')
+    console.log($(this).index())
+    $form.find('.category-criteria ol').hide().eq($(this).index()).show()
+  })
+
   function show(movie) {
     $('.new-movie').attr('disabled', 'true')
     $form.data('id', movie._id).show()

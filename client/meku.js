@@ -21,10 +21,7 @@ function movieDetails() {
     })
   })
 
-  $form.find('input.country').typeahead(
-    { hint: true, highlight: true, minLength: 1 },
-    { name: 'countries', displayKey: 'value', source: countryMatcher() }
-  )
+  $form.find('input.country').typeahead({}, { source: countryMatcher() })
 
   $form.find('select').on('change', function() {
     saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())

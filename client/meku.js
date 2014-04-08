@@ -22,7 +22,12 @@ function movieDetails() {
   })
 
   $form.find('input').throttledInput(function(txt) {
-    $.post('/movies/' + $form.data('id'), JSON.stringify(keyValue($(this).attr('name'), txt)))
+    saveMovieField($form.data('id'), $(this).attr('name'), txt)
+  })
+
+  $form.find('input.multivalue').throttledInput(function(txt) {
+    var values = txt.split(',').map($.trim)
+    saveMovieField($form.data('id'), $(this).attr('name'), values)
   })
 
   $form.find('.categories li').click(function() {
@@ -42,6 +47,10 @@ function movieDetails() {
   }
 
   return { show: show }
+}
+
+function saveMovieField(id, field, value) {
+  $.post('/movies/' + id, JSON.stringify(keyValue(field, value)))
 }
 
 function keyValue(key, value) {

@@ -29,8 +29,10 @@ function movieDetails() {
   $form.find('select').on('change', function() {
     saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
   })
-  $form.find('input').throttledInput(function(txt) {
-    saveMovieField($form.data('id'), $(this).attr('name'), txt)
+
+  $form.find('input').not('.multivalue').throttledInput(function(txt) {
+    var value = $(this).data('type') == 'number' ? parseInt(txt) : txt
+    saveMovieField($form.data('id'), $(this).attr('name'), value)
   })
 
   $form.find('input.multivalue').throttledInput(function(txt) {
@@ -50,8 +52,11 @@ function movieDetails() {
       .find('input[name=name-fi]').val(movie['name-fi']).end()
       .find('input[name=name-sv]').val(movie['name-sv']).end()
       .find('input[name=country]').val(movie.country).end()
+      .find('input[name=production-companies]').val(movie['production-companies'].join(', ')).end()
       .find('input[name=year]').val(movie.year).end()
       .find('select[name=genre]').val(movie.genre).end()
+      .find('input[name=directors]').val(movie.directors.join(', ')).end()
+      .find('input[name=actors]').val(movie.actors.join(', ')).end()
       .find('input[name=synopsis]').val(movie.synopsis).end()
   }
 

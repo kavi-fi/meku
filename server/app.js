@@ -9,6 +9,15 @@ app.use(express.json())
 
 mongoose.connect('mongodb://localhost/meku')
 
+var classification = {
+  author: String,
+  buyer: String,
+  billing: String,
+  format: String,
+  duration: Number, // in seconds
+  safe: Boolean,
+  criteria: [{ id:Number, comment:String }]
+}
 var Movie = mongoose.model('movies', {
   name: String,
   'name-fi': String,
@@ -19,10 +28,9 @@ var Movie = mongoose.model('movies', {
   genre: String,
   directors: [String],
   actors: [String],
-  synopsis: String
+  synopsis: String,
+  classifications: [classification]
 })
-
-// clear on reboot: Movie.remove().exec()
 
 app.get('/movies/:id', function(req, res) {
   Movie.findById(req.params.id, function(err, movie) { res.send(movie) })

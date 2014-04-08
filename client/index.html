@@ -59,11 +59,11 @@
     <div>Näyttelijät: <input name="actors" class="multivalue" type="text" /></div>
     <div>Synopsis: <textarea name="synopsis" class="required"></textarea></div>
     <h3>Luokittelu</h3>
-    <div>Luokittelija: <span>Anne Lind</span></div>
-    <div>Luokittelun tilaaja: <input name="buyer" type="text" /></div>
-    <div>Rekisteröinnistä laskutetaan: <input name="billing" type="text" /></div>
+    <div>Luokittelija: <span class="classification.author">Anne Lind</span></div>
+    <div>Luokittelun tilaaja: <input name="classification.buyer" type="text" /></div>
+    <div>Rekisteröinnistä laskutetaan: <input name="classification.billing" type="text" /></div>
     <div>Ohjelman formaatti:
-      <select name="format">
+      <select name="classification.format">
         <option>Valitse...</option>
         <option>DVD</option>
         <option>HD DVD</option>
@@ -77,9 +77,9 @@
         <option>Televisio</option>
       </select>
     </div>
-    <div>Kesto: <input name="duration" type="text" /></div>
+    <div>Kesto: <input name="classification.duration" type="text" /></div>
     <h3>Luokittelun kriteerit</h3>
-    <div><input name="safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
+    <div><input name="classification.safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
 
     <ol class="categories">
       <li class="selected">Väkivalta</li>
@@ -89,9 +89,9 @@
     </ol>
     <div class="category-criteria">
       <ol class="violence">
-        <li><input type="checkbox" />18 no.1: Väkivalta ...</li>
-        <li><input type="checkbox" />18 no.2: ...</li>
-        <li><input type="checkbox" />18 no.3: ...</li>
+        <li><input type="checkbox" name="criteria-violence-1" />18 no.1: Väkivalta ...</li>
+        <li><input type="checkbox" name="criteria-violence-2" />18 no.2: ...</li>
+        <li><input type="checkbox" name="criteria-violence-3" />18 no.3: ...</li>
         <li>...</li>
       </ol>
       <ol class="sex">

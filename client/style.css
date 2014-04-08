@@ -7,14 +7,24 @@ ol { list-style-type: none; }
 #movie-details > div { margin: 10px; }
 
 #movie-details .categories { float:left; margin-right: 30px; }
-#movie-details .categories li { cursor: pointer; }
+#movie-details .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
 #movie-details .categories .selected { font-weight: bold; cursor: default; }
+#movie-details .categories .violence { background-image: url('images/violence.png'); }
+#movie-details .categories .sex { background-image: url('images/sex.png'); }
+#movie-details .categories .anxiety { background-image: url('images/anxiety.png'); }
+#movie-details .categories .drugs { background-image: url('images/drugs.png'); }
 
+#movie-details .category-criteria { margin-left: 150px; min-height: 380px; }
 #movie-details .category-criteria ol { display: none;}
 #movie-details .category-criteria ol:first-of-type { display: block; }
+#movie-details .category-criteria .agelimit { display: inline-block; margin: 0 10px; width: 30px; height: 30px; background: transparent no-repeat; background-size: 30px; vertical-align: middle }
+#movie-details .category-criteria .agelimit-18 { background-image: url('images/agelimit-18.png'); }
+#movie-details .category-criteria .agelimit-16 { background-image: url('images/agelimit-16.png'); }
+#movie-details .category-criteria .agelimit-12 { background-image: url('images/agelimit-12.png'); }
+#movie-details .category-criteria .agelimit-7 { background-image: url('images/agelimit-7.png'); }
+#movie-details .category-criteria .agelimit-S { background-image: url('images/agelimit-s.png'); }
 
 #movie-details .invalid { background-color: #f2dede !important; }
-
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

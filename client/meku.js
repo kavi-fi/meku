@@ -15,6 +15,8 @@ function movieDetails() {
   var $form = $('#movie-details')
   var $submit = $form.find('button[name=register]')
 
+  renderClassificationCriteria()
+
   $('.new-movie').click(function() {
     $.post('/movies/new').done(function(movie) {
       location.hash = '#/movies/'+movie._id
@@ -82,6 +84,21 @@ function movieDetails() {
     $form.find('.required').trigger('change')
   }
 
+  function renderClassificationCriteria() {
+    var $categories = ['violence', 'sex', 'anxiety', 'drugs'].map(function(category) {
+      var criteria = classificationCriteria.filter(function(c) { return c.category == category })
+      var $criteria = criteria.map(function(c) {
+        return $('<li>')
+          .append($('<input>', { type: 'checkbox', name:'criteria-' + c.id } ))
+          .append($('<span>', { class:'agelimit agelimit-' + c.age }))
+          .append($('<span>').text(c.description))
+      })
+
+      return $('<ol>', { class: category }).append($criteria)
+    })
+    $form.find('.category-criteria').html($categories)
+  }
+
   return { show: show }
 }
 
@@ -121,42 +138,43 @@ function countryMatcher() {
   }
 }
 
-var classificationCriteria = {
-  1: { category: 'violence', age: '18', description: "01. Kuvaohjelmassa on ERITTÄIN VOIMAKASTA VÄKIVALTAA: fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa" },
-  2: { category: 'violence', age: '18', description: "02. Kuvaohjelmassa on ERITTÄIN VOIMAKASTA VÄKIVALTAA: aitoa ja yksityiskohtaisesti tai selväpiirteisesti sekä viihteellisesti tai ihannoiden esitettyä ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-  3: { category: 'violence', age: '18', description: "03. Kuvaohjelmassa on ERITTÄIN VOIMAKASTA VÄKIVALTAA: fiktiivistä, selväpiirteisesti ja pitkäkestoisesti esitettyä seksiin liittyvää väkivaltaa (raiskaus, insesti, pedofilia)" },
-  4: { category: 'violence', age: '16', description: "04. Kuvaohjelmassa on VOIMAKASTA VÄKIVALTAA: fiktiivistä tai aitoa yksityiskohtaista ja realistista tai hallitsevaa tai pitkäkestoista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-  5: { category: 'violence', age: '16', description: "05. Kuvaohjelmassa on VOIMAKASTA VÄKIVALTAA: fiktiivistä tai aitoa yksityiskohtaisesti ja korostetusti tai yksityiskohtaisesti ja viihteellistetysti esitettyä ihmisiin tai eläimiin kohdistuvaa väkivallan tai onnettomuuksien seurausten kuvausta." },
-  6: { category: 'violence', age: '16', description: "06. Kuvaohjelmassa on VOIMAKASTA VÄKIVALTAA: fiktiivistä, esitystavaltaan selvästi yliampuvaa tai parodista, veristä ja yksityiskohtaista tai pitkäkestoista ja yksityiskohtaista tai pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-  7: { category: 'violence', age: '16', description: "07. Kuvaohjelmassa on VOIMAKASTA VÄKIVALTAA: aitoa yksityiskohtaisesti ta selväpiirteisesti esitettyä väkivaltaa, jossa uhrin kärsimykset tai väkivallan seuraukset tuodaan realistisesti esille." },
-  8: { category: 'violence', age: '16', description: "08. Kuvaohjelmassa on VOIMAKASTA VÄKIVALTAA: seksiin liittyvää fiktiivistä väkivaltaa, jossa uhrin kärsimys tulee selvästi esiin ja väkivalta on tarinan kannalta perusteltua tai voimakkaita viittauksia alaikäisiin kohdistuvaan seksuaaliseen väkivaltaan tai hyväksikäyttöön." },
-  9: { category: 'violence', age: '12', description: "09. Kuvaohjelmassa on VÄKIVALTAA: ei erityisen yksityiskohtaista tai ei hallitsevasti lapsiin, eläimiin tai lapsi-päähenkilön perheenjäseniin kohdistuvaa tai tarinan kannalta perusteltu yksittäinen, yksityiskohtainen ihmisiin tai eläimiin kohdistuva väkivaltakohtaus." },
-  10: { category: 'violence', age: '12', description: "10. Kuvaohjelmassa on VÄKIVALTAA: epärealistisessa, etäännytetyssä yhteydessä esitettyä (joko epärealistinen väkivalta ihmis- tai eläinmäisiä hahmoja kohtaan tai realistinen väkivalta selkeän kuvitteellisia hahmoja kohtaan tai historiallinen, kulttuurinen jne. etäännytys!)" },
-  11: { category: 'violence', age: '12', description: "11. Kuvaohjelmassa on VÄKIVALTAA: seksuaaliseen väkivaltaan viittaavaa (raiskaus, insesti, pedofilia)." },
-  12: { category: 'violence', age: '7',  description: "12. Kuvaohjelmassa on LIEVÄÄ VÄKIVALTAA: epärealistista tai komediallista tai animaatio- tai slapstick-komediassa esitettyä yliampuvaa tai vähäistä väkivaltaa." },
-  13: { category: 'violence', age: '7',  description: "13. Kuvaohjelmassa on LIEVÄÄ VÄKIVALTAA: Yksittäinen, lievähkö ja lyhytkestoinen realistinen väkivaltakohtaus tai selkeät, mutta lievät tai lyhytkestoiset väkivaltaviitteet." },
-  14: { category: 'violence', age: 'S',  description: "14. Kuvaohjelmassa EI VÄKIVALTAA tai vain HYVIN LIEVÄÄ VÄKIVALTAA: Kuvaohjelmassa ei ole lainkaan väkivaltaa tai se on vain hyvin lievää." },
-  15: { category: 'sex',      age: '18', description: "15. Kuvaohjelmassa on ERITTÄIN YKSITYISKOHTAISTA SEKSUAALISTA SISÄLTÖÄ: hallitsevaa ja seksikohtauksissa sukuelimiä selväpiirteisesti näyttävää." },
-  16: { category: 'sex',      age: '16', description: "16. Kuvaohjelmassa on AVOINTA SEKSUAALISTA SISÄLTÖÄ: avointa, mutta yksityiskohdiltaan peiteltyä kuvausta tai yksityiskohtainen, yksittäinen ja lyhyt seksikohtaus." },
-  17: { category: 'sex',      age: '12', description: "17. Kuvaohjelmassa on SEKSUAALISTA SISÄLTÖÄ: peiteltyjä seksikohtauksia tai runsaasti selkeitä seksiviitteitä." },
-  18: { category: 'sex',      age: '12', description: "18. Kuvaohjelmassa on SEKSUAALISTA SISÄLTÖÄ: yksittäinen avoin, mutta yksityiskohdiltaan peitelty seksikuvaus (seksikohtaus)." },
-  19: { category: 'sex',      age: '7',  description: "19. Kuvaohjelmassa on LIEVÄÄ SEKSUAALISTA SISÄLTÖÄ: lieviä seksuaalisia viittauksia tai yksittäisiä verhotusti esitettyjä eroottissävyisiä kohtauksia." },
-  20: { category: 'sex',      age: 'S',  description: "20. Kuvaohjelmassa on vain HYVIN LIEVÄÄ SEKSUAALISTA SISÄLTÖÄ: halailua, syleilyä tai suudelmia tai alastomuutta muussa kuin seksuaalisessa kontekstissa." },
-  21: { category: 'anxiety',  age: '18', description: "21. Kuvaohjelmassa on ERITTÄIN VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: hallitsevaa, erittäin järkyttävää, yksityiskohtaista kuvausta ihmisiin tai eläimiin kohdistuvista julmuuksista tai perversioista." },
-  22: { category: 'anxiety',  age: '18', description: "22. Kuvaohjelmassa on ERITTÄIN VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: aitoa ongelmattomana tai ihannoiden esitettyä itseä tai muita vahingoittavaa, vakavasti henkeä uhkaavaa ja hengenvaarallista käyttäytymistä." },
-  23: { category: 'anxiety',  age: '16', description: "23. Kuvaohjelmassa on VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: ihmisiin tai eläimiin kohdistuvaa järkyttävää ja ahdistusta herättävää, pitkäkestoista ja intensiivistä kuoleman, vakavan väkivallan tai psyykkisen hajoamisen uhkaa. Myös itsemurhan ihannointi. Yliluonnolliseen liittyvää voimakasta ahdistavuutta. Yliluonnolliseen liittyvää voimakasta ahdistavuutta." },
-  24: { category: 'anxiety',  age: '16', description: "24. Kuvaohjelmassa on VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: runsaasti realistisia ja yksityiskohtaisia (makaabereja) kuvia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
-  25: { category: 'anxiety',  age: '16', description: "25. Kuvaohjelmassa on VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: aitoa, ihannoivasti esitettyä itseä tai muita vahingoittavaa käyttäytymistä." },
-  26: { category: 'anxiety',  age: '12', description: "26. Kuvaohjelmassa on MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: ihmisiin tai eläimiin kohdistuvaa lyhytkestoista tai ei-hallitsevaa väkivallan tai kuoleman uhkaa tai kaltoin kohtelun tai psyykkisen kärsimyksen kuvausta. Menetysten, esim. perheenjäsenten sairauden tai kuoleman, voimakkaan surun, sekavuustilan tai itsemurhan kuvauksia." },
-  27: { category: 'anxiety',  age: '12', description: "27. Kuvaohjelmassa on MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: ahdistusta herättäviä luonnonmullistusten, onnettomuuksien, katastrofien tai konfliktien ja niihin kytkeytyvän kuoleman uhan tai uhrien kuvauksia." },
-  28: { category: 'anxiety',  age: '12', description: "28. Kuvaohjelmassa on MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: voimakkaita, äkillisiä ja yllättäviä ahdistusta, pelkoa tai kauhua herättäviä ääni- ja kuvatehosteita tai pitkäkestoista piinaavaa uhkaa. Yliluonnolliseen liittyvää melko voimakasta ahdistavuutta." },
-  29: { category: 'anxiety',  age: '12', description: "29. Kuvaohjelmassa on MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: yksittäisiä realistisia ja yksityiskohtaisia kuvauksia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
-  30: { category: 'anxiety',  age: '12', description: "30. Kuvaohjelmassa on MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: aitoa, itseä tai muita vahingoittavaa käyttäytymistä." },
-  31: { category: 'anxiety',  age: '7',  description: "31. Kuvaohjelmassa on LIEVÄÄ AHDISTUSTA HERÄTTÄVÄÄ sisältöä: melko lieviä ja lyhytkestoisia kauhuelementtejä, pientä pelottavuutta tai jännittävyyttä tai väkivallan uhkaa esimerkiksi animaatiossa tai fantasiassa (hirviöhahmoja, muodonmuutoksia, synkähköä visuaalista kuvastoa, lyhytkestoisia takaa-ajoja tai kohtalaisia äänitehosteita)." },
-  32: { category: 'anxiety',  age: '7',  description: "32. Kuvaohjelmassa on LIEVÄÄ AHDISTUSTA HERÄTTÄVÄÄ sisältöä: lasten universaaleja pelkoja käsitteleviä kuvauksia tai tilanteita (esimerkiksi yksin jääminen, vanhemmista eroon joutuminen, pimeä, eksyminen tai läheisen menettäminen)." },
-  33: { category: 'anxiety',  age: '7',  description: "33. Kuvaohjelmassa on LIEVÄÄ AHDISTUSTA HERÄTTÄVÄÄ sisältöä: dokumentaarista ihmisiin/eläimiin kohdistuvaa  lyhytkestoista uhkaa ilman tehosteita." },
-  34: { category: 'anxiety',  age: 'S',  description: "34. Kuvaohjelmassa on vain HYVIN LIEVÄÄ AHDISTAVAA SISÄLTÖÄ: hyvin lieviä ja lyhytkestoisia pelottavia tai jännittäviä elementtejä, jotka ratkeavat hyvin nopeasti positiiviseen suuntaan." },
-  35: { category: 'drugs',    age: '18', description: "35. Kuvaohjelmassa on IHANNOIVAA ERITTÄIN VAARALLISTEN HUUMEIDEN KÄYTTÖÄ: hallitsevaa ja ihannoivassa valossa yksityiskohtaisesti esitettyä erittäin vaarallisten huumeiden käyttöä." },
-  36: { category: 'drugs',    age: '16', description: "36. Kuvaohjelmassa on HUUMEIDEN KÄYTTÖÄ: huumeiden realistista ja yksityiskohtaista ongelmakäyttöä tai yksittäisiä ongelmattomia tai ihannoivia huumeiden käytön kuvauksia." },
-  37: { category: 'drugs',    age: '12', description: "37. Kuvaohjelmassa on HUUMEIDEN EI-HALLITSEVAA KÄYTTÖÄ / ALAIKÄISTEN ALKOHOLIN KÄYTTÖÄ: Tällä tarkoitetaan huumeiden viitteellistä tai vähäistä käyttöä tai alaikäisten korostettua, viihteellistä tai ongelmatonta alkoholin käyttöä." }
-}
+var classificationCriteria = [
+  {},
+  { id:1,  category: 'violence', age: '18', description: "01. ERITTÄIN VOIMAKASTA VÄKIVALTAA: fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa" },
+  { id:2,  category: 'violence', age: '18', description: "02. ERITTÄIN VOIMAKASTA VÄKIVALTAA: aitoa ja yksityiskohtaisesti tai selväpiirteisesti sekä viihteellisesti tai ihannoiden esitettyä ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
+  { id:3,  category: 'violence', age: '18', description: "03. ERITTÄIN VOIMAKASTA VÄKIVALTAA: fiktiivistä, selväpiirteisesti ja pitkäkestoisesti esitettyä seksiin liittyvää väkivaltaa (raiskaus, insesti, pedofilia)" },
+  { id:4,  category: 'violence', age: '16', description: "04. VOIMAKASTA VÄKIVALTAA: fiktiivistä tai aitoa yksityiskohtaista ja realistista tai hallitsevaa tai pitkäkestoista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
+  { id:5,  category: 'violence', age: '16', description: "05. VOIMAKASTA VÄKIVALTAA: fiktiivistä tai aitoa yksityiskohtaisesti ja korostetusti tai yksityiskohtaisesti ja viihteellistetysti esitettyä ihmisiin tai eläimiin kohdistuvaa väkivallan tai onnettomuuksien seurausten kuvausta." },
+  { id:6,  category: 'violence', age: '16', description: "06. VOIMAKASTA VÄKIVALTAA: fiktiivistä, esitystavaltaan selvästi yliampuvaa tai parodista, veristä ja yksityiskohtaista tai pitkäkestoista ja yksityiskohtaista tai pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
+  { id:7,  category: 'violence', age: '16', description: "07. VOIMAKASTA VÄKIVALTAA: aitoa yksityiskohtaisesti ta selväpiirteisesti esitettyä väkivaltaa, jossa uhrin kärsimykset tai väkivallan seuraukset tuodaan realistisesti esille." },
+  { id:8,  category: 'violence', age: '16', description: "08. VOIMAKASTA VÄKIVALTAA: seksiin liittyvää fiktiivistä väkivaltaa, jossa uhrin kärsimys tulee selvästi esiin ja väkivalta on tarinan kannalta perusteltua tai voimakkaita viittauksia alaikäisiin kohdistuvaan seksuaaliseen väkivaltaan tai hyväksikäyttöön." },
+  { id:9,  category: 'violence', age: '12', description: "09. VÄKIVALTAA: ei erityisen yksityiskohtaista tai ei hallitsevasti lapsiin, eläimiin tai lapsi-päähenkilön perheenjäseniin kohdistuvaa tai tarinan kannalta perusteltu yksittäinen, yksityiskohtainen ihmisiin tai eläimiin kohdistuva väkivaltakohtaus." },
+  { id:10, category: 'violence', age: '12', description: "10. VÄKIVALTAA: epärealistisessa, etäännytetyssä yhteydessä esitettyä (joko epärealistinen väkivalta ihmis- tai eläinmäisiä hahmoja kohtaan tai realistinen väkivalta selkeän kuvitteellisia hahmoja kohtaan tai historiallinen, kulttuurinen jne. etäännytys!)" },
+  { id:11, category: 'violence', age: '12', description: "11. VÄKIVALTAA: seksuaaliseen väkivaltaan viittaavaa (raiskaus, insesti, pedofilia)." },
+  { id:12, category: 'violence', age: '7',  description: "12. LIEVÄÄ VÄKIVALTAA: epärealistista tai komediallista tai animaatio- tai slapstick-komediassa esitettyä yliampuvaa tai vähäistä väkivaltaa." },
+  { id:13, category: 'violence', age: '7',  description: "13. LIEVÄÄ VÄKIVALTAA: Yksittäinen, lievähkö ja lyhytkestoinen realistinen väkivaltakohtaus tai selkeät, mutta lievät tai lyhytkestoiset väkivaltaviitteet." },
+  { id:14, category: 'violence', age: 'S',  description: "14. VÄKIVALTAA tai vain HYVIN LIEVÄÄ VÄKIVALTAA: Kuvaohjelmassa ei ole lainkaan väkivaltaa tai se on vain hyvin lievää." },
+  { id:15, category: 'sex',      age: '18', description: "15. ERITTÄIN YKSITYISKOHTAISTA SEKSUAALISTA SISÄLTÖÄ: hallitsevaa ja seksikohtauksissa sukuelimiä selväpiirteisesti näyttävää." },
+  { id:16, category: 'sex',      age: '16', description: "16. AVOINTA SEKSUAALISTA SISÄLTÖÄ: avointa, mutta yksityiskohdiltaan peiteltyä kuvausta tai yksityiskohtainen, yksittäinen ja lyhyt seksikohtaus." },
+  { id:17, category: 'sex',      age: '12', description: "17. SEKSUAALISTA SISÄLTÖÄ: peiteltyjä seksikohtauksia tai runsaasti selkeitä seksiviitteitä." },
+  { id:18, category: 'sex',      age: '12', description: "18. SEKSUAALISTA SISÄLTÖÄ: yksittäinen avoin, mutta yksityiskohdiltaan peitelty seksikuvaus (seksikohtaus)." },
+  { id:19, category: 'sex',      age: '7',  description: "19. LIEVÄÄ SEKSUAALISTA SISÄLTÖÄ: lieviä seksuaalisia viittauksia tai yksittäisiä verhotusti esitettyjä eroottissävyisiä kohtauksia." },
+  { id:20, category: 'sex',      age: 'S',  description: "20. vain HYVIN LIEVÄÄ SEKSUAALISTA SISÄLTÖÄ: halailua, syleilyä tai suudelmia tai alastomuutta muussa kuin seksuaalisessa kontekstissa." },
+  { id:21, category: 'anxiety',  age: '18', description: "21. ERITTÄIN VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: hallitsevaa, erittäin järkyttävää, yksityiskohtaista kuvausta ihmisiin tai eläimiin kohdistuvista julmuuksista tai perversioista." },
+  { id:22, category: 'anxiety',  age: '18', description: "22. ERITTÄIN VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: aitoa ongelmattomana tai ihannoiden esitettyä itseä tai muita vahingoittavaa, vakavasti henkeä uhkaavaa ja hengenvaarallista käyttäytymistä." },
+  { id:23, category: 'anxiety',  age: '16', description: "23. VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: ihmisiin tai eläimiin kohdistuvaa järkyttävää ja ahdistusta herättävää, pitkäkestoista ja intensiivistä kuoleman, vakavan väkivallan tai psyykkisen hajoamisen uhkaa. Myös itsemurhan ihannointi. Yliluonnolliseen liittyvää voimakasta ahdistavuutta. Yliluonnolliseen liittyvää voimakasta ahdistavuutta." },
+  { id:24, category: 'anxiety',  age: '16', description: "24. VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: runsaasti realistisia ja yksityiskohtaisia (makaabereja) kuvia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
+  { id:25, category: 'anxiety',  age: '16', description: "25. VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ SISÄLTÖÄ: aitoa, ihannoivasti esitettyä itseä tai muita vahingoittavaa käyttäytymistä." },
+  { id:26, category: 'anxiety',  age: '12', description: "26. MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: ihmisiin tai eläimiin kohdistuvaa lyhytkestoista tai ei-hallitsevaa väkivallan tai kuoleman uhkaa tai kaltoin kohtelun tai psyykkisen kärsimyksen kuvausta. Menetysten, esim. perheenjäsenten sairauden tai kuoleman, voimakkaan surun, sekavuustilan tai itsemurhan kuvauksia." },
+  { id:27, category: 'anxiety',  age: '12', description: "27. MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: ahdistusta herättäviä luonnonmullistusten, onnettomuuksien, katastrofien tai konfliktien ja niihin kytkeytyvän kuoleman uhan tai uhrien kuvauksia." },
+  { id:28, category: 'anxiety',  age: '12', description: "28. MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: voimakkaita, äkillisiä ja yllättäviä ahdistusta, pelkoa tai kauhua herättäviä ääni- ja kuvatehosteita tai pitkäkestoista piinaavaa uhkaa. Yliluonnolliseen liittyvää melko voimakasta ahdistavuutta." },
+  { id:29, category: 'anxiety',  age: '12', description: "29. MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: yksittäisiä realistisia ja yksityiskohtaisia kuvauksia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
+  { id:30, category: 'anxiety',  age: '12', description: "30. MELKO VOIMAKASTA AHDISTUSTA HERÄTTÄVÄÄ sisältöä: aitoa, itseä tai muita vahingoittavaa käyttäytymistä." },
+  { id:31, category: 'anxiety',  age: '7',  description: "31. LIEVÄÄ AHDISTUSTA HERÄTTÄVÄÄ sisältöä: melko lieviä ja lyhytkestoisia kauhuelementtejä, pientä pelottavuutta tai jännittävyyttä tai väkivallan uhkaa esimerkiksi animaatiossa tai fantasiassa (hirviöhahmoja, muodonmuutoksia, synkähköä visuaalista kuvastoa, lyhytkestoisia takaa-ajoja tai kohtalaisia äänitehosteita)." },
+  { id:32, category: 'anxiety',  age: '7',  description: "32. LIEVÄÄ AHDISTUSTA HERÄTTÄVÄÄ sisältöä: lasten universaaleja pelkoja käsitteleviä kuvauksia tai tilanteita (esimerkiksi yksin jääminen, vanhemmista eroon joutuminen, pimeä, eksyminen tai läheisen menettäminen)." },
+  { id:33, category: 'anxiety',  age: '7',  description: "33. LIEVÄÄ AHDISTUSTA HERÄTTÄVÄÄ sisältöä: dokumentaarista ihmisiin/eläimiin kohdistuvaa  lyhytkestoista uhkaa ilman tehosteita." },
+  { id:34, category: 'anxiety',  age: 'S',  description: "34. vain HYVIN LIEVÄÄ AHDISTAVAA SISÄLTÖÄ: hyvin lieviä ja lyhytkestoisia pelottavia tai jännittäviä elementtejä, jotka ratkeavat hyvin nopeasti positiiviseen suuntaan." },
+  { id:35, category: 'drugs',    age: '18', description: "35. IHANNOIVAA ERITTÄIN VAARALLISTEN HUUMEIDEN KÄYTTÖÄ: hallitsevaa ja ihannoivassa valossa yksityiskohtaisesti esitettyä erittäin vaarallisten huumeiden käyttöä." },
+  { id:36, category: 'drugs',    age: '16', description: "36. HUUMEIDEN KÄYTTÖÄ: huumeiden realistista ja yksityiskohtaista ongelmakäyttöä tai yksittäisiä ongelmattomia tai ihannoivia huumeiden käytön kuvauksia." },
+  { id:37, category: 'drugs',    age: '12', description: "37. HUUMEIDEN EI-HALLITSEVAA KÄYTTÖÄ / ALAIKÄISTEN ALKOHOLIN KÄYTTÖÄ: Tällä tarkoitetaan huumeiden viitteellistä tai vähäistä käyttöä tai alaikäisten korostettua, viihteellistä tai ongelmatonta alkoholin käyttöä." }
+]

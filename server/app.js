@@ -14,7 +14,7 @@ var classification = {
   buyer: String,
   billing: String,
   format: String,
-  duration: Number, // in seconds
+  duration: String, // for now matches a regexp in the client
   safe: Boolean,
   criteria: [{ id:Number, comment:String }]
 }

@@ -38,18 +38,24 @@ function movieDetails() {
     }
   })
 
-  $form.find('.required').on('keyup change', function(e) {
-    var $el = $(this)
-    if ($el.val().length > 0) {
-      $el.removeClass('invalid')
-    } else {
-      $el.addClass('invalid')
-    }
-    $el.trigger('validation')
-  })
+  // validations
+  $form.find('.required').on('keyup change', validate(isNotEmpty))
+  $form.find('.required-duration').on('keyup change', validate(isValidDuration))
 
   $form.find('input, textarea').not('.multivalue').throttledInput(function(txt) {
-    var value = $(this).data('type') == 'number' ? parseInt(txt) : txt
+    var value = txt
+    var dataType = $(this).data('type')
+
+    if ($(this).hasClass('invalid')) {
+      return false
+    }
+
+    if (dataType == 'number') {
+      value = parseInt(txt)
+    } else {
+      value = txt
+    }
+
     saveMovieField($form.data('id'), $(this).attr('name'), value)
   })
 
@@ -111,6 +117,27 @@ function keyValue(key, value) {
   data[key] = value
   return data
 }
+
+function isNotEmpty(val) {
+  return (val.trim().length) > 0
+}
+
+function isValidDuration(txt) {
+  return /(?:(\d+)?:)?(\d+):(\d+)/.test(txt)
+}
+
+function validate(f) {
+  return function(e) {
+    var $el = $(this)
+    if (f($el.val())) {
+      $el.removeClass('invalid')
+    } else {
+      $el.addClass('invalid')
+    }
+    $el.trigger('validation')
+  }
+}
+
 
 $.fn.throttledInput = function(fn) {
   return $(this).each(function() {

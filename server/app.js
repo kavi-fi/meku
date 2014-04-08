@@ -37,7 +37,7 @@ app.get('/movies/:id', function(req, res) {
 })
 
 app.post('/movies/new', function(req, res, next) {
-  (new Movie()).save(function(err, movie) {
+  new Movie({ classifications: [{}] }).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
   })

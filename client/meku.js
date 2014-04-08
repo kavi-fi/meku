@@ -27,7 +27,6 @@ function movieDetails() {
 
   $form.find('.categories li').click(function() {
     $(this).addClass('selected').siblings().removeClass('selected')
-    console.log($(this).index())
     $form.find('.category-criteria ol').hide().eq($(this).index()).show()
   })
 

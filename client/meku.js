@@ -74,6 +74,10 @@ function movieDetails() {
       .find('input[name=directors]').val(movie.directors.join(', ')).end()
       .find('input[name=actors]').val(movie.actors.join(', ')).end()
       .find('textarea[name=synopsis]').val(movie.synopsis).end()
+      .find('input[name="classifications.0.buyer"]').val(movie.classifications[0].buyer).end()
+      .find('input[name="classifications.0.billing"]').val(movie.classifications[0].billing).end()
+      .find('select[name="classifications.0.format"]').val(movie.classifications[0].format).end()
+      .find('input[name="classifications.0.duration"]').val(movie.classifications[0].duration).end()
 
     $form.find('.required').trigger('change')
   }

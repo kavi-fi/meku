@@ -59,11 +59,11 @@
     <div>Näyttelijät: <input name="actors" class="multivalue" type="text" /></div>
     <div>Synopsis: <textarea name="synopsis" class="required"></textarea></div>
     <h3>Luokittelu</h3>
-    <div>Luokittelija: <span class="classification.author">Anne Lind</span></div>
-    <div>Luokittelun tilaaja: <input name="classification.buyer" type="text" /></div>
-    <div>Rekisteröinnistä laskutetaan: <input name="classification.billing" type="text" /></div>
+    <div>Luokittelija: <span class="classifications.author">Anne Lind</span></div>
+    <div>Luokittelun tilaaja: <input name="classifications.0.buyer" class="required" type="text" /></div>
+    <div>Rekisteröinnistä laskutetaan: <input name="classifications.0.billing" class="required" type="text" /></div>
     <div>Ohjelman formaatti:
-      <select name="classification.format">
+      <select name="classifications.0.format">
         <option>Valitse...</option>
         <option>DVD</option>
         <option>HD DVD</option>
@@ -77,7 +77,7 @@
         <option>Televisio</option>
       </select>
     </div>
-    <div>Kesto: <input name="classification.duration" type="text" /></div>
+    <div>Kesto: <input name="classifications.0.duration" class="required" type="text" /></div>
     <h3>Luokittelun kriteerit</h3>
     <div><input name="classification.safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
 

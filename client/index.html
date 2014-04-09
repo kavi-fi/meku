@@ -19,7 +19,7 @@
     <div>Valmistusvuosi: <input name="year" type="text" class="required" data-type="number" /></div>
     <div>Tuotantoyhtiö: <input name="production-companies" class="multivalue required" type="text" /></div>
     <div>Genre
-      <select name="genre">
+      <select name="genre" class="required">
         <option value="">Valitse...</option>
         <option>Fiktio</option>
         <option>Animaatio</option>
@@ -63,7 +63,7 @@
     <div>Luokittelun tilaaja: <input name="classifications.0.buyer" class="required" type="text" /></div>
     <div>Rekisteröinnistä laskutetaan: <input name="classifications.0.billing" class="required" type="text" /></div>
     <div>Ohjelman formaatti:
-      <select name="classifications.0.format">
+      <select name="classifications.0.format" class="required">
         <option value="">Valitse...</option>
         <option>DVD</option>
         <option>HD DVD</option>

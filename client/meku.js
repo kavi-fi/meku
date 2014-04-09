@@ -42,7 +42,7 @@ function movieDetails() {
   $form.find('.required').on('keyup change', validate(isNotEmpty))
   $form.find('.duration').on('keyup change', validate(isValidDuration))
 
-  $form.find('input, textarea').not('.multivalue').throttledInput(function(txt) {
+  $form.find('input[type=text], textarea').not('.multivalue').throttledInput(function(txt) {
     var value = txt
     var dataType = $(this).data('type')
 
@@ -55,7 +55,6 @@ function movieDetails() {
     } else {
       value = txt
     }
-
     saveMovieField($form.data('id'), $(this).attr('name'), value)
   })
 
@@ -69,8 +68,14 @@ function movieDetails() {
     $form.find('.category-criteria ol').hide().eq($(this).index()).show()
   })
 
+  $form.find('.category-criteria input[type=checkbox]').change(function() {
+    var ids = $form.find('.category-criteria input[type=checkbox]:checked').map(function(i, e) { return $(e).data('id') }).get()
+    saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
+  })
+
   function show(movie) {
     $('.new-movie').attr('disabled', 'true')
+    var classification = movie.classifications[0]
     $form.data('id', movie._id).show()
       .find('input[name=name]').val(movie.name).end()
       .find('input[name=name-fi]').val(movie['name-fi']).end()
@@ -82,11 +87,13 @@ function movieDetails() {
       .find('input[name=directors]').val(movie.directors.join(', ')).end()
       .find('input[name=actors]').val(movie.actors.join(', ')).end()
       .find('textarea[name=synopsis]').val(movie.synopsis).end()
-      .find('input[name="classifications.0.buyer"]').val(movie.classifications[0].buyer).end()
-      .find('input[name="classifications.0.billing"]').val(movie.classifications[0].billing).end()
-      .find('select[name="classifications.0.format"]').val(movie.classifications[0].format).end()
-      .find('input[name="classifications.0.duration"]').val(movie.classifications[0].duration).end()
+      .find('input[name="classifications.0.buyer"]').val(classification.buyer).end()
+      .find('input[name="classifications.0.billing"]').val(classification.billing).end()
+      .find('select[name="classifications.0.format"]').val(classification.format).end()
+      .find('input[name="classifications.0.duration"]').val(classification.duration).end()
 
+    $form.find('.category-criteria input').removeAttr('checked')
+    classification.criteria.forEach(function(id) { $form.find('input[name=criteria-'+id+']').attr('checked', 'checked') })
     $form.find('.required').trigger('change')
   }
 
@@ -95,7 +102,7 @@ function movieDetails() {
       var criteria = classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
         return $('<li>')
-          .append($('<input>', { type: 'checkbox', name:'criteria-' + c.id } ))
+          .append($('<input>', { type: 'checkbox', name:'criteria-' + c.id, 'data-id': c.id } ))
           .append($('<span>', { class:'agelimit agelimit-' + c.age }))
           .append($('<span>').text(c.description))
       })

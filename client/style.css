@@ -1,6 +1,6 @@
 button[disabled=disabled], button:disabled { color: gray; }
 
-ol { list-style-type: none; }
+ol { list-style-type: none; margin: 0; }
 .new-movie { margin: 10px; }
 
 #movie-details { display: none; margin: 10px; }
@@ -14,16 +14,18 @@ ol { list-style-type: none; }
 #movie-details .categories .anxiety { background-image: url('images/anxiety.png'); }
 #movie-details .categories .drugs { background-image: url('images/drugs.png'); }
 
-#movie-details .category-criteria { margin-left: 150px; min-height: 380px; }
+#movie-details .category-criteria { margin-left: 150px; min-height: 700px; }
 #movie-details .category-criteria ol { display: none;}
 #movie-details .category-criteria ol:first-of-type { display: block; }
+#movie-details .category-criteria li { margin-bottom: 10px; }
 #movie-details .category-criteria .agelimit { display: inline-block; margin: 0 10px; width: 30px; height: 30px; background: transparent no-repeat; background-size: 30px; vertical-align: middle }
 #movie-details .category-criteria .agelimit-18 { background-image: url('images/agelimit-18.png'); }
 #movie-details .category-criteria .agelimit-16 { background-image: url('images/agelimit-16.png'); }
 #movie-details .category-criteria .agelimit-12 { background-image: url('images/agelimit-12.png'); }
 #movie-details .category-criteria .agelimit-7 { background-image: url('images/agelimit-7.png'); }
 #movie-details .category-criteria .agelimit-S { background-image: url('images/agelimit-s.png'); }
-#movie-details .category-criteria small { padding-left: 65px; display: block; }
+#movie-details .category-criteria small { margin-left: 65px; display: block; }
+#movie-details .category-criteria textarea { float: right; }
 
 #movie-details .invalid { background-color: #f2dede !important; }
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }

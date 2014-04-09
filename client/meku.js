@@ -94,7 +94,13 @@ function movieDetails() {
 
     $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')
-    classification.criteria.forEach(function(id) { $form.find('input[name=criteria-'+id+']').check(true) })
+    classification.criteria.forEach(function(id) {
+      $form.find('input[name=criteria-'+id+']').check(true)
+    })
+    $form.find('.category-criteria textarea').val()
+    Object.keys(classification['criteria-comments'] || {}).forEach(function(id) {
+      $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(classification['criteria-comments'][id])
+    })
     $form.find('.required').trigger('change')
   }
 
@@ -103,6 +109,7 @@ function movieDetails() {
       var criteria = classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
         return $('<li>')
+          .append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
           .append($('<input>', { type: 'checkbox', name:'criteria-' + c.id, 'data-id': c.id } ))
           .append($('<span>', { class:'agelimit agelimit-' + c.age }))
           .append($('<span>').text(c.id + ' ' + c.title))

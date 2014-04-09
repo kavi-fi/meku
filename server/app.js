@@ -16,8 +16,10 @@ var classification = {
   format: String,
   duration: String, // for now matches a regexp in the client
   safe: Boolean,
-  criteria: [Number]
+  criteria: [Number],
+  comments: {}
 }
+
 var Movie = mongoose.model('movies', {
   name: String,
   'name-fi': String,

@@ -40,7 +40,7 @@ function movieDetails() {
 
   // validations
   $form.find('.required').on('keyup change', validate(isNotEmpty))
-  $form.find('.required-duration').on('keyup change', validate(isValidDuration))
+  $form.find('.duration').on('keyup change', validate(isValidDuration))
 
   $form.find('input, textarea').not('.multivalue').throttledInput(function(txt) {
     var value = txt

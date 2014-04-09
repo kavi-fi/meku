@@ -150,7 +150,7 @@ function validate(f) {
 
 $.fn.throttledInput = function(fn) {
   return $(this).each(function() {
-    var prev = ''
+    var prev = undefined
     var timeout = null
     var $input = $(this).on('keyup', function() {
       var txt = $input.val()

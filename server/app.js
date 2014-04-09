@@ -34,6 +34,10 @@ var Movie = mongoose.model('movies', {
   classifications: [classification]
 })
 
+var ProductionCompany = mongoose.model('production_companies', {
+  name: String
+})
+
 app.get('/movies/:id', function(req, res) {
   Movie.findById(req.params.id, function(err, movie) { res.send(movie) })
 })
@@ -52,10 +56,36 @@ app.post('/movies/:id', function(req, res, next) {
   })
 })
 
+app.get('/production_companies', function(req, res, next) {
+  ProductionCompany.find({}, 'name', function(err, all) {
+    if (err) return next(err)
+    return res.send(all)
+  })
+})
+
 app.use(express.static(path.join(__dirname, '../client')))
 
 liveReload(app, { watchDir: path.join(__dirname, '../client') })
 
 var server = app.listen(3000, function() {
   console.log('Listening on port ' + server.address().port)
+  importProductionCompanies()
 })
+
+function importProductionCompanies() {
+  ProductionCompany.remove({}, function(err) { })
+
+  // update production companies
+  var fs = require('fs')
+  fs.readFile(path.join(__dirname, '../data/meku-production-companies-samples.txt'), {encoding: 'utf8'}, function(err, data) {
+    if (err) throw err;
+
+    var companies = data.split('\r\n')
+
+    companies.forEach(function(name) {
+      new ProductionCompany({name: name}).save(function(err, comp) {
+        if (err) throw err
+      })
+    })
+  })
+}

@@ -23,6 +23,7 @@ ol { list-style-type: none; }
 #movie-details .category-criteria .agelimit-12 { background-image: url('images/agelimit-12.png'); }
 #movie-details .category-criteria .agelimit-7 { background-image: url('images/agelimit-7.png'); }
 #movie-details .category-criteria .agelimit-S { background-image: url('images/agelimit-s.png'); }
+#movie-details .category-criteria small { padding-left: 65px; display: block; }
 
 #movie-details .invalid { background-color: #f2dede !important; }
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }

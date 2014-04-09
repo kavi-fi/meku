@@ -125,24 +125,12 @@ function keyValue(key, value) {
   return data
 }
 
-function or(x, y) {
-  return function(val) {
-    return x(val) || y(val)
-  }
-}
-
 function isNotEmpty(val) {
   return (val.trim().length) > 0
 }
 
-function isEmpty(val) {
-  return val.trim().length === 0
-}
-
-var isValidDuration = or(isEmpty, isDuration)
-
-function isDuration(txt) {
-  return  /(?:(\d+)?:)?(\d+):(\d+)/.test(txt)
+function isValidDuration(txt) {
+  return /(?:(\d+)?:)?(\d+):(\d+)/.test(txt)
 }
 
 function validate(f) {

@@ -68,6 +68,12 @@ function movieDetails() {
     $form.find('.category-criteria ol').hide().eq($(this).index()).show()
   })
 
+  $form.find('input[name="classifications.0.safe"]').change(function() {
+    var safe = $(this).is(':checked')
+    $form.find('.category-container').toggle(!safe)
+    saveMovieField($form.data('id'), $(this).attr('name'), safe)
+  })
+
   $form.find('.category-criteria input[type=checkbox]').change(function() {
     var ids = $form.find('.category-criteria input[type=checkbox]:checked').map(function(i, e) { return $(e).data('id') }).get()
     saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
@@ -91,9 +97,11 @@ function movieDetails() {
       .find('input[name="classifications.0.billing"]').val(classification.billing).end()
       .find('select[name="classifications.0.format"]').val(classification.format).end()
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
+      .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
+    $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')
-    classification.criteria.forEach(function(id) { $form.find('input[name=criteria-'+id+']').attr('checked', 'checked') })
+    classification.criteria.forEach(function(id) { $form.find('input[name=criteria-'+id+']').check(true) })
     $form.find('.required').trigger('change')
   }
 
@@ -161,6 +169,10 @@ $.fn.throttledInput = function(fn) {
       }, 400)
     })
   })
+}
+
+$.fn.check = function(on) {
+  return on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
 }
 
 function countryMatcher() {

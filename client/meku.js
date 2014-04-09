@@ -43,17 +43,10 @@ function movieDetails() {
   $form.find('.duration').on('keyup change', validate(isValidDuration))
 
   $form.find('input[type=text], textarea').not('.multivalue').throttledInput(function(txt) {
+    if ($(this).hasClass('invalid')) return false
     var value = txt
-    var dataType = $(this).data('type')
-
-    if ($(this).hasClass('invalid')) {
-      return false
-    }
-
-    if (dataType == 'number') {
+    if ($(this).data('type') == 'number') {
       value = parseInt(txt)
-    } else {
-      value = txt
     }
     saveMovieField($form.data('id'), $(this).attr('name'), value)
   })

@@ -43,7 +43,7 @@ app.get('/movies/:id', function(req, res) {
 })
 
 app.post('/movies/new', function(req, res, next) {
-  new Movie({ classifications: [{}] }).save(function(err, movie) {
+  new Movie({ classifications: [{}], 'production-companies': [""] }).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
   })
@@ -57,7 +57,7 @@ app.post('/movies/:id', function(req, res, next) {
 })
 
 app.get('/production_companies', function(req, res, next) {
-  ProductionCompany.find({}, 'name', function(err, all) {
+  ProductionCompany.find({}, function(err, all) {
     if (err) return next(err)
     return res.send(all)
   })

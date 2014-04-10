@@ -17,7 +17,9 @@
     <div>Ruotsalainen nimi: <input name="name-sv" type="text" /></div>
     <div>Maa: <input name="country" class="country required" type="text" /></div>
     <div>Valmistusvuosi: <input name="year" type="text" class="required" data-type="number" /></div>
-    <div>Tuotantoyhtiö: <input name="production-companies" class="multivalue required" type="text" /></div>
+    <div>Tuotantoyhtiö: <select name="production-companies.0" class="required" type="text">
+        <option value="">Valitse...</option>
+    </select></div>
     <div>Genre
       <select name="genre" class="required">
         <option value="">Valitse...</option>

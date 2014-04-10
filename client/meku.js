@@ -26,7 +26,7 @@ function movieDetails() {
 
   $form.find('input.country').typeahead({hint: false}, { source: countryMatcher() })
 
-  $form.find('select').on('change', function() {
+  $form.find('select').on('change', function(e) {
     saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
   })
 
@@ -39,8 +39,8 @@ function movieDetails() {
   })
 
   // validations
-  $form.find('.required').on('keyup change', validate(isNotEmpty))
-  $form.find('.duration').on('keyup change', validate(isValidDuration))
+  $form.find('.required').on('keyup change validate', validate(isNotEmpty))
+  $form.find('.duration').on('keyup change validate', validate(isValidDuration))
 
   $form.find('input[type=text], textarea').not('.multivalue').throttledInput(function(txt) {
     if ($(this).hasClass('invalid')) return false
@@ -75,12 +75,12 @@ function movieDetails() {
   function show(movie) {
     $('.new-movie').attr('disabled', 'true')
     var classification = movie.classifications[0]
+
     $form.data('id', movie._id).show()
       .find('input[name=name]').val(movie.name).end()
       .find('input[name=name-fi]').val(movie['name-fi']).end()
       .find('input[name=name-sv]').val(movie['name-sv']).end()
       .find('input[name=country]').val(movie.country).end()
-      .find('input[name=production-companies]').val(movie['production-companies'].join(', ')).end()
       .find('input[name=year]').val(movie.year).end()
       .find('select[name=genre]').val(movie.genre).end()
       .find('input[name=directors]').val(movie.directors.join(', ')).end()
@@ -92,6 +92,16 @@ function movieDetails() {
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
+    $.get('/production_companies').done(function(companies) {
+      var productionCompanies = movie['production-companies'] || [""]
+      var $select = $form.find('select[name="production-companies.0"]')
+      companies.forEach(function(company) {
+        $select.append($('<option>').text(company.name))
+      })
+      $select.val(productionCompanies[0]).end()
+      $select.trigger('validate')
+    })
+
     $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')
     classification.criteria.forEach(function(id) {
@@ -101,7 +111,7 @@ function movieDetails() {
     Object.keys(classification['criteria-comments'] || {}).forEach(function(id) {
       $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(classification['criteria-comments'][id])
     })
-    $form.find('.required').trigger('change')
+    $form.find('.required').trigger('validate')
   }
 
   function renderClassificationCriteria() {

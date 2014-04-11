@@ -26,6 +26,7 @@ function movieDetails() {
 
   $form.find('input.country').typeahead({hint: false}, { source: countryMatcher() })
 
+
   $form.find('select').on('change', function(e) {
     saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
   })
@@ -94,11 +95,19 @@ function movieDetails() {
 
     $.get('/production_companies').done(function(companies) {
       var productionCompanies = movie['production-companies'] || [""]
-      var $select = $form.find('select[name="production-companies.0"]')
-      companies.forEach(function(company) {
-        $select.append($('<option>').text(company.name))
+      var $select = $form.find('input[name="production-companies"]')
+      var data = companies.map(function(x) {
+        x['id'] = x['_id'];
+        x['text'] = x['name'];
+        return x
       })
-      $select.val(productionCompanies[0]).end()
+      
+      $select.select2({data: data, multiple: true, placeholder: "Valitse..."})
+      $select.on('change', function(e) {
+        var names = e.val.map(function(id) { return _.find(companies, function (x) { return x._id == id })['name'] })
+        saveMovieField($form.data('id'), $(this).attr('name'), names)
+      })
+      $select.select2('val', productionCompanies[0])
       $select.trigger('validate')
     })
 

@@ -27,6 +27,19 @@ ol { list-style-type: none; margin: 0; }
 #movie-details .category-criteria small { margin-left: 65px; display: block; }
 #movie-details .category-criteria textarea { float: right; }
 
+.summary { position: fixed; right: 0; top: 20px; border: 1px solid black; width: 300px; min-height: 200px; line-height: 28px; padding: 5px 8px;}
+.summary .year { float: right; padding-left: 10px; }
+.summary .name { font-weight: bold; display: block; }
+.summary > div { margin-left: 10px; }
+.summary .agelimit { width: 30px; height: 30px; }
+.summary .warnings { display: inline-block; }
+.summary .warnings span { display: inline-block; background: transparent no-repeat; background-size: 30px; width: 30px; height: 30px; margin-right: 3px; }
+.summary .warnings span.violence { background-image: url('images/violence.png'); }
+.summary .warnings span.sex { background-image: url('images/sex.png'); }
+.summary .warnings span.anxiety { background-image: url('images/anxiety.png'); }
+.summary .warnings span.drugs { background-image: url('images/drugs.png'); }
+
+
 #movie-details .invalid { background-color: #f2dede !important; }
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

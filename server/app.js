@@ -50,9 +50,9 @@ app.post('/movies/new', function(req, res, next) {
 })
 
 app.post('/movies/:id', function(req, res, next) {
-  Movie.findByIdAndUpdate(req.params.id, req.body, null, function(err) {
+  Movie.findByIdAndUpdate(req.params.id, req.body, null, function(err, movie) {
     if (err) return next(err)
-    return res.send({})
+    return res.send(movie)
   })
 })
 

@@ -129,41 +129,7 @@ function movieDetails() {
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
-
-    function productionCompanySelect() {
-      var current = movie['production-companies'] || []
-      var $select = $form.find('input[name="production-companies"]')
-      
-      function companyToSelect2Option(x) {
-        return {id: x._id, text: x.name} 
-      }
-
-      function select2OptionToCompany(x) {
-        return {_id: x.id, name: x.text}
-      }
-
-      $select.select2({
-        query: function(query) {
-          if ($.trim(query.term).length == 0) return query.callback({results: []})
-          return $.get('/production-companies/' + query.term).done(function(data) {
-            return query.callback({results: data.map(companyToSelect2Option)})
-          })
-        },
-        initSelection: function(element, callback) {
-          return callback(current.map(companyToSelect2Option))
-        },
-        multiple: true,
-        placeholder: "Valitse..."
-      })
-
-      $select.on('change', function(e) {
-        saveMovieField($form.data('id'), $(this).attr('name'), $(this).select2('data').map(select2OptionToCompany))
-      })
-
-      $select.select2('val', current)
-      $select.trigger('validate')
-    }
-    productionCompanySelect()
+    productionCompanySelect(movie)
 
     $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')
@@ -176,6 +142,40 @@ function movieDetails() {
     })
     $form.find('.required').trigger('validate')
     updateSummary(movie)
+  }
+
+  function productionCompanySelect(movie) {
+    var current = movie['production-companies'] || []
+    var $select = $form.find('input[name="production-companies"]')
+    
+    function companyToSelect2Option(x) {
+      return {id: x._id, text: x.name} 
+    }
+
+    function select2OptionToCompany(x) {
+      return {_id: x.id, name: x.text}
+    }
+
+    $select.select2({
+      query: function(query) {
+        if ($.trim(query.term).length == 0) return query.callback({results: []})
+        return $.get('/production-companies/' + query.term).done(function(data) {
+          return query.callback({results: data.map(companyToSelect2Option)})
+        })
+      },
+      initSelection: function(element, callback) {
+        return callback(current.map(companyToSelect2Option))
+      },
+      multiple: true,
+      placeholder: "Valitse..."
+    })
+
+    $select.on('change', function(e) {
+      saveMovieField($form.data('id'), $(this).attr('name'), $(this).select2('data').map(select2OptionToCompany))
+    })
+
+    $select.select2('val', current)
+    $select.trigger('validate')
   }
 
   function renderClassificationCriteria() {

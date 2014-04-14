@@ -130,7 +130,7 @@ function movieDetails() {
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
     $.get('/production-companies').done(function(companies) {
-      var current = movie['production-companies'] || [""]
+      var current = movie['production-companies'] || []
       var $select = $form.find('input[name="production-companies"]')
       
       function companyToSelect2Option(x) {

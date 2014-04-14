@@ -17,7 +17,7 @@ app.get('/movies/:id', function(req, res) {
 })
 
 app.post('/movies/new', function(req, res, next) {
-  new Movie({ classifications: [{}], 'production-companies': [""] }).save(function(err, movie) {
+  new Movie({ classifications: [{}], 'production-companies': [] }).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
   })

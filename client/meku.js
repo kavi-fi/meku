@@ -13,6 +13,7 @@ function setup() {
 
 function movieDetails() {
   var $form = $('#movie-details')
+  var $summary = $form.find('.summary')
   var $submit = $form.find('button[name=register]')
 
   renderClassificationCriteria()
@@ -71,6 +72,41 @@ function movieDetails() {
   $form.find('.category-criteria input[type=checkbox]').change(function() {
     var ids = $form.find('.category-criteria input[type=checkbox]:checked').map(function(i, e) { return $(e).data('id') }).get()
     saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
+  })
+
+  $summary.on('dragstart', '.warnings .warning', function(e) {
+    var $e = $(this)
+    e.originalEvent.dataTransfer.effectAllowed = 'move'
+    e.originalEvent.dataTransfer.setData('text/plain', this.outerHTML)
+    $form.find('.summary .drop-target').not($e.next()).addClass('valid')
+    setTimeout(function() { $e.add($e.next()).addClass('dragging') }, 0)
+  })
+  $summary.on('dragenter', '.warnings .drop-target.valid', function(e) {
+    e.preventDefault()
+    return true
+  })
+  $summary.on('dragover', '.warnings .drop-target.valid', function(e) {
+    $(this).addClass('active')
+    e.preventDefault()
+  })
+  $summary.on('dragleave', '.warnings .drop-target.valid', function(e) {
+    $(this).removeClass('active')
+    e.preventDefault()
+  })
+  $summary.on('dragend', '.warnings .warning', function(e) {
+    $(this).add($(this).next()).removeClass('dragging')
+    $form.find('.summary .drop-target').removeClass('valid').removeClass('active')
+  })
+  $summary.on('drop', '.warnings .drop-target', function(e) {
+    e.preventDefault()
+    e.originalEvent.dataTransfer.dropEffect = 'move'
+    $form.find('.summary .drop-target.valid').removeClass('valid')
+    $form.find('.summary .dragging').remove()
+    $(this).replaceWith([
+      $('<span>', { class:'drop-target' }),
+      $(e.originalEvent.dataTransfer.getData('text/plain')),
+      $('<span>', { class:'drop-target' })
+    ])
   })
 
   function show(movie) {
@@ -168,7 +204,7 @@ function keyValue(key, value) {
 
 function updateSummary(movie) {
   var classification = classificationSummary(movie.classifications[0])
-  var warnings = classification.warnings.map(function(w) { return $('<span>', { class:w }) })
+  var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
   $('#movie-details .summary')
     .find('.year').text(movie.year || '-').end()
     .find('.name').text(movie.name || '-').end()

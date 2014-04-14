@@ -17,7 +17,7 @@ var Movie = exports.Movie = mongoose.model('movies', {
   'name-sv': String,
   country: String,
   year: Number,
-  'production-companies': [{_id: mongoose.Schema.Types.ObjectId, name: {type: String, index: true}}],
+  'production-companies': [{_id: mongoose.Schema.Types.ObjectId, name: String}],
   genre: String,
   directors: [String],
   actors: [String],
@@ -26,10 +26,10 @@ var Movie = exports.Movie = mongoose.model('movies', {
 })
 
 var ProductionCompany = exports.ProductionCompany = mongoose.model('production_companies', {
-  name: String
+  name: {type: String, index: true}
 })
 
 var Account = exports.Account = mongoose.model('accounts', {
-  name: String
+  name: {type: String, index: true}
 })
 

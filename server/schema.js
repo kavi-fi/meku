@@ -3,7 +3,7 @@ var mongoose = require('mongoose')
 var classification = {
   author: String,
   buyer: {_id: mongoose.Schema.Types.ObjectId, name: String},
-  billing: String,
+  billing: {_id: mongoose.Schema.Types.ObjectId, name: String},
   format: String,
   duration: String, // for now matches a regexp in the client
   safe: Boolean,

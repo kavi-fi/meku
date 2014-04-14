@@ -130,7 +130,8 @@ function movieDetails() {
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
     productionCompanySelect(movie)
-    buyerSelect(movie)
+    accountSelect($form.find('input[name="classifications.0.buyer"]'), movie.classifications[0].buyer)
+    accountSelect($form.find('input[name="classifications.0.billing"]'), movie.classifications[0].billing)
 
     $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')
@@ -179,10 +180,8 @@ function movieDetails() {
     $select.trigger('validate')
   }
 
-  function buyerSelect(movie) {
-    var $select = $form.find('input[name="classifications.0.buyer"]')
-    var current = movie.classifications[0].buyer
 
+  function accountSelect($select, current) {
     function companyToSelect2Option(x) {
       return {id: x._id, text: x.name} 
     }
@@ -190,6 +189,7 @@ function movieDetails() {
     function select2OptionToCompany(x) {
       return {_id: x.id, name: x.text}
     }
+
     $select.select2({
       query: function(query) {
         if ($.trim(query.term).length == 0) return query.callback({results: []})

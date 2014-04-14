@@ -93,7 +93,7 @@ function movieDetails() {
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
-    $.get('/production_companies').done(function(companies) {
+    $.get('/production-companies').done(function(companies) {
       var current = movie['production-companies'] || [""]
       var $select = $form.find('input[name="production-companies"]')
       
@@ -103,7 +103,7 @@ function movieDetails() {
 
       $select.select2({
         query: function(query) {
-          return $.get('/production_companies/' + query.term).done(function(data) {
+          return $.get('/production-companies/' + query.term).done(function(data) {
             return query.callback({results: data.map(companyToSelect2Option)})
           })
         },

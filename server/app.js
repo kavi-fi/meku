@@ -56,14 +56,14 @@ app.post('/movies/:id', function(req, res, next) {
   })
 })
 
-app.get('/production_companies', function(req, res, next) {
+app.get('/production-companies', function(req, res, next) {
   ProductionCompany.find({}, function(err, all) {
     if (err) return next(err)
     return res.send(all)
   })
 })
 
-app.get('/production_companies/:query', function(req, res, next) {
+app.get('/production-companies/:query', function(req, res, next) {
   ProductionCompany.find({name: new RegExp("^" + req.params.query)}).limit(20).exec(function(err, data) {
     return res.send(data)
   })

@@ -2,9 +2,12 @@
 <html>
 <head>
   <link href="vendor/normalize-3.0.1.css" media="all" rel="stylesheet" />
+  <link href="vendor/select2-3.4.6/select2.css" rel="stylesheet"/>
   <link href="style.css" media="all" rel="stylesheet" />
   <script src="vendor/jquery-2.1.0.min.js"></script>
+  <script src="vendor/lodash.min.js"></script>
   <script src="vendor/typeahead.bundle-0.10.2.js"></script>
+  <script src="vendor/select2-3.4.6/select2.js"></script>
   <script src="meku.js"></script>
   <script src="http://localhost:35729/livereload.js"></script>
 </head>
@@ -17,9 +20,7 @@
     <div>Ruotsalainen nimi: <input name="name-sv" type="text" /></div>
     <div>Maa: <input name="country" class="country required" type="text" /></div>
     <div>Valmistusvuosi: <input name="year" type="text" class="required" data-type="number" /></div>
-    <div>Tuotantoyhtiö: <select name="production-companies.0" class="required" type="text">
-        <option value="">Valitse...</option>
-    </select></div>
+    <div>Tuotantoyhtiö: <input name="production-companies" class="required" type="hidden"/></div>
     <div>Genre
       <select name="genre" class="required">
         <option value="">Valitse...</option>

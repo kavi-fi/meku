@@ -94,20 +94,32 @@ function movieDetails() {
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
     $.get('/production_companies').done(function(companies) {
-      var productionCompanies = movie['production-companies'] || [""]
+      var current = movie['production-companies'] || [""]
       var $select = $form.find('input[name="production-companies"]')
-      var data = companies.map(function(x) {
-        x['id'] = x['_id'];
-        x['text'] = x['name'];
-        return x
-      })
       
-      $select.select2({data: data, multiple: true, placeholder: "Valitse..."})
-      $select.on('change', function(e) {
-        var names = e.val.map(function(id) { return _.find(companies, function (x) { return x._id == id })['name'] })
-        saveMovieField($form.data('id'), $(this).attr('name'), names)
+      function companyToSelect2Option(x) {
+        return {id: x._id, text: x.name} 
+      }
+
+      $select.select2({
+        query: function(query) {
+          return $.get('/production_companies/' + query.term).done(function(data) {
+            return query.callback({results: data.map(companyToSelect2Option)})
+          })
+        },
+        initSelection: function(element, callback) {
+          return callback(current.map(companyToSelect2Option))
+        },
+        multiple: true,
+        placeholder: "Valitse..."
       })
-      $select.select2('val', productionCompanies[0])
+
+      $select.on('change', function(e) {
+        var selected = e.val.map(function(id) { return _.find(companies, function (x) { return x._id == id }) })
+        saveMovieField($form.data('id'), $(this).attr('name'), selected)
+      })
+
+      $select.select2('val', current)
       $select.trigger('validate')
     })
 

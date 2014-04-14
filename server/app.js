@@ -26,7 +26,7 @@ var Movie = mongoose.model('movies', {
   'name-sv': String,
   country: String,
   year: Number,
-  'production-companies': [String],
+  'production-companies': [{_id: mongoose.Schema.Types.ObjectId, name: {type: String, index: true}}],
   genre: String,
   directors: [String],
   actors: [String],
@@ -60,6 +60,12 @@ app.get('/production_companies', function(req, res, next) {
   ProductionCompany.find({}, function(err, all) {
     if (err) return next(err)
     return res.send(all)
+  })
+})
+
+app.get('/production_companies/:query', function(req, res, next) {
+  ProductionCompany.find({name: new RegExp("^" + req.params.query)}).limit(20).exec(function(err, data) {
+    return res.send(data)
   })
 })
 

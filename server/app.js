@@ -38,7 +38,7 @@ app.get('/production-companies', function(req, res, next) {
 })
 
 app.get('/production-companies/:query', function(req, res, next) {
-  ProductionCompany.find({name: new RegExp("^" + req.params.query)}).limit(20).exec(function(err, data) {
+  ProductionCompany.find({name: new RegExp("^" + req.params.query, 'i')}).limit(20).exec(function(err, data) {
     return res.send(data)
   })
 })

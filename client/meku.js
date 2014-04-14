@@ -129,7 +129,8 @@ function movieDetails() {
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
-    $.get('/production-companies').done(function(companies) {
+
+    function productionCompanySelect() {
       var current = movie['production-companies'] || []
       var $select = $form.find('input[name="production-companies"]')
       
@@ -137,8 +138,13 @@ function movieDetails() {
         return {id: x._id, text: x.name} 
       }
 
+      function select2OptionToCompany(x) {
+        return {_id: x.id, name: x.text}
+      }
+
       $select.select2({
         query: function(query) {
+          if ($.trim(query.term).length == 0) return query.callback({results: []})
           return $.get('/production-companies/' + query.term).done(function(data) {
             return query.callback({results: data.map(companyToSelect2Option)})
           })
@@ -151,13 +157,13 @@ function movieDetails() {
       })
 
       $select.on('change', function(e) {
-        var selected = e.val.map(function(id) { return _.find(companies, function (x) { return x._id == id }) })
-        saveMovieField($form.data('id'), $(this).attr('name'), selected)
+        saveMovieField($form.data('id'), $(this).attr('name'), $(this).select2('data').map(select2OptionToCompany))
       })
 
       $select.select2('val', current)
       $select.trigger('validate')
-    })
+    }
+    productionCompanySelect()
 
     $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')

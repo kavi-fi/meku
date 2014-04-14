@@ -2,7 +2,7 @@ var mongoose = require('mongoose')
 
 var classification = {
   author: String,
-  buyer: String,
+  buyer: {_id: mongoose.Schema.Types.ObjectId, name: String},
   billing: String,
   format: String,
   duration: String, // for now matches a regexp in the client
@@ -29,7 +29,7 @@ var ProductionCompany = exports.ProductionCompany = mongoose.model('production_c
   name: String
 })
 
-//var Account = mongoose.model('accounts', {
-//  name: String
-//})
+var Account = exports.Account = mongoose.model('accounts', {
+  name: String
+})
 

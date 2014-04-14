@@ -2,7 +2,7 @@ var express = require('express')
 var path = require('path')
 var mongoose = require('mongoose')
 var liveReload = require('express-livereload')
-var schema = require('server/schema')
+var schema = require('./schema')
 var Movie = schema.Movie
 var ProductionCompany = schema.ProductionCompany
 

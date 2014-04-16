@@ -129,12 +129,41 @@ function movieDetails() {
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
-    productionCompanySelect(movie)
-    accountSelect($form.find('input[name="classifications.0.buyer"]'), movie.classifications[0].buyer)
-    accountSelect($form.find('input[name="classifications.0.billing"]'), movie.classifications[0].billing)
+    selectAutocomplete({
+      $el: $form.find('input[name="production-companies"]'),
+      val: movie['production-companies'] || [],
+      path: '/production-companies/',
+      toOption: companyToSelect2Option,
+      fromOption: select2OptionToCompany,
+      multiple: true,
+    })
+
+    selectAutocomplete({
+      $el: $form.find('input[name="actors"]'),
+      val: movie['actors'] || [],
+      path: '/actors/',
+      multiple: true
+    })
+
+    selectAutocomplete({
+      $el: $form.find('input[name="classifications.0.buyer"]'),
+      val: movie.classifications[0].buyer,
+      path: '/accounts/',
+      toOption: companyToSelect2Option,
+      fromOption: select2OptionToCompany,
+    })
+
+    selectAutocomplete({
+      $el: $form.find('input[name="classifications.0.billing"]'),
+      val: movie.classifications[0].billing,
+      path: '/accounts/',
+      toOption: companyToSelect2Option,
+      fromOption: select2OptionToCompany,
+    })
 
     $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')
+
     classification.criteria.forEach(function(id) {
       $form.find('input[name=criteria-'+id+']').check(true)
     })
@@ -146,66 +175,48 @@ function movieDetails() {
     updateSummary(movie)
   }
 
-  function productionCompanySelect(movie) {
-    var current = movie['production-companies'] || []
-    var $select = $form.find('input[name="production-companies"]')
-    
-    function companyToSelect2Option(x) {
-      return {id: x._id, text: x.name} 
+  function selectAutocomplete(opts) {
+    var defaults = {
+      toOption: function(x) { return {id: x, text: x} },
+      fromOption: function(x) { return x.id },
+      multiple: false
     }
 
-    function select2OptionToCompany(x) {
-      return {_id: x.id, name: x.text}
-    }
+    opts = _.merge(defaults, opts)
+
+    var $select = opts.$el
 
     $select.select2({
       query: function(query) {
         if ($.trim(query.term).length == 0) return query.callback({results: []})
-        return $.get('/production-companies/' + query.term).done(function(data) {
-          return query.callback({results: data.map(companyToSelect2Option)})
+        return $.get(opts.path + query.term).done(function(data) {
+          return query.callback({results: data.map(opts.toOption)})
         })
       },
       initSelection: function(element, callback) {
-        return callback(current.map(companyToSelect2Option))
+        var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)
+        return callback(val)
       },
-      multiple: true,
+      multiple: opts.multiple,
       placeholder: "Valitse..."
     })
 
     $select.on('change', function(e) {
-      saveMovieField($form.data('id'), $(this).attr('name'), $(this).select2('data').map(select2OptionToCompany))
+      var data = $(this).select2('data')
+      var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
+      saveMovieField($form.data('id'), $(this).attr('name'), val)
     })
 
-    $select.select2('val', current)
+    $select.select2('val', opts.val)
     $select.trigger('validate')
   }
 
+  function companyToSelect2Option(x) {
+    return {id: x._id, text: x.name} 
+  }
 
-  function accountSelect($select, current) {
-    function companyToSelect2Option(x) {
-      return {id: x._id, text: x.name} 
-    }
-
-    function select2OptionToCompany(x) {
-      return {_id: x.id, name: x.text}
-    }
-
-    $select.select2({
-      query: function(query) {
-        if ($.trim(query.term).length == 0) return query.callback({results: []})
-        return $.get('/accounts/' + query.term).done(function(data) {
-          return query.callback({results: data.map(companyToSelect2Option)})
-        })
-      },
-      initSelection: function(element, callback) {
-        return callback(companyToSelect2Option(current))
-      },
-      placeholder: "Valitse..."
-    })
-
-    $select.on('change', function(e) {
-      saveMovieField($form.data('id'), $(this).attr('name'), select2OptionToCompany($(this).select2('data')))
-    })
+  function select2OptionToCompany(x) {
+    return {_id: x.id, name: x.text}
   }
 
   function renderClassificationCriteria() {

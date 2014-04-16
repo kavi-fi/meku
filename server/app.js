@@ -18,7 +18,7 @@ app.get('/movies/:id', function(req, res) {
 })
 
 app.post('/movies/new', function(req, res, next) {
-  new Movie({ classifications: [{}], 'production-companies': [] }).save(function(err, movie) {
+  new Movie({ classifications: [{}], 'production-companies': [], actors: [] }).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
   })
@@ -46,7 +46,7 @@ app.get('/accounts/:query', function(req, res, next) {
 app.get('/actors/:query', function(req, res, next) {
   Movie.aggregate([
     {$unwind: '$actors'},
-    {$match: {actors: new RegExp("^" + req.params.query, 'i')}},
+    {$match: {actors: new RegExp("\\b" + req.params.query, 'i')}},
     {$project: {actors: 1}},
     {$group: {_id: "$actors"}}
   ]).exec(function(err, data) {

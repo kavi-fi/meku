@@ -27,7 +27,6 @@ function movieDetails() {
 
   $form.find('input.country').typeahead({hint: false}, { source: countryMatcher() })
 
-
   $form.find('select').on('change', function(e) {
     saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
   })
@@ -74,6 +73,7 @@ function movieDetails() {
     saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
   })
 
+  $summary.on('click', '.name', function() { $summary.toggleClass('hidden') })
   $summary.on('dragstart', '.warnings .warning', function(e) {
     var $e = $(this)
     e.originalEvent.dataTransfer.effectAllowed = 'move'

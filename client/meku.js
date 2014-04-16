@@ -272,49 +272,49 @@ function movieDetails() {
     $form.find('.category-criteria').html($categories)
   }
 
-  return { show: show }
-}
+  function saveMovieField(id, field, value) {
+    $.post('/movies/' + id, JSON.stringify(keyValue(field, value))).done(updateSummary)
+  }
 
-function saveMovieField(id, field, value) {
-  $.post('/movies/' + id, JSON.stringify(keyValue(field, value))).done(updateSummary)
+  function updateSummary(movie) {
+    var classification = classificationSummary(movie.classifications[0])
+    var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
+    $summary
+      .find('.year').text(movie.year || '-').end()
+      .find('.name').text(movie.name || '-').end()
+      .find('.name-fi').text(movie['name-fi'] || '').end()
+      .find('.name-sv').text(movie['name-sv'] || '').end()
+      .find('.synopsis span').text(movie.synopsis || '-').end()
+      .find('.country span').text(movie.country || '-').end()
+      .find('.directors span').text((movie.directors).join(', ') || '-').end()
+      .find('.actors span').text((movie.actors).join(', ') || '-').end()
+      .find('.agelimit').attr('src', 'images/agelimit-'+classification.age+'.png').end()
+      .find('.warnings').html(warnings).end()
+  }
+
+  function classificationSummary(classification) {
+    if (classification.safe) return { age:'S', warnings:[] }
+    var criteria = classification.criteria.map(function(id) { return classificationCriteria[id - 1] })
+    var maxAgeLimit = criteria.reduce(function(accum, c) {
+      var ageLimit = c.age
+      if (ageLimit == 'S') return accum
+      if (accum == 'S') return ageLimit
+      return parseInt(ageLimit) > accum ? ageLimit : accum
+    }, 'S')
+    var warnings = criteria
+      .filter(function(c) { return c.age == maxAgeLimit })
+      .map(function(c) { return c.category })
+      .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
+    return { age: maxAgeLimit, warnings: warnings }
+  }
+
+  return { show: show }
 }
 
 function keyValue(key, value) {
   var data = {}
   data[key] = value
   return data
-}
-
-function updateSummary(movie) {
-  var classification = classificationSummary(movie.classifications[0])
-  var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
-  $('#movie-details .summary')
-    .find('.year').text(movie.year || '-').end()
-    .find('.name').text(movie.name || '-').end()
-    .find('.name-fi').text(movie['name-fi'] || '').end()
-    .find('.name-sv').text(movie['name-sv'] || '').end()
-    .find('.synopsis span').text(movie.synopsis || '-').end()
-    .find('.country span').text(movie.country || '-').end()
-    .find('.directors span').text((movie.directors).join(', ') || '-').end()
-    .find('.actors span').text((movie.actors).join(', ') || '-').end()
-    .find('.agelimit').attr('src', 'images/agelimit-'+classification.age+'.png').end()
-    .find('.warnings').html(warnings).end()
-}
-
-function classificationSummary(classification) {
-  if (classification.safe) return { age:'S', warnings:[] }
-  var criteria = classification.criteria.map(function(id) { return classificationCriteria[id - 1] })
-  var maxAgeLimit = criteria.reduce(function(accum, c) {
-    var ageLimit = c.age
-    if (ageLimit == 'S') return accum
-    if (accum == 'S') return ageLimit
-    return parseInt(ageLimit) > accum ? ageLimit : accum
-  }, 'S')
-  var warnings = criteria
-    .filter(function(c) { return c.age == maxAgeLimit })
-    .map(function(c) { return c.category })
-    .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
-  return { age: maxAgeLimit, warnings: warnings }
 }
 
 function isNotEmpty(val) {
@@ -336,7 +336,6 @@ function validate(f) {
     $el.trigger('validation')
   }
 }
-
 
 $.fn.throttledInput = function(fn) {
   return $(this).each(function() {

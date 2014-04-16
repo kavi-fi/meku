@@ -36,6 +36,7 @@ ol { list-style-type: none; margin: 0; }
 #movie-details .category-criteria small { margin-left: 65px; display: block; }
 #movie-details .category-criteria textarea { float: right; }
 
+#movie-details .select2-input { min-width: 200px; }
 #movie-details .select2-container-multi.invalid .select2-choices,
 #movie-details .select2-container.invalid .select2-choice {
   background-color: #f2dede;

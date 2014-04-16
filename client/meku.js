@@ -3,12 +3,55 @@ $(setup)
 function setup() {
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
 
+  var search = searchPage()
   var details = movieDetails()
 
   if (location.hash.indexOf('#/movies/') == 0) {
     var _id = location.hash.substring(9)
-    $.get('/movies/' + _id).done(details.show)
+    $.get('/movies/' + _id).done(showClassification)
   }
+
+  $('.new-movie').click(function() {
+    $.post('/movies/new').done(function(movie) {
+      location.hash = '#/movies/'+movie._id
+      showClassification(movie)
+    })
+  })
+
+  function showClassification(movie) {
+    search.disable()
+    details.show(movie)
+  }
+}
+
+function searchPage() {
+  var $input = $('#search-input')
+  var $results = $('#search-results')
+
+  $input.throttledInput(function() {
+    var q = $('#search-input').val().trim()
+    if (q == '') {
+      $results.empty()
+    } else {
+      $.get('/movies/search/'+q).done(function(results) {
+        var html = results.map(function(result) {
+          return $('<div>')
+            .append($('<h3>').text(result.name))
+            .append($('<span>').text(result['name-fi']))
+            .append($('<span>').text(result['name-sv']))
+        })
+        $results.html(html)
+      })
+    }
+  })
+
+  function disable() {
+    $input.val('').attr('disabled', 'true')
+    $results.empty()
+  }
+
+  return { disable: disable }
+
 }
 
 function movieDetails() {
@@ -17,13 +60,6 @@ function movieDetails() {
   var $submit = $form.find('button[name=register]')
 
   renderClassificationCriteria()
-
-  $('.new-movie').click(function() {
-    $.post('/movies/new').done(function(movie) {
-      location.hash = '#/movies/'+movie._id
-      show(movie)
-    })
-  })
 
   $form.find('input.country').typeahead({hint: false}, { source: countryMatcher() })
 

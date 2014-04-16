@@ -13,6 +13,15 @@ app.use(express.json())
 
 mongoose.connect('mongodb://localhost/meku')
 
+app.get('/movies/search/:q', function(req, res) {
+  var q = req.params.q
+  var regexp = new RegExp("\\b" + q, 'i')
+  Movie.find({ $or: [ { name: regexp }, { 'name-fi': regexp }, { 'name-sv': regexp } ] }, { name:1, 'name-fi':1, 'name-sv': 1 }, function(err, results) {
+    res.send(results)
+  })
+})
+
+
 app.get('/movies/:id', function(req, res) {
   Movie.findById(req.params.id, function(err, movie) { res.send(movie) })
 })

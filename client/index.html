@@ -12,7 +12,12 @@
   <script src="http://localhost:35729/livereload.js"></script>
 </head>
 <body>
-  <button class="new-movie">Uusi elokuvaluokittelu</button>
+  <div id="header">
+    <div style="display: inline-block;">Hae: <input id="search-input" type="text" /></div>
+    <button class="new-movie">Uusi elokuvaluokittelu</button>
+  </div>
+  <div id="search-results"></div>
+
   <form id="movie-details" data-id="">
     <h3>Elokuvan perustiedot</h3>
     <div>Alkuperäinen nimi: <input name="name" class="required" type="text" /></div>

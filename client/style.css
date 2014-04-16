@@ -12,6 +12,12 @@ button[disabled=disabled], button:disabled { color: gray; }
 ol { list-style-type: none; margin: 0; }
 .new-movie { margin: 10px; }
 
+#header { margin: 10px 0 0 10px; }
+
+#search-results > div { margin: 10px; }
+#search-results h3 { padding: 0; margin: 0; }
+#search-results span { margin-left: 20px; display: block; }
+
 #movie-details { display: none; margin: 10px; }
 #movie-details > div { margin: 10px; }
 

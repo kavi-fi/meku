@@ -15,6 +15,7 @@ awk '/<!-- Table/{ if (f) { print "</docs>" > f; close(f); } f = $3".xml"; print
 
 */
 
+// TODO: None of the import functions currently handle the deleted-attribute!
 
 var schema = require('../server/schema')
 var xml = require('xml-object-stream')

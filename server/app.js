@@ -68,6 +68,22 @@ app.get('/actors/:query', function(req, res, next) {
   }
 })
 
+app.get('/directors/:query', function(req, res, next) {
+  if (req.params.query.length < 3) return res.send([])
+  else {
+    Movie.aggregate([
+      {$unwind: '$directors'},
+      {$match: {directors: new RegExp("\\b" + req.params.query, 'i')}},
+      {$project: {directors: 1}},
+      {$group: {_id: "$directors"}}
+    ]).exec(function(err, data) {
+        return res.send(data.reduce(function(acc, doc) {
+          return acc.concat([doc._id])
+        }, []))
+      })
+  }
+})
+
 app.use(express.static(path.join(__dirname, '../client')))
 
 liveReload(app, { watchDir: path.join(__dirname, '../client') })

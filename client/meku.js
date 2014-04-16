@@ -156,8 +156,6 @@ function movieDetails() {
       .find('input[name=country]').val(movie.country).end()
       .find('input[name=year]').val(movie.year).end()
       .find('select[name=genre]').val(movie.genre).end()
-      .find('input[name=directors]').val(movie.directors.join(', ')).end()
-      .find('input[name=actors]').val(movie.actors.join(', ')).end()
       .find('textarea[name=synopsis]').val(movie.synopsis).end()
       .find('input[name="classifications.0.buyer"]').val(classification.buyer).end()
       .find('input[name="classifications.0.billing"]').val(classification.billing).end()
@@ -172,6 +170,14 @@ function movieDetails() {
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany,
       multiple: true,
+    })
+
+    selectAutocomplete({
+      $el: $form.find('input[name="directors"]'),
+      val: movie['directors'] || [],
+      path: '/directors/',
+      multiple: true,
+      allowAdding: true
     })
 
     selectAutocomplete({

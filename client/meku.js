@@ -178,7 +178,8 @@ function movieDetails() {
       $el: $form.find('input[name="actors"]'),
       val: movie['actors'] || [],
       path: '/actors/',
-      multiple: true
+      multiple: true,
+      allowAdding: true
     })
 
     selectAutocomplete({
@@ -215,12 +216,19 @@ function movieDetails() {
     var defaults = {
       toOption: function(x) { return {id: x, text: x} },
       fromOption: function(x) { return x.id },
-      multiple: false
+      multiple: false,
+      allowAdding: false
     }
 
     opts = _.merge(defaults, opts)
 
     var $select = opts.$el
+
+    function createSearchChoice(term, data) {
+      if (_.indexOf(data, term) === -1) {
+        return {id: term, text: term}
+      }
+    }
 
     $select.select2({
       query: function(query) {
@@ -234,7 +242,8 @@ function movieDetails() {
         return callback(val)
       },
       multiple: opts.multiple,
-      placeholder: "Valitse..."
+      placeholder: "Valitse...",
+      createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
     })
 
     $select.on('change', function(e) {

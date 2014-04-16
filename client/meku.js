@@ -36,9 +36,9 @@ function searchPage() {
       $.get('/movies/search/'+q).done(function(results) {
         var html = results.map(function(result) {
           return $('<div>')
-            .append($('<h3>').text(result.name))
-            .append($('<span>').text(result['name-fi']))
-            .append($('<span>').text(result['name-sv']))
+            .append($('<h3>').text(result.name.join(', ')))
+            .append($('<span>').text(result['name-fi'].join(', ')))
+            .append($('<span>').text(result['name-sv'].join(', ')))
         })
         $results.html(html)
       })
@@ -150,9 +150,9 @@ function movieDetails() {
     var classification = movie.classifications[0]
 
     $form.data('id', movie._id).show()
-      .find('input[name=name]').val(movie.name).end()
-      .find('input[name=name-fi]').val(movie['name-fi']).end()
-      .find('input[name=name-sv]').val(movie['name-sv']).end()
+      .find('input[name="name.0"]').val(movie.name[0]).end()
+      .find('input[name="name-fi.0"]').val(movie['name-fi'][0]).end()
+      .find('input[name="name-sv.0"]').val(movie['name-sv'][0]).end()
       .find('input[name=country]').val(movie.country).end()
       .find('input[name=year]').val(movie.year).end()
       .find('select[name=genre]').val(movie.genre).end()
@@ -296,9 +296,9 @@ function movieDetails() {
     var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     $summary
       .find('.year').text(movie.year || '-').end()
-      .find('.name').text(movie.name || '-').end()
-      .find('.name-fi').text(movie['name-fi'] || '').end()
-      .find('.name-sv').text(movie['name-sv'] || '').end()
+      .find('.name').text(movie.name.join(', ') || '-').end()
+      .find('.name-fi').text(movie['name-fi'].join(', ') || '-').end()
+      .find('.name-sv').text(movie['name-sv'].join(', ') || '-').end()
       .find('.synopsis span').text(movie.synopsis || '-').end()
       .find('.country span').text(movie.country || '-').end()
       .find('.directors span').text((movie.directors).join(', ') || '-').end()

@@ -44,16 +44,19 @@ app.get('/accounts/:query', function(req, res, next) {
 })
 
 app.get('/actors/:query', function(req, res, next) {
-  Movie.aggregate([
-    {$unwind: '$actors'},
-    {$match: {actors: new RegExp("\\b" + req.params.query, 'i')}},
-    {$project: {actors: 1}},
-    {$group: {_id: "$actors"}}
-  ]).exec(function(err, data) {
-      return res.send(data.reduce(function(acc, doc) {
-        return acc.concat([doc._id])
-      }, []))
-    })
+  if (req.params.query.length < 3) return res.send([])
+  else {
+    Movie.aggregate([
+      {$unwind: '$actors'},
+      {$match: {actors: new RegExp("\\b" + req.params.query, 'i')}},
+      {$project: {actors: 1}},
+      {$group: {_id: "$actors"}}
+    ]).exec(function(err, data) {
+        return res.send(data.reduce(function(acc, doc) {
+          return acc.concat([doc._id])
+        }, []))
+      })
+  }
 })
 
 app.use(express.static(path.join(__dirname, '../client')))

@@ -78,7 +78,7 @@ function movieDetails() {
   $form.find('.duration').on('keyup change validate', validate(isValidDuration))
 
   $form.find('input[type=text], textarea').not('.multivalue').throttledInput(function(txt) {
-    if ($(this).hasClass('invalid')) return false
+    if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
     var value = txt
     if ($(this).data('type') == 'number') {
       value = parseInt(txt)

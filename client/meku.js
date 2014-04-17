@@ -77,18 +77,13 @@ function movieDetails() {
   $form.find('.required').on('keyup change validate', validate(isNotEmpty))
   $form.find('.duration').on('keyup change validate', validate(isValidDuration))
 
-  $form.find('input[type=text], textarea').not('.multivalue').throttledInput(function(txt) {
+  $form.find('input[type=text], textarea').throttledInput(function(txt) {
     if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
     var value = txt
     if ($(this).data('type') == 'number') {
       value = parseInt(txt)
     }
     saveMovieField($form.data('id'), $(this).attr('name'), value)
-  })
-
-  $form.find('input.multivalue').throttledInput(function(txt) {
-    var values = txt.split(',').map($.trim)
-    saveMovieField($form.data('id'), $(this).attr('name'), values)
   })
 
   $form.find('.categories li').click(function() {

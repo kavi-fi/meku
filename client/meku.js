@@ -343,7 +343,7 @@ function isNotEmpty(val) {
 }
 
 function isValidDuration(txt) {
-  return /(?:(\d+)?:)?(\d+):(\d+)/.test(txt)
+  return /(?:(\d+)?:)?(\d+):(\d+)$/.test(txt)
 }
 
 function validate(f) {

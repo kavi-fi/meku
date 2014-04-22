@@ -1,0 +1,148 @@
+
+
+
+MEKU CSS versio 1
+
+
+
+/* TYPOGRAPHY */
+
+/* h2 */
+font-family: Helvetica, Arial;
+font-weight: Bold;
+font-size: 24px;
+color: #444444;
+line-height: 30px;
+
+/* h3 */
+font-family: Helvetica, Arial;
+font-weight: Bold;
+font-size: 20px;
+color: #444444;
+line-height: 24px;
+
+/* h4 */
+font-family: Helvetica, Arial;
+font-weight: Bold;
+font-size: 16px;
+color: #444444;
+line-height: 24px;
+
+/* h5 */
+font-family: Helvetica, Arial;
+font-weight: Bold;
+font-size: 14px;
+color: #444444;
+line-height: 19px;
+
+/* p & input text */
+font-family: Helvetica, Arial;
+font-weight: Normal;
+font-size: 14px;
+color: #666666;
+line-height: 19px;
+
+/* form label */
+font-family: Helvetica, Arial;
+font-weight: Bold;
+font-size: 14px;
+color: #444444;
+line-height: 19px;
+text-align: right;
+
+/* p.kriteeri & p.kriteerin kommentti */
+font-family: Helvetica, Arial;
+font-size: 12px;
+font-weight: Normal;
+color: #666666;
+line-height: 17px;
+
+
+
+/* BTN RED */
+border-radius: 3px;
+background-image: -o-linear-gradient(-89deg, #AA0050 0%, #8C0032 100%);
+background-image: -moz-linear-gradient(-89deg, #AA0050 0%, #8C0032 100%);
+background-image: -ms-linear-gradient(-89deg, #AA0050 0%, #8C0032 100%);
+background-image: linear-gradient(-179deg, #AA0050 0%, #8C0032 100%);
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+
+
+
+
+/* FORM ELEMENTS */
+
+/* FORM ELEMENT OPTIONAL — height 36px */
+border-radius: 3px;
+background: #FFFFFF;
+border: 1px solid #D3D3D3;
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
+
+
+/* FORM ELEMENT REQUIRED — height 36px */
+border-radius: 3px;
+background: #FFFFFF;
+border: 1px solid #FF99CC;
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
+
+
+/* FORM ELEMENT SELECTED — height 36px  */
+border-radius: 3px;
+background: #FFFFFF;
+border: 1px solid #44AAFF;
+-moz-box-shadow:    0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
+box-shadow:         0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
+
+/* INPUT TEXT TAG — height 24px */
+border-radius: 2px;
+background: #EEEEEE;
+
+
+
+
+/* LINES & COLORS */
+
+/* FAT RED */
+border: solid 5px #AA0050;
+
+/* FAT GRAY */
+border: solid 5px #DDDDDD;
+
+/* THIN GRAY */
+border: solid 1px #D3D3D3;
+
+/* FAT BLUE */
+border: solid 5px #44AAFF; 
+
+/* FAT PINK */
+border: solid 5px #FF77AA;
+
+/* FAT GREEN */
+border: solid 5px #33BB33;
+
+
+
+
+/* KRITEERIBOKSIT */
+
+/* These behave like form elements above, but without border-radius */
+/* Kriteeriboksi, when hovered/focused, behaves like “form element required” */
+
+/* Selected (clicked) element */
+color: #ffffff;
+background: #777777;
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+
+/* Comment field within selected element */
+background: #FFFFFF;
+border: 1px solid #666666;
+
+
+
+
+
+

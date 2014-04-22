@@ -253,6 +253,7 @@ function movieDetails() {
         return callback(val)
       },
       multiple: opts.multiple,
+      width: 'copy', 
       placeholder: "Valitse...",
       createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
     })

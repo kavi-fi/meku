@@ -186,7 +186,8 @@ function movieDetails() {
       val: movie['actors'] || [],
       path: '/actors/',
       multiple: true,
-      allowAdding: true
+      allowAdding: true,
+      termMinLength: 3
     })
 
     selectAutocomplete({
@@ -224,7 +225,8 @@ function movieDetails() {
       toOption: function(x) { return {id: x, text: x} },
       fromOption: function(x) { return x.id },
       multiple: false,
-      allowAdding: false
+      allowAdding: false,
+      termMinLength: 0
     }
 
     opts = _.merge(defaults, opts)
@@ -239,10 +241,12 @@ function movieDetails() {
 
     $select.select2({
       query: function(query) {
-        if ($.trim(query.term).length == 0) return query.callback({results: []})
-        return $.get(opts.path + query.term).done(function(data) {
-          return query.callback({results: data.map(opts.toOption)})
-        })
+        if ($.trim(query.term).length >= opts.termMinLength) {
+          return $.get(opts.path + query.term).done(function(data) {
+            return query.callback({results: data.map(opts.toOption)})
+          })
+        }
+        return query.callback({results: []})
       },
       initSelection: function(element, callback) {
         var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)

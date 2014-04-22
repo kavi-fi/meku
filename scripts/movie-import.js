@@ -33,7 +33,9 @@ var tasks = {
   wipeActors: wipeActors,
   actors: actors,
   wipeNames: wipeNames,
-  names: names
+  names: names,
+  accounts: accounts,
+  wipeAccounts: wipeAccounts,
 }
 
 var mappings = {
@@ -42,7 +44,8 @@ var mappings = {
   meku_audiov_meku_actors_c: { table: 'meku_audiov_meku_actors_c', fields: { 'meku_audio7d9crograms_ida':1, 'meku_audio8fcb_actors_idb':1, 'deleted':intToBoolean } },
 
   meku_names: { table: 'meku_names', fields: { 'id':1, 'name':trim, 'deleted':intToBoolean } },
-  meku_audiovs_meku_names_c: { table: 'meku_audiovs_meku_names_c', fields: { type:1, 'meku_audio91farograms_ida':1, 'meku_audio7e24u_names_idb':1, 'deleted':intToBoolean } }
+  meku_audiovs_meku_names_c: { table: 'meku_audiovs_meku_names_c', fields: { type:1, 'meku_audio91farograms_ida':1, 'meku_audio7e24u_names_idb':1, 'deleted':intToBoolean } },
+  accounts: { table: 'accounts', fields: {id: mapTo('emeku-id'), name: trim}}
 }
 
 if (process.argv.length < 3) {
@@ -142,6 +145,17 @@ function actors(callback) {
       massUpdate('Movie', updates, callback)
     })
   })
+}
+
+function accounts(callback) {
+  parseTableToJsonArray(mappings.accounts, function(err, allAccounts) {
+    if (err) return callback(err)
+    massCreate('Account', allAccounts, callback) 
+  })
+}
+
+function wipeAccounts(callback) {
+  schema.Account.remove({}, callback)
 }
 
 function massCreate(schemaName, objects, callback) {

@@ -32,6 +32,7 @@ var ProductionCompany = exports.ProductionCompany = mongoose.model('production_c
 })
 
 var Account = exports.Account = mongoose.model('accounts', {
+  'emeku-id': String,
   name: {type: String, index: true}
 })
 

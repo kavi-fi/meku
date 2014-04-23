@@ -241,19 +241,19 @@ function movieDetails() {
 
     $select.select2({
       query: function(query) {
-        if ($.trim(query.term).length >= opts.termMinLength) {
-          return $.get(opts.path + query.term).done(function(data) {
-            return query.callback({results: data.map(opts.toOption)})
-          })
+        var len = $.trim(query.term).length
+        if (len === 0 || len < opts.termMinLength) {
+          return query.callback({results: []})
         }
-        return query.callback({results: []})
+        return $.get(opts.path + query.term).done(function(data) {
+          return query.callback({results: data.map(opts.toOption)})
+        })
       },
       initSelection: function(element, callback) {
         var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)
         return callback(val)
       },
       multiple: opts.multiple,
-      width: 'copy', 
       placeholder: "Valitse...",
       createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
     })

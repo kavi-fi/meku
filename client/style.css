@@ -37,18 +37,27 @@ input[type=text] {
   border-radius: 3px;
   background: #FFFFFF;
   border: 1px solid #FF99CC;
-  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
-  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
-  width: 300px;
+  -moz-box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
+  box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
+  width: 280px;
   font-size: 14px;
   color: #666666;
   line-height: 19px;
+  padding: 8px 10px;
 }
 
-input, .select2-container {
+input, .select2-choices  {
   margin: 0 0 15px 0;
   vertical-align: middle;
-  height: 32px;
+}
+
+.select2-container {
+  margin-bottom: 10px;
+}
+
+.select2-container .select2-choice {
+  height: 36px;
+  line-height: 36px;
 }
 
 input[type=text].invalid { background-color: #FFF7FA !important; }
@@ -70,7 +79,6 @@ label {
 
 .select2-container { width: 305px; }
 
-.select2-input { min-width: 200px; }
 .select2-container-multi.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
   background-color: #f2dede;

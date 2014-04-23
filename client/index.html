@@ -20,8 +20,8 @@
 
   <form id="movie-details" data-id="">
     <div class="row">
-      <div class="content">
-        <h3>Uusi kuvaohjelma</h3>
+      <div class="movie-info content">
+        <h2>Uusi kuvaohjelma</h2>
         <div class="left">
           <label>Alkuperäinen nimi</label><input name="name.0" class="required" type="text" />
           <label>Suomalainen nimi</label><input name="name-fi.0" class="required" type="text" />
@@ -68,17 +68,16 @@
               <option>Kokeiluelokuva</option>
               <option>Videotaide</option>
             </select>
-          <br/>
-          <label>Ohjaaja</label><input name="directors" class="required" type="hidden" /><br/>
-          <label>Näyttelijät</label><input name="actors" class="" type="hidden" /><br/>
-          <label>Synopsis</label><textarea name="synopsis" class="required"></textarea><br/>
+          <label>Ohjaaja</label><input name="directors" class="required" type="hidden"/>
+          <label>Näyttelijät</label><input name="actors" class="" type="hidden"/>
+          <label for="synopsis">Synopsis</label><textarea name="synopsis" class="required"></textarea>
         </div>
       </div>
     </div>
 
     <div id="classification" class="row">
-      <div class="content">
-        <h3>Luokittelu</h3>
+      <div class="movie-info content">
+        <h2>Luokittelu</h2>
         <div class="left">
           <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
           <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="text" />
@@ -105,7 +104,7 @@
 
     <div id="criteria" class="row">
       <div class="content">
-        <h3>Luokittelun kriteerit</h3>
+        <h2>Luokittelun kriteerit</h2>
         <div><input name="classifications.0.safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
 
         <div class="category-container">

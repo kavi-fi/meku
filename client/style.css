@@ -33,7 +33,7 @@ ol { list-style-type: none; margin: 0; }
 #search-results h3 { padding: 0; margin: 0; }
 #search-results span { margin-left: 20px; display: block; }
 
-input[type=text] {
+input[type=text], .select2-container-multi .select2-choices {
   border-radius: 3px;
   background: #FFFFFF;
   border: 1px solid #FF99CC;
@@ -43,7 +43,31 @@ input[type=text] {
   font-size: 14px;
   color: #666666;
   line-height: 19px;
-  padding: 8px 10px;
+}
+
+input[type=text], .select2-container-multi .select2-choices .select2-search-field input {
+  padding: 8px 10px !important;
+}
+
+.select2-container-multi .select2-choices {
+  min-height: 0;
+  width: 300px;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+  padding: 6px 8px 6px 18px;
+  border: 0;
+  background-color: #eee;
+  color: #666666;
+}
+.select2-search-choice-close {
+  top: 5px;
+}
+
+.select2-container-multi .select2-choices .select2-search-field input {
+  margin: 0;
+  padding: 0;
+  line-height: 19px;
 }
 
 input, .select2-choices  {

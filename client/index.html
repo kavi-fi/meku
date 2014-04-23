@@ -79,41 +79,48 @@
     <div id="classification" class="row">
       <div class="content">
         <h3>Luokittelu</h3>
-        <div>Luokittelija: <span class="classifications.author">Anne Lind</span></div>
-        <div>Luokittelun tilaaja: <input name="classifications.0.buyer" class="required" type="hidden" /></div>
-        <div>Rekisteröinnistä laskutetaan: <input name="classifications.0.billing" class="required" type="text" /></div>
-        <div>Ohjelman formaatti:
-          <select name="classifications.0.format" class="required">
-            <option value="">Valitse...</option>
-            <option>DVD</option>
-            <option>HD DVD</option>
-            <option>Blu-ray Disc</option>
-            <option>VoD</option>
-            <option>CDkuva</option>
-            <option>VHS</option>
-            <option>8 mm</option>
-            <option>16 mm</option>
-            <option>70 mm</option>
-            <option>Televisio</option>
-          </select>
+        <div class="left">
+          <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
+          <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="text" />
         </div>
-        <div>Kesto: <input name="classifications.0.duration" class="required duration" data-type="duration" type="text" /></div>
+        <div class="right">
+          <label>Ohjelman formaatti</label>
+            <select name="classifications.0.format" class="required">
+              <option value="">Valitse...</option>
+              <option>DVD</option>
+              <option>HD DVD</option>
+              <option>Blu-ray Disc</option>
+              <option>VoD</option>
+              <option>CDkuva</option>
+              <option>VHS</option>
+              <option>8 mm</option>
+              <option>16 mm</option>
+              <option>70 mm</option>
+              <option>Televisio</option>
+            </select>
+          <label>Kesto</label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
+        </div>
       </div>
     </div>
 
-    <div id="criteria">
-      <h3>Luokittelun kriteerit</h3>
-      <div><input name="classifications.0.safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
+    <div id="criteria" class="row">
+      <div class="content">
+        <h3>Luokittelun kriteerit</h3>
+        <div><input name="classifications.0.safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
 
-      <div class="category-container">
-        <ol class="categories">
-          <li class="violence selected">Väkivalta</li>
-          <li class="sex">Seksi</li>
-          <li class="anxiety">Ahdistus</li>
-          <li class="drugs">Päihteet</li>
-        </ol>
-        <div class="category-criteria"></div>
+        <div class="category-container">
+          <ol class="categories">
+            <li class="violence selected">Väkivalta</li>
+            <li class="sex">Seksi</li>
+            <li class="anxiety">Ahdistus</li>
+            <li class="drugs">Päihteet</li>
+          </ol>
+          <div class="category-criteria"></div>
+        </div>
       </div>
+
+    </div>
+
       <div class="summary">
         <span class="year"></span>
         <span class="name"></span>

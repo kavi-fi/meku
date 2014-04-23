@@ -70,7 +70,7 @@ input[type=text], .select2-container-multi .select2-choices .select2-search-fiel
   line-height: 19px;
 }
 
-input, .select2-choices  {
+input, select, .select2-choices  {
   margin: 0 0 15px 0;
   vertical-align: middle;
 }

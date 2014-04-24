@@ -86,19 +86,16 @@ function movieDetails() {
     saveMovieField($form.data('id'), $(this).attr('name'), value)
   })
 
-  $form.find('.categories li').click(function() {
-    $(this).addClass('selected').siblings().removeClass('selected')
-    $form.find('.category-criteria ol').hide().eq($(this).index()).show()
-  })
-
   $form.find('input[name="classifications.0.safe"]').change(function() {
     var safe = $(this).is(':checked')
     $form.find('.category-container').toggle(!safe)
     saveMovieField($form.data('id'), $(this).attr('name'), safe)
   })
 
-  $form.find('.category-criteria input[type=checkbox]').change(function() {
-    var ids = $form.find('.category-criteria input[type=checkbox]:checked').map(function(i, e) { return $(e).data('id') }).get()
+  $form.on('click', '.category .criteria', function(e) {
+    $(e.currentTarget).toggleClass('selected')
+
+    var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
     saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
   })
 
@@ -210,7 +207,7 @@ function movieDetails() {
     $form.find('.category-criteria input').removeAttr('checked')
 
     classification.criteria.forEach(function(id) {
-      $form.find('input[name=criteria-'+id+']').check(true)
+      $form.find('.criteria[data-id=' + id + ']').addClass('selected')
     })
     $form.find('.category-criteria textarea').val()
     Object.keys(classification['criteria-comments'] || {}).forEach(function(id) {
@@ -241,12 +238,13 @@ function movieDetails() {
 
     $select.select2({
       query: function(query) {
-        if ($.trim(query.term).length >= opts.termMinLength) {
-          return $.get(opts.path + query.term).done(function(data) {
-            return query.callback({results: data.map(opts.toOption)})
-          })
+        var len = $.trim(query.term).length
+        if (len === 0 || len < opts.termMinLength) {
+          return query.callback({results: []})
         }
-        return query.callback({results: []})
+        return $.get(opts.path + query.term).done(function(data) {
+          return query.callback({results: data.map(opts.toOption)})
+        })
       },
       initSelection: function(element, callback) {
         var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)
@@ -276,20 +274,16 @@ function movieDetails() {
   }
 
   function renderClassificationCriteria() {
-    var $categories = ['violence', 'sex', 'anxiety', 'drugs'].map(function(category) {
+    ['violence', 'sex', 'anxiety', 'drugs'].map(function(category) {
       var criteria = classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
-        return $('<li>')
-          .append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
-          .append($('<input>', { type: 'checkbox', name:'criteria-' + c.id, 'data-id': c.id } ))
-          .append($('<span>', { class:'agelimit agelimit-' + c.age }))
-          .append($('<span>').text(c.id + ' ' + c.title))
-          .append($('<small>').text(c.description))
+        return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
+          .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
+          .append($('<p>').text(c.description))
+          //.append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
       })
-
-      return $('<ol>', { class: category }).append($criteria)
+      $('.category-container .' + category).append($criteria)
     })
-    $form.find('.category-criteria').html($categories)
   }
 
   function saveMovieField(id, field, value) {

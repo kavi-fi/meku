@@ -19,100 +19,129 @@
   <div id="search-results"></div>
 
   <form id="movie-details" data-id="">
-    <h3>Elokuvan perustiedot</h3>
-    <div>Alkuperäinen nimi: <input name="name.0" class="required" type="text" /></div>
-    <div>Suomalainen nimi: <input name="name-fi.0" class="required" type="text" /></div>
-    <div>Ruotsinkielinen nimi: <input name="name-sv.0" type="text" /></div>
-    <div>Maa: <input name="country" class="country required" type="hidden" /></div>
-    <div>Valmistusvuosi: <input name="year" type="text" class="required" data-type="number" /></div>
-    <div>Tuotantoyhtiö: <input name="production-companies" class="required" type="hidden"/></div>
-    <div>Genre
-      <select name="genre" class="required">
-        <option value="">Valitse...</option>
-        <option>Fiktio</option>
-        <option>Animaatio</option>
-        <option>Viihde</option>
-        <option>Seksi / Erotiikka</option>
-        <option>Dokumentti</option>
-        <option>Lasten ohjelmat</option>
-        <option>Muut</option>
-        <option>Romantiikka</option>
-        <option>Draama</option>
-        <option>Historiallinen näytelmä</option>
-        <option>Trilleri</option>
-        <option>Seikkailu</option>
-        <option>Western</option>
-        <option>Sota</option>
-        <option>Kauhu</option>
-        <option>Tieteisseikkailu</option>
-        <option>Toimintaelokuva</option>
-        <option>Fantasia</option>
-        <option>Komedia ja farssi</option>
-        <option>Musiikki</option>
-        <option>Opetus</option>
-        <option>Urheilu</option>
-        <option>Matkailu</option>
-        <option>Henkilödokumentti</option>
-        <option>Luontodokumentti</option>
-        <option>Lasten animaatio</option>
-        <option>Lasten fiktio</option>
-        <option>Muu lastenelokuva</option>
-        <option>Mainonta</option>
-        <option>Tietoisku</option>
-        <option>Kokeiluelokuva</option>
-        <option>Videotaide</option>
-      </select>
-    </div>
-    <div>Ohjaaja: <input name="directors" class="required" type="hidden" /></div>
-    <div>Näyttelijät: <input name="actors" class="" type="hidden" /></div>
-    <div>Synopsis: <textarea name="synopsis" class="required"></textarea></div>
-    <h3>Luokittelu</h3>
-    <div>Luokittelija: <span class="classifications.author">Anne Lind</span></div>
-    <div>Luokittelun tilaaja: <input name="classifications.0.buyer" class="required" type="hidden" /></div>
-    <div>Rekisteröinnistä laskutetaan: <input name="classifications.0.billing" class="required" type="text" /></div>
-    <div>Ohjelman formaatti:
-      <select name="classifications.0.format" class="required">
-        <option value="">Valitse...</option>
-        <option>DVD</option>
-        <option>HD DVD</option>
-        <option>Blu-ray Disc</option>
-        <option>VoD</option>
-        <option>CDkuva</option>
-        <option>VHS</option>
-        <option>8 mm</option>
-        <option>16 mm</option>
-        <option>70 mm</option>
-        <option>Televisio</option>
-      </select>
-    </div>
-    <div>Kesto: <input name="classifications.0.duration" class="required duration" data-type="duration" type="text" /></div>
-    <h3>Luokittelun kriteerit</h3>
-    <div><input name="classifications.0.safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
+    <div class="row">
+      <div class="movie-info content">
+        <h2>Uusi kuvaohjelma</h2>
+        <div class="left">
+          <label>Alkuperäinen nimi</label><input name="name.0" class="required" type="text" />
+          <label>Suomalainen nimi</label><input name="name-fi.0" class="required" type="text" />
+          <label>Ruotsinkielinen nimi</label><input name="name-sv.0" type="text" />
+          <label>Maa</label><input name="country" class="country required" type="hidden" />
+          <label>Valmistusvuosi</label><input name="year" type="text" class="required" data-type="number" />
+          <label>Tuotantoyhtiö</label><input name="production-companies" class="required" type="hidden"/>
+        </div>
 
-    <div class="category-container">
-      <ol class="categories">
-        <li class="violence selected">Väkivalta</li>
-        <li class="sex">Seksi</li>
-        <li class="anxiety">Ahdistus</li>
-        <li class="drugs">Päihteet</li>
-      </ol>
-      <div class="category-criteria"></div>
-    </div>
-    <div class="summary">
-      <span class="year"></span>
-      <span class="name"></span>
-      <div class="name-fi"></div>
-      <div class="name-sv"></div>
-      <div>
-        <img class="agelimit" src="images/agelimit-s.png" />
-        <div class="warnings"></div>
+        <div class="right">
+          <label>Genre</label>
+            <select name="genre" class="required">
+              <option value="">Valitse...</option>
+              <option>Fiktio</option>
+              <option>Animaatio</option>
+              <option>Viihde</option>
+              <option>Seksi / Erotiikka</option>
+              <option>Dokumentti</option>
+              <option>Lasten ohjelmat</option>
+              <option>Muut</option>
+              <option>Romantiikka</option>
+              <option>Draama</option>
+              <option>Historiallinen näytelmä</option>
+              <option>Trilleri</option>
+              <option>Seikkailu</option>
+              <option>Western</option>
+              <option>Sota</option>
+              <option>Kauhu</option>
+              <option>Tieteisseikkailu</option>
+              <option>Toimintaelokuva</option>
+              <option>Fantasia</option>
+              <option>Komedia ja farssi</option>
+              <option>Musiikki</option>
+              <option>Opetus</option>
+              <option>Urheilu</option>
+              <option>Matkailu</option>
+              <option>Henkilödokumentti</option>
+              <option>Luontodokumentti</option>
+              <option>Lasten animaatio</option>
+              <option>Lasten fiktio</option>
+              <option>Muu lastenelokuva</option>
+              <option>Mainonta</option>
+              <option>Tietoisku</option>
+              <option>Kokeiluelokuva</option>
+              <option>Videotaide</option>
+            </select>
+          <label>Ohjaaja</label><input name="directors" class="required" type="hidden"/>
+          <label>Näyttelijät</label><input name="actors" class="" type="hidden"/>
+          <label for="synopsis">Synopsis</label><textarea name="synopsis" class="required"></textarea>
+        </div>
       </div>
-      <div class="synopsis"><b>Synopsis: </b><span></span></div>
-      <div class="country"><b>Maa: </b><span></span></div>
-      <div class="directors"><b>Ohjaajat: </b><span></span></div>
-      <div class="actors"><b>Näyttelijät: </b><span></span></div>
     </div>
-    <button name="register" disabled=disabled>Rekisterõi</button>
+
+    <div id="classification" class="row">
+      <div class="movie-info content">
+        <h2>Luokittelu</h2>
+        <div class="left">
+          <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
+          <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="text" />
+        </div>
+        <div class="right">
+          <label>Ohjelman formaatti</label>
+            <select name="classifications.0.format" class="required">
+              <option value="">Valitse...</option>
+              <option>DVD</option>
+              <option>HD DVD</option>
+              <option>Blu-ray Disc</option>
+              <option>VoD</option>
+              <option>CDkuva</option>
+              <option>VHS</option>
+              <option>8 mm</option>
+              <option>16 mm</option>
+              <option>70 mm</option>
+              <option>Televisio</option>
+            </select>
+          <label>Kesto</label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
+        </div>
+      </div>
+    </div>
+
+    <div id="criteria" class="row">
+      <div class="content">
+        <h2>Luokittelun kriteerit</h2>
+        <div><input name="classifications.0.safe" type="checkbox" /> Ei sisällä lapsille haitallista materiaalia</div>
+
+        <div class="category-container">
+          <div class="category violence">
+            <div class="heading"><h3>Väkivalta</h3></div>
+          </div>
+          <div class="category anxiety">
+            <div class="heading"><h3>Ahdistus</h3></div>
+          </div>
+          <div class="category sex">
+            <div class="heading"><h3>Seksi</h3></div>
+          </div>
+          <div class="category drugs">
+            <div class="heading"><h3>Päihteet</h3></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+      <div class="summary">
+        <span class="year"></span>
+        <span class="name"></span>
+        <div class="name-fi"></div>
+        <div class="name-sv"></div>
+        <div>
+          <img class="agelimit" src="images/agelimit-s.png" />
+          <div class="warnings"></div>
+        </div>
+        <div class="synopsis"><b>Synopsis: </b><span></span></div>
+        <div class="country"><b>Maa: </b><span></span></div>
+        <div class="directors"><b>Ohjaajat: </b><span></span></div>
+        <div class="actors"><b>Näyttelijät: </b><span></span></div>
+      </div>
+    </div>
+      <button name="register" disabled=disabled>Rekisterõi</button>
   </form>
 </body>
 </html>

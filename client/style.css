@@ -1,3 +1,9 @@
+body {
+  background-color: #F8F8F8;
+  font-family: Helvetica, Arial;
+  color: #444444;
+}
+
 [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;
@@ -12,42 +18,258 @@ button[disabled=disabled], button:disabled { color: gray; }
 ol { list-style-type: none; margin: 0; }
 .new-movie { margin: 10px; }
 
+/* layout */
 #header { margin: 10px 0 0 10px; }
+.row { border-bottom: 1px solid #D3D3D3; width: 100%; float: left; margin: 0; padding: 70px 0 80px 0; }
+.content { width: 940px; margin: 0 auto; padding: 0 10px; }
+
+h2 { font-size: 24px; color: #444444; line-height: 30px; }
+h3 { font-size: 20px; color: #444444; line-height: 24px; }
+h4 { font-size: 16px; color: #444444; line-height: 24px; }
+h5 { font-size: 14px; color: #444444; line-height: 19px; }
+
+.content h2 {
+  margin: 0 0 40px 0; padding: 0 0 40px 0; border-bottom: 4px solid #DDDDDD;
+}
+
+.left { float: left; width: 50%; }
+.right { float: right; width: 50%; }
 
 #search-results > div { margin: 10px; }
 #search-results h3 { padding: 0; margin: 0; }
 #search-results span { margin-left: 20px; display: block; }
 
-#movie-details { display: none; margin: 10px; }
-#movie-details > div { margin: 10px; }
+input[type=text],
+.select2-container-multi .select2-choices {
+  width: 280px;
+}
+.movie-info select {width: 300px;}
+.movie-info textarea { width: 280px; height: 130px; }
 
-#movie-details .categories { float:left; margin-right: 30px; }
-#movie-details .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
-#movie-details .categories .selected { font-weight: bold; cursor: default; }
-#movie-details .categories .violence { background-image: url('images/violence.png'); }
-#movie-details .categories .sex { background-image: url('images/sex.png'); }
-#movie-details .categories .anxiety { background-image: url('images/anxiety.png'); }
-#movie-details .categories .drugs { background-image: url('images/drugs.png'); }
+input[type=text],
+textarea,
+.select2-container-multi .select2-choices,
+.select2-container .select2-choice {
+  border-radius: 3px;
+  background: #FFFFFF;
+  border: 1px solid #FF99CC;
+  -moz-box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
+  box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
+  font-size: 14px;
+  color: #666666;
+  line-height: 19px;
+}
 
-#movie-details .category-criteria { margin-left: 150px; min-height: 700px; }
-#movie-details .category-criteria ol { display: none;}
-#movie-details .category-criteria ol:first-of-type { display: block; }
-#movie-details .category-criteria li { margin-bottom: 10px; }
-#movie-details .category-criteria .agelimit { display: inline-block; margin: 0 10px; width: 30px; height: 30px; background: transparent no-repeat; background-size: 30px; vertical-align: middle }
-#movie-details .category-criteria .agelimit-18 { background-image: url('images/agelimit-18.png'); }
-#movie-details .category-criteria .agelimit-16 { background-image: url('images/agelimit-16.png'); }
-#movie-details .category-criteria .agelimit-12 { background-image: url('images/agelimit-12.png'); }
-#movie-details .category-criteria .agelimit-7 { background-image: url('images/agelimit-7.png'); }
-#movie-details .category-criteria .agelimit-S { background-image: url('images/agelimit-s.png'); }
-#movie-details .category-criteria small { margin-left: 65px; display: block; }
-#movie-details .category-criteria textarea { float: right; }
+input[type=text]:focus,
+textarea:focus,
+.select2-container-active .select2-choices,
+.select2-container-active .select2-choice {
+  outline: none;
+  border: 1px solid #44AAFF;
+  -moz-box-shadow:    0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
+  box-shadow:         0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
+}
 
-#movie-details .select2-input { min-width: 200px; }
-#movie-details .select2-container-multi.invalid .select2-choices,
-#movie-details .select2-container.invalid .select2-choice {
+input[type=text], textarea, .select2-container-multi .select2-choices .select2-search-field input {
+  padding: 8px 10px !important;
+}
+
+.select2-container-multi .select2-choices {
+  min-height: 0;
+  width: 300px;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+  padding: 6px 8px 6px 18px;
+  border: 0;
+  background-color: #eee;
+  color: #666666;
+}
+.select2-search-choice-close {
+  top: 5px;
+}
+
+.select2-container-multi .select2-choices .select2-search-field input {
+  margin: 0;
+  padding: 0;
+  line-height: 19px;
+}
+
+input, select, .select2-choices  {
+  margin: 0 0 15px 0;
+  vertical-align: middle;
+}
+
+.select2-container {
+  margin-bottom: 10px;
+}
+
+.select2-container .select2-choice {
+  height: 36px;
+  line-height: 36px;
+}
+
+label, input {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+label[for=synopsis] {
+  vertical-align: top;
+}
+
+label {
+  width: 140px;
+  text-align: right;
+  padding: 0 20px 0 0;
+  font-weight: bold;
+  font-size: 14px;
+  color: #444444;
+  line-height: 19px;
+}
+
+.select2-container { width: 305px; }
+
+input[type=text].invalid,
+.select2-container-multi.invalid .select2-choices,
+.select2-container.invalid .select2-choice {
+  background-color: #FFF7FA !important;
   background-color: #f2dede;
   background-image: none;
 }
+
+#movie-details { display: none; }
+
+#criteria .category {
+  width: 300px;
+  float: left;
+  margin-right: 15px;
+}
+
+#criteria .category .heading {
+  outline: 1px solid #D3D3D3;
+  background-color: #fff;
+  padding: 0 0 0 70px;;
+  height: 70px;
+  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
+  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
+  background-position: 15px 15px;
+  background-repeat: no-repeat;
+  background-size: 40px 40px;
+}
+
+#criteria .category .heading h3 {
+  margin: 24px 0;
+}
+
+#criteria .category.violence .heading h3 { color: #AA0050; }
+#criteria .category.anxiety .heading h3 { color: #44AAFF;}
+#criteria .category.sex .heading h3 { color: #FF77AA;}
+#criteria .category.drugs .heading h3 { color: #33BB33;}
+
+#criteria .category.violence .heading {
+  border-top: 5px solid #AA0050;
+  background-image: url('images/violence.png');
+}
+
+#criteria .category.anxiety .heading {
+  border-top: 5px solid #44AAFF;
+  background-image: url('images/anxiety.png');
+}
+
+#criteria .category.sex .heading {
+  border-top: 5px solid #FF77AA;
+  background-image: url('images/sex.png');
+}
+
+#criteria .category.drugs .heading {
+  margin-top: 15px;
+  border-top: 5px solid #33BB33;
+  background-image: url('images/drugs.png');
+}
+
+#criteria .category .heading h3 {}
+
+#criteria .category .criteria {
+  background-color: #fff;
+  padding: 15px 20px 15px 70px;
+  margin-top: 15px;
+  border: 1px solid #D3D3D3;
+  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
+  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
+}
+
+#criteria .category .criteria:hover {
+  cursor: pointer;
+}
+
+#criteria .category .criteria.selected {
+  color: #ffffff;
+  background: #777777;
+  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+}
+
+#criteria .category .criteria h5 {
+  margin: 0 0 10px 0;
+}
+
+#criteria .category .criteria h5 span {
+  color: #777;
+  font-weight: normal;
+}
+
+#criteria .category .criteria p {
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  font-weight: Normal;
+  color: #666666;
+  line-height: 17px;
+}
+
+#criteria .category .criteria.selected p,
+#criteria .category .criteria.selected h5,
+#criteria .category .criteria.selected h5 span {
+  color: #fff;
+}
+
+#criteria .category .criteria.agelimit {
+  background-position: 15px 15px;
+  background-repeat: no-repeat;
+  background-size: 40px 40px;
+}
+
+#criteria .category .criteria.agelimit-18 { background-image: url('images/agelimit-18.png'); }
+#criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
+#criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
+#criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
+#criteria .category .criteria.agelimit-S { background-image: url('images/agelimit-s.png'); }
+
+#criteria .category-container .category.sex, #criteria .category-container .category.drugs {
+  margin-right: 0;
+}
+
+#criteria .categories { float:left; margin-right: 30px; }
+#criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
+#criteria .categories .selected { font-weight: bold; cursor: default; }
+#criteria .categories .violence { background-image: url('images/violence.png'); }
+#criteria .categories .sex { background-image: url('images/sex.png'); }
+#criteria .categories .anxiety { background-image: url('images/anxiety.png'); }
+#criteria .categories .drugs { background-image: url('images/drugs.png'); }
+
+#criteria .category-criteria { margin-left: 150px; min-height: 700px; }
+#criteria .category-criteria ol { display: none;}
+#criteria .category-criteria ol:first-of-type { display: block; }
+#criteria .category-criteria li { margin-bottom: 10px; }
+#criteria .category-criteria .agelimit { display: inline-block; margin: 0 10px; width: 30px; height: 30px; background: transparent no-repeat; background-size: 30px; vertical-align: middle }
+#criteria .category-criteria .agelimit-18 { background-image: url('images/agelimit-18.png'); }
+#criteria .category-criteria .agelimit-16 { background-image: url('images/agelimit-16.png'); }
+#criteria .category-criteria .agelimit-12 { background-image: url('images/agelimit-12.png'); }
+#criteria .category-criteria .agelimit-7 { background-image: url('images/agelimit-7.png'); }
+#criteria .category-criteria .agelimit-S { background-image: url('images/agelimit-s.png'); }
+#criteria .category-criteria small { margin-left: 65px; display: block; }
+#criteria .category-criteria textarea { float: right; }
 
 .summary { position: fixed; right: 0; top: 20px; border: 1px solid black; width: 300px; min-height: 200px; line-height: 28px; padding: 5px 8px; transition: right 0.3s; }
 .summary.hidden { right: -280px; }
@@ -69,7 +291,6 @@ ol { list-style-type: none; margin: 0; }
 /*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 .summary .warnings .drop-target.active { width: 50px; }
 
-#movie-details .invalid { background-color: #f2dede !important; }
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

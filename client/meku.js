@@ -277,20 +277,20 @@ function movieDetails() {
   }
 
   function renderClassificationCriteria() {
-    var $categories = ['violence', 'sex', 'anxiety', 'drugs'].map(function(category) {
+    ['violence', 'sex', 'anxiety', 'drugs'].map(function(category) {
       var criteria = classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
-        return $('<li>')
-          .append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
-          .append($('<input>', { type: 'checkbox', name:'criteria-' + c.id, 'data-id': c.id } ))
-          .append($('<span>', { class:'agelimit agelimit-' + c.age }))
-          .append($('<span>').text(c.id + ' ' + c.title))
-          .append($('<small>').text(c.description))
+        return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age})
+          .append($('<h5>').text(c.title))
+          .append($('<p>').text(c.description))
+          //.append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
+          //.append($('<input>', { type: 'checkbox', name:'criteria-' + c.id, 'data-id': c.id } ))
+          //.append($('<span>', { class:'agelimit agelimit-' + c.age }))
+          //.append($('<span>').text(c.id + ' ' + c.title))
+          //.append($('<small>').text(c.description))
       })
-
-      return $('<ol>', { class: category }).append($criteria)
+      $('.category-container .' + category).append($criteria)
     })
-    $form.find('.category-criteria').html($categories)
   }
 
   function saveMovieField(id, field, value) {

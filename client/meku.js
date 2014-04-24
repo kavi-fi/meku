@@ -278,7 +278,7 @@ function movieDetails() {
       var criteria = classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
-          .append($('<h5>').text(c.title))
+          .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
           .append($('<p>').text(c.description))
           //.append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
       })

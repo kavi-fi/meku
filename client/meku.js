@@ -99,6 +99,10 @@ function movieDetails() {
     saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
   })
 
+  $form.on('click', '.category .criteria textarea', function(e) {
+    e.stopPropagation()
+  })
+
   $summary.on('click', '.name', function() { $summary.toggleClass('hidden') })
   $summary.on('dragstart', '.warnings .warning', function(e) {
     var $e = $(this)
@@ -280,7 +284,7 @@ function movieDetails() {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
           .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
           .append($('<p>').text(c.description))
-          //.append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
+          .append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
       })
       $('.category-container .' + category).append($criteria)
     })

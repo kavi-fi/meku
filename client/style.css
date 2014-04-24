@@ -201,6 +201,9 @@ input[type=text].invalid,
 
 #criteria .category .criteria:hover {
   cursor: pointer;
+  border: 1px solid #44AAFF;
+  -moz-box-shadow:    0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
+  box-shadow:         0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
 }
 
 #criteria .category .criteria.selected {
@@ -208,6 +211,7 @@ input[type=text].invalid,
   background: #777777;
   -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+  border: 0;
 }
 
 #criteria .category .criteria h5 {
@@ -221,7 +225,7 @@ input[type=text].invalid,
 
 #criteria .category .criteria p {
   padding: 0;
-  margin: 0;
+  margin: 0 0 20px 0;
   font-size: 12px;
   font-weight: Normal;
   color: #666666;
@@ -232,6 +236,15 @@ input[type=text].invalid,
 #criteria .category .criteria.selected h5,
 #criteria .category .criteria.selected h5 span {
   color: #fff;
+}
+
+#criteria .category .criteria textarea {
+  display: none;
+  border: 1px solid #666666;
+  border-radius: 0;
+}
+#criteria .category .criteria.selected textarea {
+  display: block;
 }
 
 #criteria .category .criteria.agelimit {

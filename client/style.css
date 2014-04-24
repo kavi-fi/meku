@@ -199,6 +199,17 @@ input[type=text].invalid,
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
 }
 
+#criteria .category .criteria:hover {
+  cursor: pointer;
+}
+
+#criteria .category .criteria.selected {
+  color: #ffffff;
+  background: #777777;
+  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+}
+
 #criteria .category .criteria h5 {
   margin: 0 0 10px 0;
 }
@@ -210,6 +221,11 @@ input[type=text].invalid,
   font-weight: Normal;
   color: #666666;
   line-height: 17px;
+}
+
+#criteria .category .criteria.selected p,
+#criteria .category .criteria.selected h5 {
+  color: #fff;
 }
 
 #criteria .category .criteria.agelimit {

@@ -35,7 +35,7 @@ var tasks = {
   wipeNames: wipeNames,
   names: names,
   accounts: accounts,
-  wipeAccounts: wipeAccounts,
+  wipeAccounts: wipeAccounts
 }
 
 var mappings = {
@@ -195,7 +195,7 @@ function toObject(table, fieldMapping) {
     if (value == 'NULL') return
     var mapper = fieldMapping[columnName]
     if (mapper) {
-      if (mapper == '1') {
+      if (mapper == 1) {
         obj[columnName] = value
       } else {
         mapper(obj, columnName, value)
@@ -217,7 +217,7 @@ function mapTo(fieldName) {
 function trim(obj, key, value) {
   obj[key] = (value || '').trim()
 }
-function intToBoolean(obj, value) {
+function intToBoolean(obj, key, value) {
   if (value == '1') obj[key] = true
 }
 

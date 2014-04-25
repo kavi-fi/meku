@@ -4,7 +4,7 @@ body {
   color: #444444;
 }
 
-[draggable] {
+#criteria .category, [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -211,7 +211,7 @@ input[type=text].invalid,
   background: #777777;
   -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
-  border: 0;
+  border: 1px solid #777777;
 }
 
 #criteria .category .criteria h5 {

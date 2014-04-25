@@ -137,6 +137,8 @@ function movieDetails() {
       $(e.originalEvent.dataTransfer.getData('text/plain')),
       $('<span>', { class:'drop-target' })
     ])
+    var newOrder = $summary.find('.warnings .warning').map(function() { return $(this).data('id') }).get()
+    saveMovieField($form.data('id'), 'classifications.0.warning-order', newOrder)
   })
 
   function show(movie) {
@@ -296,7 +298,7 @@ function movieDetails() {
 
   function updateSummary(movie) {
     var classification = classificationSummary(movie.classifications[0])
-    var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
+    var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     $summary
       .find('.year').text(movie.year || '-').end()
       .find('.name').text(movie.name.join(', ') || '-').end()
@@ -323,6 +325,12 @@ function movieDetails() {
       .filter(function(c) { return c.age == maxAgeLimit })
       .map(function(c) { return c.category })
       .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
+    if (classification['warning-order'].length > 0) {
+      var order = classification['warning-order']
+      warnings = warnings.sort(function(a, b) {
+        return order.indexOf(a) - order.indexOf(b)
+      })
+    }
     return { age: maxAgeLimit, warnings: warnings }
   }
 

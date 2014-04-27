@@ -40,13 +40,21 @@ var mappings = {
   meku_audiovisualprograms: {
     table:'meku_audiovisualprograms',
     filter: filterDeleted,
-    fields: { 'id':mapTo('emeku-id'), 'name':asArray, 'deleted':intToBoolean, 'program_type':mapTo('program-type') }
+    fields: { 'id':mapTo('emeku-id'), 'deleted':intToBoolean, 'program_type':mapTo('program-type') }
   },
   meku_actors: { table:'meku_actors', fields: { 'id':1, 'name':trim, 'surname':trim, 'deleted':intToBoolean } },
   meku_audiov_meku_actors_c: { table: 'meku_audiov_meku_actors_c', fields: { 'meku_audio7d9crograms_ida':1, 'meku_audio8fcb_actors_idb':1, 'deleted':intToBoolean } },
 
-  meku_names: { table: 'meku_names', fields: { 'id':1, 'name':trim, 'deleted':intToBoolean } },
-  meku_audiovs_meku_names_c: { table: 'meku_audiovs_meku_names_c', fields: { type:1, 'meku_audio91farograms_ida':1, 'meku_audio7e24u_names_idb':1, 'deleted':intToBoolean } },
+  meku_names: {
+    table: 'meku_names',
+    filter: filterDeleted,
+    fields: { 'id':1, 'name':trim, 'deleted':intToBoolean }
+  },
+  meku_audiovs_meku_names_c: {
+    table: 'meku_audiovs_meku_names_c',
+    filter: filterDeleted,
+    fields: { type:1, 'meku_audio91farograms_ida':1, 'meku_audio7e24u_names_idb':1, 'deleted':intToBoolean }
+  },
   accounts: { table: 'accounts', fields: {id: mapTo('emeku-id'), name: trim}}
 }
 
@@ -84,9 +92,7 @@ function wipeActors(callback) {
 }
 
 function wipeNames(callback) {
-  schema.Movie.update({}, { $push: { name: { $each: [ ], $slice: 1 } } }, { multi:true}, function() {
-    schema.Movie.update({}, { 'name-fi': [], 'name-sv': [] }, { multi:true }, callback)
-  })
+  schema.Movie.update({}, { 'name': [], 'name-fi': [], 'name-sv': [], 'name-other': [] }, { multi:true }, callback)
 }
 
 function base(callback) {
@@ -97,7 +103,6 @@ function base(callback) {
 }
 
 function names(callback) {
-  // NOTE: This has NOT been tested yet.
   parseTableToJsonArray(mappings.meku_names, function(err, allNames) {
     if (err) return callback(err)
     parseTableToJsonArray(mappings.meku_audiovs_meku_names_c, function(err, allLinks) {
@@ -123,6 +128,7 @@ function names(callback) {
     if (type == '1A') return 'name'
     if (type == '2S') return 'name-fi'
     if (type == '3R') return 'name-sv'
+    if (type == '4M') return 'name-other'
     return undefined
   }
 }

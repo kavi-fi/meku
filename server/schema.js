@@ -25,7 +25,8 @@ var Movie = exports.Movie = mongoose.model('movies', {
   directors: {type: [String], index: true},
   actors: {type: [String], index: true},
   synopsis: String,
-  classifications: [classification]
+  classifications: [classification],
+  'program-type': String // enums.programType
 })
 
 var ProductionCompany = exports.ProductionCompany = mongoose.model('production_companies', {

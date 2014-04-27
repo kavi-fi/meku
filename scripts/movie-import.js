@@ -15,8 +15,6 @@ awk '/<!-- Table/{ if (f) { print "</docs>" > f; close(f); } f = $3".xml"; print
 
 */
 
-// TODO: None of the import functions currently handle the deleted-attribute!
-
 var schema = require('../server/schema')
 var xml = require('xml-object-stream')
 var mongoose = require('mongoose')
@@ -39,7 +37,11 @@ var tasks = {
 }
 
 var mappings = {
-  meku_audiovisualprograms: { table:'meku_audiovisualprograms', fields: { 'id':mapTo('emeku-id'), 'name':asArray, 'deleted':intToBoolean } },
+  meku_audiovisualprograms: {
+    table:'meku_audiovisualprograms',
+    filter: filterDeleted,
+    fields: { 'id':mapTo('emeku-id'), 'name':asArray, 'deleted':intToBoolean, 'program_type':mapTo('program-type') }
+  },
   meku_actors: { table:'meku_actors', fields: { 'id':1, 'name':trim, 'surname':trim, 'deleted':intToBoolean } },
   meku_audiov_meku_actors_c: { table: 'meku_audiov_meku_actors_c', fields: { 'meku_audio7d9crograms_ida':1, 'meku_audio8fcb_actors_idb':1, 'deleted':intToBoolean } },
 
@@ -182,7 +184,9 @@ function parseTableToJsonArray(mapping, callback) {
     result.push(toObject(table, mapping.fields))
   })
   parser.on('error', callback)
-  parser.on('end', function() { callback(null, result) })
+  parser.on('end', function() {
+    callback(null, mapping.filter ? result.filter(mapping.filter) : result)
+  })
 
   // TODO: do we need to explicitly close the read stream?
 }
@@ -225,4 +229,8 @@ function keyValue(key, value) {
   var o = {}
   o[key] = value
   return o
+}
+
+function filterDeleted(obj) {
+  return obj.deleted != true
 }

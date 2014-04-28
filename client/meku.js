@@ -107,7 +107,7 @@ function movieDetails() {
     var $e = $(this)
     e.originalEvent.dataTransfer.effectAllowed = 'move'
     e.originalEvent.dataTransfer.setData('text/plain', this.outerHTML)
-    $form.find('.summary .drop-target').not($e.next()).addClass('valid')
+    $summary.find('.drop-target').not($e.next()).addClass('valid')
     setTimeout(function() { $e.add($e.next()).addClass('dragging') }, 0)
   })
   $summary.on('dragenter', '.warnings .drop-target.valid', function(e) {
@@ -124,13 +124,13 @@ function movieDetails() {
   })
   $summary.on('dragend', '.warnings .warning', function(e) {
     $(this).add($(this).next()).removeClass('dragging')
-    $form.find('.summary .drop-target').removeClass('valid').removeClass('active')
+    $summary.find('.drop-target').removeClass('valid').removeClass('active')
   })
   $summary.on('drop', '.warnings .drop-target', function(e) {
     e.preventDefault()
     e.originalEvent.dataTransfer.dropEffect = 'move'
-    $form.find('.summary .drop-target.valid').removeClass('valid')
-    $form.find('.summary .dragging').remove()
+    $summary.find('.drop-target.valid').removeClass('valid')
+    $summary.find('.dragging').remove()
     $(this).replaceWith([
       $('<span>', { class:'drop-target' }),
       $(e.originalEvent.dataTransfer.getData('text/plain')),
@@ -297,6 +297,7 @@ function movieDetails() {
     var classification = classificationSummary(movie.classifications[0])
     var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
+    console.log(warnings)
     $summary
       .find('.name').text(movie.name.join(', ') || '-').append($('<span>', {class:'year'}).text(movie.year || '-')).end()
       .find('.name-fi').text(movie['name-fi'].join(', ') || '-').end()

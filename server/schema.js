@@ -27,7 +27,8 @@ var Movie = exports.Movie = mongoose.model('movies', {
   actors: {type: [String], index: true},
   synopsis: String,
   classifications: [classification],
-  'program-type': String // enums.programType
+  'program-type': String, // enums.programType
+  comments: String
 })
 
 var Account = exports.Account = mongoose.model('accounts', {

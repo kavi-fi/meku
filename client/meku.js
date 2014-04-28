@@ -158,6 +158,8 @@ function movieDetails() {
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
+    $form.find('textarea[name="comments"]').val(movie.comments)
+
     $form.find('input.country').select2({
       data: countryMatcher(),
       placeholder: "Valitse..."

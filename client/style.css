@@ -262,6 +262,8 @@ input[type=text].invalid,
   margin-right: 0;
 }
 
+#summary .comments textarea { width: 438px; }
+#summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
 #summary .left {width: 460px; padding: 0 10px 0 0;}
 #summary .right {width: 460px; padding: 0 0 0 10px;}
 #summary .wrapper { border: 1px solid #D3D3D3; border-radius: 2px; padding: 20px; }

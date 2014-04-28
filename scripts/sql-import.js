@@ -6,7 +6,7 @@ var stream = require('stream')
 var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
 
 var tasks = {
-  base: base,
+  wipe: wipe, base: base,
   wipeNames: wipeNames, names: names,
   wipeActors: wipeActors, actors: actors,
   wipeDirectors: wipeDirectors, directors: directors,
@@ -41,14 +41,11 @@ function run(job, callback) {
 }
 
 function base(callback) {
-  drop('movies', function(err) {
-    if (err) throw err
-    conn.query('SELECT id, program_type, year FROM meku_audiovisualprograms where deleted != "1"')
-      .stream({ highWaterMark: 2000 })
-      .pipe(programMapper())
-      .pipe(batcher(1000))
-      .pipe(batchInserter(callback))
-  })
+  conn.query('SELECT id, program_type, publish_year, year FROM meku_audiovisualprograms where deleted != "1"')
+    .stream({ highWaterMark: 2000 })
+    .pipe(programMapper())
+    .pipe(batcher(1000))
+    .pipe(batchInserter(callback))
 }
 
 function names(callback) {
@@ -157,7 +154,8 @@ function programMapper() {
   tx._transform = function(row, encoding, done) {
     var obj = { 'emeku-id': row.id }
     if (row.program_type) obj['program-type'] = row.program_type
-    if (row.year) obj['year'] = row.year
+    if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
+    if (row.year && row.year != 'undefined') obj.year = row.year
     tx.push(obj)
     done()
   }
@@ -165,9 +163,9 @@ function programMapper() {
 }
 
 function batchInserter(callback) {
-  var mon = progressMonitor(10)
+  var tick = progressMonitor(2)
   var onRows = function(rows, cb) {
-    mon()
+    tick()
     var args = rows.concat([cb])
     schema.Movie.create.apply(schema.Movie, args)
   }
@@ -189,10 +187,15 @@ function consumer(onRow, callback) {
   return s
 }
 
-function drop(coll, callback) {
+function dropCollection(coll, callback) {
   mongoose.connection.db.dropCollection(coll, callback)
 }
-
+function wipe(callback) {
+  dropCollection('movies', function(err) {
+    if (err) return callback(err)
+    dropCollection('accounts', callback)
+  })
+}
 function wipeNames(callback) {
   schema.Movie.update({}, { 'name': [], 'name-fi': [], 'name-sv': [], 'name-other': [] }, { multi:true }, callback)
 }

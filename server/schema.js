@@ -21,17 +21,13 @@ var Movie = exports.Movie = mongoose.model('movies', {
   deleted: Boolean,
   country: String,
   year: String,
-  'production-companies': [{_id: mongoose.Schema.Types.ObjectId, name: String}],
+  'production-companies': {type: [String], index: true },
   genre: String,
   directors: {type: [String], index: true},
   actors: {type: [String], index: true},
   synopsis: String,
   classifications: [classification],
   'program-type': String // enums.programType
-})
-
-var ProductionCompany = exports.ProductionCompany = mongoose.model('production_companies', {
-  name: {type: String, index: true}
 })
 
 var Account = exports.Account = mongoose.model('accounts', {

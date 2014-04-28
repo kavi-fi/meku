@@ -171,9 +171,7 @@ function movieDetails() {
       $el: $form.find('input[name="production-companies"]'),
       val: movie['production-companies'] || [],
       path: '/production-companies/',
-      toOption: companyToSelect2Option,
-      fromOption: select2OptionToCompany,
-      multiple: true,
+      multiple: true
     })
 
     selectAutocomplete({

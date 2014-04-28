@@ -28,9 +28,8 @@ h3 { font-size: 20px; color: #444444; line-height: 24px; }
 h4 { font-size: 16px; color: #444444; line-height: 24px; }
 h5 { font-size: 14px; color: #444444; line-height: 19px; }
 
-.content h2 {
-  margin: 0 0 40px 0; padding: 0 0 40px 0; border-bottom: 4px solid #DDDDDD;
-}
+.content h2 { margin: 0 0 40px 0; padding: 0 0 40px 0; border-bottom: 4px solid #DDDDDD; }
+.content h3 { margin: 0 0 20px 0; padding: 0 0 15px 0; }
 
 .left { float: left; width: 50%; }
 .right { float: right; width: 50%; }
@@ -263,24 +262,36 @@ input[type=text].invalid,
   margin-right: 0;
 }
 
+#summary .left {width: 460px; padding: 0 10px 0 0;}
+#summary .right {width: 460px; padding: 0 0 0 10px;}
+#summary .wrapper { border: 1px solid #D3D3D3; border-radius: 2px; padding: 20px; }
+#summary label, #summary .info { padding: 0 0 10px 0;}
+#summary label { display: inline-block; width: 150px; text-align: left; }
+#summary .info { display: inline-block; float: right; width: 250px; }
+#summary h3 { border-bottom: 5px solid #DDDDDD; }
+#summary h4 { border-bottom: 1px solid #D3D3D3; padding: 0 0 15px 0; margin: 0;}
+#summary h4 span { font-size: 16px; font-weight: normal; float: right;}
+#summary .synopsis p { margin: 0 0 20px 0;}
+
+#summary .synopsis p,
+#summary .info {
+  font-size: 14px;
+  color: #666666;
+  line-height: 17px;
+}
+
+#summary .agelimit  { width: 170px; float: left; padding: 15px 0 0 0;}
+#summary .agelimit img { width: 40px; height: 40px;}
+#summary .synopsis  { float: left; width: 230px; min-height: 100px; padding: 15px 0 0 0;}
+
+
 #criteria .categories { float:left; margin-right: 30px; }
 #criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
-#criteria .categories .selected { font-weight: bold; cursor: default; }
-#criteria .categories .violence { background-image: url('images/violence.png'); }
-#criteria .categories .sex { background-image: url('images/sex.png'); }
-#criteria .categories .anxiety { background-image: url('images/anxiety.png'); }
-#criteria .categories .drugs { background-image: url('images/drugs.png'); }
 
 #criteria .category-criteria { margin-left: 150px; min-height: 700px; }
 #criteria .category-criteria ol { display: none;}
 #criteria .category-criteria ol:first-of-type { display: block; }
 #criteria .category-criteria li { margin-bottom: 10px; }
-#criteria .category-criteria .agelimit { display: inline-block; margin: 0 10px; width: 30px; height: 30px; background: transparent no-repeat; background-size: 30px; vertical-align: middle }
-#criteria .category-criteria .agelimit-18 { background-image: url('images/agelimit-18.png'); }
-#criteria .category-criteria .agelimit-16 { background-image: url('images/agelimit-16.png'); }
-#criteria .category-criteria .agelimit-12 { background-image: url('images/agelimit-12.png'); }
-#criteria .category-criteria .agelimit-7 { background-image: url('images/agelimit-7.png'); }
-#criteria .category-criteria .agelimit-S { background-image: url('images/agelimit-s.png'); }
 #criteria .category-criteria small { margin-left: 65px; display: block; }
 #criteria .category-criteria textarea { float: right; }
 

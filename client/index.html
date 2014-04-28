@@ -126,21 +126,30 @@
 
     </div>
 
-      <div class="summary">
-        <span class="year"></span>
-        <span class="name"></span>
-        <div class="name-fi"></div>
-        <div class="name-sv"></div>
-        <div>
-          <img class="agelimit" src="images/agelimit-s.png" />
-          <div class="warnings"></div>
+    <div id="summary" class="row">
+      <div class="content">
+
+        <div class="left">
+          <h3>KAVIN sisäiset kommentit</h3>
         </div>
-        <div class="synopsis"><b>Synopsis: </b><span></span></div>
-        <div class="country"><b>Maa: </b><span></span></div>
-        <div class="directors"><b>Ohjaajat: </b><span></span></div>
-        <div class="actors"><b>Näyttelijät: </b><span></span></div>
+
+        <div class="right">
+          <h3>Ikärajat.fi-näkymä</h3>
+          <div class="wrapper">
+            <h4 class="name"><span class="year"></span></h4>
+            <div class="agelimit">
+              <img src="images/agelimit-s.png" />
+              <div class="warnings"></div>
+            </div>
+            <div class="synopsis"></div>
+            <label>Maa</label><span class="info country"></span>
+            <label>Ohjaajat</label><span class="info directors"></span>
+            <label>Näyttelijät</label><span class="info actors"></span>
+          </div>
+        </div>
       </div>
     </div>
+
       <button name="register" disabled=disabled>Rekisterõi</button>
   </form>
 </body>

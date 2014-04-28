@@ -56,7 +56,7 @@ function searchPage() {
 
 function movieDetails() {
   var $form = $('#movie-details')
-  var $summary = $form.find('.summary')
+  var $summary = $('#summary')
   var $submit = $form.find('button[name=register]')
 
   renderClassificationCriteria()
@@ -103,7 +103,6 @@ function movieDetails() {
     e.stopPropagation()
   })
 
-  $summary.on('click', '.name', function() { $summary.toggleClass('hidden') })
   $summary.on('dragstart', '.warnings .warning', function(e) {
     var $e = $(this)
     e.originalEvent.dataTransfer.effectAllowed = 'move'
@@ -297,16 +296,16 @@ function movieDetails() {
   function updateSummary(movie) {
     var classification = classificationSummary(movie.classifications[0])
     var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
+    var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
     $summary
-      .find('.year').text(movie.year || '-').end()
-      .find('.name').text(movie.name.join(', ') || '-').end()
+      .find('.name').text(movie.name.join(', ') || '-').append($('<span>', {class:'year'}).text(movie.year || '-')).end()
       .find('.name-fi').text(movie['name-fi'].join(', ') || '-').end()
       .find('.name-sv').text(movie['name-sv'].join(', ') || '-').end()
-      .find('.synopsis span').text(movie.synopsis || '-').end()
-      .find('.country span').text(movie.country || '-').end()
-      .find('.directors span').text((movie.directors).join(', ') || '-').end()
-      .find('.actors span').text((movie.actors).join(', ') || '-').end()
-      .find('.agelimit').attr('src', 'images/agelimit-'+classification.age+'.png').end()
+      .find('.synopsis').html(synopsis).end()
+      .find('.country').text(movie.country || '-').end()
+      .find('.directors').text((movie.directors).join(', ') || '-').end()
+      .find('.actors').text((movie.actors).join(', ') || '-').end()
+      .find('.agelimit img').attr('src', 'images/agelimit-'+classification.age+'.png').end()
       .find('.warnings').html(warnings).end()
   }
 

@@ -8,7 +8,7 @@ exports.programType = {
   6: 'Traileri',
   7: 'Extra',
   8: 'Peli',
-  10: 'TESTI',
+  10: 'Yhteistuotanto',
   11: 'PEGI hyväksytty peli',
   12: 'Muu kuvaohjelma'
 }

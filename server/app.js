@@ -20,7 +20,6 @@ app.get('/movies/search/:q', function(req, res) {
   })
 })
 
-
 app.get('/movies/:id', function(req, res) {
   Movie.findById(req.params.id, function(err, movie) { res.send(movie) })
 })

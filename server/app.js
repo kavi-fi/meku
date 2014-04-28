@@ -87,6 +87,7 @@ app.get('/directors/:query', function(req, res, next) {
 })
 
 app.use(express.static(path.join(__dirname, '../client')))
+app.use('/shared', express.static(path.join(__dirname, '../shared')))
 
 liveReload(app, { watchDir: path.join(__dirname, '../client') })
 

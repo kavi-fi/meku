@@ -161,7 +161,7 @@ function movieDetails() {
     $form.find('textarea[name="comments"]').val(movie.comments)
 
     $form.find('input.country').select2({
-      data: countryMatcher(),
+      data: Object.keys(enums.countries).map(function(key) { return { id: key, text: enums.countries[key] }}),
       placeholder: "Valitse...",
       multiple: true
     })
@@ -301,13 +301,13 @@ function movieDetails() {
     var classification = classificationSummary(movie.classifications[0])
     var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
-    console.log(warnings)
+    var countries = movie.country.map(function(c) { return enums.countries[c] }).join(', ')
     $summary
       .find('.name').text(movie.name.join(', ') || '-').append($('<span>', {class:'year'}).text(movie.year || '-')).end()
       .find('.name-fi').text(movie['name-fi'].join(', ') || '-').end()
       .find('.name-sv').text(movie['name-sv'].join(', ') || '-').end()
       .find('.synopsis').html(synopsis).end()
-      .find('.country').text(movie.country || '-').end()
+      .find('.country').text(countries || '-').end()
       .find('.directors').text((movie.directors).join(', ') || '-').end()
       .find('.actors').text((movie.actors).join(', ') || '-').end()
       .find('.agelimit img').attr('src', 'images/agelimit-'+classification.age+'.png').end()
@@ -384,11 +384,6 @@ $.fn.throttledInput = function(fn) {
 
 $.fn.check = function(on) {
   return on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
-}
-
-function countryMatcher() {
-  var countries = ['Afganistan', 'Alankomaat', 'Albania', 'Algeria', 'Arabiemiirikunnat', 'Argentiina', 'Australia', 'Bangladesh', 'Belgia', 'Bermuda', 'Bhutan', 'Bhutan', 'Bolivia', 'Bosnia-Hertsegovina', 'Brasilia', 'Bulgaria', 'Chile', 'Costa Rica', 'Ecuador', 'Egypti', 'El Salvador', 'Espanja', 'Etelä-Afrikka', 'Etelä-Korea', 'Etiopia', 'Filippiinit', 'Fär-saaret', 'Grönlanti', 'Guatemala', 'Guinea', 'Hongkong', 'Indonesia', 'Intia', 'Irak', 'Iran', 'Irlanti', 'Islanti', 'Iso-Britannia', 'Israel', 'Italia', 'Itä-Saksa', 'Itävalta', 'Jamaika', 'Japani', 'Jordania', 'Jugoslavia', 'Kamerun', 'Kanada', 'Kenia', 'Kiina', 'Kolumbia', 'Kreikka', 'Kroatia', 'Kuuba', 'Kypros', 'Laos', 'Latvia', 'Libanon', 'Lichtenstein', 'Liettua', 'Luxemburg', 'Malesia', 'Mali', 'Malta', 'Marokko', 'Mauritania', 'Mauritius', 'Meksiko', 'Monaca', 'Mongolia', 'Mosambik', 'Muu maa', 'Namibia', 'Nepal', 'Neuvostoliitto', 'Nicaragua', 'Niger', 'Nigeria', 'Norja', 'Pakistan', 'Paraguay', 'Peru', 'Pohjois-Korea', 'Portugali', 'Puerto Rico', 'Puola', 'Ranska', 'Romania', 'Ruotsi', 'Saksa', 'Sambia', 'Senegal', 'Serbia / Tsekkoslovakia', 'Singapore', 'Slovakia', 'Slovenia', 'Sri Lanka', 'Sudan', 'Suomi', 'Sveitsi', 'Syyria', 'Taiwan', 'Tansania', 'Tanska', 'Thaimaa', 'Tsekinmaa', 'Tunisia', 'Turkki', 'Unkari', 'Uruguay', 'Uusi-Seelanti', 'Valko-Venäjä', 'Vatikaanivaltio', 'Venezuela', 'Venäjä', 'Vietnam', 'Viro', 'Yhdysvallat', 'Zimbabwe']
-  return countries.map(function(x) { return {id: x, text: x}})
 }
 
 var classificationCriteria = [

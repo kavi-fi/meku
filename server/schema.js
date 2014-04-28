@@ -20,7 +20,7 @@ var Movie = exports.Movie = mongoose.model('movies', {
   'name-other': {type: [String], index: true},
   deleted: Boolean,
   country: String,
-  year: Number,
+  year: String,
   'production-companies': [{_id: mongoose.Schema.Types.ObjectId, name: String}],
   genre: String,
   directors: {type: [String], index: true},

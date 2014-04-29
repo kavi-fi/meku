@@ -62,7 +62,7 @@ function names(callback) {
       var name = nameType(row.type)
       if (!result[row.id]) result[row.id] = {}
       if (!result[row.id][name]) result[row.id][name] = []
-      result[row.id][name].push(row.name.trim())
+      result[row.id][name].push(trim(row.name))
       done()
     }, function() {
       async.eachLimit(Object.keys(result), 5, function(key, cb) {
@@ -227,6 +227,10 @@ function optionListToArray(string) {
 function mapFormat(f) {
   if (enums.format.indexOf(f) >= 0) return f
   return 'Muu'
+}
+function trim(s) {
+  if (!s) return undefined
+  return s.trim()
 }
 
 function wipe(callback) {

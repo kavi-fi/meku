@@ -43,7 +43,7 @@ function run(job, callback) {
 }
 
 function base(callback) {
-  conn.query('SELECT id, program_type, publish_year, year FROM meku_audiovisualprograms where deleted != "1"')
+  conn.query('SELECT id, program_type, publish_year, year, countries, description FROM meku_audiovisualprograms where deleted != "1"')
     .stream({ highWaterMark: 2000 })
     .pipe(programMapper())
     .pipe(batcher(1000))
@@ -158,6 +158,8 @@ function programMapper() {
     if (row.program_type) obj['program-type'] = row.program_type
     if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
     if (row.year && row.year != 'undefined') obj.year = row.year
+    if (row.countries) obj.country = optionListToArray(row.countries)
+    if (row.description) obj.synopsis = row.description.trim()
     tx.push(obj)
     done()
   }

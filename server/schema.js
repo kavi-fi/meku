@@ -12,7 +12,8 @@ var classification = {
   safe: Boolean,
   criteria: [Number],
   'warning-order': [String],
-  comments: {}
+  comments: {},
+  'legacy-age-limit': String
 }
 
 var Movie = exports.Movie = mongoose.model('movies', {

@@ -139,12 +139,12 @@ function classifications(callback) {
   // TODO: add c.date_entered, c.reg_date, c.age_level, c.descriptors, c.status, c.no_items, c.description
   // TODO: order classifications by reg_date or some such?
 
-  async.waterfall([base, criteria, save], callback)
+  async.waterfall([base, criteria, harmonize, save], callback)
 
   function base(callback) {
     var tick = progressMonitor()
     var result = { programs: {}, classifications: {} }
-    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime from meku_audiovisualprograms p' +
+    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
         ' where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
@@ -154,7 +154,7 @@ function classifications(callback) {
         var classification = { 'emeku-id': row.classificationId }
         if (row.format) classification.format = mapFormat(row.format)
         if (row.runtime) classification.duration = row.runtime
-
+        if (row.age_level) classification['legacy-age-limit'] = row.age_level
         if (!result.programs[row.programId]) result.programs[row.programId] = []
         result.programs[row.programId].push(classification)
         result.classifications[row.classificationId] = classification
@@ -187,6 +187,16 @@ function classifications(callback) {
       }, function(err) {
         callback(err, result)
       }))
+  }
+
+  function harmonize(result, callback) {
+    Object.keys(result.classifications).forEach(function(key) {
+      var obj = result.classifications[key]
+      if (obj.criteria && obj.criteria.length > 0) {
+        delete obj['legacy-age-limit']
+      }
+    })
+    callback(null, result)
   }
 
   function save(result, callback) {

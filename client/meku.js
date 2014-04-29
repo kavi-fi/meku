@@ -229,6 +229,7 @@ function movieDetails() {
     })
     $form.find('.required').trigger('validate')
     updateSummary(movie)
+    updatePreview(movie)
   }
 
   function selectAutocomplete(opts) {
@@ -301,7 +302,10 @@ function movieDetails() {
   }
 
   function saveMovieField(id, field, value) {
-    $.post('/movies/' + id, JSON.stringify(keyValue(field, value))).done(updateSummary)
+    $.post('/movies/' + id, JSON.stringify(keyValue(field, value))).done(function(movie) {
+      updateSummary(movie)
+      updatePreview(movie)
+    })
   }
 
   function updateSummary(movie) {
@@ -341,6 +345,22 @@ function movieDetails() {
       })
     }
     return { age: maxAgeLimit, warnings: warnings }
+  }
+
+  function updatePreview(movie) {
+    var $email = $("#email .email-preview")
+    var now = new Date()
+    var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
+    var classification = _.first(movie.classifications)
+    var buyer = classification.buyer ? classification.buyer.name : ''
+    var summary = classificationSummary(classification)
+
+    $email.find('.date').text(dateString)
+    $email.find('.name').text(movie.name.join(', '))
+    $email.find('.year').text(movie.year || '')
+    $email.find('.buyer').text(buyer)
+    $email.find('.classification').text(classificationText(summary))
+    $email.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
   }
 
   return { show: show }
@@ -392,6 +412,23 @@ $.fn.throttledInput = function(fn) {
 $.fn.check = function(on) {
   return on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
 }
+
+function classificationText(classification) {
+  var criteria = classificationCriteriaText(classification.warnings)
+  if (classification.age === 'S') {
+    return 'Kuvaohjelma on sallittu.'
+  } else {
+    return 'Kuvaohjelman ikäraja on ' + classification.age
+         + ' vuotta ja ' + (classification.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+         + criteria
+  }
+}
+
+function classificationCriteriaText(warnings) {
+  return warnings.map(function(x) { return classificationCategory_FI[x] }).join(', ')
+}
+
+var classificationCategory_FI = {violence: 'väkivälta', anxiety: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
 
 var classificationCriteria = [
   { id:1,  category: 'violence', age: '18', title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa" },

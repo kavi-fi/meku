@@ -34,6 +34,8 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .left { float: left; width: 50%; }
 .right { float: right; width: 50%; }
 
+.box { border: 1px solid #D3D3D3; border-radius: 2px; padding: 20px; }
+
 #search-results > div { margin: 10px; }
 #search-results h3 { padding: 0; margin: 0; }
 #search-results span { margin-left: 20px; display: block; }
@@ -262,11 +264,21 @@ input[type=text].invalid,
   margin-right: 0;
 }
 
+
+#criteria .categories { float:left; margin-right: 30px; }
+#criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
+
+#criteria .category-criteria { margin-left: 150px; min-height: 700px; }
+#criteria .category-criteria ol { display: none;}
+#criteria .category-criteria ol:first-of-type { display: block; }
+#criteria .category-criteria li { margin-bottom: 10px; }
+#criteria .category-criteria small { margin-left: 65px; display: block; }
+#criteria .category-criteria textarea { float: right; }
+
 #summary .comments textarea { width: 438px; }
 #summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
 #summary .left {width: 460px; padding: 0 10px 0 0;}
 #summary .right {width: 460px; padding: 0 0 0 10px;}
-#summary .wrapper { border: 1px solid #D3D3D3; border-radius: 2px; padding: 20px; }
 #summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
 #summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
 #summary h3 { border-bottom: 5px solid #DDDDDD; }
@@ -289,29 +301,25 @@ input[type=text].invalid,
 #summary .warnings .warning.sex { background-image: url('images/sex.png'); }
 #summary .warnings .warning.fear { background-image: url('images/fear.png'); }
 #summary .warnings .warning.drugs { background-image: url('images/drugs.png'); }
-
-#criteria .categories { float:left; margin-right: 30px; }
-#criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
-
-#criteria .category-criteria { margin-left: 150px; min-height: 700px; }
-#criteria .category-criteria ol { display: none;}
-#criteria .category-criteria ol:first-of-type { display: block; }
-#criteria .category-criteria li { margin-bottom: 10px; }
-#criteria .category-criteria small { margin-left: 65px; display: block; }
-#criteria .category-criteria textarea { float: right; }
-
 #summary .warnings { display: inline-block; }
 #summary .warnings .warning { display: inline-block; cursor: move; background: transparent no-repeat; background-size: 40px; width: 40px; height: 40px; transition: width 0.3s; }
 #summary .warnings .warning.dragging { opacity: 0.3; }
-#summary .warnings .warning.violence { background-image: url('images/violence.png'); }
-#summary .warnings .warning.sex { background-image: url('images/sex.png'); }
-#summary .warnings .warning.fear { background-image: url('images/fear.png'); }
-#summary .warnings .warning.drugs { background-image: url('images/drugs.png'); }
 
 #summary .warnings .warning.dragging, .summary .warnings .drop-target.dragging { width: 0; opacity: 0; }
 #summary .warnings .drop-target { display: inline-block; width: 10px; height: 30px; transition: width 0.3s; }
 /*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 #summary .warnings .drop-target.active { width: 50px; }
+
+#email h3 { border-bottom: 5px solid #DDDDDD; }
+#email .left { width: 300px; }
+#email .right { width: 620px; }
+
+#email dl, #email .email-preview p { font-size: 14px; color: #666666; line-height: 17px; }
+#email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
+
+#email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
+#email dl dd { padding: 0 0 10px 0;}
+#email dl dt { font-weight: bold;}
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

@@ -136,24 +136,66 @@ function productionCompanies(callback) {
 }
 
 function classifications(callback) {
-  var tick = progressMonitor()
-  var result = {}
-  conn.query('select p.id, c.id as classificationId, c.format, c.runtime, c.date_entered, c.reg_date, c.age_level, c.descriptors, c.status, c.no_items, c.description from meku_audiovisualprograms p join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida) join meku_classification c on (c.id = j.meku_audioc249ication_idb) where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
-    .stream()
-    .pipe(consumer(function(row, done) {
-      tick()
-      if (!result[row.id]) result[row.id] = []
-      var classification = { 'emeku-id': row.classificationId }
-      if (row.format) classification.format = mapFormat(row.format)
-      if (row.runtime) classification.duration = row.runtime
-      result[row.id].push(classification)
-      done()
-    }, function() {
-      async.eachLimit(Object.keys(result), 5, function(key, cb) {
-        tick('*')
-        schema.Movie.update({ 'emeku-id': key }, { 'classifications': result[key] }, cb)
-      }, callback)
-    }))
+  // TODO: add c.date_entered, c.reg_date, c.age_level, c.descriptors, c.status, c.no_items, c.description
+  // TODO: order classifications by reg_date or some such?
+
+  async.waterfall([base, criteria, save], callback)
+
+  function base(callback) {
+    var tick = progressMonitor()
+    var result = { programs: {}, classifications: {} }
+    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime from meku_audiovisualprograms p' +
+        ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
+        ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
+        ' where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
+      .stream()
+      .pipe(consumer(function(row, done) {
+        tick()
+        var classification = { 'emeku-id': row.classificationId }
+        if (row.format) classification.format = mapFormat(row.format)
+        if (row.runtime) classification.duration = row.runtime
+
+        if (!result.programs[row.programId]) result.programs[row.programId] = []
+        result.programs[row.programId].push(classification)
+        result.classifications[row.classificationId] = classification
+        done()
+      }, function(err) {
+        callback(err, result)
+      }))
+  }
+
+  function criteria(result, callback) {
+    var tick = progressMonitor()
+    conn.query('select c.id as classificationId, substring(i.name, 1, 2) as item, l.text from meku_classification c' +
+        ' join meku_classication_items_c l on (c.id = l.meku_classd51cication_ida)' +
+        ' join meku_classification_items i on (i.id = l.meku_class42efn_items_idb)' +
+        ' where c.deleted != "1" and l.deleted != "1" and i.deleted != "1"')
+      .stream()
+      .pipe(consumer(function(row, done) {
+        tick('+')
+        var obj = result.classifications[row.classificationId]
+        if (!obj) return done()
+        var cId = parseInt(row.item)
+        if (!obj.criteria) obj.criteria = []
+        obj.criteria.push(cId)
+        var comment = trim(row.text)
+        if (comment) {
+          if (!obj.comments) obj.comments = {}
+          obj.comments[cId] = comment
+        }
+        done()
+      }, function(err) {
+        callback(err, result)
+      }))
+  }
+
+  function save(result, callback) {
+    var tick = progressMonitor(100)
+    async.eachLimit(Object.keys(result.programs), 5, function(key, cb) {
+      tick('*')
+      schema.Movie.update({ 'emeku-id': key }, { 'classifications': result.programs[key] }, cb)
+    }, callback)
+  }
 }
 
 function accounts(callback) {

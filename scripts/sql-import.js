@@ -12,7 +12,8 @@ var tasks = {
   wipeActors: wipeActors, actors: actors,
   wipeDirectors: wipeDirectors, directors: directors,
   wipeProductionCompanies: wipeProductionCompanies, productionCompanies: productionCompanies,
-  wipeClassifications: wipeClassifications, classifications: classifications
+  wipeClassifications: wipeClassifications, classifications: classifications,
+  wipeAccounts: wipeAccounts, accounts: accounts
 }
 
 if (process.argv.length < 3) {
@@ -34,7 +35,6 @@ conn.connect(function(err) {
     })
   })
 })
-
 
 function run(job, callback) {
   console.log('\n> '+job)
@@ -137,13 +137,14 @@ function productionCompanies(callback) {
 function classifications(callback) {
   var tick = progressMonitor()
   var result = {}
-  conn.query('select p.id, c.id as classificationId, c.date_entered, c.reg_date, c.age_level, c.descriptors, c.status, c.format, c.no_items, c.description from meku_audiovisualprograms p join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida) join meku_classification c on (c.id = j.meku_audioc249ication_idb) where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
+  conn.query('select p.id, c.id as classificationId, c.format, c.runtime, c.date_entered, c.reg_date, c.age_level, c.descriptors, c.status, c.no_items, c.description from meku_audiovisualprograms p join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida) join meku_classification c on (c.id = j.meku_audioc249ication_idb) where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
     .stream()
     .pipe(consumer(function(row, done) {
       tick()
       if (!result[row.id]) result[row.id] = []
       var classification = { 'emeku-id': row.classificationId }
       if (row.format) classification.format = mapFormat(row.format)
+      if (row.runtime) classification.duration = row.runtime
       result[row.id].push(classification)
       done()
     }, function() {
@@ -152,6 +153,12 @@ function classifications(callback) {
         schema.Movie.update({ 'emeku-id': key }, { 'classifications': result[key] }, cb)
       }, callback)
     }))
+}
+
+function accounts(callback) {
+  var tick = progressMonitor()
+  var result = {}
+  callback()
 }
 
 function batcher(num) {
@@ -222,16 +229,15 @@ function mapFormat(f) {
   return 'Muu'
 }
 
-function dropCollection(coll, callback) {
-  mongoose.connection.db.dropCollection(coll, callback)
-}
 function wipe(callback) {
   // Calling native driver methods right after mongoose.connect doesn't work, so work-around'ing:
-  schema.Movie.findOne({}, function() {
-    dropCollection('movies', function(err) {
-      if (err) return callback(err)
-      dropCollection('accounts', callback)
-    })
+  connectMongoose(function() {
+    async.each(schema.models, function(m, callback) { dropCollection(m.collection.name, function() { callback() }) }, callback)
+  })
+}
+function wipeAccounts(callback) {
+  connectMongoose(function() {
+    async.each(['accounts', 'providers'], function(c, callback) { dropCollection(c, function() { callback() }) }, callback)
   })
 }
 function wipeNames(callback) {
@@ -248,4 +254,10 @@ function wipeProductionCompanies(callback) {
 }
 function wipeClassifications(callback) {
   schema.Movie.update({}, { 'classifications': [] }, { multi:true }, callback)
+}
+function dropCollection(coll, callback) {
+  mongoose.connection.db.dropCollection(coll, callback)
+}
+function connectMongoose(callback) {
+  schema.Movie.findOne({}, callback)
 }

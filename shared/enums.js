@@ -17,6 +17,15 @@ enums.format = [
   'Muu'
 ]
 
+enums.roles = {
+  'Provider': 'Tarjoaja',
+  'Location_of_providing': 'Tarjoamispaikka',
+  'Subscriber': 'Tilaaja',
+  'Classifier': 'Luokittelija',
+  'Distributor': 'Levittaja',
+  'Other': 'Muu'
+}
+
 enums.programType = {
   1: 'Kotimainen elokuva',
   2: 'Ulkomainen elokuva',

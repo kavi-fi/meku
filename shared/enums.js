@@ -1,5 +1,7 @@
 enums = {}
 
+enums.criteriaCategories = ['violence', 'sex', 'fear', 'drugs']
+
 enums.format = [
   '8 mm',
   '16 mm',

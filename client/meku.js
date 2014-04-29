@@ -288,7 +288,7 @@ function movieDetails() {
   }
 
   function renderClassificationCriteria() {
-    ['violence', 'sex', 'fear', 'drugs'].map(function(category) {
+    enums.criteriaCategories.map(function(category) {
       var criteria = classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})

@@ -7,7 +7,8 @@
   },
   "dependencies": {
     "express": "3.5.1",
-    "mongoose": "3.8.8"
+    "mongoose": "3.8.8",
+    "lodash": "2.4.1"
   },
   "devDependencies": {
     "express-livereload": "~0.0.24",

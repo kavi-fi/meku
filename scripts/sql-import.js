@@ -4,6 +4,7 @@ var mongoose = require('mongoose')
 var schema = require('../server/schema')
 var enums = require('../shared/enums')
 var stream = require('stream')
+var _ = require('lodash')
 var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
 
 var tasks = {
@@ -144,7 +145,7 @@ function classifications(callback) {
   function base(callback) {
     var tick = progressMonitor()
     var result = { programs: {}, classifications: {} }
-    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level from meku_audiovisualprograms p' +
+    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level, c.descriptors from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
         ' where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
@@ -155,6 +156,8 @@ function classifications(callback) {
         if (row.format) classification.format = mapFormat(row.format)
         if (row.runtime) classification.duration = row.runtime
         if (row.age_level) classification['legacy-age-limit'] = row.age_level
+        if (row.descriptors) classification['warning-order'] = optionListToArray(row.descriptors)
+
         if (!result.programs[row.programId]) result.programs[row.programId] = []
         result.programs[row.programId].push(classification)
         result.classifications[row.classificationId] = classification
@@ -317,8 +320,10 @@ function consumer(onRow, callback) {
 
 function optionListToArray(string) {
   if (!string || string.length == 0) return []
-  return string.split(',').map(function(s) { return s.replace(/[\^\s]/g, '')} )
+  var arr = string.split(',').map(function(s) { return s.replace(/[\^\s]/g, '')} )
+  return _(arr).compact().uniq().value()
 }
+
 function mapFormat(f) {
   if (enums.format.indexOf(f) >= 0) return f
   return 'Muu'

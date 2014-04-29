@@ -1,17 +1,23 @@
 
 
 
-MEKU CSS versio 1
+MEKU CSS versio 2
 
 
 
 /* TYPOGRAPHY */
 
+/* h1 sivuston nimi */
+font-family: Helvetica, Arial;
+font-size: 20px;
+color: #00BB88;
+line-height: 24px;
+
 /* h2 */
 font-family: Helvetica, Arial;
 font-weight: Bold;
 font-size: 24px;
-color: #444444;
+color: #00BB88;
 line-height: 30px;
 
 /* h3 */
@@ -24,7 +30,7 @@ line-height: 24px;
 /* h4 */
 font-family: Helvetica, Arial;
 font-weight: Bold;
-font-size: 16px;
+font-size: 20px;
 color: #444444;
 line-height: 24px;
 
@@ -84,10 +90,16 @@ box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
 /* FORM ELEMENT REQUIRED — height 36px */
 border-radius: 3px;
 background: #FFFFFF;
-border: 1px solid #FF99CC;
+border: 1px solid #00BB88;
 -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
 box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
 
+/* FORM ELEMENT REQUIRED & EMPTY — height 36px */
+border-radius: 3px;
+background: #F0FFF0;
+border: 1px solid #00BB88;
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
 
 /* FORM ELEMENT SELECTED — height 36px  */
 border-radius: 3px;
@@ -99,6 +111,12 @@ box-shadow:         0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(
 /* INPUT TEXT TAG — height 24px */
 border-radius: 2px;
 background: #EEEEEE;
+
+/* FORM ELEMENT DEACTIVATED */
+border-radius: 3px;
+border: 1px solid #D3D3D3;
+/* NO BACKGROUND COLOR! */
+
 
 
 
@@ -121,7 +139,7 @@ border: solid 5px #44AAFF;
 border: solid 5px #FF77AA;
 
 /* FAT GREEN */
-border: solid 5px #33BB33;
+border: solid 5px #00BB88;
 
 
 
@@ -133,7 +151,7 @@ border: solid 5px #33BB33;
 
 /* Selected (clicked) element */
 color: #ffffff;
-background: #777777;
+background: #555555;
 -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
 box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
 

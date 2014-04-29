@@ -162,7 +162,7 @@ input[type=text].invalid,
 }
 
 #criteria .category.violence .heading h3 { color: #AA0050; }
-#criteria .category.anxiety .heading h3 { color: #44AAFF;}
+#criteria .category.fear .heading h3 { color: #44AAFF;}
 #criteria .category.sex .heading h3 { color: #FF77AA;}
 #criteria .category.drugs .heading h3 { color: #33BB33;}
 
@@ -171,9 +171,9 @@ input[type=text].invalid,
   background-image: url('images/violence.png');
 }
 
-#criteria .category.anxiety .heading {
+#criteria .category.fear .heading {
   border-top: 5px solid #44AAFF;
-  background-image: url('images/anxiety.png');
+  background-image: url('images/fear.png');
 }
 
 #criteria .category.sex .heading {
@@ -287,7 +287,7 @@ input[type=text].invalid,
 
 #summary .warnings .warning.violence { background-image: url('images/violence.png'); }
 #summary .warnings .warning.sex { background-image: url('images/sex.png'); }
-#summary .warnings .warning.anxiety { background-image: url('images/anxiety.png'); }
+#summary .warnings .warning.fear { background-image: url('images/fear.png'); }
 #summary .warnings .warning.drugs { background-image: url('images/drugs.png'); }
 
 #criteria .categories { float:left; margin-right: 30px; }
@@ -305,7 +305,7 @@ input[type=text].invalid,
 #summary .warnings .warning.dragging { opacity: 0.3; }
 #summary .warnings .warning.violence { background-image: url('images/violence.png'); }
 #summary .warnings .warning.sex { background-image: url('images/sex.png'); }
-#summary .warnings .warning.anxiety { background-image: url('images/anxiety.png'); }
+#summary .warnings .warning.fear { background-image: url('images/fear.png'); }
 #summary .warnings .warning.drugs { background-image: url('images/drugs.png'); }
 
 #summary .warnings .warning.dragging, .summary .warnings .drop-target.dragging { width: 0; opacity: 0; }

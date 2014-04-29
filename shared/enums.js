@@ -155,6 +155,6 @@ enums.countries = {
   '-': 'Muu maa'
 }
 
-if (typeof exports !== 'undefined') {
-  exports = enums
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = enums
 }

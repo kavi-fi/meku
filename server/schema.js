@@ -1,6 +1,7 @@
 var mongoose = require('mongoose')
 
 var classification = {
+  'emeku-id': String,
   author: String,
   buyer: {_id: mongoose.Schema.Types.ObjectId, name: String},
   billing: {_id: mongoose.Schema.Types.ObjectId, name: String},

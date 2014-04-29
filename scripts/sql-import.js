@@ -2,6 +2,7 @@ var async = require('async')
 var mysql = require('mysql')
 var mongoose = require('mongoose')
 var schema = require('../server/schema')
+var enums = require('../shared/enums')
 var stream = require('stream')
 var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
 
@@ -10,7 +11,8 @@ var tasks = {
   wipeNames: wipeNames, names: names,
   wipeActors: wipeActors, actors: actors,
   wipeDirectors: wipeDirectors, directors: directors,
-  wipeProductionCompanies: wipeProductionCompanies, productionCompanies: productionCompanies
+  wipeProductionCompanies: wipeProductionCompanies, productionCompanies: productionCompanies,
+  wipeClassifications: wipeClassifications, classifications: classifications
 }
 
 if (process.argv.length < 3) {
@@ -132,6 +134,26 @@ function productionCompanies(callback) {
     }))
 }
 
+function classifications(callback) {
+  var tick = progressMonitor()
+  var result = {}
+  conn.query('select p.id, c.id as classificationId, c.date_entered, c.reg_date, c.age_level, c.descriptors, c.status, c.format, c.no_items, c.description from meku_audiovisualprograms p join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida) join meku_classification c on (c.id = j.meku_audioc249ication_idb) where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
+    .stream()
+    .pipe(consumer(function(row, done) {
+      tick()
+      if (!result[row.id]) result[row.id] = []
+      var classification = { 'emeku-id': row.classificationId }
+      if (row.format) classification.format = mapFormat(row.format)
+      result[row.id].push(classification)
+      done()
+    }, function() {
+      async.eachLimit(Object.keys(result), 5, function(key, cb) {
+        tick('*')
+        schema.Movie.update({ 'emeku-id': key }, { 'classifications': result[key] }, cb)
+      }, callback)
+    }))
+}
+
 function batcher(num) {
   var arr = []
   var tx = new stream.Transform({ objectMode: true })
@@ -195,6 +217,10 @@ function optionListToArray(string) {
   if (!string || string.length == 0) return []
   return string.split(',').map(function(s) { return s.replace(/[\^\s]/g, '')} )
 }
+function mapFormat(f) {
+  if (enums.format.indexOf(f) >= 0) return f
+  return 'Muu'
+}
 
 function dropCollection(coll, callback) {
   mongoose.connection.db.dropCollection(coll, callback)
@@ -219,4 +245,7 @@ function wipeDirectors(callback) {
 }
 function wipeProductionCompanies(callback) {
   schema.Movie.update({}, { 'production-companies': [] }, { multi:true }, callback)
+}
+function wipeClassifications(callback) {
+  schema.Movie.update({}, { 'classifications': [] }, { multi:true }, callback)
 }

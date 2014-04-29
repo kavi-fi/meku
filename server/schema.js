@@ -3,7 +3,7 @@ var mongoose = require('mongoose')
 var address = { street: String, city: String, zip: String, country: String }
 
 var classification = {
-  'emeku-id': String,
+  'emeku-id': { type: String, index: true },
   author: String,
   buyer: {_id: mongoose.Schema.Types.ObjectId, name: String},
   billing: {_id: mongoose.Schema.Types.ObjectId, name: String},

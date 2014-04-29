@@ -225,7 +225,7 @@ function programMapper() {
     if (row.year && row.year != 'undefined') obj.year = row.year
     if (row.countries) obj.country = optionListToArray(row.countries)
     if (row.description) obj.synopsis = trim(row.description)
-    return row
+    return obj
   })
 }
 
@@ -309,6 +309,7 @@ function wipeProductionCompanies(callback) {
 function wipeClassifications(callback) {
   schema.Movie.update({}, { 'classifications': [] }, { multi:true }, callback)
 }
+
 function dropCollection(coll, callback) {
   mongoose.connection.db.dropCollection(coll, callback)
 }

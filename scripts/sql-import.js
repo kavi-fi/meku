@@ -19,18 +19,20 @@ if (process.argv.length < 3) {
   process.exit(1)
 }
 
-conn.connect(function(err) { if (err) throw err })
-mongoose.connect('mongodb://localhost/meku')
-
 var jobs = process.argv.slice(2)
 
-async.eachSeries(jobs, run, function(err) {
-  mongoose.disconnect(function() {
-    conn.end(function() {
-      console.log('> All done: ', err ? err : 'OK')
+conn.connect(function(err) {
+  if (err) throw err
+  mongoose.connect('mongodb://localhost/meku')
+  async.eachSeries(jobs, run, function(err) {
+    mongoose.disconnect(function() {
+      conn.end(function() {
+        console.log('> All done: ', err ? err : 'OK')
+      })
     })
   })
 })
+
 
 function run(job, callback) {
   console.log('\n> '+job)
@@ -187,13 +189,21 @@ function consumer(onRow, callback) {
   return s
 }
 
+function optionListToArray(string) {
+  if (!string || string.length == 0) return []
+  return string.split(',').map(function(s) { return s.replace(/[\^\s]/g, '')} )
+}
+
 function dropCollection(coll, callback) {
   mongoose.connection.db.dropCollection(coll, callback)
 }
 function wipe(callback) {
-  dropCollection('movies', function(err) {
-    if (err) return callback(err)
-    dropCollection('accounts', callback)
+  // Calling native driver methods right after mongoose.connect doesn't work, so work-around'ing:
+  schema.Movie.findOne({}, function() {
+    dropCollection('movies', function(err) {
+      if (err) return callback(err)
+      dropCollection('accounts', callback)
+    })
   })
 }
 function wipeNames(callback) {

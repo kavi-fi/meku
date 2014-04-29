@@ -61,7 +61,7 @@ function movieDetails() {
 
   renderClassificationCriteria()
 
-  $form.find('select').on('change', function(e) {
+  $form.find('select').on('change', function() {
     saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
   })
 
@@ -122,7 +122,7 @@ function movieDetails() {
     $(this).removeClass('active')
     e.preventDefault()
   })
-  $summary.on('dragend', '.warnings .warning', function(e) {
+  $summary.on('dragend', '.warnings .warning', function() {
     $(this).add($(this).next()).removeClass('dragging')
     $summary.find('.drop-target').removeClass('valid').removeClass('active')
   })
@@ -165,7 +165,7 @@ function movieDetails() {
       placeholder: "Valitse...",
       multiple: true
     })
-    $form.find('input.country').on('change', function(e) {
+    $form.find('input.country').on('change', function() {
       var data = $(this).select2('data').map(function(x) { return x.id })
       saveMovieField($form.data('id'), $(this).attr('name'), data)
     })
@@ -199,7 +199,7 @@ function movieDetails() {
       val: movie.classifications[0].buyer,
       path: '/accounts/',
       toOption: companyToSelect2Option,
-      fromOption: select2OptionToCompany,
+      fromOption: select2OptionToCompany
     })
 
     selectAutocomplete({
@@ -207,7 +207,7 @@ function movieDetails() {
       val: movie.classifications[0].billing,
       path: '/accounts/',
       toOption: companyToSelect2Option,
-      fromOption: select2OptionToCompany,
+      fromOption: select2OptionToCompany
     })
 
     $form.find('input[name="classifications.0.format"]').select2({
@@ -269,7 +269,7 @@ function movieDetails() {
       createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
     })
 
-    $select.on('change', function(e) {
+    $select.on('change', function() {
       var data = $(this).select2('data')
       var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
       saveMovieField($form.data('id'), $(this).attr('name'), val)
@@ -361,7 +361,7 @@ function isValidDuration(txt) {
 }
 
 function validate(f) {
-  return function(e) {
+  return function() {
     var $el = $(this)
     if (f($el.val())) {
       $el.removeClass('invalid')

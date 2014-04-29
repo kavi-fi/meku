@@ -154,7 +154,7 @@ function movieDetails() {
       .find('textarea[name=synopsis]').val(movie.synopsis).end()
       .find('input[name="classifications.0.buyer"]').val(classification.buyer).end()
       .find('input[name="classifications.0.billing"]').val(classification.billing).end()
-      .find('select[name="classifications.0.format"]').val(classification.format).end()
+      .find('input[name="classifications.0.format"]').val(classification.format).end()
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
 
@@ -208,6 +208,13 @@ function movieDetails() {
       path: '/accounts/',
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany,
+    })
+
+    $form.find('input[name="classifications.0.format"]').select2({
+      data: enums.format.map(function(f) { return { id: f, text: f }}),
+      placeholder: "Valitse..."
+    }).on('change', function() {
+      saveMovieField($form.data('id'), $(this).attr('name'), $(this).select2('data').id)
     })
 
     $form.find('.category-container').toggle(!classification.safe)

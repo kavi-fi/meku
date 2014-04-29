@@ -84,20 +84,7 @@
           <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="text" />
         </div>
         <div class="right">
-          <label>Ohjelman formaatti</label>
-            <select name="classifications.0.format" class="required">
-              <option value="">Valitse...</option>
-              <option>DVD</option>
-              <option>HD DVD</option>
-              <option>Blu-ray Disc</option>
-              <option>VoD</option>
-              <option>CDkuva</option>
-              <option>VHS</option>
-              <option>8 mm</option>
-              <option>16 mm</option>
-              <option>70 mm</option>
-              <option>Televisio</option>
-            </select>
+          <label>Ohjelman formaatti</label><input name="classifications.0.format" class="required format" type="hidden"/>
           <label>Kesto</label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
         </div>
       </div>

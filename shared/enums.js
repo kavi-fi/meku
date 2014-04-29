@@ -1,5 +1,22 @@
 enums = {}
 
+enums.format = [
+  '8 mm',
+  '16 mm',
+  '35 mm',
+  '70 mm',
+  'Blu-ray Disc',
+  'CDKuva',
+  'DCP',
+  'DVD',
+  'Televisio',
+  'Verkkoaineisto',
+  'VHS',
+  'video',
+  'VoD',
+  'Muu'
+]
+
 enums.programType = {
   1: 'Kotimainen elokuva',
   2: 'Ulkomainen elokuva',

@@ -13,6 +13,7 @@ var tasks = {
   wipeDirectors: wipeDirectors, directors: directors,
   wipeProductionCompanies: wipeProductionCompanies, productionCompanies: productionCompanies,
   wipeClassifications: wipeClassifications, classifications: classifications,
+  wipeProviders: wipeProviders, providers: providers,
   wipeAccounts: wipeAccounts, accounts: accounts
 }
 
@@ -49,7 +50,7 @@ function base(callback) {
     .stream({ highWaterMark: 2000 })
     .pipe(programMapper())
     .pipe(batcher(1000))
-    .pipe(batchInserter(callback))
+    .pipe(batchInserter('Movie', callback))
 }
 
 function names(callback) {
@@ -156,9 +157,45 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  var tick = progressMonitor()
+  async.eachSeries([accountBase, accountEmailAddresses], function(fn, cb) { fn(cb) }, callback)
+}
+
+function accountBase(callback) {
+  conn.query('select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"')
+    .stream({ highWaterMark: 2000 })
+    .pipe(transformer(function(row) { return { 'emeku-id': row.id, name: trim(row.name), roles: optionListToArray(row.customer_type) } }))
+    .pipe(batcher(1000))
+    .pipe(batchInserter('Account', callback))
+}
+
+function accountEmailAddresses(callback) {
+  var tick = progressMonitor(100)
   var result = {}
-  callback()
+  conn.query('select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts"')
+    .stream()
+    .pipe(consumer(function(row, done) {
+      tick()
+      if (!result[row.id]) result[row.id] = []
+      if (row.primary_address == '1') {
+        result[row.id].unshift(row.email_address)
+      } else {
+        result[row.id].push(row.email_address)
+      }
+      done()
+    }, function() {
+      async.eachLimit(Object.keys(result), 5, function(key, cb) {
+        tick('*')
+        schema.Account.update({ 'emeku-id': key }, { 'email-addresses': result[key] }, cb)
+      }, callback)
+    }))
+}
+
+function providers(callback) {
+  conn.query('select id, name from accounts where customer_type like "%Location_of_providing%" and deleted != "1"')
+    .stream({ highWaterMark: 2000 })
+    .pipe(transformer(function(row) { return { 'emeku-id': row.id, name: trim(row.name) } }))
+    .pipe(batcher(1000))
+    .pipe(batchInserter('Provider', callback))
 }
 
 function batcher(num) {
@@ -181,26 +218,23 @@ function batcher(num) {
 }
 
 function programMapper() {
-  var tx = new stream.Transform({ objectMode: true })
-  tx._transform = function(row, encoding, done) {
+  return transformer(function(row) {
     var obj = { 'emeku-id': row.id }
     if (row.program_type) obj['program-type'] = row.program_type
     if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
     if (row.year && row.year != 'undefined') obj.year = row.year
     if (row.countries) obj.country = optionListToArray(row.countries)
-    if (row.description) obj.synopsis = row.description.trim()
-    tx.push(obj)
-    done()
-  }
-  return tx
+    if (row.description) obj.synopsis = trim(row.description)
+    return row
+  })
 }
 
-function batchInserter(callback) {
+function batchInserter(model, callback) {
   var tick = progressMonitor(2)
   var onRows = function(rows, cb) {
     tick()
     var args = rows.concat([cb])
-    schema.Movie.create.apply(schema.Movie, args)
+    schema[model].create.apply(schema[model], args)
   }
   return consumer(onRows, callback)
 }
@@ -211,6 +245,15 @@ function progressMonitor(num) {
   return function(char) {
     if (ii++ % tick == 0) process.stdout.write(char || '.')
   }
+}
+
+function transformer(onRow) {
+  var tx = new stream.Transform({ objectMode: true })
+  tx._transform = function(row, encoding, done) {
+    tx.push(onRow(row))
+    done()
+  }
+  return tx
 }
 
 function consumer(onRow, callback) {
@@ -228,6 +271,7 @@ function mapFormat(f) {
   if (enums.format.indexOf(f) >= 0) return f
   return 'Muu'
 }
+
 function trim(s) {
   if (!s) return undefined
   return s.trim()
@@ -241,9 +285,15 @@ function wipe(callback) {
 }
 function wipeAccounts(callback) {
   connectMongoose(function() {
-    async.each(['accounts', 'providers'], function(c, callback) { dropCollection(c, function() { callback() }) }, callback)
+    dropCollection('accounts', function() { callback() })
   })
 }
+function wipeProviders(callback) {
+  connectMongoose(function() {
+    dropCollection('providers', function() { callback() })
+  })
+}
+
 function wipeNames(callback) {
   schema.Movie.update({}, { 'name': [], 'name-fi': [], 'name-sv': [], 'name-other': [] }, { multi:true }, callback)
 }

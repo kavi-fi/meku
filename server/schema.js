@@ -1,5 +1,7 @@
 var mongoose = require('mongoose')
 
+var address = { street: String, city: String, zip: String, country: String }
+
 var classification = {
   'emeku-id': String,
   author: String,
@@ -34,7 +36,10 @@ var Movie = exports.Movie = mongoose.model('movies', {
 
 var Account = exports.Account = mongoose.model('accounts', {
   'emeku-id': String,
-  name: {type: String, index: true}
+  name: {type: String, index: true},
+  'billing-address': address,
+  roles: [String],
+  'email-addresses': [String]
 })
 
 var Provider = exports.Provider = mongoose.model('providers', {

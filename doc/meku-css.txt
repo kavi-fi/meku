@@ -161,6 +161,34 @@ border: 1px solid #666666;
 
 
 
+/* BUTTONS */
+
+
+/* NORMAL STATE */
+border-radius: 3px;
+background-image: -o-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+background-image: -moz-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+background-image: -ms-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+background-image: linear-gradient(-180deg, #00BB88 0%, #00AA77 100%);
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+
+/* HOVER STATE */
+border-radius: 3px;
+background: #00BB88;
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+
+/* ACTIVE STATE */
+border-radius: 3px;
+background: #009966;
+-moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20)
+
+
+
+
+
 
 
 

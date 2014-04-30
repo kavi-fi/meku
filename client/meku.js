@@ -173,14 +173,14 @@ function movieDetails() {
     selectAutocomplete({
       $el: $form.find('input[name="production-companies"]'),
       val: movie['production-companies'] || [],
-      path: '/production-companies/',
+      path: '/production-companies/search/',
       multiple: true
     })
 
     selectAutocomplete({
       $el: $form.find('input[name="directors"]'),
       val: movie['directors'] || [],
-      path: '/directors/',
+      path: '/directors/search/',
       multiple: true,
       allowAdding: true
     })
@@ -188,7 +188,7 @@ function movieDetails() {
     selectAutocomplete({
       $el: $form.find('input[name="actors"]'),
       val: movie['actors'] || [],
-      path: '/actors/',
+      path: '/actors/search/',
       multiple: true,
       allowAdding: true,
       termMinLength: 3
@@ -197,7 +197,7 @@ function movieDetails() {
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.buyer"]'),
       val: movie.classifications[0].buyer,
-      path: '/accounts/',
+      path: '/accounts/search/',
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany
     })
@@ -205,7 +205,7 @@ function movieDetails() {
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.billing"]'),
       val: movie.classifications[0].billing,
-      path: '/accounts/',
+      path: '/accounts/search/',
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany
     })
@@ -361,6 +361,12 @@ function movieDetails() {
     $email.find('.buyer').text(buyer)
     $email.find('.classification').text(classificationText(summary))
     $email.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
+
+    $.get('/accounts/' + classification.buyer._id).done(function(data) {
+      data['email-addresses'].forEach(function(email) {
+        $("#email .emails ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
+      })
+    })
   }
 
   return { show: show }

@@ -38,7 +38,7 @@ app.post('/movies/:id', function(req, res, next) {
   })
 })
 
-app.get('/production-companies/:query', function(req, res, next) {
+app.get('/production-companies/search/:query', function(req, res, next) {
   Movie.aggregate([
       { $unwind: '$production-companies'},
       { $match: { 'production-companies': new RegExp("^" + req.params.query, 'i') } },
@@ -51,13 +51,17 @@ app.get('/production-companies/:query', function(req, res, next) {
     })
 })
 
-app.get('/accounts/:query', function(req, res, next) {
+app.get('/accounts/search/:query', function(req, res, next) {
   Account.find({name: new RegExp("^" + req.params.query, 'i')}).limit(20).exec(function(err, data) {
     return res.send(data)
   })
 })
 
-app.get('/actors/:query', function(req, res, next) {
+app.get('/accounts/:id', function(req, res, next) {
+  Account.findById(req.params.id, function(err, account) { res.send(account) })
+})
+
+app.get('/actors/search/:query', function(req, res, next) {
   Movie.aggregate([
     {$unwind: '$actors'},
     {$match: {actors: new RegExp("\\b" + req.params.query, 'i')}},
@@ -70,7 +74,7 @@ app.get('/actors/:query', function(req, res, next) {
     })
 })
 
-app.get('/directors/:query', function(req, res, next) {
+app.get('/directors/search/:query', function(req, res, next) {
   if (req.params.query.length < 3) return res.send([])
   else {
     Movie.aggregate([

@@ -310,6 +310,9 @@ input[type=text].invalid,
 /*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 #summary .warnings .drop-target.active { width: 50px; }
 
+#email .emails label { text-align: left; width: 225px;}
+#email .emails input { width: 205px; }
+
 #email h3 { border-bottom: 5px solid #DDDDDD; }
 #email .left { width: 300px; }
 #email .right { width: 620px; }

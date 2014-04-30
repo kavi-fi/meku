@@ -145,7 +145,7 @@ function classifications(callback) {
   function base(callback) {
     var tick = progressMonitor()
     var result = { programs: {}, classifications: {} }
-    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level, c.descriptors from meku_audiovisualprograms p' +
+    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
         ' where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
@@ -157,7 +157,7 @@ function classifications(callback) {
         if (row.runtime) classification.duration = row.runtime
         if (row.age_level) classification['legacy-age-limit'] = row.age_level
         if (row.descriptors) classification['warning-order'] = optionListToArray(row.descriptors)
-
+        classification.comments = trimConcat(row.description, row.opinions, '\n')
         if (!result.programs[row.programId]) result.programs[row.programId] = []
         result.programs[row.programId].push(classification)
         result.classifications[row.classificationId] = classification
@@ -331,7 +331,12 @@ function mapFormat(f) {
 
 function trim(s) {
   if (!s) return undefined
-  return s.trim()
+  var trimmed = s.trim()
+  if (!trimmed) return undefined
+  return trimmed
+}
+function trimConcat(s1, s2, sep){
+  return _.compact([trim(s1), trim(s2)]).join(sep)
 }
 
 function wipe(callback) {

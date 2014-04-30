@@ -11,8 +11,8 @@ var classification = {
   duration: String, // for now matches a regexp in the client
   safe: Boolean,
   criteria: [Number],
+  'criteria-comments': {},
   'warning-order': [String],
-  comments: {},
   'legacy-age-limit': String
 }
 

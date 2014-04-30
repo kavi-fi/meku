@@ -137,7 +137,7 @@ function productionCompanies(callback) {
 }
 
 function classifications(callback) {
-  // TODO: add c.date_entered, c.reg_date, c.age_level, c.descriptors, c.status, c.no_items, c.description
+  // TODO: add c.date_entered, c.reg_date, c.status, c.no_items, c.description
   // TODO: order classifications by reg_date or some such?
 
   async.waterfall([base, criteria, harmonize, save], callback)
@@ -183,8 +183,8 @@ function classifications(callback) {
         obj.criteria.push(cId)
         var comment = trim(row.text)
         if (comment) {
-          if (!obj.comments) obj.comments = {}
-          obj.comments[cId] = comment
+          if (!obj['criteria-comments']) obj['criteria-comments'] = {}
+          obj['criteria-comments'][cId] = comment
         }
         done()
       }, function(err) {

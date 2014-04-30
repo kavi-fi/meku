@@ -14,6 +14,7 @@ var classification = {
   'criteria-comments': {},
   'warning-order': [String],
   'legacy-age-limit': String,
+  'registration-date': Date,
   comments: String
 }
 

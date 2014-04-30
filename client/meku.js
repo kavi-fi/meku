@@ -157,8 +157,7 @@ function movieDetails() {
       .find('input[name="classifications.0.format"]').val(classification.format).end()
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
-
-    $form.find('textarea[name="comments"]').val(movie.comments)
+      .find('textarea[name="classifications.0.comments"]').val(classification.comments).end()
 
     $form.find('input.country').select2({
       data: Object.keys(enums.countries).map(function(key) { return { id: key, text: enums.countries[key] }}),

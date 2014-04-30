@@ -13,7 +13,8 @@ var classification = {
   criteria: [Number],
   'criteria-comments': {},
   'warning-order': [String],
-  'legacy-age-limit': String
+  'legacy-age-limit': String,
+  comments: String
 }
 
 var Movie = exports.Movie = mongoose.model('movies', {
@@ -31,8 +32,7 @@ var Movie = exports.Movie = mongoose.model('movies', {
   actors: {type: [String], index: true},
   synopsis: String,
   classifications: [classification],
-  'program-type': String, // enums.programType
-  comments: String
+  'program-type': String // enums.programType
 })
 
 var Account = exports.Account = mongoose.model('accounts', {

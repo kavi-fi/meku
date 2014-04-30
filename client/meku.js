@@ -416,7 +416,10 @@ $.fn.throttledInput = function(fn) {
 }
 
 $.fn.check = function(on) {
-  return on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
+  $(this).each(function() {
+    on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
+  })
+  return this
 }
 
 function classificationText(classification) {

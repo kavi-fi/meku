@@ -49,4 +49,11 @@ var Provider = exports.Provider = mongoose.model('providers', {
   name: String
 })
 
-var models = exports.models = [Movie, Account, Provider]
+var User = exports.User = mongoose.model('users', {
+  'emeku-id': String,
+  username: String,
+  name: String,
+  active: Boolean
+})
+
+var models = exports.models = [Movie, Account, Provider, User]

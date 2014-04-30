@@ -15,7 +15,8 @@ var tasks = {
   wipeProductionCompanies: wipeProductionCompanies, productionCompanies: productionCompanies,
   wipeClassifications: wipeClassifications, classifications: classifications,
   wipeProviders: wipeProviders, providers: providers,
-  wipeAccounts: wipeAccounts, accounts: accounts
+  wipeAccounts: wipeAccounts, accounts: accounts,
+  wipeUsers: wipeUsers, users: users
 }
 
 if (process.argv.length < 3) {
@@ -258,6 +259,14 @@ function providers(callback) {
     .pipe(batchInserter('Provider', callback))
 }
 
+function users(callback) {
+  conn.query('select id, user_name, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users')
+    .stream({ highWaterMark: 2000 })
+    .pipe(transformer(function(row) { return { 'emeku-id': row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }))
+    .pipe(batcher(1000))
+    .pipe(batchInserter('User', callback))
+}
+
 function batcher(num) {
   var arr = []
   var tx = new stream.Transform({ objectMode: true })
@@ -351,14 +360,13 @@ function wipe(callback) {
   })
 }
 function wipeAccounts(callback) {
-  connectMongoose(function() {
-    dropCollection('accounts', function() { callback() })
-  })
+  connectMongoose(function() { dropCollection('accounts', function() { callback() }) })
 }
 function wipeProviders(callback) {
-  connectMongoose(function() {
-    dropCollection('providers', function() { callback() })
-  })
+  connectMongoose(function() { dropCollection('providers', function() { callback() }) })
+}
+function wipeUsers(callback) {
+  connectMongoose(function() { dropCollection('users', function() { callback() }) })
 }
 
 function wipeNames(callback) {

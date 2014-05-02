@@ -43,6 +43,16 @@ enums.programType = {
   12: 'Muu kuvaohjelma'
 }
 
+enums.classificationStatus = [
+  'reclassification1',
+  'reclassification3',
+  'registered',
+  'disapproved'
+  // 'in_pocess',
+  // 'in_process',
+  // NULL,
+]
+
 enums.countries = {
   'AE': 'Arabiemiirikunnat',
   'AF': 'Afganistan',

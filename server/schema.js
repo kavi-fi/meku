@@ -15,7 +15,8 @@ var classification = {
   'warning-order': [String],
   'legacy-age-limit': String,
   'registration-date': Date,
-  comments: String
+  comments: String,
+  status: String
 }
 
 var Movie = exports.Movie = mongoose.model('movies', {

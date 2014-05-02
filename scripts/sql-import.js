@@ -138,15 +138,15 @@ function productionCompanies(callback) {
 }
 
 function classifications(callback) {
-  // TODO: add c.date_entered, c.reg_date, c.status, c.no_items, c.description
-  // TODO: order classifications by reg_date or some such?
+  // TODO: add c.status, c.no_items (== safe?), c.date_entered?, ...
+  // TODO: verify that reg_date order is the valid ordering
 
-  async.waterfall([base, criteria, harmonize, save], callback)
+  async.waterfall([base, criteria, mapUsers, harmonize, save], callback)
 
   function base(callback) {
     var tick = progressMonitor()
     var result = { programs: {}, classifications: {} }
-    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.reg_date from meku_audiovisualprograms p' +
+    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.reg_date, c.assigned_user_id from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
         ' where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
@@ -160,6 +160,7 @@ function classifications(callback) {
         if (row.descriptors) classification['warning-order'] = optionListToArray(row.descriptors)
         classification.comments = trimConcat(row.description, row.opinions, '\n')
         classification['registration-date'] = row.reg_date && new Date(row.reg_date) || undefined
+        classification.assigned_user_id = row.assigned_user_id
         if (!result.programs[row.programId]) result.programs[row.programId] = []
         result.programs[row.programId].push(classification)
         result.classifications[row.classificationId] = classification
@@ -192,6 +193,20 @@ function classifications(callback) {
       }, function(err) {
         callback(err, result)
       }))
+  }
+
+  function mapUsers(result, callback) {
+    schema.User.find({}, function(err, users) {
+      if (err) return callback(err)
+      var userMap = _.indexBy(users, 'emeku-id')
+      _.values(result.classifications).forEach(function(c) {
+        if (c.assigned_user_id) {
+          var u = userMap[c.assigned_user_id]
+          c.author = { _id: u._id, name: u.name }
+        }
+      })
+      callback(null, result)
+    })
   }
 
   function harmonize(result, callback) {

@@ -4,7 +4,7 @@ var address = { street: String, city: String, zip: String, country: String }
 
 var classification = {
   'emeku-id': { type: String, index: true },
-  author: String,
+  author: {_id: mongoose.Schema.Types.ObjectId, name: String},
   buyer: {_id: mongoose.Schema.Types.ObjectId, name: String},
   billing: {_id: mongoose.Schema.Types.ObjectId, name: String},
   format: String,

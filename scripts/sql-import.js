@@ -7,6 +7,9 @@ var stream = require('stream')
 var _ = require('lodash')
 var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
 
+// TODO: Remove programs which have no classifications? -> ~7400
+// TODO: Remove programs with ' (<user-id>) in the name -> ~5000
+
 var tasks = {
   wipe: wipe, base: base,
   wipeNames: wipeNames, names: names,
@@ -141,12 +144,12 @@ function classifications(callback) {
   // TODO: add c.status, c.no_items (== safe?), c.date_entered?, ...
   // TODO: verify that reg_date order is the valid ordering
 
-  async.waterfall([base, criteria, mapUsers, harmonize, save], callback)
+  async.waterfall([base, criteria, mapUsers, mapBuyers, harmonize, save], callback)
 
   function base(callback) {
     var tick = progressMonitor()
     var result = { programs: {}, classifications: {} }
-    conn.query('select p.id as programId, c.id as classificationId, c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.reg_date, c.assigned_user_id from meku_audiovisualprograms p' +
+    conn.query('select p.id as programId, c.id as classificationId, p.provider_id, c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.reg_date, c.assigned_user_id from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
         ' where p.deleted != "1" and j.deleted != "1" and c.deleted != "1"')
@@ -158,6 +161,7 @@ function classifications(callback) {
         if (row.runtime) classification.duration = row.runtime
         if (row.age_level) classification['legacy-age-limit'] = row.age_level
         if (row.descriptors) classification['warning-order'] = optionListToArray(row.descriptors)
+        classification.provider_id = row.provider_id
         classification.comments = trimConcat(row.description, row.opinions, '\n')
         classification['registration-date'] = row.reg_date && new Date(row.reg_date) || undefined
         classification.assigned_user_id = row.assigned_user_id
@@ -204,6 +208,24 @@ function classifications(callback) {
           var u = userMap[c.assigned_user_id]
           c.author = { _id: u._id, name: u.name }
         }
+      })
+      callback(null, result)
+    })
+  }
+
+  function mapBuyers(result, callback) {
+    schema.Account.find({}, function(err, accounts) {
+      if (err) return callback(err)
+      var accountMap = _.indexBy(accounts, 'emeku-id')
+      _.values(result.classifications).forEach(function(c) {
+        if (!c.provider_id || c.provider_id == '0') return
+        // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
+        if (c.provider_id == '38d427ff-a829-14ce-9950-4fcf065ceb64') return
+
+        var a = accountMap[c.provider_id]
+        var obj = { _id: a._id, name: a.name }
+        c.buyer = obj
+        c.billing = obj
       })
       callback(null, result)
     })

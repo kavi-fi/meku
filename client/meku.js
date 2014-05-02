@@ -361,11 +361,13 @@ function movieDetails() {
     $email.find('.classification').text(classificationText(summary))
     $email.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
 
-    $.get('/accounts/' + classification.buyer._id).done(function(data) {
-      data['email-addresses'].forEach(function(email) {
-        $("#email .emails ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
+    if (classification.buyer) {
+      $.get('/accounts/' + classification.buyer._id).done(function(data) {
+        data['email-addresses'].forEach(function(email) {
+          $("#email .emails ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
+        })
       })
-    })
+    }
   }
 
   return { show: show }

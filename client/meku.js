@@ -316,8 +316,6 @@ function movieDetails() {
     var countries = movie.country.map(function(c) { return enums.countries[c] }).join(', ')
     $summary
       .find('.name').text(movie.name.join(', ') || '-').append($('<span>', {class:'year'}).text(movie.year || '-')).end()
-      .find('.name-fi').text(movie['name-fi'].join(', ') || '-').end()
-      .find('.name-sv').text(movie['name-sv'].join(', ') || '-').end()
       .find('.synopsis').html(synopsis).end()
       .find('.country').text(countries || '-').end()
       .find('.directors').text((movie.directors).join(', ') || '-').end()

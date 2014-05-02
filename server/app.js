@@ -13,9 +13,11 @@ app.use(express.json())
 mongoose.connect('mongodb://localhost/meku')
 
 app.get('/movies/search/:q', function(req, res) {
-  var q = req.params.q
-  var regexp = new RegExp("\\b" + q, 'i')
-  Movie.find({ $or: [ { name: regexp }, { 'name-fi': regexp }, { 'name-sv': regexp } ] }, { name:1, 'name-fi':1, 'name-sv': 1 }, function(err, results) {
+  var q = (req.params.q || '').trim().toLowerCase().split(/\s+/)
+  var regexps = q.map(function(s) { return new RegExp('^' + escapeRegExp(s)) })
+  var query = { 'all-names': { $all: regexps } }
+  var fields = { 'emeku-id': 1, name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }
+  Movie.find(query, fields).sort('name').exec(function(err, results) {
     res.send(results)
   })
 })
@@ -99,3 +101,6 @@ var server = app.listen(3000, function() {
   console.log('Listening on port ' + server.address().port)
 })
 
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
+}

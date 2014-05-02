@@ -19,7 +19,8 @@ var tasks = {
   wipeClassifications: wipeClassifications, classifications: classifications,
   wipeProviders: wipeProviders, providers: providers,
   wipeAccounts: wipeAccounts, accounts: accounts,
-  wipeUsers: wipeUsers, users: users
+  wipeUsers: wipeUsers, users: users,
+  nameIndex: nameIndex
 }
 
 if (process.argv.length < 3) {
@@ -307,6 +308,19 @@ function users(callback) {
     .pipe(transformer(function(row) { return { 'emeku-id': row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }))
     .pipe(batcher(1000))
     .pipe(batchInserter('User', callback))
+}
+
+function nameIndex(callback) {
+  var tick = progressMonitor()
+  schema.Movie.find({}, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }, function(err, allPrograms) {
+    if (err) return callback(err)
+    async.eachLimit(allPrograms, 5, function(p, callback) {
+      tick()
+      var words = p.name.concat(p['name-fi']).concat(p['name-sv']).concat(p['name-other']).map(function(s) { return s.split(/\s+/) })
+      words = _(words).flatten().uniq().invoke('toLowerCase').sort().value()
+      schema.Movie.update({ _id: p._id }, { 'all-names': words }, callback)
+    }, callback)
+  })
 }
 
 function batcher(num) {

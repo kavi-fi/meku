@@ -21,10 +21,11 @@ var classification = {
 
 var Movie = exports.Movie = mongoose.model('movies', {
   'emeku-id': { type: String, index: true },
-  name: {type: [String], index: true},
-  'name-fi': {type: [String], index: true},
-  'name-sv': {type: [String], index: true},
-  'name-other': {type: [String], index: true},
+  'all-names': { type: [String], index: true },
+  name: [String],
+  'name-fi': [String],
+  'name-sv': [String],
+  'name-other': [String],
   deleted: Boolean,
   country: [String],
   year: String,

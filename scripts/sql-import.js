@@ -68,7 +68,9 @@ function names(callback) {
       var name = nameType(row.type)
       if (!result[row.id]) result[row.id] = {}
       if (!result[row.id][name]) result[row.id][name] = []
-      result[row.id][name].push(trim(row.name))
+      var trimmed = trim(row.name)
+      var arr = result[row.id][name]
+      if (arr.indexOf(trimmed) == -1) arr.push(trimmed)
       done()
     }, function() {
       async.eachLimit(Object.keys(result), 5, function(key, cb) {

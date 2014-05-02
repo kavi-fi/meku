@@ -92,6 +92,7 @@ app.get('/directors/search/:query', function(req, res, next) {
   }
 })
 
+app.use(nocache)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
 
@@ -103,4 +104,11 @@ var server = app.listen(3000, function() {
 
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
+}
+
+function nocache(req, res, next) {
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+  res.header('Expires', '-1')
+  res.header('Pragma', 'no-cache')
+  next()
 }

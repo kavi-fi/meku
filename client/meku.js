@@ -347,22 +347,29 @@ function movieDetails() {
   }
 
   function updatePreview(movie) {
-    var $email = $("#email .email-preview")
+    var $emails = $('#email .emails')
+    var $preview = $("#email .email-preview")
     var now = new Date()
     var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
     var classification = _.first(movie.classifications)
     var buyer = classification.buyer ? classification.buyer.name : ''
     var summary = classificationSummary(classification)
 
-    $email.find('.date').text(dateString)
-    $email.find('.name').text(movie.name.join(', '))
-    $email.find('.year').text(movie.year || '')
-    $email.find('.buyer').text(buyer)
-    $email.find('.classification').text(classificationText(summary))
-    $email.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
+    $preview.find('.date').text(dateString)
+    $preview.find('.name').text(movie.name.join(', '))
+    $preview.find('.year').text(movie.year || '')
+    $preview.find('.buyer').text(buyer)
+    $preview.find('.classification').text(classificationText(summary))
+    $preview.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
+
+    $emails.find('ul').on('change', 'input', function() {
+      var emails = $emails.find('ul input:checked').map(function() { return $(this).val() }).get()
+      $preview.find('.recipients').text(emails.join(', '))
+    })
 
     if (classification.buyer) {
       $.get('/accounts/' + classification.buyer._id).done(function(data) {
+        $("#email .emails ul input:not(:checked)").each(function() { $(this).parent().remove() })
         data['email-addresses'].forEach(function(email) {
           $("#email .emails ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
         })

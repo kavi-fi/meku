@@ -59,6 +59,7 @@ function movieDetails() {
   var $form = $('#movie-details')
   var $summary = $('#summary')
   var $submit = $form.find('button[name=register]')
+  var preview = registrationPreview()
 
   renderClassificationCriteria()
 
@@ -230,7 +231,7 @@ function movieDetails() {
     })
     $form.find('.required').trigger('validate')
     updateSummary(movie)
-    updatePreview(movie)
+    preview.update(movie)
   }
 
   function selectAutocomplete(opts) {
@@ -305,7 +306,7 @@ function movieDetails() {
   function saveMovieField(id, field, value) {
     $.post('/movies/' + id, JSON.stringify(keyValue(field, value))).done(function(movie) {
       updateSummary(movie)
-      updatePreview(movie)
+      preview.update(movie)
     })
   }
 
@@ -346,35 +347,40 @@ function movieDetails() {
     return { age: maxAgeLimit, warnings: warnings }
   }
 
-  function updatePreview(movie) {
+  function registrationPreview() {
     var $emails = $('#email .emails')
     var $preview = $("#email .email-preview")
-    var now = new Date()
-    var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
-    var classification = _.first(movie.classifications)
-    var buyer = classification.buyer ? classification.buyer.name : ''
-    var summary = classificationSummary(classification)
-
-    $preview.find('.date').text(dateString)
-    $preview.find('.name').text(movie.name.join(', '))
-    $preview.find('.year').text(movie.year || '')
-    $preview.find('.buyer').text(buyer)
-    $preview.find('.classification').text(classificationText(summary))
-    $preview.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
 
     $emails.find('ul').on('change', 'input', function() {
       var emails = $emails.find('ul input:checked').map(function() { return $(this).val() }).get()
       $preview.find('.recipients').text(emails.join(', '))
     })
 
-    if (classification.buyer) {
-      $.get('/accounts/' + classification.buyer._id).done(function(data) {
-        $("#email .emails ul input:not(:checked)").each(function() { $(this).parent().remove() })
-        data['email-addresses'].forEach(function(email) {
-          $("#email .emails ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
+    function updatePreview(movie) {
+      var now = new Date()
+      var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
+      var classification = _.first(movie.classifications)
+      var buyer = classification.buyer ? classification.buyer.name : ''
+      var summary = classificationSummary(classification)
+
+      $preview.find('.date').text(dateString)
+      $preview.find('.name').text(movie.name.join(', '))
+      $preview.find('.year').text(movie.year || '')
+      $preview.find('.buyer').text(buyer)
+      $preview.find('.classification').text(classificationText(summary))
+      $preview.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
+
+      if (classification.buyer) {
+        $.get('/accounts/' + classification.buyer._id).done(function(data) {
+          $("#email .emails ul input:not(:checked)").each(function() { $(this).parent().remove() })
+          data['email-addresses'].forEach(function(email) {
+            $("#email .emails ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
+          })
         })
-      })
+      }
     }
+
+    return {update: updatePreview}
   }
 
   return { show: show }

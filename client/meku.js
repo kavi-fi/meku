@@ -79,7 +79,7 @@ function movieDetails() {
   $form.find('.required').on('keyup change validate', validate(isNotEmpty))
   $form.find('.duration').on('keyup change validate', validate(isValidDuration))
 
-  $form.find('input[type=text], textarea').throttledInput(function(txt) {
+  $form.find('input[type=text], textarea').not('[name="registration-email"]').throttledInput(function(txt) {
     if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
     var value = txt
     if ($(this).data('type') == 'number') {
@@ -356,6 +356,13 @@ function movieDetails() {
       $preview.find('.recipients').text(emails.join(', '))
     })
 
+    $emails.find('button.new-registration-email').on('click', function(e) {
+      e.preventDefault()
+      var $input = $emails.find('input[name=registration-email]')
+      addEmailCheckbox($input.val())
+      $input.val('')
+    })
+
     function updatePreview(movie) {
       var now = new Date()
       var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
@@ -373,11 +380,13 @@ function movieDetails() {
       if (classification.buyer) {
         $.get('/accounts/' + classification.buyer._id).done(function(data) {
           $("#email .emails ul input:not(:checked)").each(function() { $(this).parent().remove() })
-          data['email-addresses'].forEach(function(email) {
-            $("#email .emails ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
-          })
+          data['email-addresses'].forEach(addEmailCheckbox)
         })
       }
+    }
+
+    function addEmailCheckbox(email) {
+      $emails.find("ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
     }
 
     return {update: updatePreview}

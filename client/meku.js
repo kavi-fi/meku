@@ -78,6 +78,7 @@ function movieDetails() {
   // validations
   $form.find('.required').on('keyup change validate', validate(isNotEmpty))
   $form.find('.duration').on('keyup change validate', validate(isValidDuration))
+  $form.find('.email').on('keyup change validate', validate(isEmail))
 
   $form.find('input[type=text], textarea').not('[name="registration-email"]').throttledInput(function(txt) {
     if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
@@ -358,6 +359,7 @@ function movieDetails() {
     $emails.find('button.add-registration-email').on('click', function(e) {
       e.preventDefault()
       var $input = $emails.find('input[name=registration-email]')
+      if ($input.hasClass('invalid')) { return; }
       addManualEmailCheckbox(true, $input.val())
       $input.val('')
       saveEmailState()
@@ -445,6 +447,11 @@ function isNotEmpty(val) {
 
 function isValidDuration(txt) {
   return /(?:(\d+)?:)?(\d+):(\d+)$/.test(txt)
+}
+
+function isEmail(txt) {
+  var regexp = /^([A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+(\.[A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+)*)@(([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63})(\.([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63}))*\.[a-zA-Z0-9]{2,63})$/
+  return regexp.test(txt)
 }
 
 function validate(f) {

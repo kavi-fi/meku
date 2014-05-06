@@ -395,6 +395,7 @@ function movieDetails() {
       $preview.find('.buyer').text(buyer)
       $preview.find('.classification').text(classificationText(summary))
       $preview.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
+      $preview.find('.recipients').text(buyerEmails.concat(manualEmails).join(', '))
 
       if (classification.buyer) {
         $.get('/accounts/' + classification.buyer._id).done(function(data) {

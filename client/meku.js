@@ -351,17 +351,29 @@ function movieDetails() {
     var $emails = $('#email .emails')
     var $preview = $("#email .email-preview")
 
-    $emails.find('ul').on('change', 'input', function() {
-      var emails = $emails.find('ul input:checked').map(function() { return $(this).val() }).get()
-      $preview.find('.recipients').text(emails.join(', '))
+    $emails.find('ul').on('change', 'input', function(e) {
+      saveEmailState()
     })
 
-    $emails.find('button.new-registration-email').on('click', function(e) {
+    $emails.find('button.add-registration-email').on('click', function(e) {
       e.preventDefault()
       var $input = $emails.find('input[name=registration-email]')
-      addEmailCheckbox($input.val())
+      addManualEmailCheckbox(true, $input.val())
       $input.val('')
+      saveEmailState()
     })
+
+    function saveEmailState() {
+      var buyerEmails = $emails.find('ul.buyer input:checked')
+        .map(function() { return $(this).val() }).get()
+        .map(function(email) { return {email: email, manual: false}})
+
+      var manualEmails = $emails.find('ul.manual input:checked')
+        .map(function() { return $(this).val() }).get()
+        .map(function(email) { return {email: email, manual: true}})
+
+      saveMovieField($form.data('id'), $emails.find('ul li input:first').attr('name'), buyerEmails.concat(manualEmails))
+    }
 
     function updatePreview(movie) {
       var now = new Date()
@@ -369,6 +381,13 @@ function movieDetails() {
       var classification = _.first(movie.classifications)
       var buyer = classification.buyer ? classification.buyer.name : ''
       var summary = classificationSummary(classification)
+      var buyerEmails = classification['registration-email-addresses']
+        .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
+      var manualEmails = classification['registration-email-addresses']
+        .filter(function(email) { return email.manual }).map(function(e) { return e.email })
+
+      var manualInDom = $emails.find('ul.manual li input').map(function() { return $(this).val() }).get()
+      manualEmails.filter(function(email) { return notIn(manualInDom, email) }).forEach(addManualEmailCheckbox(true))
 
       $preview.find('.date').text(dateString)
       $preview.find('.name').text(movie.name.join(', '))
@@ -379,15 +398,33 @@ function movieDetails() {
 
       if (classification.buyer) {
         $.get('/accounts/' + classification.buyer._id).done(function(data) {
-          $("#email .emails ul input:not(:checked)").each(function() { $(this).parent().remove() })
-          data['email-addresses'].forEach(addEmailCheckbox)
+          // remove all email addresses linked to the selected buyer
+          $emails.find('ul.buyer li').remove()
+
+          data['email-addresses'].forEach(function(email) {
+            if (notIn(buyerEmails, email)) {
+              addBuyerEmailCheckbox(false, email)
+            } else {
+              addBuyerEmailCheckbox(true, email)
+            }
+          })
         })
       }
     }
 
-    function addEmailCheckbox(email) {
-      $emails.find("ul").append($('<li>').html([$('<input>', {type: 'checkbox', value: email}), $('<span>').text(email)]))
+    function addEmailCheckbox($el, checked, email) {
+      $el.append($('<li>').html([
+         $('<input>', {
+           type: 'checkbox',
+           checked: checked || false,
+           name: 'classifications.0.registration-email-addresses',
+           value: email
+         }),
+         $('<span>').text(email)
+      ]))
     }
+    var addBuyerEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.buyer'))
+    var addManualEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.manual'))
 
     return {update: updatePreview}
   }
@@ -458,6 +495,10 @@ function classificationText(classification) {
 
 function classificationCriteriaText(warnings) {
   return warnings.map(function(x) { return classificationCategory_FI[x] }).join(', ')
+}
+
+function notIn(arr, el) {
+  return _.indexOf(arr, el) === -1
 }
 
 var classificationCategory_FI = {violence: 'väkivälta', anxiety: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}

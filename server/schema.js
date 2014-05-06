@@ -15,6 +15,7 @@ var classification = {
   'warning-order': [String],
   'legacy-age-limit': String,
   'registration-date': Date,
+  'registration-email-addresses': [{email: String, manual: Boolean}],
   comments: String,
   status: String
 }

@@ -502,7 +502,7 @@ function notIn(arr, el) {
   return _.indexOf(arr, el) === -1
 }
 
-var classificationCategory_FI = {violence: 'väkivälta', anxiety: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
+var classificationCategory_FI = {violence: 'väkivälta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
 
 var classificationCriteria = [
   { id:1,  category: 'violence', age: '18', title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa" },

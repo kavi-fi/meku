@@ -14,10 +14,26 @@
 </head>
 <body>
   <div id="header">
-    <div style="display: inline-block;">Hae: <input id="search-input" type="text" /></div>
-    <button class="new-movie">Uusi elokuvaluokittelu</button>
+    <div class="content">
+      <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
+
+      <ul>
+        <li><a href="#haku">Haku</a></li>
+        <li><a class="active" href="#luokittelu">Luokittelu</a></li>
+        <li><a href="#tilaajat">Tilaajat</a></li>
+        <li><a href="#laskutus">Laskutus</a></li>
+      </ul>
+
+    </div>
   </div>
-  <div id="search-results"></div>
+
+  <div id="search">
+    <div class="content">
+      <div style="display: inline-block;">Hae: <input id="search-input" type="text" /></div>
+      <button class="new-movie">Uusi elokuvaluokittelu</button>
+      <div id="search-results"></div>
+    </div>
+  </div>
 
   <form id="movie-details" data-id="">
     <div class="row">
@@ -145,15 +161,18 @@
 
     <div id="email" class="row">
       <div class="content">
+        <h2>Luokittelupäätös</h2>
         <div class="emails left">
           <h3>Lähetä luokittelupäätös</h3>
 
           <ul class="buyer"></ul>
           <ul class="manual"></ul>
 
-          <div class="">
+          <div>
             <label>Lisää sähköpostiosoite: <input type="text" class="email required" name="registration-email"/></label><button class="add-registration-email">Lisää</button>
           </div>
+          <button name="register" disabled=disabled>Rekisterõi</button>
+
         </div>
         <div class="preview right">
           <h3>Luokittelupäätöksen esikatselu</h3>
@@ -180,7 +199,6 @@
       </div>
     </div>
 
-      <button name="register" disabled=disabled>Rekisterõi</button>
   </form>
 </body>
 </html>

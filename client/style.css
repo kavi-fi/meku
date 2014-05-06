@@ -13,18 +13,84 @@ body {
   -webkit-user-drag: element;
 }
 
+button {
+  border-radius: 3px;
+  background-image: -o-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+  background-image: -moz-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+  background-image: -ms-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+  background-image: linear-gradient(-180deg, #00BB88 0%, #00AA77 100%);
+  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+  border: 0;
+  padding: 10px 20px;
+  color: #fff;
+}
+
+button:hover {
+  border-radius: 3px;
+  background: #00BB88;
+  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
+}
+
+button:active {
+  border-radius: 3px;
+  background: #009966;
+  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
+  box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20)
+}
+
+button:focus { outline: none; }
+
 button[disabled=disabled], button:disabled { color: gray; }
 
 ol { list-style-type: none; margin: 0; }
 .new-movie { margin: 10px; }
 
 /* layout */
-#header { margin: 10px 0 0 10px; }
+#header {
+  background-image: -o-linear-gradient(-180deg, #333 0%, #444 100%);
+  background-image: -moz-linear-gradient(-180deg, #333 0%, #444 100%);
+  background-image: -ms-linear-gradient(-180deg, #333 0%, #444 100%);
+  background-image: linear-gradient(-180deg, #333 0%, #444 100%);
+  border-bottom: solid 5px #00AA77;
+}
+
+#header .content { padding: 15px 0 0 0; }
+
+#header h1 { margin-bottom: 30px; font-size: 22px; }
+#header ul { list-style: none; padding: 0; margin: 0;}
+#header ul li { display: inline-block; margin-right: 15px; }
+#header ul li a {
+  display: block;
+  background-color: black;
+  padding: 20px 0;
+  width: 217px;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #00BB88;
+  font-weight: bold;
+  border-radius: 3px 3px 0 0;
+  background-image: -o-linear-gradient(-180deg, #555 70%, #484848 100%);
+  background-image: -moz-linear-gradient(-180deg, #555 70%, #484848 100%);
+  background-image: -ms-linear-gradient(-180deg, #555 70%, #484848 100%);
+  background-image: linear-gradient(-180deg, #555 70%, #484848 100%);
+}
+#header ul li a.active {
+  background-image: -o-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+  background-image: -moz-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+  background-image: -ms-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
+  background-image: linear-gradient(-180deg, #00BB88 0%, #00AA77 100%);
+  color: #fff;
+}
+
 .row { border-bottom: 1px solid #D3D3D3; width: 100%; float: left; margin: 0; padding: 70px 0 80px 0; }
 .content { width: 940px; margin: 0 auto; padding: 0 10px; }
 
-h2 { font-size: 24px; color: #444444; line-height: 30px; }
-h3 { font-size: 20px; color: #444444; line-height: 24px; }
+h1 { font-size: 24px; color: #00BB88; line-height: 30px; }
+h2 { font-size: 24px; color: #00BB88; line-height: 30px; }
+h3 { font-size: 20px; color: #00BB88; line-height: 24px; }
 h4 { font-size: 16px; color: #444444; line-height: 24px; }
 h5 { font-size: 14px; color: #444444; line-height: 19px; }
 
@@ -53,7 +119,7 @@ textarea,
 .select2-container .select2-choice {
   border-radius: 3px;
   background: #FFFFFF;
-  border: 1px solid #FF99CC;
+  border: 1px solid #D3D3D3;
   -moz-box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
   box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
   font-size: 14px;
@@ -131,12 +197,20 @@ label {
 
 .select2-container { width: 305px; }
 
+input[type=text].required,
+.select2-container-multi.required .select2-choices,
+.select2-container.required .select2-choice {
+  background: #ffffff !important;
+  background-image: none;
+  border: 1px solid #00BB88;
+}
+
 input[type=text].invalid,
 .select2-container-multi.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
-  background-color: #FFF7FA !important;
-  background-color: #f2dede;
+  background: #F0FFF0 !important;
   background-image: none;
+  border: 1px solid #00BB88;
 }
 
 #movie-details { display: none; }
@@ -310,8 +384,8 @@ input[type=text].invalid,
 /*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 #summary .warnings .drop-target.active { width: 50px; }
 
-#email .emails label { text-align: left; width: 225px;}
-#email .emails input[name=registration-email] { width: 205px; }
+#email .emails label { text-align: left; width: 200px;}
+#email .emails input[name=registration-email] { width: 93%; }
 
 #email h3 { border-bottom: 5px solid #DDDDDD; }
 #email .left { width: 300px; }

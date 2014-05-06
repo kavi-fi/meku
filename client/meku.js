@@ -19,6 +19,7 @@ function setup() {
   })
 
   function showClassification(movie) {
+    $("#search").hide()
     search.disable()
     details.show(movie)
   }

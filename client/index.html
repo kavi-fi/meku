@@ -96,6 +96,15 @@
     <div id="classification" class="row">
       <div class="movie-info content">
         <h2>Luokittelu</h2>
+
+        <div class="summary">
+          <span class="name"></span>
+          <div class="agelimit">
+            <img src="images/agelimit-s.png" />
+            <div class="warnings"></div>
+          </div>
+        </div>
+
         <div class="left">
           <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
           <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="text" />
@@ -140,7 +149,7 @@
           <p>KAVI:n sisäiset kommentit näkyvät vain KAVIN työntekijöille.</p>
         </div>
 
-        <div class="right">
+        <div class="right summary">
           <h3>Ikärajat.fi-näkymä</h3>
           <div class="box">
             <h4 class="name"><span class="year"></span></h4>

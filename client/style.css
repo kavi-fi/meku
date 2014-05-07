@@ -220,6 +220,12 @@ input[type=text].invalid,
 
 #movie-details { display: none; }
 
+#classification h2 { margin: 0 0 10px 0; }
+#classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
+#classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
+#classification .summary .year { display: none; }
+#classification .summary .agelimit { padding: 0; display: inline-block;}
+
 #criteria .category {
   width: 300px;
   float: left;
@@ -373,21 +379,21 @@ input[type=text].invalid,
 
 #summary dl dt { font-weight: bold;}
 
-#summary .agelimit  { padding: 15px 0 0 0;}
-#summary .agelimit img { width: 40px; height: 40px;}
+.summary .agelimit  { padding: 15px 0 0 0;}
+.summary .agelimit img { width: 40px; height: 40px;}
 
-#summary .warnings .warning.violence { background-image: url('images/violence.png'); }
-#summary .warnings .warning.sex { background-image: url('images/sex.png'); }
-#summary .warnings .warning.fear { background-image: url('images/fear.png'); }
-#summary .warnings .warning.drugs { background-image: url('images/drugs.png'); }
-#summary .warnings { display: inline-block; }
-#summary .warnings .warning { display: inline-block; cursor: move; background: transparent no-repeat; background-size: 40px; width: 40px; height: 40px; transition: width 0.3s; }
-#summary .warnings .warning.dragging { opacity: 0.3; }
+.summary .warnings .warning.violence { background-image: url('images/violence.png'); }
+.summary .warnings .warning.sex { background-image: url('images/sex.png'); }
+.summary .warnings .warning.fear { background-image: url('images/fear.png'); }
+.summary .warnings .warning.drugs { background-image: url('images/drugs.png'); }
+.summary .warnings { display: inline-block; }
+.summary .warnings .warning { display: inline-block; cursor: move; background: transparent no-repeat; background-size: 40px; width: 40px; height: 40px; transition: width 0.3s; }
+.summary .warnings .warning.dragging { opacity: 0.3; }
 
-#summary .warnings .warning.dragging, .summary .warnings .drop-target.dragging { width: 0; opacity: 0; }
-#summary .warnings .drop-target { display: inline-block; width: 10px; height: 30px; transition: width 0.3s; }
-/*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
-#summary .warnings .drop-target.active { width: 50px; }
+.summary .warnings .warning.dragging, .summary .warnings .drop-target.dragging { width: 0; opacity: 0; }
+.summary .warnings .drop-target { display: inline-block; width: 10px; height: 30px; transition: width 0.3s; }
+.*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
+.summary .warnings .drop-target.active { width: 50px; }
 
 #email .emails label { text-align: left; width: 200px;}
 #email .emails input[name=registration-email] { width: 93%; }

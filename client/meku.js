@@ -58,7 +58,7 @@ function searchPage() {
 
 function movieDetails() {
   var $form = $('#movie-details')
-  var $summary = $('#summary')
+  var $summary = $('.summary')
   var $submit = $form.find('button[name=register]')
   var preview = registrationPreview()
 

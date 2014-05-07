@@ -202,7 +202,11 @@ label {
   line-height: 19px;
 }
 
-.select2-container { width: 305px; }
+.select2-container { width: 302px; }
+.select2-container.select2-dropdown-open .select2-choices {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
 
 input[type=text].required,
 .select2-container-multi.required .select2-choices,

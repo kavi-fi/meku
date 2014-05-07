@@ -228,7 +228,6 @@ input[type=text].invalid,
 #classification h2 { margin: 0 0 10px 0; }
 #classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
 #classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
-#classification .summary .year { display: none; }
 #classification .summary .agelimit { padding: 0; display: inline-block;}
 
 #criteria .category {
@@ -372,8 +371,10 @@ input[type=text].invalid,
 #summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
 #summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
 #summary h3 { border-bottom: 5px solid #DDDDDD; }
-#summary h4 { border-bottom: 1px solid #D3D3D3; padding: 0 0 15px 0; margin: 0;}
-#summary h4 span { font-size: 16px; font-weight: normal; float: right;}
+
+#summary .header { border-bottom: 1px solid #D3D3D3; }
+#summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
+#summary .header .year { font-size: 16px; font-weight: normal; float: right;}
 #summary .synopsis p { margin: 0 0 20px 0;}
 
 #summary dl { margin: 15px 0 0 0; }
@@ -397,7 +398,7 @@ input[type=text].invalid,
 
 .summary .warnings .warning.dragging, .summary .warnings .drop-target.dragging { width: 0; opacity: 0; }
 .summary .warnings .drop-target { display: inline-block; width: 10px; height: 30px; transition: width 0.3s; }
-.*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
+/*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 .summary .warnings .drop-target.active { width: 50px; }
 
 #email .emails label { text-align: left; width: 200px;}

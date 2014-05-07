@@ -106,42 +106,47 @@ function movieDetails() {
     e.stopPropagation()
   })
 
-  $summary.on('dragstart', '.warnings .warning', function(e) {
-    var $e = $(this)
-    e.originalEvent.dataTransfer.effectAllowed = 'move'
-    e.originalEvent.dataTransfer.setData('text/plain', this.outerHTML)
-    $summary.find('.drop-target').not($e.next()).addClass('valid')
-    setTimeout(function() { $e.add($e.next()).addClass('dragging') }, 0)
-  })
-  $summary.on('dragenter', '.warnings .drop-target.valid', function(e) {
-    e.preventDefault()
-    return true
-  })
-  $summary.on('dragover', '.warnings .drop-target.valid', function(e) {
-    $(this).addClass('active')
-    e.preventDefault()
-  })
-  $summary.on('dragleave', '.warnings .drop-target.valid', function(e) {
-    $(this).removeClass('active')
-    e.preventDefault()
-  })
-  $summary.on('dragend', '.warnings .warning', function() {
-    $(this).add($(this).next()).removeClass('dragging')
-    $summary.find('.drop-target').removeClass('valid').removeClass('active')
-  })
-  $summary.on('drop', '.warnings .drop-target', function(e) {
-    e.preventDefault()
-    e.originalEvent.dataTransfer.dropEffect = 'move'
-    $summary.find('.drop-target.valid').removeClass('valid')
-    $summary.find('.dragging').remove()
-    $(this).replaceWith([
-      $('<span>', { class:'drop-target' }),
-      $(e.originalEvent.dataTransfer.getData('text/plain')),
-      $('<span>', { class:'drop-target' })
-    ])
-    var newOrder = $summary.find('.warnings .warning').map(function() { return $(this).data('id') }).get()
-    saveMovieField($form.data('id'), 'classifications.0.warning-order', newOrder)
-  })
+  warningDragOrder($("#summary .summary"))
+  warningDragOrder($("#classification .summary"))
+
+  function warningDragOrder($el) {
+    $el.on('dragstart', '.warnings .warning', function(e) {
+      var $e = $(this)
+      e.originalEvent.dataTransfer.effectAllowed = 'move'
+      e.originalEvent.dataTransfer.setData('text/plain', this.outerHTML)
+      $el.find('.drop-target').not($e.next()).addClass('valid')
+      setTimeout(function() { $e.add($e.next()).addClass('dragging') }, 0)
+    })
+    $el.on('dragenter', '.warnings .drop-target.valid', function(e) {
+      e.preventDefault()
+      return true
+    })
+    $el.on('dragover', '.warnings .drop-target.valid', function(e) {
+      $(this).addClass('active')
+      e.preventDefault()
+    })
+    $el.on('dragleave', '.warnings .drop-target.valid', function(e) {
+      $(this).removeClass('active')
+      e.preventDefault()
+    })
+    $el.on('dragend', '.warnings .warning', function(e) {
+      $(this).add($(this).next()).removeClass('dragging')
+      $el.find('.drop-target').removeClass('valid').removeClass('active')
+    })
+    $el.on('drop', '.warnings .drop-target', function(e) {
+      e.preventDefault()
+      e.originalEvent.dataTransfer.dropEffect = 'move'
+      $el.find('.drop-target.valid').removeClass('valid')
+      $el.find('.dragging').remove()
+      $(this).replaceWith([
+        $('<span>', { class:'drop-target' }),
+        $(e.originalEvent.dataTransfer.getData('text/plain')),
+        $('<span>', { class:'drop-target' })
+      ])
+      var newOrder = $el.find('.warnings .warning').map(function() { return $(this).data('id') }).get()
+      saveMovieField($form.data('id'), 'classifications.0.warning-order', newOrder)
+    })
+  }
 
   function show(movie) {
     $('.new-movie').attr('disabled', 'true')
@@ -335,7 +340,8 @@ function movieDetails() {
     var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
     var countries = movie.country.map(function(c) { return enums.countries[c] }).join(', ')
     $summary
-      .find('.name').text(movie.name.join(', ') || '-').append($('<span>', {class:'year'}).text(movie.year || '-')).end()
+      .find('.name').text(movie.name.join(', ') || '-').end()
+      .find('.year').text(movie.year || '-').end()
       .find('.synopsis').html(synopsis).end()
       .find('.country').text(countries || '-').end()
       .find('.directors').text((movie.directors).join(', ') || '-').end()

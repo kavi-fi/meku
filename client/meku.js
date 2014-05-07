@@ -98,15 +98,17 @@ function movieDetails() {
     saveMovieField($form.data('id'), $(this).attr('name'), safe)
   })
 
-  $form.on('click', '.category .criteria', function(e) {
-    $(e.currentTarget).toggleClass('selected')
-
+  $form.on('click', '.category .criteria', function() {
+    $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
     var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
     saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
   })
 
   $form.on('click', '.category .criteria textarea', function(e) {
     e.stopPropagation()
+  })
+  $form.on('blur', '.category .criteria.has-comment:not(.selected) textarea', function() {
+    $(this).parents('.criteria').toggleClass('has-comment', isNotEmpty($(this).val()))
   })
 
   warningDragOrder($("#summary .summary"))
@@ -236,7 +238,10 @@ function movieDetails() {
     })
     $form.find('.category-criteria textarea').val()
     Object.keys(classification['criteria-comments'] || {}).forEach(function(id) {
-      $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(classification['criteria-comments'][id])
+      var txt = classification['criteria-comments'][id]
+      if (isNotEmpty(txt)) {
+        $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(txt).parents('.criteria').addClass('has-comment')
+      }
     })
     $form.find('.required').trigger('validate')
     updateSummary(movie)

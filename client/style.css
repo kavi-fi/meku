@@ -336,6 +336,7 @@ input[type=text].invalid,
   border: 1px solid #666666;
   border-radius: 0;
 }
+#criteria .category .criteria.has-comment textarea,
 #criteria .category .criteria.selected textarea {
   display: block;
 }

@@ -1,6 +1,9 @@
 $(setup)
 
 function setup() {
+  $.fn.select2.defaults.formatNoMatches = 'Ei tuloksia'
+  $.fn.select2.defaults.formatSearching = 'Haetaan...'
+
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
 
   var search = searchPage()

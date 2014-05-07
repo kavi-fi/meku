@@ -209,7 +209,7 @@ function movieDetails() {
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.buyer"]'),
       val: movie.classifications[0].buyer,
-      path: '/accounts/search/',
+      path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber' },
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany
     })
@@ -217,7 +217,7 @@ function movieDetails() {
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.billing"]'),
       val: movie.classifications[0].billing,
-      path: '/accounts/search/',
+      path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber,Classifier' },
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany
     })
@@ -286,7 +286,8 @@ function movieDetails() {
         if (len === 0 || len < opts.termMinLength) {
           return query.callback({results: []})
         }
-        return $.get(opts.path + query.term).done(function(data) {
+        var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + query.term
+        return $.get(path).done(function(data) {
           return query.callback({results: data.map(opts.toOption)})
         })
       },

@@ -1,10 +1,12 @@
 var express = require('express')
+var _ = require('lodash')
 var path = require('path')
 var mongoose = require('mongoose')
 var liveReload = require('express-livereload')
 var schema = require('./schema')
 var Movie = schema.Movie
 var Account = schema.Account
+var enums = require('../shared/enums')
 
 var app = express()
 
@@ -41,7 +43,8 @@ app.post('/movies/:id', function(req, res, next) {
 })
 
 app.get('/accounts/search/:query', function(req, res, next) {
-  Account.find({name: new RegExp("^" + req.params.query, 'i')}).limit(20).exec(function(err, data) {
+  var roles = req.query.roles ? req.query.roles.split(',') : []
+  Account.find({name: new RegExp("^" + req.params.query, 'i'), roles: { $in: roles }}).limit(20).exec(function(err, data) {
     return res.send(data)
   })
 })

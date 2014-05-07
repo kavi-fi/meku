@@ -3,6 +3,7 @@ $(setup)
 function setup() {
   $.fn.select2.defaults.formatNoMatches = 'Ei tuloksia'
   $.fn.select2.defaults.formatSearching = 'Haetaan...'
+  $.fn.select2.defaults.adaptDropdownCssClass = function(c) {  return c == 'required' ? c : null }
 
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
 

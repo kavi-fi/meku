@@ -153,31 +153,26 @@ function movieDetails() {
       .find('input[name="name-fi.0"]').val(movie['name-fi'][0]).end()
       .find('input[name="name-sv.0"]').val(movie['name-sv'][0]).end()
       .find('input[name="name-other.0"]').val(movie['name-other'][0]).end()
-      .find('input[name=country]').val(movie.country).end()
       .find('input[name=year]').val(movie.year).end()
       .find('select[name=genre]').val(movie.genre).end()
       .find('textarea[name=synopsis]').val(movie.synopsis).end()
       .find('input[name="classifications.0.buyer"]').val(classification.buyer).end()
       .find('input[name="classifications.0.billing"]').val(classification.billing).end()
-      .find('input[name="classifications.0.format"]').val(classification.format).end()
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
       .find('textarea[name="classifications.0.comments"]').val(classification.comments).end()
 
-    $form.find('input.country').select2({
+    selectEnumAutocomplete({
+      $el: $form.find('input.country'),
+      val: movie.country,
       data: Object.keys(enums.countries).map(function(key) { return { id: key, text: enums.countries[key] }}),
-      placeholder: "Valitse...",
       multiple: true
     })
-    $form.find('input.country').on('change', function() {
-      var data = $(this).select2('data').map(function(x) { return x.id })
-      saveMovieField($form.data('id'), $(this).attr('name'), data)
-    })
 
-    selectAutocomplete({
+    selectEnumAutocomplete({
       $el: $form.find('input[name="production-companies"]'),
-      val: movie['production-companies'] || [],
-      path: '/production-companies/search/',
+      val: movie['production-companies'],
+      data: enums.productionCompanies.map(function(f) { return { id: f, text: f }}),
       multiple: true
     })
 
@@ -214,11 +209,10 @@ function movieDetails() {
       fromOption: select2OptionToCompany
     })
 
-    $form.find('input[name="classifications.0.format"]').select2({
-      data: enums.format.map(function(f) { return { id: f, text: f }}),
-      placeholder: "Valitse..."
-    }).on('change', function() {
-      saveMovieField($form.data('id'), $(this).attr('name'), $(this).select2('data').id)
+    selectEnumAutocomplete({
+      $el: $form.find('input[name="classifications.0.format"]'),
+      val: movie.classifications[0].format,
+      data: enums.format.map(function(f) { return { id: f, text: f }})
     })
 
     $form.find('.category-container').toggle(!classification.safe)
@@ -234,6 +228,24 @@ function movieDetails() {
     $form.find('.required').trigger('validate')
     updateSummary(movie)
     preview.update(movie)
+  }
+
+  function selectEnumAutocomplete(opts) {
+    opts.$el.select2({
+      data: opts.data,
+      placeholder: "Valitse...",
+      multiple: opts.multiple || false,
+      initSelection: function(e, callback) {
+        return callback(opts.multiple ? (opts.val || []).map(idToOption) : idToOption(opts.val))
+      }
+    }).on('change', function() {
+      var data = $(this).select2('data')
+      saveMovieField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
+    }).select2('val', opts.val)
+
+    function idToOption(id) {
+      return _.find(opts.data, function(item) { return item.id === id })
+    }
   }
 
   function selectAutocomplete(opts) {

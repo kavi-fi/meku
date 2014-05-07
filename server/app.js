@@ -40,19 +40,6 @@ app.post('/movies/:id', function(req, res, next) {
   })
 })
 
-app.get('/production-companies/search/:query', function(req, res, next) {
-  Movie.aggregate([
-      { $unwind: '$production-companies'},
-      { $match: { 'production-companies': new RegExp("^" + req.params.query, 'i') } },
-      { $project: { 'production-companies': 1 } },
-      { $group: {_id: '$production-companies' } }
-    ]).exec(function(err, data) {
-      return res.send(data.reduce(function(acc, doc) {
-        return acc.concat([doc._id])
-      }, []))
-    })
-})
-
 app.get('/accounts/search/:query', function(req, res, next) {
   Account.find({name: new RegExp("^" + req.params.query, 'i')}).limit(20).exec(function(err, data) {
     return res.send(data)

@@ -176,6 +176,18 @@ enums.countries = {
   '-': 'Muu maa'
 }
 
+enums.productionCompanies = [
+  'Amblin Entertainment',
+  'Keystone Studios',
+  'Spyglass Entertainment',
+  'Tuffi Films',
+  'United Artists Films, Inc.',
+  'Universal Studios',
+  'Walt Disney Studios',
+  'Warner Brothers',
+  'Warner Sisters'
+]
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = enums
 }

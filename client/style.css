@@ -230,6 +230,9 @@ input[type=text].invalid,
 #classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
 #classification .summary .agelimit { padding: 0; display: inline-block;}
 
+#criteria .header { position: relative; }
+#criteria .safe-container { position: absolute; left: 320px; top: 9px; }
+#criteria .safe-container input { margin: 0 5px 0 0; }
 #criteria .category {
   width: 300px;
   float: left;

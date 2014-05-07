@@ -77,17 +77,20 @@ function movieDetails() {
   })
 
   // validations
-  $form.find('.required').on('keyup change validate', validate(isNotEmpty))
-  $form.find('.duration').on('keyup change validate', validate(isValidDuration))
-  $form.find('.email').on('keyup change validate', validate(isEmail))
+  validateTextChange($form.find('.required'), isNotEmpty)
+  validateTextChange($form.find('.duration'), isValidDuration)
+  validateTextChange($form.find('.email'), isEmail)
+  validateTextChange($form.find('input[name=year]'), isValidYear)
+
+  function validateTextChange($el, validatorFn) {
+    var validator = validate(validatorFn)
+    $el.on('keyup change validate', validator)
+       .on('paste', function() { var me = this; setTimeout(function() { validator.call(me) }, 0) })
+  }
 
   $form.find('input[type=text], textarea').not('[name="registration-email"]').throttledInput(function(txt) {
     if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
-    var value = txt
-    if ($(this).data('type') == 'number') {
-      value = parseInt(txt)
-    }
-    saveMovieField($form.data('id'), $(this).attr('name'), value)
+    saveMovieField($form.data('id'), $(this).attr('name'), txt)
   })
 
   $form.find('input[name="classifications.0.safe"]').change(function() {
@@ -465,6 +468,11 @@ function isValidDuration(txt) {
 function isEmail(txt) {
   var regexp = /^([A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+(\.[A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+)*)@(([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63})(\.([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63}))*\.[a-zA-Z0-9]{2,63})$/
   return regexp.test(txt)
+}
+
+function isValidYear(txt) {
+  console.log('is valid year: ', txt)
+  return /^\d{4}$/.test(txt) && parseInt(txt) > 1889
 }
 
 function validate(f) {

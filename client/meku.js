@@ -471,7 +471,6 @@ function isEmail(txt) {
 }
 
 function isValidYear(txt) {
-  console.log('is valid year: ', txt)
   return /^\d{4}$/.test(txt) && parseInt(txt) > 1889
 }
 

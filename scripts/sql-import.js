@@ -316,9 +316,8 @@ function nameIndex(callback) {
     if (err) return callback(err)
     async.eachLimit(allPrograms, 5, function(p, callback) {
       tick()
-      var words = p.name.concat(p['name-fi']).concat(p['name-sv']).concat(p['name-other']).map(function(s) { return s.split(/\s+/) })
-      words = _(words).flatten().uniq().invoke('toLowerCase').sort().value()
-      schema.Movie.update({ _id: p._id }, { 'all-names': words }, callback)
+      p.populateAllNames()
+      schema.Movie.update({ _id: p._id }, { 'all-names': p['all-names'] }, callback)
     }, callback)
   })
 }

@@ -1,4 +1,6 @@
+var _ = require('lodash')
 var mongoose = require('mongoose')
+var Schema = mongoose.Schema
 
 var address = { street: String, city: String, zip: String, country: String }
 
@@ -20,7 +22,7 @@ var classification = {
   status: String
 }
 
-var Movie = exports.Movie = mongoose.model('movies', {
+var MovieSchema = new Schema({
   'emeku-id': { type: String, index: true },
   'all-names': { type: [String], index: true },
   name: [String],
@@ -38,6 +40,12 @@ var Movie = exports.Movie = mongoose.model('movies', {
   classifications: [classification],
   'program-type': String // enums.programType
 })
+MovieSchema.methods.populateAllNames = function() {
+  var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other']).map(function(s) { return s.split(/\s+/) })
+  this['all-names'] = _(words).flatten().uniq().invoke('toLowerCase').sort().value()
+}
+
+var Movie = exports.Movie = mongoose.model('movies', MovieSchema)
 
 var Account = exports.Account = mongoose.model('accounts', {
   'emeku-id': String,

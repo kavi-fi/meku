@@ -47,6 +47,8 @@ button[disabled=disabled], button:disabled { color: gray; }
 ol { list-style-type: none; margin: 0; }
 .new-movie { margin: 10px; }
 
+textarea { resize: vertical; }
+
 /* layout */
 #header {
   background-image: -o-linear-gradient(-180deg, #333 0%, #444 100%);

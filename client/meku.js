@@ -64,10 +64,6 @@ function movieDetails() {
 
   renderClassificationCriteria()
 
-  $form.find('select').on('change', function() {
-    saveMovieField($form.data('id'), $(this).attr('name'), $(this).val())
-  })
-
   $form.on('validation', function() {
     if ($form.find(".required.invalid").length === 0) {
       $submit.removeAttr('disabled')
@@ -157,7 +153,6 @@ function movieDetails() {
       .find('input[name="name-sv.0"]').val(movie['name-sv'][0]).end()
       .find('input[name="name-other.0"]').val(movie['name-other'][0]).end()
       .find('input[name=year]').val(movie.year).end()
-      .find('select[name=genre]').val(movie.genre).end()
       .find('textarea[name=synopsis]').val(movie.synopsis).end()
       .find('input[name="classifications.0.buyer"]').val(classification.buyer).end()
       .find('input[name="classifications.0.billing"]').val(classification.billing).end()
@@ -176,6 +171,13 @@ function movieDetails() {
       $el: $form.find('input[name="production-companies"]'),
       val: movie['production-companies'],
       data: enums.productionCompanies.map(function(f) { return { id: f, text: f }}),
+      multiple: true
+    })
+
+    selectEnumAutocomplete({
+      $el: $form.find('input[name=genre]'),
+      val: movie.genre,
+      data: enums.genre.map(function(f) { return { id: f, text: f }}),
       multiple: true
     })
 

@@ -43,6 +43,41 @@ enums.programType = {
   12: 'Muu kuvaohjelma'
 }
 
+enums.genre = [
+  'Fiktio',
+  'Animaatio',
+  'Viihde',
+  'Seksi / Erotiikka',
+  'Dokumentti',
+  'Lasten ohjelmat',
+  'Romantiikka',
+  'Draama',
+  'Historiallinen näytelmä',
+  'Trilleri',
+  'Seikkailu',
+  'Western',
+  'Sota',
+  'Kauhu',
+  'Tieteisseikkailu',
+  'Toimintaelokuva',
+  'Fantasia',
+  'Komedia ja farssi',
+  'Musiikki',
+  'Opetus',
+  'Urheilu',
+  'Matkailu',
+  'Henkilödokumentti',
+  'Luontodokumentti',
+  'Lasten animaatio',
+  'Lasten fiktio',
+  'Muu lastenelokuva',
+  'Mainonta',
+  'Tietoisku',
+  'Kokeiluelokuva',
+  'Videotaide',
+  'Muut'
+]
+
 enums.classificationStatus = [
   'reclassification1',
   'reclassification3',

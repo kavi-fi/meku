@@ -19,7 +19,6 @@ button {
   background-image: -moz-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
   background-image: -ms-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
   background-image: linear-gradient(-180deg, #00BB88 0%, #00AA77 100%);
-  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
   border: 0;
   padding: 10px 20px;
@@ -29,14 +28,12 @@ button {
 button:hover {
   border-radius: 3px;
   background: #00BB88;
-  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
 }
 
 button:active {
   border-radius: 3px;
   background: #009966;
-  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20)
 }
 
@@ -122,7 +119,6 @@ textarea,
   border-radius: 3px;
   background: #fff;
   border: 1px solid #D3D3D3;
-  -moz-box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
   box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.10);
   font-size: 14px;
   color: #666666;
@@ -135,7 +131,6 @@ textarea:focus,
 .select2-container-active .select2-choice {
   outline: none;
   border: 1px solid #44AAFF;
-  -moz-box-shadow:    0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
   box-shadow:         0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
 }
 
@@ -259,7 +254,6 @@ input[type=text].invalid,
   background-color: #fff;
   padding: 0 0 0 70px;;
   height: 70px;
-  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
   background-position: 15px 15px;
   background-repeat: no-repeat;
@@ -303,21 +297,18 @@ input[type=text].invalid,
   padding: 15px 20px 15px 70px;
   margin-top: 15px;
   border: 1px solid #D3D3D3;
-  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.10);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
 }
 
 #criteria .category .criteria:hover {
   cursor: pointer;
   border: 1px solid #44AAFF;
-  -moz-box-shadow:    0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
   box-shadow:         0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
 }
 
 #criteria .category .criteria.selected {
   color: #ffffff;
   background: #777777;
-  -moz-box-shadow:    0px 2px 2px 0px rgba(0,0,0,0.20);
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.20);
   border: 1px solid #777777;
 }

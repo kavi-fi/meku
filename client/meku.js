@@ -75,8 +75,8 @@ function searchPage() {
     var c = p.classifications[0]
     return $('<div>')
       .data('program', p)
-      .append($('<span>', { class:'name' }).text(p.name[0]))
-      .append($('<span>', { class:'name' }).text(countryAndYear(p)))
+      .append($('<span>').text(p.name[0]))
+      .append($('<span>').text(countryAndYear(p)))
       .append($('<span>').text(classificationAgeLimit(c)))
       .append($('<span>').text(duration(c)))
 

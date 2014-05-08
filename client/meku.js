@@ -28,7 +28,7 @@ function navi() {
     if (hash == '') {
       $navi.find('a:first').click()
     } else {
-      var parts = hash.split('/')
+      var parts = hash.split('/').map(decodeURIComponent)
       var $a = $navi.find('a[href='+parts.shift()+']')
       show($a).trigger('show', parts)
     }
@@ -67,15 +67,16 @@ function searchPage() {
     location.hash = '#haku/' + encodeURIComponent(q)
     $.get('/movies/search/'+q).done(function(results) {
       $noResults.toggle(results.length == 0)
-      $results.html(results.map(render))
+      $results.html(results.map(function(p) { return render(p, q) }))
     })
   })
 
-  function render(p) {
+  function render(p, query) {
     var c = p.classifications[0]
+    var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
     return $('<div>')
       .data('program', p)
-      .append($('<span>').text(p.name[0]))
+      .append($('<span>').text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>').text(countryAndYear(p)))
       .append($('<span>').text(classificationAgeLimit(c)))
       .append($('<span>').text(duration(c)))

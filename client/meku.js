@@ -7,26 +7,37 @@ function setup() {
 
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
 
-  var search = searchPage()
-  var details = movieDetails()
+  var navigation = navi()
+  searchPage()
+  movieDetails()
+  navigation.start()
+}
 
-  if (location.hash.indexOf('#/movies/') == 0) {
-    var _id = location.hash.substring(9)
-    $.get('/movies/' + _id).done(showClassification)
-  }
+function navi() {
+  var $navi = $('#header .navi')
 
-  $('.new-movie').click(function() {
-    $.post('/movies/new').done(function(movie) {
-      location.hash = '#/movies/'+movie._id
-      showClassification(movie)
-    })
+  $navi.find('a').on('click', function(e) {
+    $navi.find('a.active').removeClass('active')
+    $(this).addClass('active')
+    $('body').children('.page').hide()
+    $($(this).data('href')).show()
   })
 
-  function showClassification(movie) {
-    $("#search").hide()
-    search.disable()
-    details.show(movie)
+  function start() {
+    var hash = location.hash
+    if (hash == '') {
+      $navi.find('a:first').click()
+    } else {
+      var parts = hash.split('/')
+      var $a = $navi.find('a[href='+parts.shift()+']')
+      $a.click()
+      if (parts.length > 0) {
+        $($a.data('href')).trigger('show', parts)
+      }
+    }
   }
+
+  return { start: start }
 }
 
 function searchPage() {
@@ -50,23 +61,26 @@ function searchPage() {
       })
     }
   })
-
-  function disable() {
-    $input.val('').attr('disabled', 'true')
-    $results.empty()
-  }
-
-  return { disable: disable }
-
 }
 
 function movieDetails() {
+  var $root = $('#classification-page')
   var $form = $('#movie-details')
   var $summary = $('.summary')
   var $submit = $form.find('button[name=register]')
   var preview = registrationPreview()
 
   renderClassificationCriteria()
+
+  $root.on('show', function(e, programId) {
+    $.get('/movies/' + programId).done(show)
+  })
+  $root.find('.new-movie').click(function() {
+    $.post('/movies/new').done(function(movie) {
+      location.hash = '#luokittelu/'+movie._id
+      show(movie)
+    })
+  })
 
   $form.on('validation', function() {
     if ($form.find(".required.invalid").length === 0) {
@@ -469,8 +483,6 @@ function movieDetails() {
 
     return {update: updatePreview}
   }
-
-  return { show: show }
 }
 
 function keyValue(key, value) {

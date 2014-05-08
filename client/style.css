@@ -42,7 +42,6 @@ button:focus { outline: none; }
 button[disabled=disabled], button:disabled { color: gray; }
 
 ol { list-style-type: none; margin: 0; }
-.new-movie { margin: 10px; }
 
 textarea { resize: vertical; }
 
@@ -53,6 +52,7 @@ textarea { resize: vertical; }
   background-image: -ms-linear-gradient(-180deg, #333 0%, #444 100%);
   background-image: linear-gradient(-180deg, #333 0%, #444 100%);
   border-bottom: solid 5px #00AA77;
+  margin-bottom: 10px;
 }
 
 #header .content { padding: 15px 0 0 0; }
@@ -101,6 +101,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 
 .box { border: 1px solid #D3D3D3; border-radius: 2px; padding: 20px; }
 
+.page { display: none; }
 #search-results > div { margin: 10px; }
 #search-results h3 { padding: 0; margin: 0; }
 #search-results span { margin-left: 20px; display: block; }

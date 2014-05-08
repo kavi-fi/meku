@@ -16,24 +16,26 @@
   <div id="header">
     <div class="content">
       <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
-
-      <ul>
-        <li><a href="#haku">Haku</a></li>
-        <li><a class="active" href="#luokittelu">Luokittelu</a></li>
-        <li><a href="#tilaajat">Tilaajat</a></li>
-        <li><a href="#laskutus">Laskutus</a></li>
+      <ul class="navi">
+        <li><a href="#haku" data-href="#search-page">Haku</a></li>
+        <li><a href="#luokittelu" data-href="#classification-page">Luokittelu</a></li>
+        <li><a href="#tilaajat" data-href="#buyer-page">Tilaajat</a></li>
+        <li><a href="#laskutus" data-href="#billing-page">Laskutus</a></li>
       </ul>
-
     </div>
   </div>
 
-  <div id="search">
+  <div id="search-page" class="page">
     <div class="content">
       <div style="display: inline-block;">Hae: <input id="search-input" type="text" /></div>
-      <button class="new-movie">Uusi elokuvaluokittelu</button>
       <div id="search-results"></div>
     </div>
   </div>
+
+  <div id="classification-page" class="page">
+    <div class="content">
+      <button class="new-movie">Uusi elokuvaluokittelu</button>
+    </div>
 
   <form id="movie-details" data-id="">
     <div class="row">
@@ -182,5 +184,9 @@
     </div>
 
   </form>
+  </div>
+
+  <div id="buyer-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
+  <div id="billing-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
 </body>
 </html>

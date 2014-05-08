@@ -41,26 +41,34 @@ function navi() {
 }
 
 function searchPage() {
-  var $input = $('#search-input')
-  var $results = $('#search-results')
+  var $page = $('#search-page')
+  var $input = $page.find('.query')
+  var $results = $('.results')
+
+  $page.on('show', function(e, q) {
+    $input.val(q).trigger('fire')
+  })
 
   $input.throttledInput(function() {
-    var q = $('#search-input').val().trim()
+    var q = $input.val().trim()
+    location.hash = '#haku/' + encodeURIComponent(q)
     if (q == '') {
       $results.empty()
     } else {
       $.get('/movies/search/'+q).done(function(results) {
-        var html = results.map(function(result) {
-          return $('<div>')
-            .append($('<h3>').text(result.name.join(', ')))
-            .append($('<span>').text(result['name-fi'].join(', ')))
-            .append($('<span>').text(result['name-sv'].join(', ')))
-            .append($('<span>').text(result['name-other'].join(', ')))
-        })
-        $results.html(html)
+        $results.html(results.map(render))
       })
     }
   })
+
+  function render(p) {
+    var classification = p.classifications[0]
+    return $('<div>')
+      .append($('<span>').text(p.name[0]))
+      .append($('<span>').text('('+ p.country.map(enums.util.toCountry).join(',') + ', ' + p.year + ')'))
+      .append($('<span>').text(classification.duration))
+      .append($('<span>').text(classificationAgeLimit(classification)))
+  }
 }
 
 function movieDetails() {
@@ -394,14 +402,9 @@ function movieDetails() {
 
   function classificationSummary(classification) {
     if (classification.safe) return { age:'S', warnings:[] }
-    var criteria = classification.criteria.map(function(id) { return classificationCriteria[id - 1] })
-    var maxAgeLimit = criteria.reduce(function(accum, c) {
-      var ageLimit = c.age
-      if (ageLimit == 'S') return accum
-      if (accum == 'S') return ageLimit
-      return parseInt(ageLimit) > accum ? ageLimit : accum
-    }, 'S')
-    var warnings = criteria
+    var maxAgeLimit = classificationAgeLimit(classification)
+    var warnings = _(classification.criteria)
+      .map(function(id) { return classificationCriteria[id - 1] })
       .filter(function(c) { return c.age == maxAgeLimit })
       .map(function(c) { return c.category })
       .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
@@ -549,6 +552,10 @@ $.fn.throttledInput = function(fn) {
         fn.call(that, txt)
       }, 400)
     })
+   $input.on('fire', function() {
+     prev = $input.val()
+     fn.call(this, prev)
+   })
   })
 }
 
@@ -557,6 +564,22 @@ $.fn.check = function(on) {
     on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
   })
   return this
+}
+
+function classificationAgeLimit(classification) {
+  if (!classification) return '-'
+  if (classification.safe) return 'S'
+  if (classification.criteria.length == 0 && classification['legacy-age-limit']) return classification['legacy-age-limit']
+  return _(classification.criteria)
+    .map(function(id) { return classificationCriteria[id - 1] })
+    .pluck('age')
+    .reduce(maxAge) || 'S'
+
+  function maxAge(prev, curr) {
+    if (curr == 'S') return prev
+    if (prev == 'S') return curr
+    return parseInt(curr) > prev ? curr : prev
+  }
 }
 
 function classificationText(classification) {

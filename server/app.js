@@ -18,8 +18,7 @@ app.get('/movies/search/:q', function(req, res) {
   var q = (req.params.q || '').trim().toLowerCase().split(/\s+/)
   var regexps = q.map(function(s) { return new RegExp('^' + escapeRegExp(s)) })
   var query = { 'all-names': { $all: regexps } }
-  var fields = { 'emeku-id': 1, name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }
-  Movie.find(query, fields).sort('name').exec(function(err, results) {
+  Movie.find(query).sort('name').exec(function(err, results) {
     res.send(results)
   })
 })

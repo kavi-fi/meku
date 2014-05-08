@@ -1,4 +1,5 @@
 enums = {}
+enums.util = {}
 
 enums.criteriaCategories = ['violence', 'sex', 'fear', 'drugs']
 
@@ -210,6 +211,8 @@ enums.countries = {
   'ZW': 'Zimbabwe',
   '-': 'Muu maa'
 }
+
+enums.util.toCountry = function(code) { return enums.countries[code] || '-' }
 
 enums.productionCompanies = [
   'Amblin Entertainment',

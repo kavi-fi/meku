@@ -75,12 +75,30 @@ function searchPage() {
       .append($('<span>', { class:'name' }).text(p.name[0]))
       .append($('<span>', { class:'name' }).text(countryAndYear(p)))
       .append($('<span>').text(classificationAgeLimit(c)))
-      .append($('<span>').text(c && c.duration || ''))
-  }
+      .append($('<span>').text(duration(c)))
 
-  function countryAndYear(p) {
-    var s = _([p.country.map(enums.util.toCountry).join(', '), p.year]).compact().join(', ')
-    return s == '' ? s : '('+s+')'
+    function countryAndYear(p) {
+      var s = _([p.country.map(enums.util.toCountry).join(', '), p.year]).compact().join(', ')
+      return s == '' ? s : '('+s+')'
+    }
+
+    function duration(c) {
+      if (!c || !c.duration) return ''
+      var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
+      if (!match) return c.duration
+      match.shift()
+      return _.chain(match).map(suffixify).compact().join(' ')
+
+      function suffixify(x, ii) {
+        if (!x) return x
+        var int = parseInt(x)
+        if (!int) return ''
+        if (ii == 0) return int + ' h'
+        if (ii == 1) return int + ' min'
+        if (ii == 2) return int + ' s'
+        return x
+      }
+    }
   }
 }
 

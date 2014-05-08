@@ -83,7 +83,7 @@ function movieDetails() {
   })
 
   $form.on('validation', function() {
-    if ($form.find(".required.invalid").length === 0) {
+    if ($form.find(".required.invalid, .required-pseudo.invalid").not('.exclude').length === 0) {
       $submit.removeAttr('disabled')
     } else {
       $submit.attr('disabled', 'disabled')
@@ -95,12 +95,26 @@ function movieDetails() {
   validateTextChange($form.find('.duration'), isValidDuration)
   validateTextChange($form.find('.email'), isEmail)
   validateTextChange($form.find('input[name=year]'), isValidYear)
+  requiredCheckboxGroup($form.find('#email .emails'))
 
   function validateTextChange($el, validatorFn) {
     var validator = validate(validatorFn)
     $el.on('keyup change validate', validator)
        .on('blur', function() { $(this).addClass('touched') })
        .on('paste', function() { var me = this; setTimeout(function() { validator.call(me) }, 0) })
+  }
+
+  function requiredCheckboxGroup($el) {
+    function validate() {
+      var valid = $el.find('input:checkbox:checked').length > 0 ? true : false
+      if (valid) {
+        $el.removeClass('invalid')
+      } else {
+        $el.addClass('invalid')
+      }
+      $el.trigger('validation')
+    }
+    $el.on('change validate', 'input:checkbox', validate)
   }
 
   $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
@@ -463,6 +477,7 @@ function movieDetails() {
               addBuyerEmailCheckbox(true, email)
             }
           })
+          $emails.find('ul li input:checkbox').trigger('validate')
         })
       }
     }

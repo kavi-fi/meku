@@ -25,7 +25,7 @@ var classification = {
 var MovieSchema = new Schema({
   'emeku-id': { type: String, index: true },
   'all-names': { type: [String], index: true },
-  name: [String],
+  name: { type: [String], index: true },
   'name-fi': [String],
   'name-sv': [String],
   'name-other': [String],

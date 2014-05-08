@@ -14,13 +14,17 @@ app.use(express.json())
 
 mongoose.connect('mongodb://localhost/meku')
 
-app.get('/movies/search/:q', function(req, res) {
-  var q = (req.params.q || '').trim().toLowerCase().split(/\s+/)
-  var regexps = q.map(function(s) { return new RegExp('^' + escapeRegExp(s)) })
-  var query = { 'all-names': { $all: regexps } }
-  Movie.find(query).sort('name').exec(function(err, results) {
+app.get('/movies/search/:q?', function(req, res) {
+  Movie.find(query()).limit(100).sort('name').exec(function(err, results) {
     res.send(results)
   })
+
+  function query() {
+    var q = (req.params.q || '').trim().toLowerCase().split(/\s+/)
+    if (q.length == 1 && q[0] == '') return { 'name': /^a/i }
+    var regexps = q.map(function(s) { return new RegExp('^' + escapeRegExp(s)) })
+    return { 'all-names': { $all: regexps } }
+  }
 })
 
 app.get('/movies/:id', function(req, res) {

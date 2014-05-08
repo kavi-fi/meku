@@ -50,22 +50,25 @@ function billingPage() { $('#billing-page').on('show', function() { location.has
 function searchPage() {
   var $page = $('#search-page')
   var $input = $page.find('.query')
-  var $results = $('.results')
+  var $button = $page.find('button.search')
+  var $results = $page.find('.results')
+  var $noResults = $page.find('.no-results')
 
   $page.on('show', function(e, q) {
     $input.val(q || '').trigger('fire')
   })
 
+  $button.click(function() {
+    $input.trigger('fire')
+  })
+
   $input.throttledInput(function() {
     var q = $input.val().trim()
     location.hash = '#haku/' + encodeURIComponent(q)
-    if (q == '') {
-      $results.empty()
-    } else {
-      $.get('/movies/search/'+q).done(function(results) {
-        $results.html(results.map(render))
-      })
-    }
+    $.get('/movies/search/'+q).done(function(results) {
+      $noResults.toggle(results.length == 0)
+      $results.html(results.map(render))
+    })
   })
 
   function render(p) {
@@ -598,10 +601,11 @@ $.fn.throttledInput = function(fn) {
         fn.call(that, txt)
       }, 400)
     })
-   $input.on('fire', function() {
-     prev = $input.val()
-     fn.call(this, prev)
-   })
+    $input.on('fire', function() {
+      if (timeout) clearTimeout(timeout)
+      prev = $input.val()
+      fn.call(this, prev)
+    })
   })
 }
 

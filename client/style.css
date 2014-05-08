@@ -107,7 +107,8 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page label { display: block; text-align: left; padding: 0 0 20px 0; }
 #search-page .query { width: 350px; }
 #search-page button.search { margin-left: 15px; }
-#search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
+#search-page .no-results { display: none; }
+#search-page .results, #search-page .no-results { width: 940px; margin: 0 auto; padding: 0 10px; }
 #search-page .results > div {
   border-bottom: 2px solid #D3D3D3; line-height: 47px;
   font-size: 14px; color: #444444; cursor: pointer;

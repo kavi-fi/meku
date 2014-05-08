@@ -28,7 +28,19 @@ app.get('/movies/:id', function(req, res) {
 })
 
 app.post('/movies/new', function(req, res, next) {
-  new Movie({ classifications: [{}], 'production-companies': [], actors: [] }).save(function(err, movie) {
+  new Movie({ classifications: [{status: 'in_process'}], 'production-companies': [], actors: [] }).save(function(err, movie) {
+    if (err) return next(err)
+    return res.send(movie)
+  })
+})
+
+app.post('/movies/:id/register', function(req, res, next) {
+  var data = {
+    'classifications.0.registration-date': new Date(),
+    'classifications.0.status': 'registered'
+  }
+
+  Movie.findByIdAndUpdate(req.params.id, data, function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
   })

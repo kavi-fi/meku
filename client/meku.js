@@ -144,6 +144,13 @@ function movieDetails() {
   validateTextChange($form.find('input[name=year]'), isValidYear)
   requiredCheckboxGroup($form.find('#email .emails'))
 
+  $form.on('submit', function(e) {
+    e.preventDefault()
+    $.post('/movies/' + $form.data('id') + '/register', function(data) {
+      console.log(data)
+    })
+  })
+
   function validateTextChange($el, validatorFn) {
     var validator = validate(validatorFn)
     $el.on('keyup change validate', validator)

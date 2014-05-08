@@ -62,12 +62,19 @@ function searchPage() {
   })
 
   function render(p) {
-    var classification = p.classifications[0]
+    var c = p.classifications[0]
     return $('<div>')
-      .append($('<span>').text(p.name[0]))
-      .append($('<span>').text('('+ p.country.map(enums.util.toCountry).join(',') + ', ' + p.year + ')'))
-      .append($('<span>').text(classification.duration))
-      .append($('<span>').text(classificationAgeLimit(classification)))
+      .data('program', p)
+      .append($('<span>', { class:'name' }).text(p.name[0]))
+      .append($('<span>', { class:'name' }).text(countryAndYear(p)))
+      .append($('<span>').text(classificationAgeLimit(c)))
+      .append($('<span>').text(c && c.duration || ''))
+  }
+
+  function countryAndYear(p) {
+    console.log(p.country, p.year)
+    var s = _([p.country.map(enums.util.toCountry).join(', '), p.year]).compact().join(', ')
+    return s == '' ? s : '('+s+')'
   }
 }
 

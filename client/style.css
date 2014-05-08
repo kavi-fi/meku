@@ -229,6 +229,11 @@ input[type=text].invalid,
 .select2-container.invalid .select2-choice {
   background: #F0FFF0;
 }
+input[type=text].invalid.touched,
+.select2-container.invalid.touched .select2-choices,
+.select2-container.invalid.touched .select2-choice {
+  background: #fff0f0;
+}
 
 #movie-details { display: none; }
 
@@ -427,6 +432,7 @@ input[type=text].invalid,
 
 #email .emails ul { list-style: none; padding: 0; margin: 0 0; }
 #email .emails ul input { margin-right: 10px; }
+#email .emails input.email.invalid.touched { background-color: #F0FFF0; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

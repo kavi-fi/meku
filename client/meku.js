@@ -85,8 +85,11 @@ function movieDetails() {
   function validateTextChange($el, validatorFn) {
     var validator = validate(validatorFn)
     $el.on('keyup change validate', validator)
+       .on('blur', function() { $(this).addClass('touched') })
        .on('paste', function() { var me = this; setTimeout(function() { validator.call(me) }, 0) })
   }
+
+  $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
 
   $form.find('input[type=text], textarea').not('[name="registration-email"]').throttledInput(function(txt) {
     if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
@@ -159,6 +162,7 @@ function movieDetails() {
     var classification = movie.classifications[0]
 
     $form.data('id', movie._id).show()
+      .find('.touched').removeClass('touched').end()
       .find('input[name="name.0"]').val(movie.name[0]).end()
       .find('input[name="name-fi.0"]').val(movie['name-fi'][0]).end()
       .find('input[name="name-sv.0"]').val(movie['name-sv'][0]).end()
@@ -331,7 +335,7 @@ function movieDetails() {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
           .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
           .append($('<p>').text(c.description))
-          .append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id }))
+          .append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id, placeholder:'Kommentit...' }))
       })
       $('.category-container .' + category).append($criteria)
     })

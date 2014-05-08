@@ -10,6 +10,8 @@ function setup() {
   var navigation = navi()
   searchPage()
   movieDetails()
+  buyerPage()
+  billingPage()
   navigation.start()
 }
 
@@ -17,10 +19,8 @@ function navi() {
   var $navi = $('#header .navi')
 
   $navi.find('a').on('click', function(e) {
-    $navi.find('a.active').removeClass('active')
-    $(this).addClass('active')
-    $('body').children('.page').hide()
-    $($(this).data('href')).show()
+    e.preventDefault()
+    show($(this)).trigger('show')
   })
 
   function start() {
@@ -30,15 +30,22 @@ function navi() {
     } else {
       var parts = hash.split('/')
       var $a = $navi.find('a[href='+parts.shift()+']')
-      $a.click()
-      if (parts.length > 0) {
-        $($a.data('href')).trigger('show', parts)
-      }
+      show($a).trigger('show', parts)
     }
+  }
+
+  function show($a) {
+    $navi.find('a.active').removeClass('active')
+    $a.addClass('active')
+    $('body').children('.page').hide()
+    return $($a.data('href')).show()
   }
 
   return { start: start }
 }
+
+function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
+function billingPage() { $('#billing-page').on('show', function() { location.hash = '#laskutus'}) }
 
 function searchPage() {
   var $page = $('#search-page')
@@ -46,7 +53,7 @@ function searchPage() {
   var $results = $('.results')
 
   $page.on('show', function(e, q) {
-    $input.val(q).trigger('fire')
+    $input.val(q || '').trigger('fire')
   })
 
   $input.throttledInput(function() {
@@ -72,7 +79,6 @@ function searchPage() {
   }
 
   function countryAndYear(p) {
-    console.log(p.country, p.year)
     var s = _([p.country.map(enums.util.toCountry).join(', '), p.year]).compact().join(', ')
     return s == '' ? s : '('+s+')'
   }
@@ -88,8 +94,16 @@ function movieDetails() {
   renderClassificationCriteria()
 
   $root.on('show', function(e, programId) {
-    $.get('/movies/' + programId).done(show)
+    if (programId) {
+      location.hash = '#luokittelu/'+programId
+      $.get('/movies/' + programId).done(show)
+    } else if ($form.data('id')) {
+      location.hash = '#luokittelu/'+$form.data('id')
+    } else {
+      location.hash = '#luokittelu'
+    }
   })
+
   $root.find('.new-movie').click(function() {
     $.post('/movies/new').done(function(movie) {
       location.hash = '#luokittelu/'+movie._id

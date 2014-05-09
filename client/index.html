@@ -30,7 +30,7 @@
     <div class="row">
       <div class="content">
         <h2>Kuvaohjelmahaku</h2>
-        <label>Nimi</label>
+        <label class="search-label">Nimi</label>
         <input class="query" type="text" /><button class="search">Hae</button>
       </div>
     </div>
@@ -197,5 +197,59 @@
 
   <div id="buyer-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
   <div id="billing-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
+
+  <div id="templates">
+    <div class="details">
+      <div class="header">
+        <h2 class="primary-name"></h2>
+        <div class="warning-summary">
+          <img class="agelimit" src="images/agelimit-s.png" /><div class="warnings"></div>
+          <div style="clear: both"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display: inline-block;">
+          <h3 style="">Kuvaohjelman perustiedot</h3>
+          <div class="column">
+            <label>Alkuperäinen nimi</label>
+            <span class="name"></span>
+            <label>Suomenkielinen nimi</label>
+            <span class="name-fi"></span>
+            <label>Maa</label>
+            <span class="country"></span>
+            <label>Valmistumisvuosi</label>
+            <span class="year"></span>
+            <label>Tuotantoyhtiö</label>
+            <span class="production-companies"></span>
+          </div>
+          <div class="column">
+            <label>Genre</label>
+            <span class="genre"></span>
+            <label>Ohjaaja</label>
+            <span class="directors"></span>
+            <label>Näyttelijät</label>
+            <span class="actors"></span>
+            <label>Synopsis</label>
+            <span class="synopsis"></span>
+          </div>
+          <div class="column">
+            <label>Luokittelun tilaaja</label>
+            <span class="buyer"></span>
+            <label>Rekisteröinnistä laskutetaan</label>
+            <span class="billing"></span>
+            <label>Ohjelman formaatti</label>
+            <span class="format"></span>
+            <label>Kesto</label>
+            <span class="duration"></span>
+          </div>
+        </div>
+        <div class="column" style="margin-left: 20px;">
+          <h3>Kriteerit</h3>
+          <div class="criteria"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </body>
 </html>

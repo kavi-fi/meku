@@ -213,6 +213,7 @@ enums.countries = {
 }
 
 enums.util.toCountry = function(code) { return enums.countries[code] || '-' }
+enums.util.toCountryString = function(countries) { return countries.map(function(c) { return enums.countries[c] }).join(', ') }
 
 enums.productionCompanies = [
   'Amblin Entertainment',

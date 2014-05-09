@@ -53,8 +53,12 @@ function searchPage() {
   var $button = $page.find('button.search')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
+  var $detailTemplate = $('#templates > .details').detach()
 
-  $page.on('show', function(e, q) {
+  var selectedProgramId = null
+
+  $page.on('show', function(e, q, programId) {
+    selectedProgramId = programId
     $input.val(q || '').trigger('fire')
   })
 
@@ -62,19 +66,46 @@ function searchPage() {
     $input.trigger('fire')
   })
 
+  $results.on('click', '.result', function() {
+    if ($(this).hasClass('selected')) {
+      closeDetail()
+    } else {
+      closeDetail()
+      openDetail($(this))
+    }
+  })
+
   $input.throttledInput(function() {
     var q = $input.val().trim()
-    location.hash = '#haku/' + encodeURIComponent(q)
+    location.hash = '#haku/' + encodeURIComponent(q) + '/'
     $.get('/movies/search/'+q).done(function(results) {
       $noResults.toggle(results.length == 0)
       $results.html(results.map(function(p) { return render(p, q) }))
+      if (selectedProgramId) {
+        $results.find('.result[data-id='+selectedProgramId+']').click()
+        selectedProgramId = null
+      }
     })
   })
+
+  function openDetail($row) {
+    var p = $row.data('program')
+    var lastSlashIndex = location.hash.lastIndexOf('/')
+    location.hash = location.hash.substring(0, lastSlashIndex) + '/' + p._id
+    var $details = renderDetails(p)
+    $row.addClass('selected').after($details)
+    $details.slideDown()
+  }
+
+  function closeDetail() {
+    $results.find('.result.selected').removeClass('selected')
+    $results.find('.details').slideUp(function() { $(this).remove() }).end()
+  }
 
   function render(p, query) {
     var c = p.classifications[0]
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
-    return $('<div>')
+    return $('<div>', { class:'result', 'data-id': p._id })
       .data('program', p)
       .append($('<span>').text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>').text(countryAndYear(p)))
@@ -82,7 +113,7 @@ function searchPage() {
       .append($('<span>').text(duration(c)))
 
     function countryAndYear(p) {
-      var s = _([p.country.map(enums.util.toCountry).join(', '), p.year]).compact().join(', ')
+      var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
       return s == '' ? s : '('+s+')'
     }
 
@@ -103,6 +134,42 @@ function searchPage() {
         return x
       }
     }
+  }
+
+  function renderDetails(p) {
+    var c = p.classifications[0] || {}
+    var summary = classificationSummary(p.classifications[0])
+    var warnings = summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
+
+    return $detailTemplate.clone()
+      .find('.primary-name').text(p.name[0]).end()
+      .find('.agelimit').attr('src', 'images/agelimit-'+summary.age+'.png').end()
+      .find('.warnings').html(warnings).end()
+      .find('.name').text(p.name.join(', ')).end()
+      .find('.name-fi').text(p['name-fi'].join(', ')).end()
+      .find('.country').text(enums.util.toCountryString(p.country)).end()
+      .find('.year').text(p.year).end()
+      .find('.production-companies').text(p['production-companies'].join(', ')).end()
+      .find('.genre').text(p.genre.join(', ')).end()
+      .find('.directors').text(p.directors.join(', ')).end()
+      .find('.actors').text(p.actors.join(', ')).end()
+      .find('.synopsis').text(p.synopsis).end()
+      .find('.buyer').text(c.buyer && c.buyer.name || '').end()
+      .find('.billing').text(c.billing && c.billing.name || '').end()
+      .find('.format').text(c.format).end()
+      .find('.duration').text(c.duration).end()
+      .find('.criteria').html(renderClassificationCriteria(c)).end()
+  }
+
+  function renderClassificationCriteria(c) {
+    if (!c.criteria) return ''
+    return c.criteria.map(function(id) {
+      var cr = classificationCriteria[id - 1]
+      var category = classificationCategory_FI[cr.category]
+      return $('<div>')
+        .append($('<label>').text(category + ' ('+cr.id+')'))
+        .append($('<span>').text(c['criteria-comments'] && c['criteria-comments'][cr.id] || ''))
+    })
   }
 }
 
@@ -438,7 +505,7 @@ function movieDetails() {
     var classification = classificationSummary(movie.classifications[0])
     var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
-    var countries = movie.country.map(function(c) { return enums.countries[c] }).join(', ')
+    var countries = enums.util.toCountryString(movie.country)
     $summary
       .find('.name').text(movie.name.join(', ') || '-').end()
       .find('.year').text(movie.year || '-').end()
@@ -448,23 +515,6 @@ function movieDetails() {
       .find('.actors').text((movie.actors).join(', ') || '-').end()
       .find('.agelimit img').attr('src', 'images/agelimit-'+classification.age+'.png').end()
       .find('.warnings').html(warnings).end()
-  }
-
-  function classificationSummary(classification) {
-    if (classification.safe) return { age:'S', warnings:[] }
-    var maxAgeLimit = classificationAgeLimit(classification)
-    var warnings = _(classification.criteria)
-      .map(function(id) { return classificationCriteria[id - 1] })
-      .filter(function(c) { return c.age == maxAgeLimit })
-      .map(function(c) { return c.category })
-      .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
-    if (classification['warning-order'].length > 0) {
-      var order = classification['warning-order']
-      warnings = warnings.sort(function(a, b) {
-        return order.indexOf(a) - order.indexOf(b)
-      })
-    }
-    return { age: maxAgeLimit, warnings: warnings }
   }
 
   function registrationPreview() {
@@ -615,6 +665,23 @@ $.fn.check = function(on) {
     on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
   })
   return this
+}
+
+function classificationSummary(classification) {
+  if (classification.safe) return { age:'S', warnings:[] }
+  var maxAgeLimit = classificationAgeLimit(classification)
+  var warnings = _(classification.criteria)
+    .map(function(id) { return classificationCriteria[id - 1] })
+    .filter(function(c) { return c.age == maxAgeLimit })
+    .map(function(c) { return c.category })
+    .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
+  if (classification['warning-order'].length > 0) {
+    var order = classification['warning-order']
+    warnings = warnings.sort(function(a, b) {
+      return order.indexOf(a) - order.indexOf(b)
+    })
+  }
+  return { age: maxAgeLimit, warnings: warnings }
 }
 
 function classificationAgeLimit(classification) {

@@ -157,7 +157,7 @@ function searchPage() {
       .find('.country').text(enums.util.toCountryString(p.country)).end()
       .find('.year').text(p.year).end()
       .find('.production-companies').text(p['production-companies'].join(', ')).end()
-      .find('.genre').text(p.genre.join(', ')).end()
+      .find('.genre').text(p.genre.join(', ') || p['legacy-genre'].join(', ')).end()
       .find('.directors').text(p.directors.join(', ')).end()
       .find('.actors').text(p.actors.join(', ')).end()
       .find('.synopsis').text(p.synopsis).end()

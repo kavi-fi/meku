@@ -35,6 +35,7 @@ var MovieSchema = new Schema({
   year: String,
   'production-companies': {type: [String], index: true },
   genre: [String],
+  'legacy-genre': [String],
   directors: {type: [String], index: true},
   actors: {type: [String], index: true},
   synopsis: String,

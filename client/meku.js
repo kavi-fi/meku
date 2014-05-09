@@ -61,7 +61,7 @@ function searchPage() {
   var $button = $page.find('button.search')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
-  var $detailTemplate = $('#templates > .details').detach()
+  var $detailTemplate = $('#templates > .search-result-details').detach()
 
   var selectedProgramId = null
 
@@ -107,7 +107,7 @@ function searchPage() {
 
   function closeDetail() {
     $results.find('.result.selected').removeClass('selected')
-    $results.find('.details').slideUp(function() { $(this).remove() }).end()
+    $results.find('.search-result-details').slideUp(function() { $(this).remove() }).end()
   }
 
   function render(p, query) {

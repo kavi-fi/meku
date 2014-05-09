@@ -148,13 +148,17 @@ function searchPage() {
     var c = p.classifications[0] || {}
     var summary = classificationSummary(p.classifications[0])
     var warnings = summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
+    var names = { n: p.name.join(', '), fi: p['name-fi'].join(', '), sv: p['name-sv'].join(', '), other: p['name-other'].join(', ')}
 
     return $detailTemplate.clone()
       .find('.primary-name').text(p.name[0]).end()
       .find('.agelimit').attr('src', 'images/agelimit-'+summary.age+'.png').end()
+      .find('.status').text(classificationStatus(c)).end()
       .find('.warnings').html(warnings).end()
-      .find('.name').text(p.name.join(', ')).end()
-      .find('.name-fi').text(p['name-fi'].join(', ')).end()
+      .find('.name').text(names.n).end()
+      .find('.name-fi').text(names.fi).end()
+      .find('.name-sv').text(names.sv).prev().toggleClass('hide', !!names.sv).end().end()
+      .find('.name-other').text(names.other).prev().toggleClass('hide', !!names.other).end().end()
       .find('.country').text(enums.util.toCountryString(p.country)).end()
       .find('.year').text(p.year).end()
       .find('.production-companies').text(p['production-companies'].join(', ')).end()
@@ -688,6 +692,18 @@ $.fn.check = function(on) {
     on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
   })
   return this
+}
+
+function classificationStatus(classification) {
+  var date = classification['registration-date']
+  switch (classification.status) {
+    case 'registered':
+    case 'reclassification1':
+    case 'reclassification3':
+      return 'Rekisteröity '+moment(date).format('D.M.YYYY [klo] H:mm');
+    default:
+      return 'Unknown status: '+classification.status
+  }
 }
 
 function classificationSummary(classification) {

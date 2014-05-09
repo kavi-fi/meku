@@ -9,6 +9,7 @@
   <script src="vendor/typeahead.bundle-0.10.2.js"></script>
   <script src="vendor/select2-3.4.6/select2.js"></script>
   <script src="vendor/jquery.highlight-3-custom.js"></script>
+  <script src="vendor/moment-2.6.0.min.js"></script>
   <script src="meku.js"></script>
   <script src="shared/enums.js"></script>
   <script src="http://localhost:35729/livereload.js"></script>
@@ -204,8 +205,8 @@
         <h2 class="primary-name"></h2>
         <div class="warning-summary">
           <img class="agelimit" src="images/agelimit-s.png" /><div class="warnings"></div>
-          <div style="clear: both"></div>
         </div>
+        <span class="status"></span>
       </div>
       <div>
         <div style="display: inline-block;">
@@ -215,6 +216,10 @@
             <span class="name"></span>
             <label>Suomenkielinen nimi</label>
             <span class="name-fi"></span>
+            <label>Ruotsinkielinen nimi</label>
+            <span class="name-sv"></span>
+            <label>Muu nimi</label>
+            <span class="name-other"></span>
             <label>Maa</label>
             <span class="country"></span>
             <label>Valmistumisvuosi</label>
@@ -243,7 +248,7 @@
             <span class="duration"></span>
           </div>
         </div>
-        <div class="column" style="margin-left: 20px;">
+        <div class="column" style="margin: 0 0 0 28px;">
           <h3>Kriteerit</h3>
           <div class="criteria"></div>
         </div>

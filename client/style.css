@@ -150,14 +150,18 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page .result.selected { border-bottom: none; }
 #search-page .highlight { color: #00BB88; }
 
-#search-page .details { background: #fff; padding: 20px 40px; font-size: 13px; color: #777; box-shadow: 0px 5px 5px 0px rgba(0,0,0,.10); }
+#search-page .details { background: #fff; padding: 20px 30px 50px 40px; font-size: 13px; color: #777; box-shadow: 0px 5px 5px 0px rgba(0,0,0,.10); }
 #search-page .details .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
+#search-page .details .warning-summary { vertical-align: middle; margin-right: 14px; }
 #search-page .details .agelimit, #search-page .details .warning { margin-right: 8px; }
+#search-page .details .status { font-size: 14px; }
 #search-page .details h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin-top: 0; float:left; padding-right: 15px; }
 #search-page .details h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
 #search-page .details label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
+#search-page .details .hide { display: none; }
+
 #search-page .details .criteria label { text-transform: capitalize; }
-#search-page .details .column { display:inline-block; width: 205px; vertical-align:top; }
+#search-page .details .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
 
 input[type=text],
 .select2-container-multi .select2-choices {

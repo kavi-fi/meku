@@ -67,4 +67,14 @@ var User = exports.User = mongoose.model('users', {
   active: Boolean
 })
 
-var models = exports.models = [Movie, Account, Provider, User]
+var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
+  account: {_id: mongoose.Schema.Types.ObjectId, name: String},
+	type: String, // registration, classification or distributor fee
+	movie: mongoose.Schema.Types.ObjectId,
+	name: String,
+	duration: String,
+	'registration-date': Date,
+	price: Number, // eurocents
+})
+
+var models = exports.models = [Movie, Account, Provider, User, InvoiceRow]

@@ -6,6 +6,7 @@ var liveReload = require('express-livereload')
 var schema = require('./schema')
 var Movie = schema.Movie
 var Account = schema.Account
+var InvoiceRow = schema.InvoiceRow
 var enums = require('../shared/enums')
 
 var app = express()
@@ -44,9 +45,20 @@ app.post('/movies/:id/register', function(req, res, next) {
     'classifications.0.status': 'registered'
   }
 
-  Movie.findByIdAndUpdate(req.params.id, data, function(err, movie) {
+  Movie.findByIdAndUpdate(req.params.id, data, null, function(err, movie) {
     if (err) return next(err)
-    return res.send(movie)
+    InvoiceRow.create({
+      account: movie.billing,
+      type: 'registration',
+      movie: movie._id,
+      name: movie.name,
+      duration: movie.duration,
+      'registration-date': movie.classifications[0]['registration-date'],
+      price: 700,
+    }, function(err, saved) {
+      if (err) return next(err)
+      return res.send(movie)
+    })
   })
 })
 

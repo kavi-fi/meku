@@ -7,6 +7,14 @@ function setup() {
 
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
 
+  $('#overlay').on('click', function() {
+    closeDialog()
+  })
+
+  $('body').on('click', '.dialog', function(e) {
+    e.stopPropagation()
+  })
+
   var navigation = navi()
   searchPage()
   movieDetails()
@@ -218,7 +226,12 @@ function movieDetails() {
   $form.on('submit', function(e) {
     e.preventDefault()
     $.post('/movies/' + $form.data('id') + '/register', function(data) {
-      console.log(data)
+      $form.data('id', '')
+      $form.hide().trigger('show')
+      showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
+        .append($('<h3>').text("Luokittelu rekisteröity"))
+        .append($('<span>', {class: 'name'}).text(data.name))
+        .append($('<p>').html($('<button>', {click: closeDialog}).text('Sulje'))))
     })
   })
 
@@ -636,6 +649,16 @@ function validate(f) {
     }
     $el.trigger('validation')
   }
+}
+
+function showDialog($html) {
+  $('#overlay').show()
+  $('#dialog').show().append($html)
+}
+
+function closeDialog() {
+  $('#dialog').empty().hide()
+  $('#overlay').hide()
 }
 
 $.fn.throttledInput = function(fn) {

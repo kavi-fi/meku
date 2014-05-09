@@ -147,16 +147,9 @@ function searchPage() {
   }
 
   function renderDetails(p) {
-    var c = p.classifications[0] || {}
-    var summary = classificationSummary(p.classifications[0])
-    var warnings = summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
     var names = { n: p.name.join(', '), fi: p['name-fi'].join(', '), sv: p['name-sv'].join(', '), other: p['name-other'].join(', ')}
-
-    return $detailTemplate.clone()
+    var $e = $detailTemplate.clone()
       .find('.primary-name').text(p.name[0]).end()
-      .find('.agelimit').attr('src', 'images/agelimit-'+summary.age+'.png').end()
-      .find('.status').text(classificationStatus(c)).end()
-      .find('.warnings').html(warnings).end()
       .find('.name').text(names.n).end()
       .find('.name-fi').text(names.fi).end()
       .find('.name-sv').text(names.sv).prev().toggleClass('hide', !!names.sv).end().end()
@@ -168,11 +161,21 @@ function searchPage() {
       .find('.directors').text(p.directors.join(', ')).end()
       .find('.actors').text(p.actors.join(', ')).end()
       .find('.synopsis').text(p.synopsis).end()
+
+    var c = p.classifications[0]
+    if (c) {
+      var summary = classificationSummary(c)
+      var warnings = summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
+      $e.find('.agelimit').attr('src', 'images/agelimit-'+summary.age+'.png').end()
+      .find('.status').text(classificationStatus(c)).end()
+      .find('.warnings').html(warnings).end()
       .find('.buyer').text(c.buyer && c.buyer.name || '').end()
       .find('.billing').text(c.billing && c.billing.name || '').end()
       .find('.format').text(c.format).end()
       .find('.duration').text(c.duration).end()
       .find('.criteria').html(renderClassificationCriteria(c)).end()
+    }
+    return $e
   }
 
   function renderClassificationCriteria(c) {

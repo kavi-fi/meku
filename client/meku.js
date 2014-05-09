@@ -76,6 +76,8 @@ function searchPage() {
 
   $results.on('click', '.result', function() {
     if ($(this).hasClass('selected')) {
+      var lastSlashIndex = location.hash.lastIndexOf('/')
+      location.hash = location.hash.substring(0, lastSlashIndex) + '/'
       closeDetail()
     } else {
       closeDetail()

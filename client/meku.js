@@ -697,12 +697,15 @@ $.fn.check = function(on) {
 }
 
 function classificationStatus(classification) {
-  var date = classification['registration-date']
+  var df = 'D.M.YYYY [klo] H:mm';
+
   switch (classification.status) {
     case 'registered':
     case 'reclassification1':
     case 'reclassification3':
-      return 'Rekisteröity '+moment(date).format('D.M.YYYY [klo] H:mm');
+      return 'Rekisteröity '+moment(classification['registration-date']).format(df)
+    case 'in_process':
+      return 'Luonnos tallennettu '+moment(classification['creation-date']).format(df)
     default:
       return 'Unknown status: '+classification.status
   }

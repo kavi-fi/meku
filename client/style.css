@@ -303,6 +303,14 @@ input[type=text].invalid.touched,
 #classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
 #classification .summary .agelimit { padding: 0; display: inline-block;}
 
+#registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; }
+#registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; }
+#registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
+#registration-confirmation .warning-summary { float: left; }
+#registration-confirmation .warning-summary img, #registration-confirmation .warning-summary .warning {
+  margin-right: 10px;
+}
+
 #criteria .header { position: relative; }
 #criteria .safe-container { position: absolute; left: 320px; top: 9px; }
 #criteria .safe-container input { margin: 0 5px 0 0; }

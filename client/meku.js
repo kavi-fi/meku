@@ -237,10 +237,17 @@ function movieDetails() {
     $.post('/movies/' + $form.data('id') + '/register', function(data) {
       $form.data('id', '')
       $form.hide().trigger('show')
+      var summary = classificationSummary(data.classifications[0])
+      var warnings = summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
+
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
-        .append($('<h3>').text("Luokittelu rekisteröity"))
         .append($('<span>', {class: 'name'}).text(data.name))
-        .append($('<p>').html($('<button>', {click: closeDialog}).text('Sulje'))))
+        .append($('<div>', {class: 'agelimit warning-summary'}).append([
+           $('<img>', {src: 'images/agelimit-'+summary.age+'.png'}),
+           $('<div>', {class: 'warnings'}).html(warnings),
+        ]))
+        .append($('<p>', {class: 'registration-date'}).text(classificationStatus(data.classifications[0])))
+        .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
     })
   })
 

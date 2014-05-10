@@ -244,7 +244,7 @@ function movieDetails() {
         .append($('<span>', {class: 'name'}).text(data.name))
         .append($('<div>', {class: 'agelimit warning-summary'}).append([
            $('<img>', {src: 'images/agelimit-'+summary.age+'.png'}),
-           $('<div>', {class: 'warnings'}).html(warnings),
+           $('<div>', {class: 'warnings'}).html(warnings)
         ]))
         .append($('<p>', {class: 'registration-date'}).text(classificationStatus(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))

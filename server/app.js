@@ -15,8 +15,9 @@ app.use(express.json())
 
 mongoose.connect('mongodb://localhost/meku')
 
-app.get('/movies/search/:q?', function(req, res) {
-  Movie.find(query()).limit(100).sort('name').exec(function(err, results) {
+app.get('/movies/search/:page/:q?', function(req, res) {
+  var page = req.params.page || 0
+  Movie.find(query()).skip(page * 100).limit(100).sort('name').exec(function(err, results) {
     res.send(results)
   })
 

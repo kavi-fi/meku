@@ -61,50 +61,86 @@ function searchPage() {
   var $button = $page.find('button.search')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
+  var $noMoreResults = $page.find('.no-more-results')
+  var $loading = $page.find('.loading')
   var $detailTemplate = $('#templates > .search-result-details').detach()
 
-  var selectedProgramId = null
+  var state = { q:'', page: 0 }
 
   $page.on('show', function(e, q, programId) {
-    selectedProgramId = programId
-    $input.val(q || '').trigger('fire')
+    $input.val(q || '').trigger('reset')
+    queryChanged(q || '')
+    loadUntil(programId)
   })
 
   $button.click(function() {
     $input.trigger('fire')
   })
 
-  $results.on('click', '.result', function() {
-    if ($(this).hasClass('selected')) {
-      var lastSlashIndex = location.hash.lastIndexOf('/')
-      location.hash = location.hash.substring(0, lastSlashIndex) + '/'
-      closeDetail()
-    } else {
-      closeDetail()
-      openDetail($(this))
+  $(window).on('scroll', function() {
+    if (!$page.is(':visible')) return
+    if ($loading.is(':visible') || $noResults.is(':visible') || $noMoreResults.is(':visible')) return
+    if($(document).height() - $(window).scrollTop() - $(window).height() < 100) {
+      state.page++
+      load()
     }
   })
 
   $input.throttledInput(function() {
-    var q = $input.val().trim()
-    location.hash = '#haku/' + encodeURIComponent(q) + '/'
-    $.get('/movies/search/'+q).done(function(results) {
-      $noResults.toggle(results.length == 0)
-      $results.html(results.map(function(p) { return render(p, q) }))
-      if (selectedProgramId) {
-        $results.find('.result[data-id='+selectedProgramId+']').click()
-        selectedProgramId = null
-      }
-    })
+    location.hash = '#haku/' + encodeURIComponent(state.q) + '/'
+    queryChanged($input.val().trim())
+    load()
   })
 
-  function openDetail($row) {
+  function queryChanged(q) {
+    state = { q:q, page: 0 }
+    $noResults.add($noMoreResults).hide()
+    $results.empty()
+  }
+
+  function loadUntil(selectedProgramId) {
+    load(function() {
+      if (!selectedProgramId) return
+      var $selected = $results.find('.result[data-id='+selectedProgramId+']')
+      if ($selected.length > 0) {
+        openDetail($selected, false)
+        var top = $selected.offset().top - 25
+        $('body,html').animate({ scrollTop: top })
+      } else if (state.page < 20) {
+        state.page++
+        loadUntil(selectedProgramId)
+      }
+    })
+  }
+
+  function load(callback) {
+    $loading.show()
+    state.jqXHR = $.get('/movies/search/'+state.page+'/'+state.q).done(function(results, status, jqXHR) {
+      if (state.jqXHR != jqXHR) return
+      $noResults.toggle(state.page == 0 && results.length == 0)
+      $noMoreResults.toggle(state.page > 0 && results.length == 0)
+      $results.append(results.map(function(p) { return render(p, state.q) }))
+      $loading.hide()
+      if (callback) callback()
+    })
+  }
+
+  $results.on('click', '.result', function() {
+    if ($(this).hasClass('selected')) {
+      location.hash = '#haku/' + encodeURIComponent(state.q) + '/'
+      closeDetail()
+    } else {
+      closeDetail()
+      openDetail($(this), true)
+    }
+  })
+
+  function openDetail($row, animate) {
     var p = $row.data('program')
-    var lastSlashIndex = location.hash.lastIndexOf('/')
-    location.hash = location.hash.substring(0, lastSlashIndex) + '/' + p._id
+    location.hash = '#haku/' + encodeURIComponent(state.q) + '/' + p._id
     var $details = renderDetails(p)
     $row.addClass('selected').after($details)
-    $details.slideDown()
+    animate ? $details.slideDown() : $details.show()
   }
 
   function closeDetail() {
@@ -691,11 +727,16 @@ $.fn.throttledInput = function(fn) {
         fn.call(that, txt)
       }, 400)
     })
+    $input.on('reset', reset)
     $input.on('fire', function() {
-      if (timeout) clearTimeout(timeout)
-      prev = $input.val()
+      reset()
       fn.call(this, prev)
     })
+
+    function reset() {
+      if (timeout) clearTimeout(timeout)
+      prev = $input.val()
+    }
   })
 }
 

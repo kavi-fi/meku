@@ -68,8 +68,9 @@ function searchPage() {
 
   var state = { q:'', page: 0, filters:[] }
 
-  $page.on('show', function(e, q, programId) {
+  $page.on('show', function(e, q, filters, programId) {
     $input.val(q || '').trigger('reset')
+    setFilters(filters)
     queryChanged(q || '')
     loadUntil(programId)
   })
@@ -87,25 +88,22 @@ function searchPage() {
   })
 
   $input.throttledInput(function() {
-    location.hash = '#haku/' + encodeURIComponent(state.q) + '/'
     queryChanged($input.val().trim())
+    updateLocationHash()
     load()
   })
 
-  function currentFilters() {
-    return $filters.filter(':checked')
-      .map(function() { return $(this).data('type') })
-      .toArray().join(',').split(',')
-  }
-
   function queryChanged(q) {
-    state = { q:q, page: 0, filters: currentFilters() }
+    state = { q:q, page: 0 }
     $noResults.add($noMoreResults).hide()
   }
 
   function loadUntil(selectedProgramId) {
     load(function() {
-      if (!selectedProgramId) return
+      if (!selectedProgramId) {
+        updateLocationHash()
+        return
+      }
       var $selected = $results.find('.result[data-id='+selectedProgramId+']')
       if ($selected.length > 0) {
         openDetail($selected, false)
@@ -120,8 +118,8 @@ function searchPage() {
 
   function load(callback) {
     $loading.show()
-    var url = '/movies/search/'+state.q
-    var data = $.param({ page:state.page, filters:state.filters })
+    var url = '/movies/search/'+encodeURIComponent(state.q)
+    var data = $.param({ page:state.page, filters:currentFilters() })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
       $noResults.toggle(state.page == 0 && results.length == 0)
@@ -133,9 +131,21 @@ function searchPage() {
     })
   }
 
+  function currentFilters() {
+    return $filters.filter(':checked')
+      .map(function() { return $(this).data('type') })
+      .toArray().join(',').split(',')
+  }
+
+  function setFilters(filterString) {
+    $filters.each(function() {
+      $(this).prop('checked', filterString && filterString.indexOf($(this).data('id')) >= 0)
+    })
+  }
+
   $results.on('click', '.result', function() {
     if ($(this).hasClass('selected')) {
-      location.hash = '#haku/' + encodeURIComponent(state.q) + '/'
+      updateLocationHash()
       closeDetail()
     } else {
       closeDetail()
@@ -145,7 +155,7 @@ function searchPage() {
 
   function openDetail($row, animate) {
     var p = $row.data('program')
-    location.hash = '#haku/' + encodeURIComponent(state.q) + '/' + p._id
+    updateLocationHash(p._id)
     var $details = renderDetails(p)
     $row.addClass('selected').after($details)
     animate ? $details.slideDown() : $details.show()
@@ -154,6 +164,11 @@ function searchPage() {
   function closeDetail() {
     $results.find('.result.selected').removeClass('selected')
     $results.find('.search-result-details').slideUp(function() { $(this).remove() }).end()
+  }
+
+  function updateLocationHash(selectedProgramId) {
+    var filters = $filters.filter(':checked').map(function() { return $(this).data('id') }).toArray().join('')
+    location.hash = '#haku/' + encodeURIComponent(state.q) + '/' + filters + '/' + (selectedProgramId || '')
   }
 
   function render(p, query) {

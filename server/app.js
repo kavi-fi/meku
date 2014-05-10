@@ -15,16 +15,25 @@ app.use(express.json())
 
 mongoose.connect('mongodb://localhost/meku')
 
-app.get('/movies/search/:page/:q?', function(req, res) {
-  var page = req.params.page || 0
+app.get('/movies/search/:q?', function(req, res) {
+  var page = req.query.page || 0
+  var filters = req.query.filters || []
   Movie.find(query()).skip(page * 100).limit(100).sort('name').exec(function(err, results) {
     res.send(results)
   })
 
   function query() {
-    var q = (req.params.q || '').trim().toLowerCase().split(/\s+/)
-    if (q.length == 1 && q[0] == '') return { 'name': /^a/i }
-    return { 'all-names': { $all: q.map(toTerm) } }
+    var words = (req.params.q || '').trim().toLowerCase().split(/\s+/)
+    var q = {}
+    if (words.length == 1 && words[0] == '') {
+      q['name'] = /^a/i
+    } else {
+      q['all-names'] = { $all: words.map(toTerm) }
+    }
+    if (filters.length > 0) {
+      q['program-type'] = { $in: filters }
+    }
+    return q
   }
 
   function toTerm(s) {

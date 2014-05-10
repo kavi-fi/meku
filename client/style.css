@@ -136,6 +136,9 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }
 #search-page .search-label { display: block; text-align: left; padding: 0 0 20px 0; }
 #search-page .query { width: 350px; }
+#search-page .filters { font-size: 14px; color: #444444; }
+#search-page .filters label { width: auto; font-weight: normal; }
+#search-page .filters input { margin-right: 10px; }
 #search-page button.search { margin-left: 15px; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; }
 #search-page .results, #search-page .no-results, #search-page .no-more-results, #search-page .loading { width: 940px; margin: 0 auto; padding: 0 10px; margin-bottom: 80px; }

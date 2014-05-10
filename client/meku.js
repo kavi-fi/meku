@@ -59,13 +59,14 @@ function searchPage() {
   var $page = $('#search-page')
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
+  var $filters = $page.find('.filters input[type=checkbox]')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
   var $loading = $page.find('.loading')
   var $detailTemplate = $('#templates > .search-result-details').detach()
 
-  var state = { q:'', page: 0 }
+  var state = { q:'', page: 0, filters:[] }
 
   $page.on('show', function(e, q, programId) {
     $input.val(q || '').trigger('reset')
@@ -73,9 +74,8 @@ function searchPage() {
     loadUntil(programId)
   })
 
-  $button.click(function() {
-    $input.trigger('fire')
-  })
+  $button.click(function() { $input.trigger('fire') })
+  $filters.on('change', function() { $input.trigger('fire') })
 
   $(window).on('scroll', function() {
     if (!$page.is(':visible')) return
@@ -92,8 +92,14 @@ function searchPage() {
     load()
   })
 
+  function currentFilters() {
+    return $filters.filter(':checked')
+      .map(function() { return $(this).data('type') })
+      .toArray().join(',').split(',')
+  }
+
   function queryChanged(q) {
-    state = { q:q, page: 0 }
+    state = { q:q, page: 0, filters: currentFilters() }
     $noResults.add($noMoreResults).hide()
     $results.empty()
   }
@@ -115,7 +121,9 @@ function searchPage() {
 
   function load(callback) {
     $loading.show()
-    state.jqXHR = $.get('/movies/search/'+state.page+'/'+state.q).done(function(results, status, jqXHR) {
+    var url = '/movies/search/'+state.q
+    var data = $.param({ page:state.page, filters:state.filters })
+    state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
       $noResults.toggle(state.page == 0 && results.length == 0)
       $noMoreResults.toggle(state.page > 0 && results.length == 0)

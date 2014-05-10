@@ -345,7 +345,7 @@ function batcher(num) {
 function programMapper() {
   return transformer(function(row) {
     var obj = { 'emeku-id': row.id }
-    if (row.program_type) obj['program-type'] = row.program_type
+    obj['program-type'] = legacyProgramTypes[row.program_type] || 0
     if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
     if (row.year && row.year != 'undefined') obj.year = row.year
     if (row.countries) obj.country = optionListToArray(row.countries)
@@ -416,7 +416,11 @@ function trimConcat(s1, s2, sep){
 function wipe(callback) {
   // Calling native driver methods right after mongoose.connect doesn't work, so work-around'ing:
   connectMongoose(function() {
-    async.each(schema.models, function(m, callback) { dropCollection(m.collection.name, function() { callback() }) }, callback)
+    async.each(schema.models, function(m, callback) {
+      m.collection.dropAllIndexes(function() {
+        dropCollection(m.collection.name, function() { callback() })
+      })
+    }, callback)
   })
 }
 function wipeAccounts(callback) {
@@ -514,4 +518,19 @@ var legacyTvGenres = {
   '10.1': 'Kotimainen viihde/kevyt musiikki/reality',
   '10.2': 'Ulkomainen viihde/kevyt musiikki/reality',
   '13': 'Populaarikulttuuri'
+}
+
+var legacyProgramTypes = {
+  '01': 1,       //'Kotimainen elokuva' -> movie
+  '02': 1,       //'Ulkomainen elokuva' -> movie
+  '02b': 0,    // 'TESTI' -> unknown
+  '03': 3,       //'TV-sarjan jakso' -> tv
+  '04': 3,       // 'Muu tv-ohjelma' -> tv
+  '05': 2,       // 'TV-sarjan nimi' -> tv
+  '06': 5,       // 'Traileri' -> trailer
+  '07': 4,       // 'Extra' -> extra
+  '08': 6,       // 'Peli' -> game
+  '10': 0,      // 'Yhteistuotanto' -> unknown
+  '11': 7,      // 'PEGI hyväksytty peli' -> game
+  '12': 0       // 'Muu kuvaohjelma' -> unknown
 }

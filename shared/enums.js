@@ -30,18 +30,14 @@ enums.roles = {
 }
 
 enums.programType = {
-  1: 'Kotimainen elokuva',
-  2: 'Ulkomainen elokuva',
-  '2b': 'TESTI',
-  3: 'TV-sarjan jakso',
-  4: 'Muu tv-ohjelma',
-  5: 'TV-sarjan nimi',
-  6: 'Traileri',
-  7: 'Extra',
-  8: 'Peli',
-  10: 'Yhteistuotanto',
-  11: 'PEGI hyväksytty peli',
-  12: 'Muu kuvaohjelma'
+  0: 'unknown',
+  1: 'movie',
+  2: 'series',
+  3: 'tv',
+  4: 'extra',
+  5: 'trailer',
+  6: 'game',
+  7: 'pegi'
 }
 
 enums.genre = [

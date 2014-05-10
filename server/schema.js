@@ -40,7 +40,7 @@ var MovieSchema = new Schema({
   actors: {type: [String], index: true},
   synopsis: String,
   classifications: [classification],
-  'program-type': String // enums.programType
+  'program-type': Number // enums.programType
 })
 MovieSchema.methods.populateAllNames = function() {
   var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other']).map(function(s) { return s.split(/\s+/) })

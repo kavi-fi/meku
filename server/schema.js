@@ -76,7 +76,7 @@ var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
 	name: String,
 	duration: String,
 	'registration-date': Date,
-	price: Number, // eurocents
+	price: Number // eurocents
 })
 
 var models = exports.models = [Movie, Account, Provider, User, InvoiceRow]

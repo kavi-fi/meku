@@ -24,8 +24,15 @@ app.get('/movies/search/:page/:q?', function(req, res) {
   function query() {
     var q = (req.params.q || '').trim().toLowerCase().split(/\s+/)
     if (q.length == 1 && q[0] == '') return { 'name': /^a/i }
-    var regexps = q.map(function(s) { return new RegExp('^' + escapeRegExp(s)) })
-    return { 'all-names': { $all: regexps } }
+    return { 'all-names': { $all: q.map(toTerm) } }
+  }
+
+  function toTerm(s) {
+    if (/^".+"$/.test(s)) {
+      return s.substring(1, s.length - 1)
+    } else {
+      return new RegExp('^' + escapeRegExp(s))
+    }
   }
 })
 

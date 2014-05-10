@@ -101,7 +101,6 @@ function searchPage() {
   function queryChanged(q) {
     state = { q:q, page: 0, filters: currentFilters() }
     $noResults.add($noMoreResults).hide()
-    $results.empty()
   }
 
   function loadUntil(selectedProgramId) {
@@ -127,6 +126,7 @@ function searchPage() {
       if (state.jqXHR != jqXHR) return
       $noResults.toggle(state.page == 0 && results.length == 0)
       $noMoreResults.toggle(state.page > 0 && results.length == 0)
+      if (state.page == 0) $results.empty()
       $results.append(results.map(function(p) { return render(p, state.q) }))
       $loading.hide()
       if (callback) callback()

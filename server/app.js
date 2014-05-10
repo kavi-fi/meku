@@ -23,12 +23,10 @@ app.get('/movies/search/:q?', function(req, res) {
   })
 
   function query() {
-    var words = (req.params.q || '').trim().toLowerCase().split(/\s+/)
     var q = {}
-    if (words.length == 1 && words[0] == '') {
-      q['name'] = /^a/i
-    } else {
-      q['all-names'] = { $all: words.map(toTerm) }
+    var words = (req.params.q || '').trim().toLowerCase()
+    if (words != '') {
+      q['all-names'] = { $all: words.split(/\s+/).map(toTerm) }
     }
     if (filters.length > 0) {
       q['program-type'] = { $in: filters }

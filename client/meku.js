@@ -66,7 +66,7 @@ function searchPage() {
   var $loading = $page.find('.loading')
   var $detailTemplate = $('#templates > .search-result-details').detach()
 
-  var state = { q:'', page: 0, filters:[] }
+  var state = { q:'', page: 0 }
 
   $page.on('show', function(e, q, filters, programId) {
     $input.val(q || '').trigger('reset')
@@ -123,7 +123,7 @@ function searchPage() {
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
       $noResults.toggle(state.page == 0 && results.length == 0)
-      $noMoreResults.toggle(state.page > 0 && results.length == 0)
+      $noMoreResults.toggle((state.page > 0 || results.length > 0) && results.length < 100)
       if (state.page == 0) $results.empty()
       $results.append(results.map(function(p) { return render(p, state.q) }))
       $loading.hide()

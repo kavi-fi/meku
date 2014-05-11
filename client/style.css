@@ -140,8 +140,8 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page .filters label { width: auto; font-weight: normal; }
 #search-page .filters input { margin-right: 10px; }
 #search-page button.search { margin-left: 15px; }
-#search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; }
-#search-page .results, #search-page .no-results, #search-page .no-more-results, #search-page .loading { width: 940px; margin: 0 auto; padding: 0 10px; margin-bottom: 80px; }
+#search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
+#search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
 #search-page .result {
   border-bottom: 2px solid #e8e8e8; line-height: 47px;
   font-size: 14px; color: #444444; cursor: pointer;

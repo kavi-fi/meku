@@ -197,7 +197,7 @@ function searchPage() {
       .append($('<span>').text(countryAndYear(p)))
       .append($('<span>').text(classificationAgeLimit(c)))
       .append($('<span>').text(enums.programType[p['program-type']].fi))
-      .append($('<span>').text(duration(c)))
+      .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
 
     function countryAndYear(p) {
       var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
@@ -241,14 +241,13 @@ function searchPage() {
 
     var c = p.classifications[0]
     if (c) {
-      var summary = classificationSummary(c)
-      var warnings = summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
-      $e.find('.agelimit').attr('src', 'images/agelimit-'+summary.age+'.png').end()
+      var summary = classificationSummary(p, c)
+      $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.status').text(classificationStatus(c)).end()
-      .find('.warnings').html(warnings).end()
+      .find('.warnings').html(warningIcons(summary)).end()
       .find('.buyer').text(c.buyer && c.buyer.name || '').end()
       .find('.billing').text(c.billing && c.billing.name || '').end()
-      .find('.format').text(c.format).end()
+      .find('.format').text(enums.util.isGameType(p) && p.gameFormat || c.format).end()
       .find('.duration').text(c.duration).end()
       .find('.criteria').html(renderClassificationCriteria(c)).end()
     }
@@ -307,14 +306,12 @@ function movieDetails() {
     $.post('/movies/' + $form.data('id') + '/register', function(data) {
       $form.data('id', '')
       $form.hide().trigger('show')
-      var summary = classificationSummary(data.classifications[0])
-      var warnings = summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
-
+      var summary = classificationSummary(data, data.classifications[0])
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
         .append($('<span>', {class: 'name'}).text(data.name))
         .append($('<div>', {class: 'agelimit warning-summary'}).append([
-           $('<img>', {src: 'images/agelimit-'+summary.age+'.png'}),
-           $('<div>', {class: 'warnings'}).html(warnings)
+           $('<img>', {src: ageLimitIcon(summary) }),
+           $('<div>', {class: 'warnings'}).html(warningIcons(summary))
         ]))
         .append($('<p>', {class: 'registration-date'}).text(classificationStatus(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
@@ -600,7 +597,7 @@ function movieDetails() {
   }
 
   function updateSummary(movie) {
-    var classification = classificationSummary(movie.classifications[0])
+    var classification = classificationSummary(movie, movie.classifications[0])
     var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
     var countries = enums.util.toCountryString(movie.country)
@@ -611,7 +608,7 @@ function movieDetails() {
       .find('.country').text(countries || '-').end()
       .find('.directors').text((movie.directors).join(', ') || '-').end()
       .find('.actors').text((movie.actors).join(', ') || '-').end()
-      .find('.agelimit img').attr('src', 'images/agelimit-'+classification.age+'.png').end()
+      .find('.agelimit img').attr('src', ageLimitIcon(classification)).end()
       .find('.warnings').html(warnings).end()
   }
 
@@ -649,7 +646,7 @@ function movieDetails() {
       var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
       var classification = _.first(movie.classifications)
       var buyer = classification.buyer ? classification.buyer.name : ''
-      var summary = classificationSummary(classification)
+      var summary = classificationSummary(movie, classification)
       var buyerEmails = classification['registration-email-addresses']
         .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
       var manualEmails = classification['registration-email-addresses']
@@ -795,21 +792,25 @@ function classificationStatus(classification) {
   }
 }
 
-function classificationSummary(classification) {
-  if (classification.safe) return { age:'S', warnings:[] }
-  var maxAgeLimit = classificationAgeLimit(classification)
-  var warnings = _(classification.criteria)
-    .map(function(id) { return classificationCriteria[id - 1] })
-    .filter(function(c) { return c.age == maxAgeLimit })
-    .map(function(c) { return c.category })
-    .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
-  if (classification['warning-order'].length > 0) {
-    var order = classification['warning-order']
-    warnings = warnings.sort(function(a, b) {
-      return order.indexOf(a) - order.indexOf(b)
-    })
+function classificationSummary(program, classification) {
+  if (enums.util.isPegiGame(program)) {
+    return { pegi: true, age: classification['legacy-age-limit'], warnings: classification.pegiWarnings }
+  } else {
+    if (classification.safe) return { age:'S', warnings:[] }
+    var maxAgeLimit = classificationAgeLimit(classification)
+    var warnings = _(classification.criteria)
+      .map(function(id) { return classificationCriteria[id - 1] })
+      .filter(function(c) { return c.age == maxAgeLimit })
+      .map(function(c) { return c.category })
+      .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
+    if (classification['warning-order'].length > 0) {
+      var order = classification['warning-order']
+      warnings = warnings.sort(function(a, b) {
+        return order.indexOf(a) - order.indexOf(b)
+      })
+    }
+    return { age: maxAgeLimit, warnings: warnings }
   }
-  return { age: maxAgeLimit, warnings: warnings }
 }
 
 function classificationAgeLimit(classification) {
@@ -843,6 +844,16 @@ function classificationCriteriaText(warnings) {
   return warnings.map(function(x) { return classificationCategory_FI[x] }).join(', ')
 }
 
+function ageLimitIcon(summary) {
+  return summary.pegi
+    ? 'images/pegi-'+summary.age+'.png'
+    : 'images/agelimit-'+summary.age+'.png'
+}
+function warningIcons(summary) {
+  return summary.pegi
+    ? summary.warnings.map(function(w) { return $('<span>', { class:'warning pegi-' + w.toLowerCase() }) })
+    : summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
+}
 function notIn(arr, el) {
   return _.indexOf(arr, el) === -1
 }

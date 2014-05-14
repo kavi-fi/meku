@@ -53,7 +53,7 @@ function run(job, callback) {
 }
 
 function base(callback) {
-  conn.query('SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre FROM meku_audiovisualprograms where deleted != "1"')
+  conn.query('SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where deleted != "1"')
     .stream({ highWaterMark: 2000 })
     .pipe(programMapper())
     .pipe(batcher(1000))
@@ -153,8 +153,9 @@ function classifications(callback) {
   function base(callback) {
     var tick = progressMonitor()
     var result = { programs: {}, classifications: {} }
-    conn.query('select p.id as programId, c.id as classificationId, p.provider_id, ' +
-        ' c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.date_entered, c.reg_date, c.assigned_user_id, c.status' +
+    conn.query('select p.id as programId, p.program_type, c.id as classificationId, p.provider_id, ' +
+        ' c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.date_entered, c.reg_date, c.assigned_user_id, c.status,' +
+        ' c.pegi_descriptors, c.pegi_age_level' +
         ' from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
@@ -165,7 +166,12 @@ function classifications(callback) {
         var classification = { 'emeku-id': row.classificationId }
         if (row.format) classification.format = mapFormat(row.format)
         if (row.runtime) classification.duration = row.runtime
-        if (row.age_level) classification['legacy-age-limit'] = row.age_level
+        if (row.age_level) {
+          classification['legacy-age-limit'] = row.age_level
+        }
+        if (row.program_type == '11') {
+          classification['legacy-age-limit'] = row.pegi_age_level
+        }
         if (row.descriptors) classification['warning-order'] = optionListToArray(row.descriptors)
         classification.provider_id = row.provider_id
         classification.comments = trimConcat(row.description, row.opinions, '\n')
@@ -173,6 +179,7 @@ function classifications(callback) {
         classification['registration-date'] = row.reg_date && new Date(row.reg_date) || undefined
         classification.assigned_user_id = row.assigned_user_id
         classification.status = row.status
+        if (row.program_type == '11') classification.pegiWarnings = optionListToArray(row.pegi_descriptors)
         if (!result.programs[row.programId]) result.programs[row.programId] = []
         result.programs[row.programId].push(classification)
         result.classifications[row.classificationId] = classification
@@ -380,6 +387,7 @@ function programMapper() {
       .concat(optionListToArray(row.tv_program_genre).map(function(g) { return legacyTvGenres[g] }))
       .concat(optionListToArray(row.game_genre))
     if (legacyGenre) obj['legacy-genre'] = _(legacyGenre).compact().uniq().value()
+    if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = row.game_format
     return obj
   })
 }

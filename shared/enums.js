@@ -39,6 +39,8 @@ enums.programType = {
   6: { type: 'game', fi: 'Peli' },
   7: { type: 'pegi', fi: 'PEGI-peli' }
 }
+enums.util.isGameType = function(p) { return p['program-type'] == 6 || p['program-type'] == 7 }
+enums.util.isPegiGame = function(p) { return p['program-type'] == 7 }
 
 enums.genre = [
   'Fiktio',

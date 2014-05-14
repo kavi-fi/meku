@@ -16,6 +16,7 @@ var classification = {
   'criteria-comments': {},
   'warning-order': [String],
   'legacy-age-limit': String,
+  pegiWarnings: [String],
   'creation-date': Date,
   'registration-date': Date,
   'registration-email-addresses': [{email: String, manual: Boolean}],
@@ -40,7 +41,8 @@ var MovieSchema = new Schema({
   actors: {type: [String], index: true},
   synopsis: String,
   classifications: [classification],
-  'program-type': Number // enums.programType
+  'program-type': Number, // enums.programType
+  gameFormat: String
 })
 MovieSchema.methods.populateAllNames = function() {
   var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other'])

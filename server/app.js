@@ -49,7 +49,14 @@ app.get('/movies/:id', function(req, res) {
 })
 
 app.post('/movies/new', function(req, res, next) {
-  new Movie({ classifications: [{ 'creation-date':new Date(), status: 'in_process' }], 'production-companies': [], actors: [] }).save(function(err, movie) {
+  var data = {
+    classifications: [{ 'creation-date':new Date(), status: 'in_process' }],
+    'program-type': req.body['program-type'] || 0,
+    'production-companies': [],
+    actors: []
+  }
+
+  new Movie(data).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
   })

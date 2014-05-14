@@ -65,6 +65,7 @@ function searchPage() {
   var $noMoreResults = $page.find('.no-more-results')
   var $loading = $page.find('.loading')
   var $detailTemplate = $('#templates > .search-result-details').detach()
+  var $newClassificationButton = $page.find('.new-classification button')
 
   var state = { q:'', page: 0 }
 
@@ -91,6 +92,22 @@ function searchPage() {
     queryChanged($input.val().trim())
     updateLocationHash()
     load()
+  })
+
+  $('input[name="new-classification-type"]').select2({
+    data: [
+      {id: 1, text: 'Elokuva'},
+      {id: 4, text: 'Extra'},
+      {id: 5, text: 'Trailer'}
+    ],
+  }).select2('val', 1)
+
+  $newClassificationButton.click(function() {
+    var programType = $('input[name="new-classification-type"]').select2('val')
+    $.post('/movies/new', JSON.stringify({'program-type': programType})).done(function(movie) {
+      $('body').children('.page').hide()
+      $('#classification-page').trigger('show', movie._id).show()
+    })
   })
 
   function queryChanged(q) {
@@ -270,13 +287,6 @@ function movieDetails() {
     }
   })
 
-  $root.find('.new-movie').click(function() {
-    $.post('/movies/new').done(function(movie) {
-      location.hash = '#luokittelu/'+movie._id
-      show(movie)
-    })
-  })
-
   $form.on('validation', function() {
     if ($form.find(".required.invalid, .required-pseudo.invalid").not('.exclude').length === 0) {
       $submit.removeAttr('disabled')
@@ -308,6 +318,8 @@ function movieDetails() {
         ]))
         .append($('<p>', {class: 'registration-date'}).text(classificationStatus(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
+
+      $('.new-movie').removeAttr('disabled')
     })
   })
 

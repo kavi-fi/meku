@@ -133,8 +133,16 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .page { display: none; }
 
 #search-page .row { border-bottom: none; padding-bottom: 0px; }
-#search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }
+#search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; height: 220px; }
+#search-page .left { width: 600px; }
+#search-page .new-classification { width: 340px; }
+#search-page .new-classification label { width: 200px; }
 #search-page .search-label { display: block; text-align: left; padding: 0 0 20px 0; }
+
+#search-page .new-classification label { display: block; text-align: left; padding: 0 0 20px 0; }
+#search-page .new-classification button { margin-left: 15px; }
+#search-page .new-classification .select2-container { width: 254px; margin-bottom: 0; }
+#search-page .new-classification input { width: auto; }
 #search-page .query { width: 350px; }
 #search-page .filters { font-size: 14px; color: #444444; }
 #search-page .filters label { width: auto; font-weight: normal; }
@@ -166,7 +174,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .search-result-details .criteria label { text-transform: capitalize; }
 .search-result-details .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
 
-input[type=text],
+#classification-page input[type=text],
 .select2-container-multi .select2-choices {
   width: 280px;
 }
@@ -307,8 +315,8 @@ input[type=text].invalid.touched,
 #classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
 #classification .summary .agelimit { padding: 0; display: inline-block;}
 
-#registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; }
-#registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; }
+#registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
+#registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
 #registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
 #registration-confirmation .warning-summary { float: left; }
 #registration-confirmation .warning-summary img, #registration-confirmation .warning-summary .warning {

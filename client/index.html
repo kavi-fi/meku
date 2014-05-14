@@ -30,16 +30,25 @@
   <div id="search-page" class="page">
     <div class="row">
       <div class="content">
+
         <h2>Kuvaohjelmahaku</h2>
-        <label class="search-label">Nimi</label>
-        <input class="query" type="text" /><button class="search">Hae</button>
-        <div class="filters">
-          <label><input type="checkbox" data-id="a" data-type="1"/>Elokuvat</label>
-          <label><input type="checkbox" data-id="b" data-type="2,3"/>TV</label>
-          <label><input type="checkbox" data-id="c" data-type="4"/>Extrat</label>
-          <label><input type="checkbox" data-id="d" data-type="5"/>Trailerit</label>
-          <label><input type="checkbox" data-id="e" data-type="6,7"/>Pelit</label>
-          <label><input type="checkbox" data-id="f" data-type="0"/>Luokittelemattomat</label>
+        <div class="left">
+          <label class="search-label">Nimi</label>
+          <input class="query" type="text" /><button class="search">Hae</button>
+          <div class="filters">
+            <label><input type="checkbox" data-id="a" data-type="1"/>Elokuvat</label>
+            <label><input type="checkbox" data-id="b" data-type="2,3"/>TV</label>
+            <label><input type="checkbox" data-id="c" data-type="4"/>Extrat</label>
+            <label><input type="checkbox" data-id="d" data-type="5"/>Trailerit</label>
+            <label><input type="checkbox" data-id="e" data-type="6,7"/>Pelit</label>
+            <label><input type="checkbox" data-id="f" data-type="0"/>Luokittelemattomat</label>
+          </div>
+        </div>
+
+        <div class="new-classification right">
+          <label>Luo uusi kuvaohjelma</label>
+          <input name="new-classification-type" type="hidden"/>
+          <button>Luo</button>
         </div>
       </div>
     </div>

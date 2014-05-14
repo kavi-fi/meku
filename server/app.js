@@ -24,7 +24,7 @@ app.get('/movies/search/:q?', function(req, res) {
   })
 
   function query() {
-    var q = {}
+    var q = { deleted: { $ne:true } }
     var words = (req.params.q || '').trim().toLowerCase()
     if (words != '') {
       q['all-names'] = { $all: words.split(/\s+/).map(toTerm) }

@@ -3,6 +3,7 @@ var mysql = require('mysql')
 var mongoose = require('mongoose')
 var schema = require('../server/schema')
 var enums = require('../shared/enums')
+var utils = require('../shared/utils')
 var stream = require('stream')
 var _ = require('lodash')
 var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
@@ -20,7 +21,8 @@ var tasks = {
   wipeProviders: wipeProviders, providers: providers,
   wipeAccounts: wipeAccounts, accounts: accounts,
   wipeUsers: wipeUsers, users: users,
-  nameIndex: nameIndex
+  nameIndex: nameIndex,
+  markTrainingProgramsDeleted: markTrainingProgramsDeleted
 }
 
 if (process.argv.length < 3) {
@@ -320,6 +322,31 @@ function nameIndex(callback) {
       p.populateAllNames()
       schema.Movie.update({ _id: p._id }, { 'all-names': p['all-names'] }, callback)
     }, callback)
+  })
+}
+
+function markTrainingProgramsDeleted(callback) {
+  // CHECK: e.g.
+  // * Armadillo OK
+  // * Requiem for a dream (no valid entries, broken in emeku...)
+  // * Antichrist (LUJUPI) is on name-fi
+  var tick = progressMonitor(1)
+  var count = 0
+  schema.User.find({ username: { $ne: 'VET' } }, { username: 1 }, function(err, users) {
+    if (err) return callback(err)
+    async.eachLimit(users, 50, function(u, callback) {
+      var q = new RegExp('\\(' + utils.escapeRegExp(u.username) + '\\)')
+      schema.Movie.update({ $or: [ { name: q }, { 'name-fi': q } ] }, { deleted: true }, { multi:true }, function(err, numChanged) {
+        tick()
+        count += numChanged
+        callback()
+      })
+    }, function(err) {
+      if (err) return callback(err)
+      console.log('\n> Number of test-programs marked as deleted: '+count)
+      callback()
+    })
+
   })
 }
 

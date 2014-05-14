@@ -12,6 +12,7 @@
   <script src="vendor/moment-2.6.0.min.js"></script>
   <script src="meku.js"></script>
   <script src="shared/enums.js"></script>
+  <script src="shared/classification.js"></script>
   <script src="http://localhost:35729/livereload.js"></script>
 </head>
 <body>
@@ -188,21 +189,9 @@
           <div class="email-preview box">
             <dl>
               <dt>Vastaanottajat</dt><dd class="recipients"></dd>
-              <dt>Aihe</dt><dd>Luokittelupäätös: <span class="name"></span>, <span class="year"></span>, <span class="classification-short"></span></dd>
+              <dt>Aihe</dt><dd class="subject"></dd>
             </dl>
-
-            <p><span class="date"></span><br/><span class="buyer"></span></p>
-
-            <p>Ilmoitus kuvaohjelman luokittelusta</p>
-
-            <p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on <span class="date"></span> tilauksestanne luokitellut kuvaohjelman <span class="name"></span>. <span class="classification"></span>.</p>
-
-            <p>Liitteet:<br/>
-            KAVIN mediakasvatus- ja kuvaohjelmayksikön päätös<br/>
-            Valitusosoitus</p>
-
-            <p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>
-            Mediakasvatus- ja kuvaohjelmayksikkö</p>
+            <pre class="body"></pre>
           </div>
         </div>
       </div>

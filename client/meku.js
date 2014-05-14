@@ -241,7 +241,7 @@ function searchPage() {
 
     var c = p.classifications[0]
     if (c) {
-      var summary = classificationSummary(p, c)
+      var summary = classification.summary(p, c)
       $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.status').text(classificationStatus(c)).end()
       .find('.warnings').html(warningIcons(summary)).end()
@@ -257,7 +257,7 @@ function searchPage() {
   function renderClassificationCriteria(c) {
     if (!c.criteria) return ''
     return c.criteria.map(function(id) {
-      var cr = classificationCriteria[id - 1]
+      var cr = enums.classificationCriteria[id - 1]
       var category = classificationCategory_FI[cr.category]
       return $('<div>')
         .append($('<label>').text(category + ' ('+cr.id+')'))
@@ -306,7 +306,7 @@ function movieDetails() {
     $.post('/movies/' + $form.data('id') + '/register', function(data) {
       $form.data('id', '')
       $form.hide().trigger('show')
-      var summary = classificationSummary(data, data.classifications[0])
+      var summary = classification.summary(data, data.classifications[0])
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
         .append($('<span>', {class: 'name'}).text(data.name))
         .append($('<div>', {class: 'agelimit warning-summary'}).append([
@@ -578,7 +578,7 @@ function movieDetails() {
 
   function renderClassificationCriteria() {
     enums.criteriaCategories.map(function(category) {
-      var criteria = classificationCriteria.filter(function(c) { return c.category == category })
+      var criteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
           .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
@@ -597,8 +597,8 @@ function movieDetails() {
   }
 
   function updateSummary(movie) {
-    var classification = classificationSummary(movie, movie.classifications[0])
-    var warnings = [$('<span>', { class:'drop-target' })].concat(classification.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
+    var summary = classification.summary(movie, movie.classifications[0])
+    var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
     var countries = enums.util.toCountryString(movie.country)
     $summary
@@ -608,7 +608,7 @@ function movieDetails() {
       .find('.country').text(countries || '-').end()
       .find('.directors').text((movie.directors).join(', ') || '-').end()
       .find('.actors').text((movie.actors).join(', ') || '-').end()
-      .find('.agelimit img').attr('src', ageLimitIcon(classification)).end()
+      .find('.agelimit img').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
   }
 
@@ -642,29 +642,24 @@ function movieDetails() {
     }
 
     function updatePreview(movie) {
-      var now = new Date()
-      var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
-      var classification = _.first(movie.classifications)
-      var buyer = classification.buyer ? classification.buyer.name : ''
-      var summary = classificationSummary(movie, classification)
-      var buyerEmails = classification['registration-email-addresses']
+      var cl = _.first(movie.classifications)
+      var buyerEmails = cl['registration-email-addresses']
         .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
-      var manualEmails = classification['registration-email-addresses']
+      var manualEmails = cl['registration-email-addresses']
         .filter(function(email) { return email.manual }).map(function(e) { return e.email })
 
       var manualInDom = $emails.find('ul.manual li input').map(function() { return $(this).val() }).get()
-      manualEmails.filter(function(email) { return notIn(manualInDom, email) }).forEach(addManualEmailCheckbox(true))
+      manualEmails.filter(function(email) { return notIn(manualInDom, email) })
+        .forEach(addManualEmailCheckbox(true))
 
-      $preview.find('.date').text(dateString)
-      $preview.find('.name').text(movie.name.join(', '))
-      $preview.find('.year').text(movie.year || '')
-      $preview.find('.buyer').text(buyer)
-      $preview.find('.classification').text(classificationText(summary))
-      $preview.find('.classification-short').text(summary.age + ' ' + classificationCriteriaText(summary.warnings))
-      $preview.find('.recipients').text(buyerEmails.concat(manualEmails).join(', '))
+      var email = classification.registrationEmail(movie)
 
-      if (classification.buyer) {
-        $.get('/accounts/' + classification.buyer._id).done(function(data) {
+      $preview.find('.recipients').text(email.recipients.join(', '))
+      $preview.find('.subject').text(email.subject)
+      $preview.find('.body').text(email.body)
+
+      if (cl.buyer) {
+        $.get('/accounts/' + cl.buyer._id).done(function(data) {
           // remove all email addresses linked to the selected buyer
           $emails.find('ul.buyer li').remove()
 
@@ -792,33 +787,12 @@ function classificationStatus(classification) {
   }
 }
 
-function classificationSummary(program, classification) {
-  if (enums.util.isPegiGame(program)) {
-    return { pegi: true, age: classification['legacy-age-limit'], warnings: classification.pegiWarnings }
-  } else {
-    if (classification.safe) return { age:'S', warnings:[] }
-    var maxAgeLimit = classificationAgeLimit(classification)
-    var warnings = _(classification.criteria)
-      .map(function(id) { return classificationCriteria[id - 1] })
-      .filter(function(c) { return c.age == maxAgeLimit })
-      .map(function(c) { return c.category })
-      .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
-    if (classification['warning-order'].length > 0) {
-      var order = classification['warning-order']
-      warnings = warnings.sort(function(a, b) {
-        return order.indexOf(a) - order.indexOf(b)
-      })
-    }
-    return { age: maxAgeLimit, warnings: warnings }
-  }
-}
-
 function classificationAgeLimit(classification) {
   if (!classification) return '-'
   if (classification.safe) return 'S'
   if (classification.criteria.length == 0 && classification['legacy-age-limit']) return classification['legacy-age-limit']
   return _(classification.criteria)
-    .map(function(id) { return classificationCriteria[id - 1] })
+    .map(function(id) { return enums.classificationCriteria[id - 1] })
     .pluck('age')
     .reduce(maxAge) || 'S'
 
@@ -827,21 +801,6 @@ function classificationAgeLimit(classification) {
     if (prev == 'S') return curr
     return parseInt(curr) > prev ? curr : prev
   }
-}
-
-function classificationText(classification) {
-  var criteria = classificationCriteriaText(classification.warnings)
-  if (classification.age === 'S') {
-    return 'Kuvaohjelma on sallittu.'
-  } else {
-    return 'Kuvaohjelman ikäraja on ' + classification.age
-         + ' vuotta ja ' + (classification.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
-         + criteria
-  }
-}
-
-function classificationCriteriaText(warnings) {
-  return warnings.map(function(x) { return classificationCategory_FI[x] }).join(', ')
 }
 
 function ageLimitIcon(summary) {
@@ -854,48 +813,11 @@ function warningIcons(summary) {
     ? summary.warnings.map(function(w) { return $('<span>', { class:'warning pegi-' + w.toLowerCase() }) })
     : summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
 }
+
+
 function notIn(arr, el) {
   return _.indexOf(arr, el) === -1
 }
 
 var classificationCategory_FI = {violence: 'väkivälta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
 
-var classificationCriteria = [
-  { id:1,  category: 'violence', age: '18', title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa" },
-  { id:2,  category: 'violence', age: '18', title: "Erittäin voimakasta väkivaltaa", description: "Aitoa ja yksityiskohtaisesti tai selväpiirteisesti sekä viihteellisesti tai ihannoiden esitettyä ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-  { id:3,  category: 'violence', age: '18', title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, selväpiirteisesti ja pitkäkestoisesti esitettyä seksiin liittyvää väkivaltaa (raiskaus, insesti, pedofilia)" },
-  { id:4,  category: 'violence', age: '16', title: "Voimakasta väkivaltaa", description: "Fiktiivistä tai aitoa yksityiskohtaista ja realistista tai hallitsevaa tai pitkäkestoista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-  { id:5,  category: 'violence', age: '16', title: "Voimakasta väkivaltaa", description: "Fiktiivistä tai aitoa yksityiskohtaisesti ja korostetusti tai yksityiskohtaisesti ja viihteellistetysti esitettyä ihmisiin tai eläimiin kohdistuvaa väkivallan tai onnettomuuksien seurausten kuvausta." },
-  { id:6,  category: 'violence', age: '16', title: "Voimakasta väkivaltaa", description: "Fiktiivistä, esitystavaltaan selvästi yliampuvaa tai parodista, veristä ja yksityiskohtaista tai pitkäkestoista ja yksityiskohtaista tai pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-  { id:7,  category: 'violence', age: '16', title: "Voimakasta väkivaltaa", description: "Aitoa yksityiskohtaisesti ta selväpiirteisesti esitettyä väkivaltaa, jossa uhrin kärsimykset tai väkivallan seuraukset tuodaan realistisesti esille." },
-  { id:8,  category: 'violence', age: '16', title: "Voimakasta väkivaltaa", description: "Seksiin liittyvää fiktiivistä väkivaltaa, jossa uhrin kärsimys tulee selvästi esiin ja väkivalta on tarinan kannalta perusteltua tai voimakkaita viittauksia alaikäisiin kohdistuvaan seksuaaliseen väkivaltaan tai hyväksikäyttöön." },
-  { id:9,  category: 'violence', age: '12', title: "Väkivaltaa", description: "Ei erityisen yksityiskohtaista tai ei hallitsevasti lapsiin, eläimiin tai lapsi-päähenkilön perheenjäseniin kohdistuvaa tai tarinan kannalta perusteltu yksittäinen, yksityiskohtainen ihmisiin tai eläimiin kohdistuva väkivaltakohtaus." },
-  { id:10, category: 'violence', age: '12', title: "Väkivaltaa", description: "Epärealistisessa, etäännytetyssä yhteydessä esitettyä (joko epärealistinen väkivalta ihmis- tai eläinmäisiä hahmoja kohtaan tai realistinen väkivalta selkeän kuvitteellisia hahmoja kohtaan tai historiallinen, kulttuurinen jne. etäännytys!)" },
-  { id:11, category: 'violence', age: '12', title: "Väkivaltaa", description: "Seksuaaliseen väkivaltaan viittaavaa (raiskaus, insesti, pedofilia)." },
-  { id:12, category: 'violence', age: '7',  title: "Lievää väkivaltaa", description: "Epärealistista tai komediallista tai animaatio- tai slapstick-komediassa esitettyä yliampuvaa tai vähäistä väkivaltaa." },
-  { id:13, category: 'violence', age: '7',  title: "Lievää väkivaltaa", description: "Yksittäinen, lievähkö ja lyhytkestoinen realistinen väkivaltakohtaus tai selkeät, mutta lievät tai lyhytkestoiset väkivaltaviitteet." },
-  { id:14, category: 'violence', age: 'S',  title: "Väkivaltaa tai vain hyvin lievää väkivaltaa", description: "Kuvaohjelmassa ei ole lainkaan väkivaltaa tai se on vain hyvin lievää." },
-  { id:15, category: 'sex',      age: '18', title: "Erittäin yksityiskohtaista seksuaalista sisältöä", description: "Hallitsevaa ja seksikohtauksissa sukuelimiä selväpiirteisesti näyttävää." },
-  { id:16, category: 'sex',      age: '16', title: "Avointa seksuaalista sisältöä", description: "Avointa, mutta yksityiskohdiltaan peiteltyä kuvausta tai yksityiskohtainen, yksittäinen ja lyhyt seksikohtaus." },
-  { id:17, category: 'sex',      age: '12', title: "Seksuaalista sisältöä", description: "Peiteltyjä seksikohtauksia tai runsaasti selkeitä seksiviitteitä." },
-  { id:18, category: 'sex',      age: '12', title: "Seksuaalista sisältöä", description: "Yksittäinen avoin, mutta yksityiskohdiltaan peitelty seksikuvaus (seksikohtaus)." },
-  { id:19, category: 'sex',      age: '7',  title: "Lievää seksuaalista sisältöä", description: "Lieviä seksuaalisia viittauksia tai yksittäisiä verhotusti esitettyjä eroottissävyisiä kohtauksia." },
-  { id:20, category: 'sex',      age: 'S',  title: "Vain hyvin lievää seksuaalista sisältöä", description: "Halailua, syleilyä tai suudelmia tai alastomuutta muussa kuin seksuaalisessa kontekstissa." },
-  { id:21, category: 'fear',     age: '18', title: "Erittäin voimakasta ahdistusta herättävää sisältöä", description: "Hallitsevaa, erittäin järkyttävää, yksityiskohtaista kuvausta ihmisiin tai eläimiin kohdistuvista julmuuksista tai perversioista." },
-  { id:22, category: 'fear',     age: '18', title: "Erittäin voimakasta ahdistusta herättävää sisältöä", description: "Aitoa ongelmattomana tai ihannoiden esitettyä itseä tai muita vahingoittavaa, vakavasti henkeä uhkaavaa ja hengenvaarallista käyttäytymistä." },
-  { id:23, category: 'fear',     age: '16', title: "Voimakasta ahdistusta herättävää sisältöä", description: "Ihmisiin tai eläimiin kohdistuvaa järkyttävää ja ahdistusta herättävää, pitkäkestoista ja intensiivistä kuoleman, vakavan väkivallan tai psyykkisen hajoamisen uhkaa. Myös itsemurhan ihannointi. Yliluonnolliseen liittyvää voimakasta ahdistavuutta. Yliluonnolliseen liittyvää voimakasta ahdistavuutta." },
-  { id:24, category: 'fear',     age: '16', title: "Voimakasta ahdistusta herättävää sisältöä", description: "Runsaasti realistisia ja yksityiskohtaisia (makaabereja) kuvia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
-  { id:25, category: 'fear',     age: '16', title: "Voimakasta ahdistusta herättävää sisältöä", description: "Aitoa, ihannoivasti esitettyä itseä tai muita vahingoittavaa käyttäytymistä." },
-  { id:26, category: 'fear',     age: '12', title: "Melko voimakasta ahdistusta herättävää sisältöä", description: "Ihmisiin tai eläimiin kohdistuvaa lyhytkestoista tai ei-hallitsevaa väkivallan tai kuoleman uhkaa tai kaltoin kohtelun tai psyykkisen kärsimyksen kuvausta. Menetysten, esim. perheenjäsenten sairauden tai kuoleman, voimakkaan surun, sekavuustilan tai itsemurhan kuvauksia." },
-  { id:27, category: 'fear',     age: '12', title: "Melko voimakasta ahdistusta herättävää sisältöä", description: "Ahdistusta herättäviä luonnonmullistusten, onnettomuuksien, katastrofien tai konfliktien ja niihin kytkeytyvän kuoleman uhan tai uhrien kuvauksia." },
-  { id:28, category: 'fear',     age: '12', title: "Melko voimakasta ahdistusta herättävää sisältöä", description: "Voimakkaita, äkillisiä ja yllättäviä ahdistusta, pelkoa tai kauhua herättäviä ääni- ja kuvatehosteita tai pitkäkestoista piinaavaa uhkaa. Yliluonnolliseen liittyvää melko voimakasta ahdistavuutta." },
-  { id:29, category: 'fear',     age: '12', title: "Melko voimakasta ahdistusta herättävää sisältöä", description: "Yksittäisiä realistisia ja yksityiskohtaisia kuvauksia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
-  { id:30, category: 'fear',     age: '12', title: "Melko voimakasta ahdistusta herättävää sisältöä", description: "Aitoa, itseä tai muita vahingoittavaa käyttäytymistä." },
-  { id:31, category: 'fear',     age: '7',  title: "Lievää ahdistusta herättävää sisältöä", description: "Melko lieviä ja lyhytkestoisia kauhuelementtejä, pientä pelottavuutta tai jännittävyyttä tai väkivallan uhkaa esimerkiksi animaatiossa tai fantasiassa (hirviöhahmoja, muodonmuutoksia, synkähköä visuaalista kuvastoa, lyhytkestoisia takaa-ajoja tai kohtalaisia äänitehosteita)." },
-  { id:32, category: 'fear',     age: '7',  title: "Lievää ahdistusta herättävää sisältöä", description: "Lasten universaaleja pelkoja käsitteleviä kuvauksia tai tilanteita (esimerkiksi yksin jääminen, vanhemmista eroon joutuminen, pimeä, eksyminen tai läheisen menettäminen)." },
-  { id:33, category: 'fear',     age: '7',  title: "Lievää ahdistusta herättävää sisältöä", description: "Dokumentaarista ihmisiin/eläimiin kohdistuvaa  lyhytkestoista uhkaa ilman tehosteita." },
-  { id:34, category: 'fear',     age: 'S',  title: "Vain hyvin lievää ahdistavaa sisältöä", description: "Hyvin lieviä ja lyhytkestoisia pelottavia tai jännittäviä elementtejä, jotka ratkeavat hyvin nopeasti positiiviseen suuntaan." },
-  { id:35, category: 'drugs',    age: '18', title: "Ihannoivaa erittäin vaarallisten huumeiden käyttöä", description: "Hallitsevaa ja ihannoivassa valossa yksityiskohtaisesti esitettyä erittäin vaarallisten huumeiden käyttöä." },
-  { id:36, category: 'drugs',    age: '16', title: "Huumeiden käyttöä", description: "Huumeiden realistista ja yksityiskohtaista ongelmakäyttöä tai yksittäisiä ongelmattomia tai ihannoivia huumeiden käytön kuvauksia." },
-  { id:37, category: 'drugs',    age: '12', title: "Huumeiden ei-hallitsevaa käyttöä / alaikäisten alkoholin käyttöä", description: "Tällä tarkoitetaan huumeiden viitteellistä tai vähäistä käyttöä tai alaikäisten korostettua, viihteellistä tai ongelmatonta alkoholin käyttöä." }
-]

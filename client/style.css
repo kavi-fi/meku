@@ -502,9 +502,9 @@ input[type=text].invalid.touched,
 #email .left { width: 300px; }
 #email .right { width: 620px; }
 
-#email dl, #email .email-preview p { font-size: 14px; color: #666666; line-height: 17px; }
+#email dl, #email .email-preview pre { line-height: 17px; color: #666666; font-family: Helvetica, Arial; font-size: 14px;  }
 #email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
-
+#email .email-preview pre { white-space: pre-line; }
 #email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
 #email dl dd { padding: 0 0 10px 0; min-height: 18px; }
 #email dl dt { font-weight: bold;}

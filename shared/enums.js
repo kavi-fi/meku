@@ -30,14 +30,14 @@ enums.roles = {
 }
 
 enums.programType = {
-  0: 'unknown',
-  1: 'movie',
-  2: 'series',
-  3: 'tv',
-  4: 'extra',
-  5: 'trailer',
-  6: 'game',
-  7: 'pegi'
+  0: { type: 'unknown', fi: '?' },
+  1: { type: 'movie', fi: 'Elokuva' },
+  2: { type: 'series', fi: 'TV-sarjan nimi' },
+  3: { type: 'tv', fi: 'TV' },
+  4: { type: 'extra', fi: 'Extra' },
+  5: { type: 'trailer', fi: 'Traileri' },
+  6: { type: 'game', fi: 'Peli' },
+  7: { type: 'pegi', fi: 'PEGI-peli' }
 }
 
 enums.genre = [

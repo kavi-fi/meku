@@ -9,7 +9,6 @@ var _ = require('lodash')
 var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
 
 // Remove programs which have no classifications? -> ~7400
-// Remove programs with ' (<user-id>) in the name -> ~5000
 
 var tasks = {
   wipe: wipe, base: base,
@@ -553,7 +552,7 @@ var legacyProgramTypes = {
   '02b': 0,    // 'TESTI' -> unknown
   '03': 3,       //'TV-sarjan jakso' -> tv
   '04': 3,       // 'Muu tv-ohjelma' -> tv
-  '05': 2,       // 'TV-sarjan nimi' -> tv
+  '05': 2,       // 'TV-sarjan nimi' -> series
   '06': 5,       // 'Traileri' -> trailer
   '07': 4,       // 'Extra' -> extra
   '08': 6,       // 'Peli' -> game

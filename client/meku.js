@@ -179,6 +179,7 @@ function searchPage() {
       .append($('<span>').text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>').text(countryAndYear(p)))
       .append($('<span>').text(classificationAgeLimit(c)))
+      .append($('<span>').text(enums.programType[p['program-type']].fi))
       .append($('<span>').text(duration(c)))
 
     function countryAndYear(p) {

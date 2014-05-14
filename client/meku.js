@@ -318,8 +318,6 @@ function movieDetails() {
         ]))
         .append($('<p>', {class: 'registration-date'}).text(classificationStatus(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
-
-      $('.new-movie').removeAttr('disabled')
     })
   })
 
@@ -412,7 +410,6 @@ function movieDetails() {
   }
 
   function show(movie) {
-    $('.new-movie').attr('disabled', 'true')
     var classification = movie.classifications[0]
 
     $form.data('id', movie._id).show()

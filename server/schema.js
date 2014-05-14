@@ -43,7 +43,8 @@ var MovieSchema = new Schema({
   'program-type': Number // enums.programType
 })
 MovieSchema.methods.populateAllNames = function() {
-  var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other']).map(function(s) { return s.split(/\s+/) })
+  var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other'])
+  words = words.map(function(s) { return s.replace(/(^|\W)["\\'\\(]/, '$1').replace(/["\\'\\)](\W|$)/, '$1').split(/\s+/) })
   this['all-names'] = _(words).flatten().uniq().invoke('toLowerCase').sort().value()
 }
 

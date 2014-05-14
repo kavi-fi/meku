@@ -143,11 +143,11 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
 #search-page .result {
-  border-bottom: 2px solid #e8e8e8; line-height: 47px;
-  font-size: 14px; color: #444444; cursor: pointer;
+  border-bottom: 2px solid #e8e8e8; line-height: 47px; height: 47px;
+  font-size: 14px; color: #444444; cursor: pointer; overflow: hidden;
 }
-#search-page .result > span:nth-child(1) { font-weight: bold; }
-#search-page .result > span:nth-child(2) { padding-left: 14px; }
+#search-page .result > span:nth-child(1) { float: left; font-weight: bold; max-width: 430px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+#search-page .result > span:nth-child(2) { float: left; padding-left: 14px; }
 #search-page .result > span:nth-child(3) { float: right; font-weight: bold; display: inline-block; width: 40px; text-align: right; padding-right: 20px; }
 #search-page .result > span:nth-child(4) { float: right; font-size: 11px; width: 70px; }
 #search-page .result > span:nth-child(5) { float: right; text-align: right; padding-right: 20px; }
@@ -158,8 +158,8 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .search-result-details .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
 .search-result-details .warning-summary { vertical-align: middle; margin-right: 14px; }
 .search-result-details .agelimit, .search-result-details .warning { margin-right: 8px; }
-.search-result-details .status { font-size: 14px; }
-.search-result-details h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin-top: 0; float:left; padding-right: 15px; }
+.search-result-details .status { font-size: 14px; white-space: nowrap; }
+.search-result-details h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding-right: 15px; }
 .search-result-details h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
 .search-result-details label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
 .search-result-details .hide { display: none; }

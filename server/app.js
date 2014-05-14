@@ -8,6 +8,7 @@ var Movie = schema.Movie
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var enums = require('../shared/enums')
+var utils = require('../shared/utils')
 
 var app = express()
 
@@ -38,7 +39,7 @@ app.get('/movies/search/:q?', function(req, res) {
     if (/^".+"$/.test(s)) {
       return s.substring(1, s.length - 1)
     } else {
-      return new RegExp('^' + escapeRegExp(s))
+      return new RegExp('^' + utils.escapeRegExp(s))
     }
   }
 })
@@ -137,10 +138,6 @@ liveReload(app, { watchDir: path.join(__dirname, '../client') })
 var server = app.listen(3000, function() {
   console.log('Listening on port ' + server.address().port)
 })
-
-function escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
-}
 
 function nocache(req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')

@@ -44,8 +44,8 @@ var MovieSchema = new Schema({
 })
 MovieSchema.methods.populateAllNames = function() {
   var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other'])
-  words = words.map(function(s) { return s.replace(/(^|\W)["\\'\\(]/, '$1').replace(/["\\'\\)](\W|$)/, '$1').split(/\s+/) })
-  this['all-names'] = _(words).flatten().uniq().invoke('toLowerCase').sort().value()
+  words = words.map(function(s) { return s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\(]/, '$1').replace(/["\\'\\)](\W|$)/, '$1').split(/\s+/) })
+  this['all-names'] = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
 }
 
 var Movie = exports.Movie = mongoose.model('movies', MovieSchema)

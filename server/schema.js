@@ -1,4 +1,5 @@
 var _ = require('lodash')
+var utils = require('../shared/utils')
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
@@ -42,11 +43,13 @@ var MovieSchema = new Schema({
   synopsis: String,
   classifications: [classification],
   'program-type': Number, // enums.programType
-  gameFormat: String
+  gameFormat: String,
+  season: String, episode: String, series: { _id: mongoose.Schema.Types.ObjectId, name: String }
 })
+
 MovieSchema.methods.populateAllNames = function() {
-  var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other'])
-  words = words.map(function(s) { return s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\(]/, '$1').replace(/["\\'\\)](\W|$)/, '$1').split(/\s+/) })
+  var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other']).concat([utils.seasonEpisodeCode(this)])
+  words = words.map(function(s) { return s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1').split(/\s+/) })
   this['all-names'] = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
 }
 

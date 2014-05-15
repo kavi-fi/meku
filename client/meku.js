@@ -193,11 +193,15 @@ function searchPage() {
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
     return $('<div>', { class:'result', 'data-id': p._id })
       .data('program', p)
-      .append($('<span>').text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
+      .append($('<span>').text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>').text(countryAndYear(p)))
       .append($('<span>').text(classificationAgeLimit(c)))
       .append($('<span>').text(enums.programType[p['program-type']].fi))
       .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
+
+    function name(p) {
+      return _.compact([p.name[0], utils.seasonEpisodeCode(p)]).join(' ')
+    }
 
     function countryAndYear(p) {
       var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
@@ -225,6 +229,7 @@ function searchPage() {
 
   function renderDetails(p) {
     var names = { n: p.name.join(', '), fi: p['name-fi'].join(', '), sv: p['name-sv'].join(', '), other: p['name-other'].join(', ')}
+    var episode = utils.seasonEpisodeCode(p)
     var $e = $detailTemplate.clone()
       .find('.primary-name').text(p.name[0]).end()
       .find('.name').text(names.n).end()
@@ -235,6 +240,7 @@ function searchPage() {
       .find('.year').text(p.year).end()
       .find('.production-companies').text(p['production-companies'].join(', ')).end()
       .find('.genre').text(p.genre.join(', ') || p['legacy-genre'].join(', ')).end()
+      .find('.episode').text(episode).prev().toggleClass('hide', !episode).end().end()
       .find('.directors').text(p.directors.join(', ')).end()
       .find('.actors').text(p.actors.join(', ')).end()
       .find('.synopsis').text(p.synopsis).end()

@@ -21,7 +21,8 @@ var tasks = {
   wipeAccounts: wipeAccounts, accounts: accounts,
   wipeUsers: wipeUsers, users: users,
   nameIndex: nameIndex,
-  markTrainingProgramsDeleted: markTrainingProgramsDeleted
+  markTrainingProgramsDeleted: markTrainingProgramsDeleted,
+  linkTvSeries: linkTvSeries
 }
 
 if (process.argv.length < 3) {
@@ -321,7 +322,7 @@ function users(callback) {
 
 function nameIndex(callback) {
   var tick = progressMonitor()
-  schema.Movie.find({}, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }, function(err, allPrograms) {
+  schema.Movie.find({}, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1, 'program-type':1, season:1, episode:1 }, function(err, allPrograms) {
     if (err) return callback(err)
     async.eachLimit(allPrograms, 5, function(p, callback) {
       tick()
@@ -352,8 +353,23 @@ function markTrainingProgramsDeleted(callback) {
       console.log('\n> Number of test-programs marked as deleted: '+count)
       callback()
     })
-
   })
+}
+
+function linkTvSeries(callback) {
+  var tick = progressMonitor()
+  conn.query('select program.id as programId, program.season, program.episode, parent.id as parentId from meku_audiovisualprograms program join meku_audiovisualprograms parent on (program.parent_id = parent.id) where program.deleted != "1" and parent.deleted != "1" and program.program_type = "03" and parent.program_type = "05"')
+    .stream()
+    .pipe(consumer(onRow, callback))
+
+  function onRow(row, callback) {
+    tick()
+    schema.Movie.findOne({ 'emeku-id': row.parentId }, { name:1 }, function(err, parent) {
+      var update = { season: trimPeriod(row.season), episode: trimPeriod(row.episode), series: { _id: parent._id, name: parent.name[0] } }
+      schema.Movie.update({ 'emeku-id': row.programId }, update, callback)
+    })
+  }
+  function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
 }
 
 function batcher(num) {

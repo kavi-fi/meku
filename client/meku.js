@@ -195,7 +195,7 @@ function searchPage() {
       .data('program', p)
       .append($('<span>').text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>').text(countryAndYear(p)))
-      .append($('<span>').text(classificationAgeLimit(c)))
+      .append($('<span>').text(classification.ageLimit(c)))
       .append($('<span>').text(enums.programType[p['program-type']].fi))
       .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
 
@@ -249,7 +249,7 @@ function searchPage() {
     if (c) {
       var summary = classification.summary(p, c)
       $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
-      .find('.status').text(classificationStatus(c)).end()
+      .find('.status').text(classification.status(c)).end()
       .find('.warnings').html(warningIcons(summary)).end()
       .find('.buyer').text(c.buyer && c.buyer.name || '').end()
       .find('.billing').text(c.billing && c.billing.name || '').end()
@@ -319,7 +319,7 @@ function movieDetails() {
            $('<img>', {src: ageLimitIcon(summary) }),
            $('<div>', {class: 'warnings'}).html(warningIcons(summary))
         ]))
-        .append($('<p>', {class: 'registration-date'}).text(classificationStatus(data.classifications[0])))
+        .append($('<p>', {class: 'registration-date'}).text(classification.status(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
     })
   })
@@ -776,37 +776,6 @@ $.fn.check = function(on) {
     on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
   })
   return this
-}
-
-function classificationStatus(classification) {
-  var df = 'D.M.YYYY [klo] H:mm';
-
-  switch (classification.status) {
-    case 'registered':
-    case 'reclassification1':
-    case 'reclassification3':
-      return 'Rekisteröity '+moment(classification['registration-date']).format(df)
-    case 'in_process':
-      return 'Luonnos tallennettu '+moment(classification['creation-date']).format(df)
-    default:
-      return 'Unknown status: '+classification.status
-  }
-}
-
-function classificationAgeLimit(classification) {
-  if (!classification) return '-'
-  if (classification.safe) return 'S'
-  if (classification.criteria.length == 0 && classification['legacy-age-limit']) return classification['legacy-age-limit']
-  return _(classification.criteria)
-    .map(function(id) { return enums.classificationCriteria[id - 1] })
-    .pluck('age')
-    .reduce(maxAge) || 'S'
-
-  function maxAge(prev, curr) {
-    if (curr == 'S') return prev
-    if (prev == 'S') return curr
-    return parseInt(curr) > prev ? curr : prev
-  }
 }
 
 function ageLimitIcon(summary) {

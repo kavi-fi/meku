@@ -10,7 +10,7 @@ var summary = exports.summary = function(program, classification) {
     return { pegi: true, age: classification['legacy-age-limit'], warnings: classification.pegiWarnings }
   } else {
     if (classification.safe) return { age:'S', warnings:[] }
-    var maxAgeLimit = classificationAgeLimit(classification)
+    var maxAgeLimit = ageLimit(classification)
     var warnings = _(classification.criteria)
       .map(function(id) { return enums.classificationCriteria[id - 1] })
       .filter(function(c) { return c.age == maxAgeLimit })
@@ -39,6 +39,37 @@ var classificationText = function(classification) {
 
 var criteriaText = exports.criteriaText = function(warnings) {
   return warnings.map(function(x) { return classificationCategory_FI[x] }).join(', ')
+}
+
+exports.status = function (classification) {
+  var df = 'D.M.YYYY [klo] H:mm';
+
+  switch (classification.status) {
+    case 'registered':
+    case 'reclassification1':
+    case 'reclassification3':
+      return 'Rekisteröity '+moment(classification['registration-date']).format(df)
+    case 'in_process':
+      return 'Luonnos tallennettu '+moment(classification['creation-date']).format(df)
+    default:
+      return 'Unknown status: '+classification.status
+  }
+}
+
+var ageLimit = exports.ageLimit = function(classification) {
+  if (!classification) return '-'
+  if (classification.safe) return 'S'
+  if (classification.criteria.length == 0 && classification['legacy-age-limit']) return classification['legacy-age-limit']
+  return _(classification.criteria)
+    .map(function(id) { return enums.classificationCriteria[id - 1] })
+    .pluck('age')
+    .reduce(maxAge) || 'S'
+
+  function maxAge(prev, curr) {
+    if (curr == 'S') return prev
+    if (prev == 'S') return curr
+    return parseInt(curr) > prev ? curr : prev
+  }
 }
 
 exports.registrationEmail = function(movie) {

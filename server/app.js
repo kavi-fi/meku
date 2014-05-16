@@ -13,7 +13,7 @@ var app = express()
 
 app.use(express.json())
 
-mongoose.connect('mongodb://localhost/meku')
+mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/meku')
 
 app.get('/movies/search/:q?', function(req, res) {
   var page = req.query.page || 0
@@ -145,7 +145,7 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 
-var server = app.listen(3000, function() {
+var server = app.listen(process.env.PORT || 3000, function() {
   console.log('Listening on port ' + server.address().port)
 })
 

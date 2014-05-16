@@ -780,8 +780,8 @@ $.fn.check = function(on) {
 
 function ageLimitIcon(summary) {
   return summary.pegi
-    ? 'images/pegi-'+summary.age+'.png'
-    : 'images/agelimit-'+summary.age+'.png'
+    ? 'images/pegi-'+summary.age.toString().toLowerCase()+'.png'
+    : 'images/agelimit-'+summary.age.toString().toLowerCase()+'.png'
 }
 function warningIcons(summary) {
   return summary.pegi

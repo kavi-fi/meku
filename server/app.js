@@ -2,7 +2,6 @@ var express = require('express')
 var _ = require('lodash')
 var path = require('path')
 var mongoose = require('mongoose')
-var liveReload = require('express-livereload')
 var schema = require('./schema')
 var Movie = schema.Movie
 var Account = schema.Account
@@ -140,7 +139,11 @@ app.use(nocache)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
 
-liveReload(app, { watchDir: path.join(__dirname, '../client') })
+if (process.env.NODE_ENV === 'dev') {
+  var liveReload = require('express-livereload')
+  liveReload(app, { watchDir: path.join(__dirname, '../client') })
+}
+
 
 var server = app.listen(3000, function() {
   console.log('Listening on port ' + server.address().port)

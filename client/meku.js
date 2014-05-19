@@ -264,7 +264,7 @@ function searchPage() {
     if (!c.criteria) return ''
     return c.criteria.map(function(id) {
       var cr = enums.classificationCriteria[id - 1]
-      var category = enumsclassificationCategoriesFI[cr.category]
+      var category = enums.classificationCategoriesFI[cr.category]
       return $('<div>')
         .append($('<label>').text(category + ' ('+cr.id+')'))
         .append($('<span>').text(c['criteria-comments'] && c['criteria-comments'][cr.id] || ''))

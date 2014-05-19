@@ -8,6 +8,8 @@ var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
+var classification = require('../shared/classification')
+var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
 var app = express()
 
@@ -79,6 +81,22 @@ app.post('/movies/:id/register', function(req, res, next) {
       price: 700,
     }, function(err, saved) {
       if (err) return next(err)
+
+      if (process.env.NODE_ENV === 'production') {
+        var data = classification.registrationEmail(movie)
+        var email = new sendgrid.Email({
+          from    : 'no-reply@kavi.fi',
+          subject : data.subject,
+          text    : data.body
+        })
+        data.recipients.forEach(function(to) {
+          email.addTo(to)
+        })
+        sendgrid.send(email, function(err, json) {
+          if (err) next(err)
+        });
+      }
+
       return res.send(movie)
     })
   })

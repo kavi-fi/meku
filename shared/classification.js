@@ -38,7 +38,7 @@ var classificationText = function(classification) {
 }
 
 var criteriaText = exports.criteriaText = function(warnings) {
-  return warnings.map(function(x) { return classificationCategory_FI[x] }).join(', ')
+  return warnings.map(function(x) { return enums.classificationCategoriesFI[x] }).join(', ')
 }
 
 exports.status = function (classification) {

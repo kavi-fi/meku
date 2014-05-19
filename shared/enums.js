@@ -2,6 +2,7 @@ enums = {}
 enums.util = {}
 
 enums.criteriaCategories = ['violence', 'sex', 'fear', 'drugs']
+enums.classificationCategoriesFI = {violence: 'väkivälta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
 
 enums.format = [
   '8 mm',

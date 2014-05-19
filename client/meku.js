@@ -264,7 +264,7 @@ function searchPage() {
     if (!c.criteria) return ''
     return c.criteria.map(function(id) {
       var cr = enums.classificationCriteria[id - 1]
-      var category = classificationCategory_FI[cr.category]
+      var category = enumsclassificationCategoriesFI[cr.category]
       return $('<div>')
         .append($('<label>').text(category + ' ('+cr.id+')'))
         .append($('<span>').text(c['criteria-comments'] && c['criteria-comments'][cr.id] || ''))
@@ -794,5 +794,4 @@ function notIn(arr, el) {
   return _.indexOf(arr, el) === -1
 }
 
-var classificationCategory_FI = {violence: 'väkivälta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
 

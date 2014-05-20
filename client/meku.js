@@ -504,6 +504,7 @@ function movieDetails() {
       .find('input[name="classifications.0.duration"]').val(classification.duration).end()
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
       .find('textarea[name="classifications.0.comments"]').val(classification.comments).end()
+      .find('textarea[name="classifications.0.publicComments"]').val(classification.publicComments).end()
 
 
     selectEnumAutocomplete({
@@ -703,8 +704,9 @@ function movieDetails() {
   function updateSummary(movie) {
     var summary = classification.summary(movie, movie.classifications[0])
     var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
-    var synopsis = (movie.synopsis ? movie.synopsis : '-').split('\n\n').map(function (x) { return $('<p>').text(x) })
+    var synopsis = commentToHtml(movie.synopsis ? movie.synopsis : '-')
     var countries = enums.util.toCountryString(movie.country)
+    var comments = commentToHtml(movie.classifications[0].publicComments || '')
     $summary
       .find('.name').text(movie.name.join(', ') || '-').end()
       .find('.year').text(movie.year || '-').end()
@@ -714,6 +716,11 @@ function movieDetails() {
       .find('.actors').text((movie.actors).join(', ') || '-').end()
       .find('.agelimit img').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
+      .find('.comments').html(comments).end()
+  }
+
+  function commentToHtml(text) {
+    return text.split('\n\n').map(function (x) { return $('<p>').text(x) })
   }
 
   function registrationPreview() {

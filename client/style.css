@@ -204,13 +204,10 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .form textarea { width: 280px; height: 130px; }
 .form input[disabled=disabled], .form textarea[disabled=disabled] {background-color: #f4f4f4; }
 
-#movie-details .reclassification {
-  display: none;
-}
+#movie-details .reclassification { display: none; }
 
-#movie-details.reclassification .reclassification {
-  display: block;
-}
+#movie-details.reclassification .classification { display: none; }
+#movie-details.reclassification .reclassification { display: block; }
 
 input[type=text],
 input[type=password],
@@ -504,11 +501,11 @@ textarea.invalid.touched,
 #summary .header { border-bottom: 1px solid #D3D3D3; }
 #summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
 #summary .header .year { font-size: 16px; font-weight: normal; float: right;}
-#summary .synopsis p { margin: 0 0 20px 0;}
+#summary p { margin: 0 0 20px 0;}
 
 #summary dl { margin: 15px 0 0 0; }
 
-#summary .synopsis p,
+#summary p,
 #summary dl dt,
 #summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
 

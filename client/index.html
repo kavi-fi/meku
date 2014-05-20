@@ -91,8 +91,10 @@
 
   <form id="movie-details" data-id="">
     <div class="row">
-      <div class="form content">
-        <h2>Uusi kuvaohjelma</h2>
+      <div class="movie-info form content">
+        <h2 class="classification">Uusi kuvaohjelma</h2>
+        <h2 class="reclassification">Kuvaohjelman tiedot</h2>
+
         <div class="left">
           <label>Alkuperäinen nimi</label><input name="name.0" class="required" type="text" />
           <label>Suomalainen nimi</label><input name="name-fi.0" class="required" type="text" />
@@ -114,7 +116,8 @@
 
     <div id="classification" class="row">
       <div class="form content">
-        <h2>Luokittelu</h2>
+        <h2 class="classification">Luokittelu</h2>
+        <h2 class="reclassification">Uudelleenluokittelu</h2>
 
         <div class="summary">
           <span class="name"></span>
@@ -176,6 +179,11 @@
           <h3>KAVIN sisäiset kommentit</h3>
           <textarea placeholder="KAVIN sisäiset kommentit" name="classifications.0.comments"></textarea>
           <p>KAVI:n sisäiset kommentit näkyvät vain KAVIN työntekijöille.</p>
+
+          <div class="reclassification">
+            <h3>Julkiset kommentit</h3>
+            <textarea placeholder="Perusteet uudellenluokittelulle" name="classifications.0.publicComments"></textarea>
+          </div>
         </div>
 
         <div class="right summary">
@@ -196,6 +204,7 @@
               <dt>Maa</dt><dd class="country"></dd>
               <dt>Ohjaajat</dt><dd class="directors"></dd>
               <dt>Näyttelijät</dt><dd class="actors"></dd>
+              <dt>Luokittelun peruste</dt><dd class="comments"></dd>
             </dl>
           </div>
         </div>

@@ -367,7 +367,9 @@ function movieDetails() {
   })
 
   $form.on('validation', function() {
-    if ($form.find(".required.invalid, .required-pseudo.invalid").not('.exclude').length === 0) {
+    var required = $form.find(".required.invalid, .required-pseudo.invalid").not('.exclude').length
+    var reclassificationRequired = $form.hasClass('reclassification') ? $form.find('.required.invalid').length : 0
+    if ((required + reclassificationRequired) === 0) {
       $submit.removeAttr('disabled')
     } else {
       $submit.attr('disabled', 'disabled')
@@ -544,8 +546,14 @@ function movieDetails() {
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.reason"]'),
-      val: movie.classifications[0].reason || 0,
+      val: movie.classifications[0].reason || null,
       data: enums.reclassificationReason.map(function(key, i) { return { id: i, text: key } })
+    })
+
+    selectEnumAutocomplete({
+      $el: $form.find('input[name="classifications.0.author"]'),
+      val: movie.classifications[0].author || null,
+      data: enums.reclassificationAuthor.map(function(key, i) { return { id: i, text: key } })
     })
 
     selectAutocomplete({
@@ -583,15 +591,15 @@ function movieDetails() {
         $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(txt).parents('.criteria').addClass('has-comment')
       }
     })
-    $form.find('.required').trigger('validate')
 
     if (movie.classifications[0].status == 'reclassification') {
-      $("#classification-page").addClass('reclassification')
+      $form.addClass('reclassification')
       var $movieInfo = $form.find('.movie-info')
       $movieInfo.find('.select2-offscreen').select2('enable', false)
       $movieInfo.find('input,textarea').attr('disabled', 'disabled')
     }
 
+    $form.find('.required').trigger('validate')
     updateSummary(movie)
     preview.update(movie)
   }

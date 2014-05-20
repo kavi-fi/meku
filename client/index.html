@@ -126,8 +126,11 @@
 
         <div class="left">
           <div class="reclassification">
-            <label>Uudelleen luokittelu</label>
+            <label>Uudelleenluokittelu</label>
             <input name="classifications.0.reason" class="required" type="hidden"/>
+
+            <label>Luokittelija</label>
+            <input name="classifications.0.author" class="required" type="hidden"/>
           </div>
           <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
           <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="text" />

@@ -95,8 +95,8 @@ enums.reclassificationReason = [
   'Oikaisupyyntö'
 ]
 
-enums.reclassificationClassifier = [
-  'KAVI',
+enums.reclassificationAuthor = [
+  'KAVIn virkailija',
   'Kuvalautakunta',
   'KHO'
 ]

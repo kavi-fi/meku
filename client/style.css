@@ -203,15 +203,13 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #movie-details textarea { width: 280px; height: 130px; }
 #movie-details input[disabled=disabled],
 #movie-details textarea[disabled=disabled] {background-color: #f4f4f4; }
-#classification-page .reclassification .movie-info input {
-  
-}
 
-#classification-page .reclassification {
+#movie-details .reclassification .movie-info input { }
+#movie-details .reclassification {
   display: none;
 }
 
-#classification-page.reclassification .reclassification {
+#movie-details.reclassification .reclassification {
   display: block;
 }
 

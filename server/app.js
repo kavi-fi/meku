@@ -129,6 +129,19 @@ app.post('/movies/:id/register', function(req, res, next) {
   })
 })
 
+app.post('/movies/:id/reclassification', function(req, res, next) {
+  // create new movie.classifications
+  Movie.findById(req.params.id, function(err, movie) {
+    if (err) next(err)
+    movie.classifications = [{ 'creation-date':new Date(), status: 'reclassification' }].concat(movie.classifications)
+  console.log(movie.classifications)
+    movie.save(function(err, saved) {
+      if (err) next(err)
+      res.send(saved)
+    })
+  })
+})
+
 app.post('/movies/:id', function(req, res, next) {
   Movie.findByIdAndUpdate(req.params.id, req.body, null, function(err, movie) {
     if (err) return next(err)

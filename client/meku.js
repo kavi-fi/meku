@@ -245,6 +245,14 @@ function searchPage() {
     $results.find('.search-result-details').slideUp(function() { $(this).remove() }).end()
   }
 
+  $results.on('click', 'button.reclassification', function(e) {
+    var id = $(this).parents('.search-result-details').data('id')
+    $.post('/movies/' + id + '/reclassification').done(function(movie) {
+      $('body').children('.page').hide()
+      $('#classification-page').trigger('show', movie._id).show()
+    })
+  })
+
   function updateLocationHash(selectedProgramId) {
     var filters = $filters.filter(':checked').map(function() { return $(this).data('id') }).toArray().join('')
     location.hash = '#haku/' + encodeURIComponent(state.q) + '/' + filters + '/' + (selectedProgramId || '')
@@ -308,6 +316,8 @@ function searchPage() {
       .find('.directors').text(p.directors.join(', ')).end()
       .find('.actors').text(p.actors.join(', ')).end()
       .find('.synopsis').text(p.synopsis).end()
+
+    $e.data('id', p._id)
 
     var c = p.classifications[0]
     if (c) {
@@ -493,6 +503,7 @@ function movieDetails() {
       .find('input[name="classifications.0.safe"]').check(classification.safe).end()
       .find('textarea[name="classifications.0.comments"]').val(classification.comments).end()
 
+
     selectEnumAutocomplete({
       $el: $form.find('input.country'),
       val: movie.country,
@@ -567,6 +578,13 @@ function movieDetails() {
       }
     })
     $form.find('.required').trigger('validate')
+
+    if (movie.classifications[0].status == 'reclassification') {
+      var $movieInfo = $form.find('.movie-info')
+      $movieInfo.find('.select2-offscreen').select2('enable', false)
+      $movieInfo.find('input,textarea').attr('disabled', 'disabled')
+    }
+
     updateSummary(movie)
     preview.update(movie)
   }
@@ -585,7 +603,8 @@ function movieDetails() {
     }).select2('val', opts.val)
 
     function idToOption(id) {
-      return _.find(opts.data, function(item) { return item.id === id })
+      var opt = _.find(opts.data, function(item) { return item.id === id })
+      return opt ? opt : { id: id, text: id }
     }
   }
 

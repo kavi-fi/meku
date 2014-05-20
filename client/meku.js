@@ -551,9 +551,9 @@ function movieDetails() {
     })
 
     selectEnumAutocomplete({
-      $el: $form.find('input[name="classifications.0.author"]'),
-      val: movie.classifications[0].author || null,
-      data: enums.reclassificationAuthor.map(function(key, i) { return { id: i, text: key } })
+      $el: $form.find('input[name="classifications.0.authorOrganization"]'),
+      val: movie.classifications[0].authorOrganization || null,
+      data: _.rest(enums.authorOrganization).map(function(key, i) { return { id: i, text: key } })
     })
 
     selectAutocomplete({

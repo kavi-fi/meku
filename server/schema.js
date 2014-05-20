@@ -10,6 +10,7 @@ var address = { street: String, city: String, zip: String, country: String }
 var classification = {
   'emeku-id': { type: String, index: true },
   author: {_id: mongoose.Schema.Types.ObjectId, name: String},
+  authorOrganization: Number,
   buyer: {_id: mongoose.Schema.Types.ObjectId, name: String},
   billing: {_id: mongoose.Schema.Types.ObjectId, name: String},
   format: String,
@@ -118,12 +119,12 @@ var User = exports.User = mongoose.model('users', UserSchema)
 
 var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
   account: {_id: mongoose.Schema.Types.ObjectId, name: String},
-	type: String, // registration, classification or distributor fee
-	movie: mongoose.Schema.Types.ObjectId,
-	name: String,
-	duration: String,
-	'registration-date': Date,
-	price: Number // eurocents
+  type: String, // registration, classification or distributor fee
+  movie: mongoose.Schema.Types.ObjectId,
+  name: String,
+  duration: String,
+  'registration-date': Date,
+  price: Number // eurocents
 })
 
 var models = exports.models = [Movie, Account, Provider, User, InvoiceRow]

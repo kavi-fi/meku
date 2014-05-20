@@ -89,6 +89,18 @@ enums.classificationStatus = [
   // NULL,
 ]
 
+enums.reclassificationReason = [
+  'KAVIn päätös',
+  'Valitus',
+  'Oikaisupyyntö'
+]
+
+enums.reclassificationClassifier = [
+  'KAVI',
+  'Kuvalautakunta',
+  'KHO'
+]
+
 enums.countries = {
   'AE': 'Arabiemiirikunnat',
   'AF': 'Afganistan',

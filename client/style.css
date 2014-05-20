@@ -207,6 +207,14 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
   
 }
 
+#classification-page .reclassification {
+  display: none;
+}
+
+#classification-page.reclassification .reclassification {
+  display: block;
+}
+
 input[type=text],
 input[type=password],
 textarea,

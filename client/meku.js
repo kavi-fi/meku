@@ -542,6 +542,12 @@ function movieDetails() {
       termMinLength: 3
     })
 
+    selectEnumAutocomplete({
+      $el: $form.find('input[name="classifications.0.reason"]'),
+      val: movie.classifications[0].reason || 0,
+      data: enums.reclassificationReason.map(function(key, i) { return { id: i, text: key } })
+    })
+
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.buyer"]'),
       val: movie.classifications[0].buyer,
@@ -580,6 +586,7 @@ function movieDetails() {
     $form.find('.required').trigger('validate')
 
     if (movie.classifications[0].status == 'reclassification') {
+      $("#classification-page").addClass('reclassification')
       var $movieInfo = $form.find('.movie-info')
       $movieInfo.find('.select2-offscreen').select2('enable', false)
       $movieInfo.find('input,textarea').attr('disabled', 'disabled')

@@ -10,6 +10,13 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
 
 // Remove programs which have no classifications? -> ~7400
 
+/*
+Dependencies:
+  base & names before everything
+  providers & accounts & users before classifications
+  linkTvSeries before nameIndex
+*/
+
 var tasks = {
   wipe: wipe, base: base,
   wipeNames: wipeNames, names: names,
@@ -61,6 +68,7 @@ function base(callback) {
     .pipe(batchInserter('Movie', callback))
 }
 
+// TODO: add meku_audiovisualprograms.name somehow, remove duplicates somehow...
 function names(callback) {
   var tick = progressMonitor()
   var result = {}

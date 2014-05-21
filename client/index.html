@@ -8,6 +8,7 @@
   <script src="vendor/lodash.min.js"></script>
   <script src="vendor/typeahead.bundle-0.10.2.js"></script>
   <script src="vendor/select2-3.4.6/select2.js"></script>
+  <script src="vendor/jquery.cookie-1.4.1.js"></script>
   <script src="vendor/jquery.highlight-3-custom.js"></script>
   <script src="vendor/moment-2.6.0.min.js"></script>
   <script src="meku.js"></script>
@@ -19,9 +20,22 @@
   </script>
 </head>
 <body>
+  <div id="login-overlay"></div>
+  <form id="login">
+    <div>
+      <label>Käyttäjätunnus<input type="text" name="username" class="invalid"/></label>
+      <label>Salasana<input type="password" name="password" class="invalid" /></label>
+      <div class="feedback">Väärä käyttäjätunnus tai salasana.</div>
+      <button disabled=disabled>Kirjaudu</button>
+    </div>
+  </form>
+
   <div id="header">
     <div class="content">
-      <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
+      <div>
+        <div class="user-info"><span class="name"></span> / <a href="#" class="logout">Kirjaudu ulos</a></div>
+        <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
+      </div>
       <ul class="navi">
         <li><a href="#haku" data-href="#search-page">Haku</a></li>
         <li><a href="#luokittelu" data-href="#classification-page">Luokittelu</a></li>

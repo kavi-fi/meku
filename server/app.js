@@ -4,6 +4,7 @@ var path = require('path')
 var mongoose = require('mongoose')
 var schema = require('./schema')
 var Movie = schema.Movie
+var User = schema.User
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var enums = require('../shared/enums')
@@ -14,8 +15,35 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var app = express()
 
 app.use(express.json())
+app.use(nocache)
+app.use(express.cookieParser('my secret here'))
+app.use(authenticate)
+app.use(express.static(path.join(__dirname, '../client')))
+app.use('/shared', express.static(path.join(__dirname, '../shared')))
 
 mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/meku')
+
+app.post('/login', function(req, res, next) {
+  var username = req.body.username
+  var password = req.body.password
+  if (!username || !password) return res.send(403)
+  User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
+    if (err) return next(err)
+    if (!user) return res.send(403)
+    console.log(user)
+    user.checkPassword(password, function(err, ok) {
+      if (err) return next(err)
+      if (!ok) return res.send(403)
+      res.cookie('user', { _id: user._id.toString(), username: user.username, name: user.name, role: user.role }, { signed: true })
+      res.send({})
+    })
+  })
+})
+
+app.post('/logout', function(req, res, next) {
+  res.clearCookie('user')
+  res.send({})
+})
 
 app.get('/movies/search/:q?', function(req, res) {
   var page = req.query.page || 0
@@ -155,10 +183,6 @@ app.get('/directors/search/:query', function(req, res, next) {
   }
 })
 
-app.use(nocache)
-app.use(express.static(path.join(__dirname, '../client')))
-app.use('/shared', express.static(path.join(__dirname, '../shared')))
-
 if (isDev()) {
   var liveReload = require('express-livereload')
   liveReload(app, { watchDir: path.join(__dirname, '../client') })
@@ -173,6 +197,16 @@ function nocache(req, res, next) {
   res.header('Expires', '-1')
   res.header('Pragma', 'no-cache')
   next()
+}
+
+function authenticate(req, res, next) {
+  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/meku.js', 'POST:/login', 'POST:/logout']
+  var url = req.method + ':' + req.path
+  if (url == 'GET:/') return next()
+  var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
+  if (isWhitelistedPath) return next()
+  if (req.signedCookies.user) return next()
+  return res.send(403)
 }
 
 function isDev() {

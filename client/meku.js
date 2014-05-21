@@ -1,11 +1,24 @@
+var user;
+
 $(setup)
 
 function setup() {
+  user = parseUserCookie()
   $.fn.select2.defaults.formatNoMatches = 'Ei tuloksia'
   $.fn.select2.defaults.formatSearching = 'Haetaan...'
   $.fn.select2.defaults.adaptDropdownCssClass = function(c) {  return c == 'required' ? c : null }
 
+  var login = loginPage()
+
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
+
+  $(document).ajaxError(function(e, req) {
+    if (req.status == 403) {
+      login.show()
+    } else {
+      // show network/server error dialog?
+    }
+  })
 
   $('#overlay').on('click', function() {
     closeDialog()
@@ -21,6 +34,47 @@ function setup() {
   buyerPage()
   billingPage()
   navigation.start()
+}
+
+function loginPage() {
+  var $overlay = $('#login-overlay')
+  var $form = $('#login').submit(function(e) { e.preventDefault() })
+  var $username = $form.find('input[name="username"]').on('input', checkInput)
+  var $password = $form.find('input[name="password"]').on('input', checkInput)
+  var $feedback = $form.find('.feedback')
+  var $button = $form.find('button')
+  var $info = $('#header .user-info').toggle(!!user)
+  $info.find('.name').text(user ? user.name : '')
+
+  $info.find('.logout').click(function() {
+    $.post('/logout').done(function() { location.reload() })
+  })
+
+  $form.on('validate', function() {
+    var invalid = $username.hasClass('invalid') || $password.hasClass('invalid')
+    $button.prop('disabled', invalid? 'disabled' : '')
+    $feedback.slideUp()
+  })
+
+  $button.click(function() {
+    $.post('/login', JSON.stringify({ username: $username.val(), password: $password.val() }))
+      .done(function() { location.reload() })
+      .fail(function(jqXHR) {
+        if (jqXHR.status == 403) {
+          $password.val('').trigger('input').focus()
+          $feedback.slideDown()
+        }
+      })
+  })
+
+  return { show: show }
+
+  function show() {
+    $form.add($overlay).show()
+  }
+  function checkInput() {
+    $(this).toggleClass('invalid', $(this).val() === '').trigger('validate')
+  }
 }
 
 function navi() {
@@ -791,9 +845,13 @@ function warningIcons(summary) {
     : summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
 }
 
-
 function notIn(arr, el) {
   return _.indexOf(arr, el) === -1
 }
 
+function parseUserCookie() {
+  var cookie = $.cookie('user')
+  if (!cookie) return null
+  return JSON.parse(cookie.substring(4, cookie.lastIndexOf('.')))
+}
 

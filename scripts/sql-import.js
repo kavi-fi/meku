@@ -1,6 +1,7 @@
 var async = require('async')
 var mysql = require('mysql')
 var mongoose = require('mongoose')
+var bcrypt = require('bcrypt')
 var schema = require('../server/schema')
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
@@ -29,7 +30,8 @@ var tasks = {
   wipeUsers: wipeUsers, users: users,
   nameIndex: nameIndex,
   markTrainingProgramsDeleted: markTrainingProgramsDeleted,
-  linkTvSeries: linkTvSeries
+  linkTvSeries: linkTvSeries,
+  demoUsers: demoUsers
 }
 
 if (process.argv.length < 3) {
@@ -380,6 +382,16 @@ function linkTvSeries(callback) {
     })
   }
   function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
+}
+
+function demoUsers(callback) {
+  var users = ['root', 'kavi', 'user']
+  schema.User.remove({ username: { $in: users } }, function(err) {
+    if (err) return callback(err)
+    async.forEach(users, function(u, callback) {
+      new schema.User({ username:u, password:u, role:u, name:u }).save(callback)
+    }, callback)
+  })
 }
 
 function batcher(num) {

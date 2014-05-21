@@ -1,5 +1,6 @@
 var _ = require('lodash')
 var utils = require('../shared/utils')
+var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
@@ -85,12 +86,34 @@ var Provider = exports.Provider = mongoose.model('providers', {
   name: String
 })
 
-var User = exports.User = mongoose.model('users', {
+var UserSchema = new Schema({
   'emeku-id': String,
-  username: String,
+  username: { type: String, index: { unique: true } },
+  password: String,
+  role: String,
   name: String,
   active: Boolean
 })
+UserSchema.pre('save', function(next) {
+  var user = this
+  if (!user.isModified('password')) return next()
+  bcrypt.genSalt(10, function(err, salt) {
+    if (err) return next(err)
+    bcrypt.hash(user.password, salt, function(err, hash) {
+      if (err) return next(err)
+      user.password = hash
+      next()
+    })
+  })
+})
+UserSchema.methods.checkPassword = function(pwd, callback) {
+  bcrypt.compare(pwd, this.password, function(err, ok) {
+    if (err) return callback(err)
+    callback(null, ok)
+  })
+}
+
+var User = exports.User = mongoose.model('users', UserSchema)
 
 var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
   account: {_id: mongoose.Schema.Types.ObjectId, name: String},

@@ -133,8 +133,7 @@ app.post('/movies/:id/reclassification', function(req, res, next) {
   // create new movie.classifications
   Movie.findById(req.params.id, function(err, movie) {
     if (err) next(err)
-    movie.classifications = [{ 'creation-date':new Date(), status: 'reclassification' }].concat(movie.classifications)
-  console.log(movie.classifications)
+    movie.classifications = [{ 'creation-date':new Date(), status: 'in_process' }].concat(movie.classifications)
     movie.save(function(err, saved) {
       if (err) next(err)
       res.send(saved)

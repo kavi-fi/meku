@@ -593,7 +593,7 @@ function movieDetails() {
       }
     })
 
-    if (movie.classifications[0].status == 'reclassification') {
+    if (movie.classifications.length > 0) {
       $form.addClass('reclassification')
       var $movieInfo = $form.find('.movie-info')
       $movieInfo.find('.select2-offscreen').select2('enable', false)
@@ -716,6 +716,7 @@ function movieDetails() {
       .find('.actors').text((movie.actors).join(', ') || '-').end()
       .find('.agelimit img').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
+      .find('.reason').html(enums.reclassificationReason[movie.classifications[0].reason]).end()
       .find('.comments').html(comments).end()
   }
 

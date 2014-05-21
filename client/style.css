@@ -508,8 +508,8 @@ textarea.invalid.touched,
 #summary p,
 #summary dl dt,
 #summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
-
 #summary dl dt { font-weight: bold;}
+#summary dd .reason { font-weight: bold; }
 
 .summary .agelimit  { padding: 15px 0 0 0;}
 .summary .warnings .warning { cursor: move; transition: width 0.3s; }

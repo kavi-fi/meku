@@ -229,6 +229,7 @@ function searchPage() {
 
   function renderDetails(p) {
     var names = { n: p.name.join(', '), fi: p['name-fi'].join(', '), sv: p['name-sv'].join(', '), other: p['name-other'].join(', ')}
+    var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
     var $e = $detailTemplate.clone()
       .find('.primary-name').text(p.name[0]).end()
@@ -236,11 +237,12 @@ function searchPage() {
       .find('.name-fi').text(names.fi).end()
       .find('.name-sv').text(names.sv).prev().toggleClass('hide', !names.sv).end().end()
       .find('.name-other').text(names.other).prev().toggleClass('hide', !names.other).end().end()
+      .find('.series').text(series).prev().toggleClass('hide', !series).end().end()
+      .find('.episode').text(episode).prev().toggleClass('hide', !episode).end().end()
       .find('.country').text(enums.util.toCountryString(p.country)).end()
       .find('.year').text(p.year).end()
       .find('.production-companies').text(p['production-companies'].join(', ')).end()
       .find('.genre').text(p.genre.join(', ') || p['legacy-genre'].join(', ')).end()
-      .find('.episode').text(episode).prev().toggleClass('hide', !episode).end().end()
       .find('.directors').text(p.directors.join(', ')).end()
       .find('.actors').text(p.actors.join(', ')).end()
       .find('.synopsis').text(p.synopsis).end()

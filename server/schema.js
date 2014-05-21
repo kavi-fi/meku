@@ -47,10 +47,27 @@ var MovieSchema = new Schema({
   season: String, episode: String, series: { _id: mongoose.Schema.Types.ObjectId, name: String }
 })
 
-MovieSchema.methods.populateAllNames = function() {
-  var words = this.name.concat(this['name-fi']).concat(this['name-sv']).concat(this['name-other']).concat([utils.seasonEpisodeCode(this)])
-  words = words.map(function(s) { return s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1').split(/\s+/) })
-  this['all-names'] = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
+MovieSchema.methods.populateAllNames = function(callback) {
+  var program = this
+  if (program.series._id) {
+    Movie.findById(program.series._id, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }, function(err, parent) {
+      if (err) return callback(err)
+      populate(program, concatNames(parent))
+      callback()
+    })
+  } else {
+    populate(program, [])
+    process.nextTick(callback)
+  }
+
+  function populate(p, extraNames) {
+    var words = concatNames(p).concat([utils.seasonEpisodeCode(p)]).concat(extraNames)
+    words = words.map(function(s) { return s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1').split(/\s+/) })
+    p['all-names'] = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
+  }
+  function concatNames(p) {
+    return p.name.concat(p['name-fi']).concat(p['name-sv']).concat(p['name-other'])
+  }
 }
 
 var Movie = exports.Movie = mongoose.model('movies', MovieSchema)

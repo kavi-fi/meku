@@ -105,10 +105,12 @@ app.post('/movies/:id/register', function(req, res, next) {
 app.post('/movies/:id', function(req, res, next) {
   Movie.findByIdAndUpdate(req.params.id, req.body, null, function(err, movie) {
     if (err) return next(err)
-    movie.populateAllNames()
-    movie.save(function(err) {
+    movie.populateAllNames(function(err) {
       if (err) return next(err)
-      return res.send(movie)
+      movie.save(function(err) {
+        if (err) return next(err)
+        return res.send(movie)
+      })
     })
   })
 })

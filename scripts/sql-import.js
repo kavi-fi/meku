@@ -329,15 +329,17 @@ function users(callback) {
 }
 
 function nameIndex(callback) {
+  var fields = { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1, 'program-type':1, season:1, episode:1, series:1 }
   var tick = progressMonitor()
-  schema.Movie.find({}, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1, 'program-type':1, season:1, episode:1 }, function(err, allPrograms) {
-    if (err) return callback(err)
-    async.eachLimit(allPrograms, 5, function(p, callback) {
-      tick()
-      p.populateAllNames()
+  schema.Movie.find({}, fields).stream().pipe(consumer(onRow, callback))
+
+  function onRow(p, callback) {
+    tick()
+    p.populateAllNames(function(err) {
+      if (err) return callback(err)
       schema.Movie.update({ _id: p._id }, { 'all-names': p['all-names'] }, callback)
-    }, callback)
-  })
+    })
+  }
 }
 
 function markTrainingProgramsDeleted(callback) {

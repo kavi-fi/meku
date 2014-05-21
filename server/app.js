@@ -159,11 +159,10 @@ app.use(nocache)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
 
-if (process.env.NODE_ENV === 'dev') {
+if (isDev()) {
   var liveReload = require('express-livereload')
   liveReload(app, { watchDir: path.join(__dirname, '../client') })
 }
-
 
 var server = app.listen(process.env.PORT || 3000, function() {
   console.log('Listening on port ' + server.address().port)
@@ -174,4 +173,8 @@ function nocache(req, res, next) {
   res.header('Expires', '-1')
   res.header('Pragma', 'no-cache')
   next()
+}
+
+function isDev() {
+  return process.env.NODE_ENV == undefined || process.env.NODE_ENV == 'dev'
 }

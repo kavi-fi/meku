@@ -14,7 +14,9 @@
   <script src="shared/enums.js"></script>
   <script src="shared/classification.js"></script>
   <script src="shared/utils.js"></script>
-  <script src="http://localhost:35729/livereload.js"></script>
+  <script>
+    if (location.hostname == 'localhost') var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s)
+  </script>
 </head>
 <body>
   <div id="header">

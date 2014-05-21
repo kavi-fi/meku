@@ -62,7 +62,7 @@ MovieSchema.methods.populateAllNames = function(callback) {
 
   function populate(p, extraNames) {
     var words = concatNames(p).concat([utils.seasonEpisodeCode(p)]).concat(extraNames)
-    words = words.map(function(s) { return s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1').split(/\s+/) })
+    words = words.map(function(s) { return (s + ' ' + s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1')).split(/\s+/) })
     p['all-names'] = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
   }
   function concatNames(p) {

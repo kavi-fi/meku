@@ -78,7 +78,11 @@ app.get('/movies/:id', function(req, res) {
 
 app.post('/movies/new', function(req, res, next) {
   var data = {
-    classifications: [{ 'creation-date':new Date(), status: 'in_process' }],
+    classifications: [{
+      'creation-date':new Date(),
+      status: 'in_process',
+      author: { _id: req.user._id, name: req.user.name }
+    }],
     'program-type': req.body['program-type'] || 0,
     'production-companies': [],
     actors: []
@@ -93,7 +97,8 @@ app.post('/movies/new', function(req, res, next) {
 app.post('/movies/:id/register', function(req, res, next) {
   var data = {
     'classifications.0.registration-date': new Date(),
-    'classifications.0.status': 'registered'
+    'classifications.0.status': 'registered',
+    'classifications.0.author': { _id: req.user._id, name: req.user.name }
   }
 
   Movie.findByIdAndUpdate(req.params.id, data, null, function(err, movie) {
@@ -216,7 +221,11 @@ function authenticate(req, res, next) {
   if (url == 'GET:/') return next()
   var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
   if (isWhitelistedPath) return next()
-  if (req.signedCookies.user) return next()
+  var cookie = req.signedCookies.user
+  if (cookie) {
+    req.user = cookie
+    return next()
+  }
   return res.send(403)
 }
 

@@ -26,6 +26,7 @@ function movieDetails() {
       // we only care about the original element from which the invalid
       // class has been removed
       .not('.select2-container.required.invalid')
+      .not('form.classification .reclassification .required')
 
     if (required.length === 0) {
       $submit.removeAttr('disabled')
@@ -277,6 +278,8 @@ function movieDetails() {
       var $movieInfo = $form.find('.movie-info')
       $movieInfo.find('.select2-offscreen').select2('enable', false)
       $movieInfo.find('input,textarea').attr('disabled', 'disabled')
+    } else {
+      $form.addClass('classification')
     }
 
     $form.find('.required').trigger('validate')

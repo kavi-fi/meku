@@ -135,7 +135,9 @@
             <label>Luokittelija</label>
             <input name="classifications.0.authorOrganization" class="required" type="hidden"/>
           </div>
-          <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
+          <div class="buyer">
+            <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
+          </div>
           <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="text" />
         </div>
         <div class="right">
@@ -182,7 +184,7 @@
 
           <div class="reclassification">
             <h3>Julkiset kommentit</h3>
-            <textarea placeholder="Perusteet uudellenluokittelulle" name="classifications.0.publicComments"></textarea>
+            <textarea placeholder="Perusteet uudellenluokittelulle" name="classifications.0.publicComments" class="required"></textarea>
           </div>
         </div>
 

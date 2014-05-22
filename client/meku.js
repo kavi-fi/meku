@@ -351,6 +351,7 @@ function movieDetails() {
   var $form = $('#movie-details')
   var $summary = $('.summary')
   var $submit = $form.find('button[name=register]')
+  var $buyer = $form.find('input[name="classifications.0.buyer"]')
   var preview = registrationPreview()
 
   renderClassificationCriteria()
@@ -367,9 +368,14 @@ function movieDetails() {
   })
 
   $form.on('validation', function() {
-    var required = $form.find(".required.invalid, .required-pseudo.invalid").not('.exclude').length
-    var reclassificationRequired = $form.hasClass('reclassification') ? $form.find('.required.invalid').length : 0
-    if ((required + reclassificationRequired) === 0) {
+    var required = $(".required.invalid, .required-pseudo.invalid")
+      // if in reclassification-mode ignore movie info fields
+      .not(".exclude, form.reclassification .movie-info .required")
+      // we only care about the original element from which the invalid
+      // class has been removed
+      .not('.select2-container.required.invalid')
+
+    if (required.length === 0) {
       $submit.removeAttr('disabled')
     } else {
       $submit.attr('disabled', 'disabled')
@@ -444,6 +450,14 @@ function movieDetails() {
   })
   $form.on('blur', '.category .criteria.has-comment:not(.selected) textarea', function() {
     $(this).parents('.criteria').toggleClass('has-comment', isNotEmpty($(this).val()))
+  })
+
+  $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
+    if ($(this).val() == 2) {
+      $('#classification .buyer').show()
+    } else {
+      $('#classification .buyer').hide()
+    }
   })
 
   warningDragOrder($("#summary .summary"))
@@ -547,14 +561,14 @@ function movieDetails() {
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.reason"]'),
-      val: movie.classifications[0].reason || null,
-      data: enums.reclassificationReason.map(function(key, i) { return { id: i, text: key } })
+      val: movie.classifications[0].reason.toString() || null,
+      data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
     })
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.authorOrganization"]'),
-      val: movie.classifications[0].authorOrganization || null,
-      data: _.rest(enums.authorOrganization).map(function(key, i) { return { id: i, text: key } })
+      val: movie.classifications[0].authorOrganization.toString() || null,
+      data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) {console.log(pair[0]);  return { id: pair[0], text: pair[1] } })
     })
 
     selectAutocomplete({
@@ -564,6 +578,19 @@ function movieDetails() {
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany
     })
+
+    if (isReclassification(movie)) {
+      $('#classification .buyer').hide()
+      $buyer.removeClass('required')
+    } else {
+      $('#classification .buyer').show()
+      $buyer.addClass('required')
+    }
+
+    if (isReclassification(movie) && movie.classifications[0].reason == 2) {
+      $('#classification .buyer').show()
+      $buyer.addClass('required')
+    }
 
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.billing"]'),
@@ -593,7 +620,7 @@ function movieDetails() {
       }
     })
 
-    if (movie.classifications.length > 0) {
+    if (isReclassification(movie)) {
       $form.addClass('reclassification')
       var $movieInfo = $form.find('.movie-info')
       $movieInfo.find('.select2-offscreen').select2('enable', false)
@@ -622,6 +649,7 @@ function movieDetails() {
       var opt = _.find(opts.data, function(item) { return item.id === id })
       return opt ? opt : { id: id, text: id }
     }
+    opts.$el.trigger('validate')
   }
 
   function selectAutocomplete(opts) {
@@ -805,6 +833,10 @@ function movieDetails() {
   }
 }
 
+function isReclassification(movie) {
+  return movie.classifications.length > 1
+}
+
 function keyValue(key, value) {
   var data = {}
   data[key] = value
@@ -836,7 +868,7 @@ function validate(f) {
     } else {
       $el.addClass('invalid')
     }
-    $el.trigger('validation')
+    $el.trigger('validation', ['kutsuttu validatesta'])
   }
 }
 

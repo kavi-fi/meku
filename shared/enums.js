@@ -89,18 +89,18 @@ enums.classificationStatus = [
   // NULL,
 ]
 
-enums.reclassificationReason = [
-  'KAVIn päätös',
-  'Valitus',
-  'Oikaisupyyntö'
-]
+enums.reclassificationReason = {
+  0: 'KAVIn päätös',
+  1: 'Valitus',
+  2: 'Oikaisupyyntö'
+}
 
-enums.authorOrganization = [
-  'Luokittelija',
-  'KAVIn virkailija',
-  'Kuvalautakunta',
-  'KHO'
-]
+enums.authorOrganization = {
+  0: 'Luokittelija',
+  1: 'KAVIn virkailija',
+  2: 'Kuvalautakunta',
+  3: 'KHO'
+}
 
 enums.countries = {
   'AE': 'Arabiemiirikunnat',

@@ -26,6 +26,7 @@ var classification = {
   'registration-email-addresses': [{email: String, manual: Boolean}],
   comments: String,
   publicComments: String,
+  reason: Number,
   status: String
 }
 

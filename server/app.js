@@ -16,7 +16,7 @@ var app = express()
 
 app.use(express.json())
 app.use(nocache)
-app.use(express.cookieParser('my secret here'))
+app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
 app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))

@@ -3,6 +3,7 @@ var utils = require('../shared/utils')
 var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
+var bcryptSaltFactor = 12
 
 var address = { street: String, city: String, zip: String, country: String }
 
@@ -97,7 +98,7 @@ var UserSchema = new Schema({
 UserSchema.pre('save', function(next) {
   var user = this
   if (!user.isModified('password')) return next()
-  bcrypt.genSalt(10, function(err, salt) {
+  bcrypt.genSalt(bcryptSaltFactor, function(err, salt) {
     if (err) return next(err)
     bcrypt.hash(user.password, salt, function(err, hash) {
       if (err) return next(err)

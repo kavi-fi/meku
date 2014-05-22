@@ -187,6 +187,7 @@ function searchPage() {
     var names = { n: p.name.join(', '), fi: p['name-fi'].join(', '), sv: p['name-sv'].join(', '), other: p['name-other'].join(', ')}
     var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
+    var classificationStatusText = classification.fullStatus(p.classifications).map(function(t) { return $('<span>').text(t) })
     var $e = $detailTemplate.clone()
       .data('id', p._id)
       .find('.primary-name').text(p.name[0]).end()
@@ -203,12 +204,12 @@ function searchPage() {
       .find('.directors').text(p.directors.join(', ')).end()
       .find('.actors').text(p.actors.join(', ')).end()
       .find('.synopsis').text(p.synopsis).end()
+      .find('.status').html(classificationStatusText).end()
 
-    var c = p.classifications[0]
+    var c = classification.mostValid(p.classifications)
     if (c) {
       var summary = classification.summary(p, c)
       $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
-        .find('.status').text(classification.status(c)).end()
         .find('.warnings').html(warningIcons(summary)).end()
         .find('.buyer').text(c.buyer && c.buyer.name || '').end()
         .find('.billing').text(c.billing && c.billing.name || '').end()

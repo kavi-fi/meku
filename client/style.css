@@ -187,7 +187,8 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .search-result-details .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
 .search-result-details .warning-summary { vertical-align: middle; margin-right: 14px; }
 .search-result-details .agelimit, .search-result-details .warning { margin-right: 8px; }
-.search-result-details .status { font-size: 14px; white-space: nowrap; }
+.search-result-details .status { display: inline-block; font-size: 14px; white-space: nowrap; }
+.search-result-details .status span { display: block; }
 .search-result-details h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding-right: 15px; }
 .search-result-details h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
 .search-result-details label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }

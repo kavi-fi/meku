@@ -41,9 +41,8 @@ var criteriaText = exports.criteriaText = function(warnings) {
   return warnings.map(function(x) { return enums.classificationCategoriesFI[x] }).join(', ')
 }
 
-exports.status = function (classification) {
-  var df = 'D.M.YYYY [klo] H:mm';
-
+var status = exports.status = function (classification) {
+  var df = 'D.M.YYYY [klo] H:mm'
   switch (classification.status) {
     case 'registered':
     case 'reclassification1':
@@ -54,6 +53,29 @@ exports.status = function (classification) {
     default:
       return 'Unknown status: '+classification.status
   }
+}
+
+exports.fullStatus = function(classifications) {
+  if (!classifications || classifications.length == 0) return ['Ei luokiteltu']
+  if (classifications.length == 1) return [status(classifications[0])]
+  var head = classifications[0]
+  if (head.status == 'in_process') {
+    return [status(classifications[1]), status(head)]
+  } else {
+    return [status(head)]
+  }
+}
+
+exports.mostValid = function(classifications) {
+  if (!classifications || classifications.length == 0) return undefined
+  if (classifications.length == 1) return classifications[0]
+  var head = classifications[0]
+  if (head.status == 'in_process') {
+    return classifications[1]
+  } else {
+    return head
+  }
+
 }
 
 var ageLimit = exports.ageLimit = function(classification) {

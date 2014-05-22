@@ -1,351 +1,3 @@
-var user;
-
-$(setup)
-
-function setup() {
-  user = parseUserCookie()
-  $.fn.select2.defaults.formatNoMatches = 'Ei tuloksia'
-  $.fn.select2.defaults.formatSearching = 'Haetaan...'
-  $.fn.select2.defaults.adaptDropdownCssClass = function(c) {  return c == 'required' ? c : null }
-
-  var login = loginPage()
-  var error = errorDialog()
-
-  $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
-
-  $(document).ajaxError(function(e, req) {
-    if (req.status == 403) {
-      login.show()
-    } else {
-      error.show()
-    }
-  })
-
-  $('#overlay').on('click', function() {
-    closeDialog()
-  })
-
-  $('body').on('click', '.dialog', function(e) {
-    e.stopPropagation()
-  })
-
-  var navigation = navi()
-  searchPage()
-  movieDetails()
-  buyerPage()
-  billingPage()
-  navigation.start()
-}
-
-function errorDialog() {
-  var $overlay = $('#error-overlay')
-  var $dialog = $('#error-dialog')
-  $dialog.find('a').click(function(e) { e.preventDefault(); location.reload() })
-  return { show: function() { $dialog.add($overlay).show() } }
-}
-
-function loginPage() {
-  var $overlay = $('#login-overlay')
-  var $form = $('#login').submit(function(e) { e.preventDefault() })
-  var $username = $form.find('input[name="username"]').on('input', checkInput)
-  var $password = $form.find('input[name="password"]').on('input', checkInput)
-  var $feedback = $form.find('.feedback')
-  var $button = $form.find('button')
-  var $info = $('#header .user-info').toggle(!!user)
-  $info.find('.name').text(user ? user.name : '')
-
-  $info.find('.logout').click(function() {
-    $.post('/logout').done(function() { location.reload() })
-  })
-
-  $form.on('validate', function() {
-    var invalid = $username.hasClass('invalid') || $password.hasClass('invalid')
-    $button.prop('disabled', invalid? 'disabled' : '')
-    $feedback.slideUp()
-  })
-
-  $button.click(function() {
-    $.post('/login', JSON.stringify({ username: $username.val(), password: $password.val() }))
-      .done(function() { location.reload() })
-      .fail(function(jqXHR) {
-        if (jqXHR.status == 403) {
-          $password.val('').trigger('input').focus()
-          $feedback.slideDown()
-        }
-      })
-  })
-
-  return { show: show }
-
-  function show() {
-    $form.add($overlay).show()
-  }
-  function checkInput() {
-    $(this).toggleClass('invalid', $(this).val() === '').trigger('validate')
-  }
-}
-
-function navi() {
-  var $navi = $('#header .navi')
-
-  $navi.find('a').on('click', function(e) {
-    e.preventDefault()
-    show($(this)).trigger('show')
-  })
-
-  function start() {
-    var hash = location.hash
-    if (hash == '') {
-      $navi.find('a:first').click()
-    } else {
-      var parts = hash.split('/').map(decodeURIComponent)
-      var $a = $navi.find('a[href='+parts.shift()+']')
-      show($a).trigger('show', parts)
-    }
-  }
-
-  function show($a) {
-    $navi.find('a.active').removeClass('active')
-    $a.addClass('active')
-    $('body').children('.page').hide()
-    return $($a.data('href')).show()
-  }
-
-  return { start: start }
-}
-
-function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
-function billingPage() { $('#billing-page').on('show', function() { location.hash = '#laskutus'}) }
-
-function searchPage() {
-  var $page = $('#search-page')
-  var $input = $page.find('.query')
-  var $button = $page.find('button.search')
-  var $filters = $page.find('.filters input[type=checkbox]')
-  var $results = $page.find('.results')
-  var $noResults = $page.find('.no-results')
-  var $noMoreResults = $page.find('.no-more-results')
-  var $loading = $page.find('.loading')
-  var $detailTemplate = $('#templates > .search-result-details').detach()
-  var $newClassificationButton = $page.find('.new-classification button')
-
-  var state = { q:'', page: 0 }
-
-  $page.on('show', function(e, q, filters, programId) {
-    $input.val(q || '').trigger('reset')
-    setFilters(filters)
-    queryChanged(q || '')
-    loadUntil(programId)
-  })
-
-  $button.click(function() { $input.trigger('fire') })
-  $filters.on('change', function() { $input.trigger('fire') })
-
-  $(window).on('scroll', function() {
-    if (!$page.is(':visible')) return
-    if ($loading.is(':visible') || $noResults.is(':visible') || $noMoreResults.is(':visible')) return
-    if($(document).height() - $(window).scrollTop() - $(window).height() < 100) {
-      state.page++
-      load()
-    }
-  })
-
-  $input.throttledInput(function() {
-    queryChanged($input.val().trim())
-    updateLocationHash()
-    load()
-  })
-
-  $('input[name="new-classification-type"]').select2({
-    data: [
-      {id: 1, text: 'Elokuva'},
-      {id: 4, text: 'Extra'},
-      {id: 5, text: 'Trailer'}
-    ],
-  }).select2('val', 1)
-
-  $newClassificationButton.click(function() {
-    var programType = $('input[name="new-classification-type"]').select2('val')
-    $.post('/movies/new', JSON.stringify({'program-type': programType})).done(function(movie) {
-      $('body').children('.page').hide()
-      $('#classification-page').trigger('show', movie._id).show()
-    })
-  })
-
-  function queryChanged(q) {
-    state = { q:q, page: 0 }
-    $noResults.add($noMoreResults).hide()
-  }
-
-  function loadUntil(selectedProgramId) {
-    load(function() {
-      if (!selectedProgramId) {
-        updateLocationHash()
-        return
-      }
-      var $selected = $results.find('.result[data-id='+selectedProgramId+']')
-      if ($selected.length > 0) {
-        openDetail($selected, false)
-        var top = $selected.offset().top - 25
-        $('body,html').animate({ scrollTop: top })
-      } else if (state.page < 20) {
-        state.page++
-        loadUntil(selectedProgramId)
-      }
-    })
-  }
-
-  function load(callback) {
-    $loading.show()
-    var url = '/movies/search/'+encodeURIComponent(state.q)
-    var data = $.param({ page:state.page, filters:currentFilters() })
-    state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
-      if (state.jqXHR != jqXHR) return
-      $noResults.toggle(state.page == 0 && results.length == 0)
-      $noMoreResults.toggle((state.page > 0 || results.length > 0) && results.length < 100)
-      if (state.page == 0) $results.empty()
-      $results.append(results.map(function(p) { return render(p, state.q) }))
-      $loading.hide()
-      if (callback) callback()
-    })
-  }
-
-  function currentFilters() {
-    return $filters.filter(':checked')
-      .map(function() { return $(this).data('type') })
-      .toArray().join(',').split(',')
-  }
-
-  function setFilters(filterString) {
-    $filters.each(function() {
-      $(this).prop('checked', filterString && filterString.indexOf($(this).data('id')) >= 0)
-    })
-  }
-
-  $results.on('click', '.result', function() {
-    if ($(this).hasClass('selected')) {
-      updateLocationHash()
-      closeDetail()
-    } else {
-      closeDetail()
-      openDetail($(this), true)
-    }
-  })
-
-  function openDetail($row, animate) {
-    var p = $row.data('program')
-    updateLocationHash(p._id)
-    var $details = renderDetails(p)
-    $row.addClass('selected').after($details)
-    animate ? $details.slideDown() : $details.show()
-  }
-
-  function closeDetail() {
-    $results.find('.result.selected').removeClass('selected')
-    $results.find('.search-result-details').slideUp(function() { $(this).remove() }).end()
-  }
-
-  $results.on('click', 'button.reclassification', function(e) {
-    var id = $(this).parents('.search-result-details').data('id')
-    $.post('/movies/' + id + '/reclassification').done(function(movie) {
-      $('body').children('.page').hide()
-      $('#classification-page').trigger('show', movie._id).show()
-    })
-  })
-
-  function updateLocationHash(selectedProgramId) {
-    var filters = $filters.filter(':checked').map(function() { return $(this).data('id') }).toArray().join('')
-    location.hash = '#haku/' + encodeURIComponent(state.q) + '/' + filters + '/' + (selectedProgramId || '')
-  }
-
-  function render(p, query) {
-    var c = p.classifications[0]
-    var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
-    return $('<div>', { class:'result', 'data-id': p._id })
-      .data('program', p)
-      .append($('<span>').text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
-      .append($('<span>').text(countryAndYear(p)))
-      .append($('<span>').text(classification.ageLimit(c)))
-      .append($('<span>').text(enums.programType[p['program-type']].fi))
-      .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
-
-    function name(p) {
-      return _.compact([p.name[0], utils.seasonEpisodeCode(p)]).join(' ')
-    }
-
-    function countryAndYear(p) {
-      var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
-      return s == '' ? s : '('+s+')'
-    }
-
-    function duration(c) {
-      if (!c || !c.duration) return ''
-      var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
-      if (!match) return c.duration
-      match.shift()
-      return _.chain(match).map(suffixify).compact().join(' ')
-
-      function suffixify(x, ii) {
-        if (!x) return x
-        var int = parseInt(x)
-        if (!int) return ''
-        if (ii == 0) return int + ' h'
-        if (ii == 1) return int + ' min'
-        if (ii == 2) return int + ' s'
-        return x
-      }
-    }
-  }
-
-  function renderDetails(p) {
-    var names = { n: p.name.join(', '), fi: p['name-fi'].join(', '), sv: p['name-sv'].join(', '), other: p['name-other'].join(', ')}
-    var series = p.series && p.series.name || undefined
-    var episode = utils.seasonEpisodeCode(p)
-    var $e = $detailTemplate.clone()
-      .find('.primary-name').text(p.name[0]).end()
-      .find('.name').text(names.n).end()
-      .find('.name-fi').text(names.fi).end()
-      .find('.name-sv').text(names.sv).prev().toggleClass('hide', !names.sv).end().end()
-      .find('.name-other').text(names.other).prev().toggleClass('hide', !names.other).end().end()
-      .find('.series').text(series).prev().toggleClass('hide', !series).end().end()
-      .find('.episode').text(episode).prev().toggleClass('hide', !episode).end().end()
-      .find('.country').text(enums.util.toCountryString(p.country)).end()
-      .find('.year').text(p.year).end()
-      .find('.production-companies').text(p['production-companies'].join(', ')).end()
-      .find('.genre').text(p.genre.join(', ') || p['legacy-genre'].join(', ')).end()
-      .find('.directors').text(p.directors.join(', ')).end()
-      .find('.actors').text(p.actors.join(', ')).end()
-      .find('.synopsis').text(p.synopsis).end()
-
-    $e.data('id', p._id)
-
-    var c = p.classifications[0]
-    if (c) {
-      var summary = classification.summary(p, c)
-      $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
-      .find('.status').text(classification.status(c)).end()
-      .find('.warnings').html(warningIcons(summary)).end()
-      .find('.buyer').text(c.buyer && c.buyer.name || '').end()
-      .find('.billing').text(c.billing && c.billing.name || '').end()
-      .find('.format').text(enums.util.isGameType(p) && p.gameFormat || c.format).end()
-      .find('.duration').text(c.duration).end()
-      .find('.criteria').html(renderClassificationCriteria(c)).end()
-    }
-    return $e
-  }
-
-  function renderClassificationCriteria(c) {
-    if (!c.criteria) return ''
-    return c.criteria.map(function(id) {
-      var cr = enums.classificationCriteria[id - 1]
-      var category = enums.classificationCategoriesFI[cr.category]
-      return $('<div>')
-        .append($('<label>').text(category + ' ('+cr.id+')'))
-        .append($('<span>').text(c['criteria-comments'] && c['criteria-comments'][cr.id] || ''))
-    })
-  }
-}
-
 function movieDetails() {
   var $root = $('#classification-page')
   var $form = $('#movie-details')
@@ -398,8 +50,8 @@ function movieDetails() {
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
         .append($('<span>', {class: 'name'}).text(data.name))
         .append($('<div>', {class: 'agelimit warning-summary'}).append([
-           $('<img>', {src: ageLimitIcon(summary) }),
-           $('<div>', {class: 'warnings'}).html(warningIcons(summary))
+          $('<img>', {src: ageLimitIcon(summary) }),
+          $('<div>', {class: 'warnings'}).html(warningIcons(summary))
         ]))
         .append($('<p>', {class: 'registration-date'}).text(classification.status(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
@@ -409,8 +61,8 @@ function movieDetails() {
   function validateTextChange($el, validatorFn) {
     var validator = validate(validatorFn)
     $el.on('keyup change validate', validator)
-       .on('blur', function() { $(this).addClass('touched') })
-       .on('paste', function() { var me = this; setTimeout(function() { validator.call(me) }, 0) })
+      .on('blur', function() { $(this).addClass('touched') })
+      .on('paste', function() { var me = this; setTimeout(function() { validator.call(me) }, 0) })
   }
 
   function requiredCheckboxGroup($el) {
@@ -641,9 +293,9 @@ function movieDetails() {
         return callback(opts.multiple ? (opts.val || []).map(idToOption) : idToOption(opts.val))
       }
     }).on('change', function() {
-      var data = $(this).select2('data')
-      saveMovieField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
-    }).select2('val', opts.val)
+        var data = $(this).select2('data')
+        saveMovieField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
+      }).select2('val', opts.val)
 
     function idToOption(id) {
       var opt = _.find(opts.data, function(item) { return item.id === id })
@@ -702,7 +354,7 @@ function movieDetails() {
   }
 
   function companyToSelect2Option(x) {
-    return {id: x._id, text: x.name} 
+    return {id: x._id, text: x.name}
   }
 
   function select2OptionToCompany(x) {
@@ -817,13 +469,13 @@ function movieDetails() {
 
     function addEmailCheckbox($el, checked, email) {
       $el.append($('<li>').html([
-         $('<input>', {
-           type: 'checkbox',
-           checked: checked || false,
-           name: 'classifications.0.registration-email-addresses',
-           value: email
-         }),
-         $('<span>').text(email)
+        $('<input>', {
+          type: 'checkbox',
+          checked: checked || false,
+          name: 'classifications.0.registration-email-addresses',
+          value: email
+        }),
+        $('<span>').text(email)
       ]))
     }
     var addBuyerEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.buyer'))
@@ -832,108 +484,3 @@ function movieDetails() {
     return {update: updatePreview}
   }
 }
-
-function isReclassification(movie) {
-  return movie.classifications.length > 1
-}
-
-function keyValue(key, value) {
-  var data = {}
-  data[key] = value
-  return data
-}
-
-function isNotEmpty(val) {
-  return (val.trim().length) > 0
-}
-
-function isValidDuration(txt) {
-  return /(?:(\d+)?:)?(\d+):(\d+)$/.test(txt)
-}
-
-function isEmail(txt) {
-  var regexp = /^([A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+(\.[A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+)*)@(([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63})(\.([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63}))*\.[a-zA-Z0-9]{2,63})$/
-  return regexp.test(txt)
-}
-
-function isValidYear(txt) {
-  return /^\d{4}$/.test(txt) && parseInt(txt) > 1889
-}
-
-function validate(f) {
-  return function() {
-    var $el = $(this)
-    if (f($el.val())) {
-      $el.removeClass('invalid')
-    } else {
-      $el.addClass('invalid')
-    }
-    $el.trigger('validation', ['kutsuttu validatesta'])
-  }
-}
-
-function showDialog($html) {
-  $('#overlay').show()
-  $('#dialog').show().append($html)
-}
-
-function closeDialog() {
-  $('#dialog').empty().hide()
-  $('#overlay').hide()
-}
-
-$.fn.throttledInput = function(fn) {
-  return $(this).each(function() {
-    var prev = undefined
-    var timeout = null
-    var $input = $(this).on('keyup', function() {
-      var txt = $input.val()
-      var that = this
-      if (timeout) clearTimeout(timeout)
-      timeout = setTimeout(function() {
-        if (prev == txt) return
-        prev = txt
-        fn.call(that, txt)
-      }, 400)
-    })
-    $input.on('reset', reset)
-    $input.on('fire', function() {
-      reset()
-      fn.call(this, prev)
-    })
-
-    function reset() {
-      if (timeout) clearTimeout(timeout)
-      prev = $input.val()
-    }
-  })
-}
-
-$.fn.check = function(on) {
-  $(this).each(function() {
-    on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
-  })
-  return this
-}
-
-function ageLimitIcon(summary) {
-  return summary.pegi
-    ? 'images/pegi-'+summary.age.toString().toLowerCase()+'.png'
-    : 'images/agelimit-'+summary.age.toString().toLowerCase()+'.png'
-}
-function warningIcons(summary) {
-  return summary.pegi
-    ? summary.warnings.map(function(w) { return $('<span>', { class:'warning pegi-' + w.toLowerCase() }) })
-    : summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w }) })
-}
-
-function notIn(arr, el) {
-  return _.indexOf(arr, el) === -1
-}
-
-function parseUserCookie() {
-  var cookie = $.cookie('user')
-  if (!cookie) return null
-  return JSON.parse(cookie.substring(4, cookie.lastIndexOf('.')))
-}
-

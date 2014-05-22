@@ -4,6 +4,7 @@ function movieDetails() {
   var $summary = $('.summary')
   var $submit = $form.find('button[name=register]')
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
+  var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
 
   renderClassificationCriteria()
@@ -107,9 +108,11 @@ function movieDetails() {
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
     if ($(this).val() == 2) {
-      $('#classification .buyer').show()
+      $buyer.select2('enable', true).removeClass('invalid')
+      $billing.select2('enable', true).removeClass('invalid')
     } else {
-      $('#classification .buyer').hide()
+      $buyer.select2('enable', false).select2('val', '', true)
+      $billing.select2('enable', false).select2('val', '', true)
     }
   })
 
@@ -214,13 +217,13 @@ function movieDetails() {
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.reason"]'),
-      val: (movie.classifications[0].reason || '').toString(),
+      val: typeof movie.classifications[0].reason == 'number' ? movie.classifications[0].reason.toString() : '',
       data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
     })
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.authorOrganization"]'),
-      val: (movie.classifications[0].authorOrganization || '').toString(),
+      val: typeof movie.classifications[0].authorOrganization == 'number' ? movie.classifications[0].authorOrganization.toString() : '',
       data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } })
     })
 
@@ -233,16 +236,16 @@ function movieDetails() {
     })
 
     if (isReclassification(movie)) {
-      $('#classification .buyer').hide()
-      $buyer.removeClass('required')
+      $buyer.select2('enable', false)
+      $billing.select2('enable', false)
     } else {
-      $('#classification .buyer').show()
-      $buyer.addClass('required')
+      $buyer.select2('enable', true)
+      $billing.select2('enable', true)
     }
 
     if (isReclassification(movie) && movie.classifications[0].reason == 2) {
-      $('#classification .buyer').show()
-      $buyer.addClass('required')
+      $buyer.select2('enable', true)
+      $billing.select2('enable', true)
     }
 
     selectAutocomplete({
@@ -361,6 +364,7 @@ function movieDetails() {
   }
 
   function select2OptionToCompany(x) {
+    if (x === null) return null
     return {_id: x.id, name: x.text}
   }
 

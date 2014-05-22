@@ -30,7 +30,6 @@ app.post('/login', function(req, res, next) {
   User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
-    console.log(user)
     user.checkPassword(password, function(err, ok) {
       if (err) return next(err)
       if (!ok) return res.send(403)

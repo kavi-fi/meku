@@ -6,14 +6,15 @@ body {
   color: #444444;
 }
 
-#login-overlay { z-index: 2; }
-#login { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
-#login > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
+#login-overlay, #error-overlay { z-index: 2; }
+#login, #error-dialog { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
+#login > div, #error-dialog > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
 #login label { display: block; text-align: left; }
 #login input { width: 330px; font-weight: normal; margin: 10px 0; }
 #login input.invalid { background-color: #fff; }
 #login button { margin-top: 10px; }
 #login .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
+#error-dialog a { color: #00BB88; }
 
 #criteria .category, [draggable] {
   -moz-user-select: none;
@@ -25,6 +26,7 @@ body {
 }
 
 #templates { display: none; }
+
 button {
   border-radius: 3px;
   background-image: -o-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
@@ -56,7 +58,6 @@ button[disabled=disabled], button:disabled { color: gray; }
 ol { list-style-type: none; margin: 0; }
 
 textarea { resize: vertical; }
-
 
 .warning-summary { display: inline-block; }
 .warning-summary img { width: 40px; height: 40px;}
@@ -90,7 +91,7 @@ textarea { resize: vertical; }
   box-shadow:         0px 2px 2px 0px rgba(0,0,0,0.10);
   z-index: 1000;
 }
-#overlay, #login-overlay { display: none; position: absolute; width: 100%; height: 100%; background: #222; opacity: 0.6; top: 0; left: 0; }
+#overlay, #login-overlay, #error-overlay { display: none; position: absolute; width: 100%; height: 100%; background: #222; opacity: 0.6; top: 0; left: 0; }
 
 /* layout */
 #header {

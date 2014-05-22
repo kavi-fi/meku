@@ -9,6 +9,7 @@ function setup() {
   $.fn.select2.defaults.adaptDropdownCssClass = function(c) {  return c == 'required' ? c : null }
 
   var login = loginPage()
+  var error = errorDialog()
 
   $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
 
@@ -16,7 +17,7 @@ function setup() {
     if (req.status == 403) {
       login.show()
     } else {
-      // show network/server error dialog?
+      error.show()
     }
   })
 
@@ -34,6 +35,13 @@ function setup() {
   buyerPage()
   billingPage()
   navigation.start()
+}
+
+function errorDialog() {
+  var $overlay = $('#error-overlay')
+  var $dialog = $('#error-dialog')
+  $dialog.find('a').click(function(e) { e.preventDefault(); location.reload() })
+  return { show: function() { $dialog.add($overlay).show() } }
 }
 
 function loginPage() {

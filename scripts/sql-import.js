@@ -70,7 +70,7 @@ function base(callback) {
     .pipe(batchInserter('Movie', callback))
 }
 
-// TODO: add meku_audiovisualprograms.name somehow, remove duplicates somehow...
+// NOTE: Should add meku_audiovisualprograms.name somehow?
 function names(callback) {
   var tick = progressMonitor()
   var result = {}
@@ -88,7 +88,9 @@ function names(callback) {
     }, function() {
       async.eachLimit(Object.keys(result), 5, function(key, cb) {
         tick('*')
-        schema.Movie.update({ 'emeku-id': key }, result[key], cb)
+        var names = result[key]
+        if (!names.name) fixNameless(names)
+        schema.Movie.update({ 'emeku-id': key }, names, cb)
       }, callback)
     }))
 
@@ -98,6 +100,11 @@ function names(callback) {
     if (type == '2S') return 'name-fi'
     if (type == '3R') return 'name-sv'
     if (type == '4M') return 'name-other'
+  }
+
+  function fixNameless(doc) {
+    var name = doc['name-fi'][0] || doc['name-sv'][0] || doc['name-other'][0]
+    if (name) doc.name = [name]
   }
 }
 
@@ -363,7 +370,7 @@ function markTrainingProgramsDeleted(callback) {
     }, function(err) {
       if (err) return callback(err)
       console.log('\n> Number of test-programs marked as deleted: '+count)
-      callback()
+      schema.Movie.update({ name:[] }, { deleted: 1 }, { multi:true }, callback)
     })
   })
 }

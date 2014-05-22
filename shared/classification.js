@@ -110,6 +110,14 @@ exports.registrationEmail = function(movie) {
   }
 }
 
+exports.createNew = function(user) {
+  return {
+    'creation-date':new Date(),
+    status: 'in_process',
+    author: { _id: user._id, name: user.name }
+  }
+}
+
 })(typeof exports === 'undefined'? this['classification']={}: exports)
 
 

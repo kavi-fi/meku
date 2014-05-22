@@ -78,16 +78,11 @@ app.get('/movies/:id', function(req, res) {
 
 app.post('/movies/new', function(req, res, next) {
   var data = {
-    classifications: [{
-      'creation-date':new Date(),
-      status: 'in_process',
-      author: { _id: req.user._id, name: req.user.name }
-    }],
+    classifications: [classification.createNew(req.user)],
     'program-type': req.body['program-type'] || 0,
     'production-companies': [],
     actors: []
   }
-
   new Movie(data).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)
@@ -138,7 +133,7 @@ app.post('/movies/:id/reclassification', function(req, res, next) {
   // create new movie.classifications
   Movie.findById(req.params.id, function(err, movie) {
     if (err) next(err)
-    movie.classifications = [{ 'creation-date':new Date(), status: 'in_process' }].concat(movie.classifications)
+    movie.classifications = [classification.createNew(req.user)].concat(movie.classifications)
     movie.save(function(err, saved) {
       if (err) next(err)
       res.send(saved)

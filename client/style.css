@@ -310,17 +310,20 @@ label {
 .select2-drop.select2-drop-above.select2-drop-active.required { border-top: 1px solid #00BB88; border-bottom: none; }
 
 input[type=text].required,
+textarea.required,
 .select2-container.required .select2-choices,
 .select2-container.required .select2-choice {
   border: 1px solid #00BB88;
 }
 
 input[type=text].invalid,
+textarea.invalid,
 .select2-container.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
   background: #F0FFF0;
 }
 input[type=text].invalid.touched,
+textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {
   background: #fff0f0;

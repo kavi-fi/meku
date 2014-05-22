@@ -126,12 +126,17 @@ function searchPage() {
     $results.find('.search-result-details').slideUp(function() { $(this).remove() }).end()
   }
 
-  $results.on('click', 'button.reclassification', function(e) {
+  $results.on('click', 'button.reclassify', function(e) {
     var id = $(this).parents('.search-result-details').data('id')
     $.post('/movies/' + id + '/reclassification').done(function(movie) {
       $('body').children('.page').hide()
       $('#classification-page').trigger('show', movie._id).show()
     })
+  })
+  $results.on('click', 'button.continue-classification', function(e) {
+    var id = $(this).parents('.search-result-details').data('id')
+    $('body').children('.page').hide()
+    $('#classification-page').trigger('show', id).show()
   })
 
   function updateLocationHash(selectedProgramId) {
@@ -183,6 +188,7 @@ function searchPage() {
     var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
     var $e = $detailTemplate.clone()
+      .data('id', p._id)
       .find('.primary-name').text(p.name[0]).end()
       .find('.name').text(names.n).end()
       .find('.name-fi').text(names.fi).end()
@@ -198,8 +204,6 @@ function searchPage() {
       .find('.actors').text(p.actors.join(', ')).end()
       .find('.synopsis').text(p.synopsis).end()
 
-    $e.data('id', p._id)
-
     var c = p.classifications[0]
     if (c) {
       var summary = classification.summary(p, c)
@@ -212,6 +216,13 @@ function searchPage() {
         .find('.duration').text(c.duration).end()
         .find('.criteria').html(renderClassificationCriteria(c)).end()
     }
+
+    var head = p.classifications[0]
+    var canContinue = head && head.status == 'in_process' && (hasRole('kavi') || !head.author || head.author._id == user._id)
+    var canReclassify = !canContinue && (hasRole('kavi') || !head || (head.status != 'registered' && head.status != 'in_process'))
+    $e.find('button.continue-classification').toggle(canContinue)
+    $e.find('button.reclassify').toggle(canReclassify)
+
     return $e
   }
 

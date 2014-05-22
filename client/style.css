@@ -194,6 +194,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .search-result-details .hide { display: none; }
 .search-result-details .criteria label { text-transform: capitalize; }
 .search-result-details .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
+.search-result-details button.reclassify, .search-result-details button.continue-classification { display: none; float: right; }
 
 #classification-page input[type=text],
 .select2-container-multi .select2-choices {

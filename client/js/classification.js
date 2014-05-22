@@ -220,7 +220,7 @@ function movieDetails() {
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.authorOrganization"]'),
       val: (movie.classifications[0].authorOrganization || '').toString(),
-      data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) {console.log(pair[0]);  return { id: pair[0], text: pair[1] } })
+      data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } })
     })
 
     selectAutocomplete({

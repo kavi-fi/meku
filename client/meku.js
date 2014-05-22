@@ -561,13 +561,13 @@ function movieDetails() {
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.reason"]'),
-      val: movie.classifications[0].reason.toString() || null,
+      val: (movie.classifications[0].reason || '').toString(),
       data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
     })
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.authorOrganization"]'),
-      val: movie.classifications[0].authorOrganization.toString() || null,
+      val: (movie.classifications[0].authorOrganization || '').toString(),
       data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) {console.log(pair[0]);  return { id: pair[0], text: pair[1] } })
     })
 

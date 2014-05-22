@@ -42,7 +42,7 @@ function searchPage() {
       {id: 1, text: 'Elokuva'},
       {id: 4, text: 'Extra'},
       {id: 5, text: 'Trailer'}
-    ],
+    ]
   }).select2('val', 1)
 
   $newClassificationButton.click(function() {

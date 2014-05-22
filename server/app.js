@@ -105,7 +105,7 @@ app.post('/movies/:id/register', function(req, res, next) {
       name: movie.name,
       duration: movie.duration,
       'registration-date': movie.classifications[0]['registration-date'],
-      price: 700,
+      price: 700
     }, function(err, saved) {
       if (err) return next(err)
 

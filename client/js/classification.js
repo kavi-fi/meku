@@ -28,6 +28,7 @@ function movieDetails() {
       // class has been removed
       .not('.select2-container.required.invalid')
       .not('form.classification .reclassification .required')
+      .not('input[disabled=disabled]')
 
     if (required.length === 0) {
       $submit.removeAttr('disabled')
@@ -452,7 +453,7 @@ function movieDetails() {
       manualEmails.filter(function(email) { return notIn(manualInDom, email) })
         .forEach(addManualEmailCheckbox(true))
 
-      var email = classification.registrationEmail(movie)
+      var email = classification.registrationEmail(movie, user)
 
       $preview.find('.recipients').text(email.recipients.join(', '))
       $preview.find('.subject').text(email.subject)

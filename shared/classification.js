@@ -94,16 +94,15 @@ var ageLimit = exports.ageLimit = function(classification) {
   }
 }
 
-exports.registrationEmail = function(movie) {
+exports.registrationEmail = function(movie, user) {
   var subject = "Luokittelupäätös: <%- name %>, <%- year %>, <%- classificationShort %>"
   var text =
     "<%- date %>\n<%- buyer %>\n\n" +
-    "Ilmoitus kuvaohjelman luokittelusta\n\n" +
-    "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on <%- date %> tilauksestanne luokitellut kuvaohjelman <%- name %>. <%- classification %>.\n\n" +
-
+    "Ilmoitus kuvaohjelman luokittelusta\n\n"
+  text += (user.role == 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name
+  text += " on <%- date %> tilauksestanne luokitellut kuvaohjelman <%- name %>. <%- classification %>.\n\n" +
     "Liitteet:\n" +
-    "KAVIN mediakasvatus- ja kuvaohjelmayksikön päätös\n" +
-    "Valitusosoitus\n"
+    "Valitusosoitus\n\n"
 
     "Kansallinen audiovisuaalinen instituutti (KAVI)\n" +
     "Mediakasvatus- ja kuvaohjelmayksikkö"

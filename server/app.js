@@ -108,7 +108,7 @@ app.post('/movies/:id/register', function(req, res, next) {
       if (err) return next(err)
 
       if (process.env.NODE_ENV === 'production') {
-        var data = classification.registrationEmail(movie)
+        var data = classification.registrationEmail(movie, req.user)
         var email = new sendgrid.Email({
           from    : 'no-reply@kavi.fi',
           subject : data.subject,

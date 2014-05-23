@@ -457,7 +457,7 @@ function movieDetails() {
 
       $preview.find('.recipients').text(email.recipients.join(', '))
       $preview.find('.subject').text(email.subject)
-      $preview.find('.body').text(email.body)
+      $preview.find('.body').html(email.body)
 
       if (cl.buyer) {
         $.get('/accounts/' + cl.buyer._id).done(function(data) {

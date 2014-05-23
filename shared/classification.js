@@ -33,7 +33,7 @@ var classificationText = function(classification) {
   } else {
     return 'Kuvaohjelman ikäraja on ' + classification.age
          + ' vuotta ja ' + (classification.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
-         + criteria
+         + criteria + '.'
   }
 }
 
@@ -95,17 +95,20 @@ var ageLimit = exports.ageLimit = function(classification) {
 }
 
 exports.registrationEmail = function(movie, user) {
+  var linkOther = {
+    url: "http://www.meku.fi/index.php?option=com_docman&task=doc_download&gid=3&Itemid=377&lang=fi",
+    name: "Oikaisuvaatimusohje"
+  }
+  var linkKavi = {url: "http://www.meku.fi/", name: "Valitusosoitus"}
+
   var subject = "Luokittelupäätös: <%- name %>, <%- year %>, <%- classificationShort %>"
   var text =
-    "<%- date %>\n<%- buyer %>\n\n" +
-    "Ilmoitus kuvaohjelman luokittelusta\n\n"
-  text += (user.role == 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name
-  text += " on <%- date %> tilauksestanne luokitellut kuvaohjelman <%- name %>. <%- classification %>.\n\n" +
-    "Liitteet:\n" +
-    "Valitusosoitus\n\n"
-
-    "Kansallinen audiovisuaalinen instituutti (KAVI)\n" +
-    "Mediakasvatus- ja kuvaohjelmayksikkö"
+    "<p><%- date %><br/><%- buyer %></p><p>Ilmoitus kuvaohjelman luokittelusta</p>" +
+    ((user.role == 'kavi') ? "<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
+    ' on <%- date %> tilauksestanne luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
+    '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
+    '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
+    'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
 
   var now = new Date()
   var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
@@ -120,7 +123,8 @@ exports.registrationEmail = function(movie, user) {
     name: movie.name.join(', '),
     year: movie.year || '',
     classification: classificationText(classificationSummary),
-    classificationShort: classificationSummary.age + ' ' + criteriaText(classificationSummary.warnings)
+    classificationShort: classificationSummary.age + ' ' + criteriaText(classificationSummary.warnings),
+    link: (user.role == 'kavi') ? linkKavi : linkOther
   }
 
   return {

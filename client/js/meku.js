@@ -79,6 +79,7 @@ function loginPage() {
 
   function show() {
     $form.add($overlay).show()
+    $username.focus()
   }
   function checkInput() {
     $(this).toggleClass('invalid', $(this).val() === '').trigger('validate')

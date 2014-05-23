@@ -106,6 +106,7 @@ exports.registrationEmail = function(movie, user) {
     "<p><%- date %><br/><%- buyer %></p><p>Ilmoitus kuvaohjelman luokittelusta</p>" +
     ((user.role == 'kavi') ? "<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
     ' on <%- date %> tilauksestanne luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
+    ((user.role == 'kavi') ? '<p>Perusteet: <%- publicComments %></p>' : '') +
     '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
     'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
@@ -124,7 +125,8 @@ exports.registrationEmail = function(movie, user) {
     year: movie.year || '',
     classification: classificationText(classificationSummary),
     classificationShort: classificationSummary.age + ' ' + criteriaText(classificationSummary.warnings),
-    link: (user.role == 'kavi') ? linkKavi : linkOther
+    link: (user.role == 'kavi') ? linkKavi : linkOther,
+    publicComments: classification.publicComments
   }
 
   return {

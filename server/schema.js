@@ -92,12 +92,14 @@ var Provider = exports.Provider = mongoose.model('providers', {
 
 var UserSchema = new Schema({
   'emeku-id': String,
+  emails: [String],
   username: { type: String, index: { unique: true } },
   password: String,
   role: String,
   name: String,
   active: Boolean
 })
+
 UserSchema.pre('save', function(next) {
   var user = this
   if (!user.isModified('password')) return next()

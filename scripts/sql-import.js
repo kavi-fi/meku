@@ -288,37 +288,37 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.eachSeries([accountBase, accountEmailAddresses], function(fn, cb) { fn(cb) }, callback)
-}
+  async.applyEachSeries([accountBase, accountEmailAddresses], callback)
 
-function accountBase(callback) {
-  conn.query('select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"')
-    .stream({ highWaterMark: 2000 })
-    .pipe(transformer(function(row) { return { 'emeku-id': row.id, name: trim(row.name), roles: optionListToArray(row.customer_type) } }))
-    .pipe(batcher(1000))
-    .pipe(batchInserter('Account', callback))
-}
+  function accountBase(callback) {
+    conn.query('select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"')
+      .stream({ highWaterMark: 2000 })
+      .pipe(transformer(function(row) { return { 'emeku-id': row.id, name: trim(row.name), roles: optionListToArray(row.customer_type) } }))
+      .pipe(batcher(1000))
+      .pipe(batchInserter('Account', callback))
+  }
 
-function accountEmailAddresses(callback) {
-  var tick = progressMonitor(100)
-  var result = {}
-  conn.query('select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts"')
-    .stream()
-    .pipe(consumer(function(row, done) {
-      tick()
-      if (!result[row.id]) result[row.id] = []
-      if (row.primary_address == '1') {
-        result[row.id].unshift(row.email_address)
-      } else {
-        result[row.id].push(row.email_address)
-      }
-      done()
-    }, function() {
-      async.eachLimit(Object.keys(result), 5, function(key, cb) {
-        tick('*')
-        schema.Account.update({ 'emeku-id': key }, { 'email-addresses': result[key] }, cb)
-      }, callback)
-    }))
+  function accountEmailAddresses(callback) {
+    var tick = progressMonitor(100)
+    var result = {}
+    conn.query('select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts"')
+      .stream()
+      .pipe(consumer(function(row, done) {
+        tick()
+        if (!result[row.id]) result[row.id] = []
+        if (row.primary_address == '1') {
+          result[row.id].unshift(row.email_address)
+        } else {
+          result[row.id].push(row.email_address)
+        }
+        done()
+      }, function() {
+        async.eachLimit(Object.keys(result), 5, function(key, cb) {
+          tick('*')
+          schema.Account.update({ 'emeku-id': key }, { 'email-addresses': result[key] }, cb)
+        }, callback)
+      }))
+  }
 }
 
 function providers(callback) {
@@ -330,11 +330,37 @@ function providers(callback) {
 }
 
 function users(callback) {
-  conn.query('select id, user_name, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users')
-    .stream({ highWaterMark: 2000 })
-    .pipe(transformer(function(row) { return { 'emeku-id': row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }))
-    .pipe(batcher(1000))
-    .pipe(batchInserter('User', callback))
+  async.applyEachSeries([base, emails], callback)
+
+  function base(callback) {
+    conn.query('select id, user_name, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users')
+      .stream({ highWaterMark: 2000 })
+      .pipe(transformer(function(row) { return { 'emeku-id': row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }))
+      .pipe(batcher(1000))
+      .pipe(batchInserter('User', callback))
+  }
+
+  function emails(callback) {
+    var tick = progressMonitor(100)
+    var result = {}
+    conn.query('select u.id, e.email_address, j.primary_address from users u join email_addr_bean_rel j on (j.bean_id = u.id) join email_addresses e on (j.email_address_id = e.id) where u.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Users"')
+      .stream()
+      .pipe(consumer(function(row, done) {
+        tick()
+        if (!result[row.id]) result[row.id] = []
+        if (row.primary_address == '1') {
+          result[row.id].unshift(row.email_address)
+        } else {
+          result[row.id].push(row.email_address)
+        }
+        done()
+      }, function() {
+        async.eachLimit(Object.keys(result), 5, function(key, cb) {
+          tick('*')
+          schema.User.update({ 'emeku-id': key }, { 'emails': result[key] }, cb)
+        }, callback)
+      }))
+  }
 }
 
 function nameIndex(callback) {
@@ -396,7 +422,7 @@ function demoUsers(callback) {
   schema.User.remove({ username: { $in: users } }, function(err) {
     if (err) return callback(err)
     async.forEach(users, function(u, callback) {
-      new schema.User({ username:u, password:u, role:u, name:u }).save(callback)
+      new schema.User({ username:u, password:u, role:u, name:u, emails:[u+'@fake-meku.fi'] }).save(callback)
     }, callback)
   })
 }

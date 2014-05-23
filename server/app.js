@@ -112,7 +112,7 @@ app.post('/movies/:id/register', function(req, res, next) {
         var email = new sendgrid.Email({
           from    : 'no-reply@kavi.fi',
           subject : data.subject,
-          text    : data.body
+          html    : data.body
         })
         data.recipients.forEach(function(to) {
           email.addTo(to)

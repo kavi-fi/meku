@@ -235,19 +235,6 @@ function movieDetails() {
       fromOption: select2OptionToCompany
     })
 
-    if (isReclassification(movie)) {
-      $buyer.select2('enable', false)
-      $billing.select2('enable', false)
-    } else {
-      $buyer.select2('enable', true)
-      $billing.select2('enable', true)
-    }
-
-    if (isReclassification(movie) && movie.classifications[0].reason == 2) {
-      $buyer.select2('enable', true)
-      $billing.select2('enable', true)
-    }
-
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.billing"]'),
       val: movie.classifications[0].billing,
@@ -261,6 +248,20 @@ function movieDetails() {
       val: movie.classifications[0].format,
       data: enums.format.map(function(f) { return { id: f, text: f }})
     })
+
+    if (isReclassification(movie)) {
+      $billing.select2('enable', false)
+      $buyer.select2('enable', false)
+
+    } else {
+      $buyer.select2('enable', true)
+      $billing.select2('enable', true)
+    }
+
+    if (isReclassification(movie) && movie.classifications[0].reason == 2) {
+      $buyer.select2('enable', true)
+      $billing.select2('enable', true)
+    }
 
     $form.find('.category-container').toggle(!classification.safe)
     $form.find('.category-criteria input').removeAttr('checked')

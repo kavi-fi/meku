@@ -332,6 +332,11 @@ textarea.invalid,
 .select2-container.invalid .select2-choice {
   background: #F0FFF0;
 }
+
+.select2-container.select2-container-disabled.invalid .select2-choice {
+  background-color: #f4f4f4;
+}
+
 input[type=text].invalid.touched,
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,

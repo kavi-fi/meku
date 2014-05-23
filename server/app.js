@@ -93,7 +93,6 @@ app.post('/movies/:id/register', function(req, res, next) {
     'classifications.0.status': 'registered',
     'classifications.0.author': { _id: req.user._id, name: req.user.name }
   }
-
   Movie.findByIdAndUpdate(req.params.id, data, null, function(err, movie) {
     if (err) return next(err)
     InvoiceRow.create({
@@ -106,23 +105,10 @@ app.post('/movies/:id/register', function(req, res, next) {
       price: 700
     }, function(err, saved) {
       if (err) return next(err)
-
-      if (process.env.NODE_ENV === 'production') {
-        var data = classification.registrationEmail(movie, req.user)
-        var email = new sendgrid.Email({
-          from    : 'no-reply@kavi.fi',
-          subject : data.subject,
-          html    : data.body
-        })
-        data.recipients.forEach(function(to) {
-          email.addTo(to)
-        })
-        sendgrid.send(email, function(err, json) {
-          if (err) next(err)
-        });
-      }
-
-      return res.send(movie)
+      sendEmail(classification.registrationEmail(movie, req.user), function(err) {
+        if (err) return next(err)
+        return res.send(movie)
+      })
     })
   })
 })
@@ -220,6 +206,18 @@ function authenticate(req, res, next) {
     return next()
   }
   return res.send(403)
+}
+
+function sendEmail(data, callback) {
+  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: data.subject, html: data.body })
+  data.recipients.forEach(function(to) { email.addTo(to) })
+
+  if (process.env.NODE_ENV === 'production') {
+    sendgrid.send(email, callback)
+  } else {
+    console.log('email (suppressed): ', email)
+    return callback()
+  }
 }
 
 function isDev() {

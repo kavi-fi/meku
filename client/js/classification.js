@@ -383,7 +383,7 @@ function movieDetails() {
   }
 
   function saveMovieField(id, field, value) {
-    $.post('/movies/' + id, JSON.stringify(keyValue(field, value))).done(function(movie) {
+    $.post('/movies/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(movie) {
       updateSummary(movie)
       preview.update(movie)
     })

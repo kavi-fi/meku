@@ -122,12 +122,6 @@ function isReclassification(movie) {
   return movie.classifications.length > 1
 }
 
-function keyValue(key, value) {
-  var data = {}
-  data[key] = value
-  return data
-}
-
 function isNotEmpty(val) {
   return (val.trim().length) > 0
 }

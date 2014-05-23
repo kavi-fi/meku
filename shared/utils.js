@@ -5,6 +5,12 @@ if (isNodeJs()) {
 
 var utils = {}
 
+utils.keyValue = function(key, value) {
+  var data = {}
+  data[key] = value
+  return data
+}
+
 utils.escapeRegExp = function(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
 }

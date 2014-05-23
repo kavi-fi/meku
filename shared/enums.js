@@ -43,6 +43,7 @@ enums.programType = {
 enums.util.isTvShow = function(p) { return p['program-type'] == 3 }
 enums.util.isGameType = function(p) { return p['program-type'] == 6 || p['program-type'] == 7 }
 enums.util.isPegiGame = function(p) { return p['program-type'] == 7 }
+enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 7 }
 
 enums.genre = [
   'Fiktio',

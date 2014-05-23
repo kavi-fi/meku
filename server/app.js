@@ -77,12 +77,10 @@ app.get('/movies/:id', function(req, res) {
 })
 
 app.post('/movies/new', function(req, res, next) {
-  var data = {
-    classifications: [classification.createNew(req.user)],
-    'program-type': req.body['program-type'] || 0,
-    'production-companies': [],
-    actors: []
-  }
+  var programType = parseInt(req.body['program-type'])
+  if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
+
+  var data = { classifications: [classification.createNew(req.user)], 'program-type': programType }
   new Movie(data).save(function(err, movie) {
     if (err) return next(err)
     return res.send(movie)

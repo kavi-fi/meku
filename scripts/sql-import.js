@@ -193,8 +193,8 @@ function classifications(callback) {
         if (row.descriptors) classification['warning-order'] = optionListToArray(row.descriptors)
         classification.provider_id = row.provider_id
         classification.comments = trimConcat(row.description, row.opinions, '\n')
-        classification['creation-date'] = row.date_entered && new Date(row.date_entered) || undefined
-        classification['registration-date'] = row.reg_date && new Date(row.reg_date) || undefined
+        classification['creation-date'] = readAsUTCDate(row.date_entered)
+        classification['registration-date'] = readAsUTCDate(row.reg_date)
         classification.assigned_user_id = row.assigned_user_id
         classification.status = row.status
         if (row.program_type == '11') classification.pegiWarnings = optionListToArray(row.pegi_descriptors)
@@ -488,8 +488,13 @@ function trim(s) {
   if (!trimmed) return undefined
   return trimmed
 }
+
 function trimConcat(s1, s2, sep){
   return _.compact([trim(s1), trim(s2)]).join(sep)
+}
+
+function readAsUTCDate(s) {
+  return s && new Date(s + 'Z') || undefined
 }
 
 function wipe(callback) {

@@ -212,8 +212,7 @@ function movieDetails() {
       val: movie['actors'] || [],
       path: '/actors/search/',
       multiple: true,
-      allowAdding: true,
-      termMinLength: 3
+      allowAdding: true
     })
 
     selectEnumAutocomplete({

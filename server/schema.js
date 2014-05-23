@@ -1,4 +1,5 @@
 var _ = require('lodash')
+var async = require('async')
 var utils = require('../shared/utils')
 var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
@@ -131,4 +132,23 @@ var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
   price: Number // eurocents
 })
 
-var models = exports.models = [Movie, Account, Provider, User, InvoiceRow]
+var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
+var DirectorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
+var ActorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
+
+function updateNamedIndex(array, callback) {
+  var that = this
+  var docs = array.map(function(s) { return { name: s, parts: _(s.toLowerCase().split(/\s+/)).uniq().sort().value() } })
+  async.forEach(docs, updateDoc, callback)
+
+  function updateDoc(doc, callback) {
+    that.update({ name: doc.name }, doc, { upsert: true }, function(_err) { callback() })
+  }
+}
+
+DirectorSchema.statics.updateWithNames = updateNamedIndex
+var Director = exports.Director = mongoose.model('directors', DirectorSchema)
+ActorSchema.statics.updateWithNames = updateNamedIndex
+var Actor = exports.Actor = mongoose.model('actors', ActorSchema)
+
+var models = exports.models = [Movie, Account, Provider, User, InvoiceRow, Director, Actor]

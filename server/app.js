@@ -53,22 +53,10 @@ app.get('/movies/search/:q?', function(req, res) {
 
   function query() {
     var q = { deleted: { $ne:true } }
-    var words = (req.params.q || '').trim().toLowerCase()
-    if (words != '') {
-      q['all-names'] = { $all: words.split(/\s+/).map(toTerm) }
-    }
-    if (filters.length > 0) {
-      q['program-type'] = { $in: filters }
-    }
+    var nameQuery = toMongoArrayQuery(req.params.q)
+    if (nameQuery) q['all-names'] = nameQuery
+    if (filters.length > 0) q['program-type'] = { $in: filters }
     return q
-  }
-
-  function toTerm(s) {
-    if (/^".+"$/.test(s)) {
-      return s.substring(1, s.length - 1)
-    } else {
-      return new RegExp('^' + utils.escapeRegExp(s))
-    }
   }
 })
 
@@ -107,7 +95,9 @@ app.post('/movies/:id/register', function(req, res, next) {
       if (err) return next(err)
       sendEmail(classification.registrationEmail(movie, req.user), function(err) {
         if (err) return next(err)
-        return res.send(movie)
+        updateActorAndDirectorIndexes(movie, function() {
+          return res.send(movie)
+        })
       })
     })
   })
@@ -149,34 +139,8 @@ app.get('/accounts/:id', function(req, res, next) {
   Account.findById(req.params.id, function(err, account) { res.send(account) })
 })
 
-app.get('/actors/search/:query', function(req, res, next) {
-  Movie.aggregate([
-    {$unwind: '$actors'},
-    {$match: {actors: new RegExp("\\b" + req.params.query, 'i')}},
-    {$project: {actors: 1}},
-    {$group: {_id: "$actors"}}
-  ]).exec(function(err, data) {
-      return res.send(data.reduce(function(acc, doc) {
-        return acc.concat([doc._id])
-      }, []))
-    })
-})
-
-app.get('/directors/search/:query', function(req, res, next) {
-  if (req.params.query.length < 3) return res.send([])
-  else {
-    Movie.aggregate([
-      {$unwind: '$directors'},
-      {$match: {directors: new RegExp("\\b" + req.params.query, 'i')}},
-      {$project: {directors: 1}},
-      {$group: {_id: "$directors"}}
-    ]).exec(function(err, data) {
-        return res.send(data.reduce(function(acc, doc) {
-          return acc.concat([doc._id])
-        }, []))
-      })
-  }
-})
+app.get('/actors/search/:query', queryNameIndex('Actor'))
+app.get('/directors/search/:query', queryNameIndex('Director'))
 
 if (isDev()) {
   var liveReload = require('express-livereload')
@@ -222,4 +186,34 @@ function sendEmail(data, callback) {
 
 function isDev() {
   return process.env.NODE_ENV == undefined || process.env.NODE_ENV == 'dev'
+}
+
+function updateActorAndDirectorIndexes(program, callback) {
+  schema.Actor.updateWithNames(program.actors, function() {
+    schema.Director.updateWithNames(program.directors, callback)
+  })
+}
+
+function queryNameIndex(schemaName) {
+  return function(req, res) {
+    var q = {}
+    var parts = toMongoArrayQuery(req.params.query)
+    if (parts) q.parts = parts
+    schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').exec(function(err, docs) {
+      res.send(_.pluck(docs || [], 'name'))
+    })
+  }
+}
+
+function toMongoArrayQuery(string) {
+  var words = (string || '').trim().toLowerCase()
+  return words ? { $all: words.split(/\s+/).map(toTerm) } : undefined
+
+  function toTerm(s) {
+    if (/^".+"$/.test(s)) {
+      return s.substring(1, s.length - 1)
+    } else {
+      return new RegExp('^' + utils.escapeRegExp(s))
+    }
+  }
 }

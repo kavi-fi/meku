@@ -14,6 +14,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
    base & names before everything
    accounts before classifications
    linkTvSeries before nameIndex
+   metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
    node scripts/sql-import.js base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries nameIndex
@@ -29,6 +30,7 @@ var tasks = {
   wipeClassifications: wipeClassifications, classifications: classifications,
   wipeAccounts: wipeAccounts, accounts: accounts,
   nameIndex: nameIndex,
+  wipeMetadataIndex: wipeMetadataIndex, metadataIndex: metadataIndex,
   markTrainingProgramsDeleted: markTrainingProgramsDeleted,
   linkTvSeries: linkTvSeries
 }
@@ -327,6 +329,20 @@ function nameIndex(callback) {
   }
 }
 
+function metadataIndex(callback) {
+  var tick = progressMonitor()
+  schema.Movie.find({}, { actors: 1, directors: 1 }).stream().pipe(consumer(onRow, callback))
+
+  function onRow(p, callback) {
+    tick()
+    schema.Actor.updateWithNames(p.actors, function() {
+      schema.Director.updateWithNames(p.directors, function() {
+        callback()
+      })
+    })
+  }
+}
+
 function markTrainingProgramsDeleted(callback) {
   // CHECK: e.g.
   // * Armadillo OK
@@ -492,7 +508,11 @@ function wipeAccounts(callback) {
     async.each(['accounts', 'providers', 'users'], dropCollection, callback)
   })
 }
-
+function wipeMetadataIndex(callback) {
+  connectMongoose(function() {
+    async.each(['actors', 'directors'], dropCollection, callback)
+  })
+}
 function wipeNames(callback) {
   schema.Movie.update({}, { 'name': [], 'name-fi': [], 'name-sv': [], 'name-other': [] }, { multi:true }, callback)
 }

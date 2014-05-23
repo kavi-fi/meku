@@ -118,6 +118,14 @@ exports.registrationEmail = function(movie, user) {
   var classificationSummary = summary(movie, classification)
   var recipients = classification['registration-email-addresses'].map(function(e) { return e.email })
 
+  function previousRecipients(classifications) {
+    if (classifications.length > 1) {
+      return classifications[1]['registration-email-addresses'].map(function(email) { return email.email })
+    } else {
+      return []
+    }
+  }
+
   var data = {
     date: dateString,
     buyer: buyer,
@@ -130,7 +138,7 @@ exports.registrationEmail = function(movie, user) {
   }
 
   return {
-    recipients: recipients,
+    recipients: recipients.concat(previousRecipients(movie.classifications)),
     from: "no-reply@kavi.fi",
     subject: _.template(subject, data),
     body: _.template(text, data)

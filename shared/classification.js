@@ -66,8 +66,8 @@ exports.fullStatus = function(classifications) {
   }
 }
 
-var isReclassification = exports.isReclassification = function(movie) {
-  return movie.classifications.length > 1
+var isReclassification = exports.isReclassification = function(program) {
+  return program.classifications.length > 1
 }
 
 exports.mostValid = function(classifications) {
@@ -98,7 +98,7 @@ var ageLimit = exports.ageLimit = function(classification) {
   }
 }
 
-exports.registrationEmail = function(movie, user) {
+exports.registrationEmail = function(program, user) {
   var linkOther = {
     url: "http://www.meku.fi/index.php?option=com_docman&task=doc_download&gid=3&Itemid=377&lang=fi",
     name: "Oikaisuvaatimusohje"
@@ -110,7 +110,7 @@ exports.registrationEmail = function(movie, user) {
     "<p><%- date %><br/><%- buyer %></p><p>Ilmoitus kuvaohjelman luokittelusta</p>" +
     ((user.role == 'kavi') ? "<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
     ' on <%- date %> tilauksestanne luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
-    ((user.role == 'kavi' && isReclassification(movie)) ? '<p>Perusteet: <%- publicComments %></p>' : '') +
+    ((user.role == 'kavi' && isReclassification(program)) ? '<p>Perusteet: <%- publicComments %></p>' : '') +
     ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
     '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
@@ -118,9 +118,9 @@ exports.registrationEmail = function(movie, user) {
 
   var now = new Date()
   var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
-  var classification = _.first(movie.classifications)
+  var classification = _.first(program.classifications)
   var buyer = classification.buyer ? classification.buyer.name : ''
-  var classificationSummary = summary(movie, classification)
+  var classificationSummary = summary(program, classification)
   var recipients = classification['registration-email-addresses'].map(function(e) { return e.email })
 
   function previousRecipients(classifications) {
@@ -134,8 +134,8 @@ exports.registrationEmail = function(movie, user) {
   var data = {
     date: dateString,
     buyer: buyer,
-    name: movie.name.join(', '),
-    year: movie.year || '',
+    name: program.name.join(', '),
+    year: program.year || '',
     classification: classificationText(classificationSummary),
     classificationShort: classificationSummary.age + ' ' + criteriaText(classificationSummary.warnings),
     link: (user.role == 'kavi') ? linkKavi : linkOther,
@@ -144,7 +144,7 @@ exports.registrationEmail = function(movie, user) {
   }
 
   return {
-    recipients: recipients.concat(previousRecipients(movie.classifications)),
+    recipients: recipients.concat(previousRecipients(program.classifications)),
     from: "no-reply@kavi.fi",
     subject: _.template(subject, data),
     body: _.template(text, data)

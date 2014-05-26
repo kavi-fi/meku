@@ -1,6 +1,6 @@
-function movieDetails() {
+function programDetails() {
   var $root = $('#classification-page')
-  var $form = $('#movie-details')
+  var $form = $('#program-details')
   var $summary = $('.summary')
   var $submit = $form.find('button[name=register]')
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
@@ -12,7 +12,7 @@ function movieDetails() {
   $root.on('show', function(e, programId) {
     if (programId) {
       location.hash = '#luokittelu/'+programId
-      $.get('/movies/' + programId).done(show)
+      $.get('/programs/' + programId).done(show)
     } else if ($form.data('id')) {
       location.hash = '#luokittelu/'+$form.data('id')
     } else {
@@ -22,8 +22,8 @@ function movieDetails() {
 
   $form.on('validation', function() {
     var required = $(".required.invalid, .required-pseudo.invalid")
-      // if in reclassification-mode ignore movie info fields
-      .not(".exclude, form.reclassification .movie-info .required")
+      // if in reclassification-mode ignore program info fields
+      .not(".exclude, form.reclassification .program-info .required")
       // we only care about the original element from which the invalid
       // class has been removed
       .not('.select2-container.required.invalid')
@@ -46,7 +46,7 @@ function movieDetails() {
 
   $form.on('submit', function(e) {
     e.preventDefault()
-    $.post('/movies/' + $form.data('id') + '/register', function(data) {
+    $.post('/programs/' + $form.data('id') + '/register', function(data) {
       $form.data('id', '')
       $form.hide().trigger('show')
       var summary = classification.summary(data, data.classifications[0])
@@ -85,19 +85,19 @@ function movieDetails() {
 
   $form.find('input[type=text], textarea').not('[name="registration-email"]').throttledInput(function(txt) {
     if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
-    saveMovieField($form.data('id'), $(this).attr('name'), txt)
+    saveProgramField($form.data('id'), $(this).attr('name'), txt)
   })
 
   $form.find('input[name="classifications.0.safe"]').change(function() {
     var safe = $(this).is(':checked')
     $form.find('.category-container').toggle(!safe)
-    saveMovieField($form.data('id'), $(this).attr('name'), safe)
+    saveProgramField($form.data('id'), $(this).attr('name'), safe)
   })
 
   $form.on('click', '.category .criteria', function() {
     $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
     var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
-    saveMovieField($form.data('id'), 'classifications.0.criteria', ids)
+    saveProgramField($form.data('id'), 'classifications.0.criteria', ids)
   })
 
   $form.on('click', '.category .criteria textarea', function(e) {
@@ -155,21 +155,21 @@ function movieDetails() {
         $('<span>', { class:'drop-target' })
       ])
       var newOrder = $el.find('.warnings .warning').map(function() { return $(this).data('id') }).get()
-      saveMovieField($form.data('id'), 'classifications.0.warning-order', newOrder)
+      saveProgramField($form.data('id'), 'classifications.0.warning-order', newOrder)
     })
   }
 
-  function show(movie) {
-    var currentClassification = _.first(movie.classifications)
+  function show(program) {
+    var currentClassification = _.first(program.classifications)
 
-    $form.data('id', movie._id).show()
+    $form.data('id', program._id).show()
       .find('.touched').removeClass('touched').end()
-      .find('input[name="name.0"]').val(movie.name[0]).end()
-      .find('input[name="name-fi.0"]').val(movie['name-fi'][0]).end()
-      .find('input[name="name-sv.0"]').val(movie['name-sv'][0]).end()
-      .find('input[name="name-other.0"]').val(movie['name-other'][0]).end()
-      .find('input[name=year]').val(movie.year).end()
-      .find('textarea[name=synopsis]').val(movie.synopsis).end()
+      .find('input[name="name.0"]').val(program.name[0]).end()
+      .find('input[name="name-fi.0"]').val(program['name-fi'][0]).end()
+      .find('input[name="name-sv.0"]').val(program['name-sv'][0]).end()
+      .find('input[name="name-other.0"]').val(program['name-other'][0]).end()
+      .find('input[name=year]').val(program.year).end()
+      .find('textarea[name=synopsis]').val(program.synopsis).end()
       .find('input[name="classifications.0.buyer"]').val(currentClassification.buyer).end()
       .find('input[name="classifications.0.billing"]').val(currentClassification.billing).end()
       .find('input[name="classifications.0.duration"]').val(currentClassification.duration).end()
@@ -180,28 +180,28 @@ function movieDetails() {
 
     selectEnumAutocomplete({
       $el: $form.find('input.country'),
-      val: movie.country,
+      val: program.country,
       data: Object.keys(enums.countries).map(function(key) { return { id: key, text: enums.countries[key] }}),
       multiple: true
     })
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="production-companies"]'),
-      val: movie['production-companies'],
+      val: program['production-companies'],
       data: enums.productionCompanies.map(function(f) { return { id: f, text: f }}),
       multiple: true
     })
 
     selectEnumAutocomplete({
       $el: $form.find('input[name=genre]'),
-      val: movie.genre,
+      val: program.genre,
       data: enums.genre.map(function(f) { return { id: f, text: f }}),
       multiple: true
     })
 
     selectAutocomplete({
       $el: $form.find('input[name="directors"]'),
-      val: movie['directors'] || [],
+      val: program['directors'] || [],
       path: '/directors/search/',
       multiple: true,
       allowAdding: true
@@ -209,7 +209,7 @@ function movieDetails() {
 
     selectAutocomplete({
       $el: $form.find('input[name="actors"]'),
-      val: movie['actors'] || [],
+      val: program['actors'] || [],
       path: '/actors/search/',
       multiple: true,
       allowAdding: true
@@ -217,19 +217,19 @@ function movieDetails() {
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.reason"]'),
-      val: typeof movie.classifications[0].reason == 'number' ? movie.classifications[0].reason.toString() : '',
+      val: typeof program.classifications[0].reason == 'number' ? program.classifications[0].reason.toString() : '',
       data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
     })
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.authorOrganization"]'),
-      val: typeof movie.classifications[0].authorOrganization == 'number' ? movie.classifications[0].authorOrganization.toString() : '',
+      val: typeof program.classifications[0].authorOrganization == 'number' ? program.classifications[0].authorOrganization.toString() : '',
       data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } })
     })
 
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.buyer"]'),
-      val: movie.classifications[0].buyer,
+      val: program.classifications[0].buyer,
       path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber' },
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany
@@ -237,7 +237,7 @@ function movieDetails() {
 
     selectAutocomplete({
       $el: $form.find('input[name="classifications.0.billing"]'),
-      val: movie.classifications[0].billing,
+      val: program.classifications[0].billing,
       path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber,Classifier' },
       toOption: companyToSelect2Option,
       fromOption: select2OptionToCompany
@@ -245,11 +245,11 @@ function movieDetails() {
 
     selectEnumAutocomplete({
       $el: $form.find('input[name="classifications.0.format"]'),
-      val: movie.classifications[0].format,
+      val: program.classifications[0].format,
       data: enums.format.map(function(f) { return { id: f, text: f }})
     })
 
-    if (classification.isReclassification(movie)) {
+    if (classification.isReclassification(program)) {
       $billing.select2('enable', false)
       $buyer.select2('enable', false)
 
@@ -258,7 +258,7 @@ function movieDetails() {
       $billing.select2('enable', true)
     }
 
-    if (classification.isReclassification(movie) && currentClassification.reason == 2) {
+    if (classification.isReclassification(program) && currentClassification.reason == 2) {
       $buyer.select2('enable', true)
       $billing.select2('enable', true)
     }
@@ -277,18 +277,18 @@ function movieDetails() {
       }
     })
 
-    if (classification.isReclassification(movie)) {
+    if (classification.isReclassification(program)) {
       $form.addClass('reclassification')
-      var $movieInfo = $form.find('.movie-info')
-      $movieInfo.find('.select2-offscreen').select2('enable', false)
-      $movieInfo.find('input,textarea').attr('disabled', 'disabled')
+      var $programInfo = $form.find('.program-info')
+      $programInfo.find('.select2-offscreen').select2('enable', false)
+      $programInfo.find('input,textarea').attr('disabled', 'disabled')
     } else {
       $form.addClass('classification')
     }
 
     $form.find('.required').trigger('validate')
-    updateSummary(movie)
-    preview.update(movie)
+    updateSummary(program)
+    preview.update(program)
   }
 
   function selectEnumAutocomplete(opts) {
@@ -301,7 +301,7 @@ function movieDetails() {
       }
     }).on('change', function() {
         var data = $(this).select2('data')
-        saveMovieField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
+        saveProgramField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
       }).select2('val', opts.val)
 
     function idToOption(id) {
@@ -353,7 +353,7 @@ function movieDetails() {
     $select.on('change', function() {
       var data = $(this).select2('data')
       var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
-      saveMovieField($form.data('id'), $(this).attr('name'), val)
+      saveProgramField($form.data('id'), $(this).attr('name'), val)
     })
 
     $select.select2('val', opts.val)
@@ -382,29 +382,29 @@ function movieDetails() {
     })
   }
 
-  function saveMovieField(id, field, value) {
-    $.post('/movies/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(movie) {
-      updateSummary(movie)
-      preview.update(movie)
+  function saveProgramField(id, field, value) {
+    $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(program) {
+      updateSummary(program)
+      preview.update(program)
     })
   }
 
-  function updateSummary(movie) {
-    var summary = classification.summary(movie, movie.classifications[0])
+  function updateSummary(program) {
+    var summary = classification.summary(program, program.classifications[0])
     var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
-    var synopsis = commentToHtml(movie.synopsis ? movie.synopsis : '-')
-    var countries = enums.util.toCountryString(movie.country)
-    var comments = commentToHtml(movie.classifications[0].publicComments || '')
+    var synopsis = commentToHtml(program.synopsis ? program.synopsis : '-')
+    var countries = enums.util.toCountryString(program.country)
+    var comments = commentToHtml(program.classifications[0].publicComments || '')
     $summary
-      .find('.name').text(movie.name.join(', ') || '-').end()
-      .find('.year').text(movie.year || '-').end()
+      .find('.name').text(program.name.join(', ') || '-').end()
+      .find('.year').text(program.year || '-').end()
       .find('.synopsis').html(synopsis).end()
       .find('.country').text(countries || '-').end()
-      .find('.directors').text((movie.directors).join(', ') || '-').end()
-      .find('.actors').text((movie.actors).join(', ') || '-').end()
+      .find('.directors').text((program.directors).join(', ') || '-').end()
+      .find('.actors').text((program.actors).join(', ') || '-').end()
       .find('.agelimit img').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
-      .find('.reason').html(enums.reclassificationReason[movie.classifications[0].reason]).end()
+      .find('.reason').html(enums.reclassificationReason[program.classifications[0].reason]).end()
       .find('.comments').html(comments).end()
   }
 
@@ -438,11 +438,11 @@ function movieDetails() {
         .map(function() { return $(this).val() }).get()
         .map(function(email) { return {email: email, manual: true}})
 
-      saveMovieField($form.data('id'), $emails.find('ul li input:first').attr('name'), buyerEmails.concat(manualEmails))
+      saveProgramField($form.data('id'), $emails.find('ul li input:first').attr('name'), buyerEmails.concat(manualEmails))
     }
 
-    function updatePreview(movie) {
-      var cl = _.first(movie.classifications)
+    function updatePreview(program) {
+      var cl = _.first(program.classifications)
       var buyerEmails = cl['registration-email-addresses']
         .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
       var manualEmails = cl['registration-email-addresses']
@@ -452,7 +452,7 @@ function movieDetails() {
       manualEmails.filter(function(email) { return notIn(manualInDom, email) })
         .forEach(addManualEmailCheckbox(true))
 
-      var email = classification.registrationEmail(movie, user)
+      var email = classification.registrationEmail(program, user)
 
       $preview.find('.recipients').text(email.recipients.join(', '))
       $preview.find('.subject').text(email.subject)

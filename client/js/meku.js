@@ -31,7 +31,7 @@ function setup() {
 
   var navigation = navi()
   searchPage()
-  movieDetails()
+  programDetails()
   buyerPage()
   billingPage()
   navigation.start()

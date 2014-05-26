@@ -206,10 +206,10 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .form textarea { width: 280px; height: 130px; }
 .form input[disabled=disabled], .form textarea[disabled=disabled] {background-color: #f4f4f4; }
 
-#movie-details .reclassification { display: none; }
+#program-details .reclassification { display: none; }
 
-#movie-details.reclassification .classification { display: none; }
-#movie-details.reclassification .reclassification { display: block; }
+#program-details.reclassification .classification { display: none; }
+#program-details.reclassification .reclassification { display: block; }
 
 input[type=text],
 input[type=password],
@@ -344,11 +344,11 @@ textarea.invalid.touched,
   background: #fff0f0;
 }
 
-#classification-page .new-movie { margin-top: 10px }
-#movie-details { display: none; }
+#classification-page .new-program { margin-top: 10px }
+#program-details { display: none; }
 
-#movie-details input.duration { margin-bottom: 3px }
-#movie-details .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
+#program-details input.duration { margin-bottom: 3px }
+#program-details .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
 
 #classification h2 { margin: 0 0 10px 0; }
 #classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }

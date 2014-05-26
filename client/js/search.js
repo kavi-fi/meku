@@ -47,9 +47,9 @@ function searchPage() {
 
   $newClassificationButton.click(function() {
     var programType = $('input[name="new-classification-type"]').select2('val')
-    $.post('/movies/new', JSON.stringify({'program-type': programType})).done(function(movie) {
+    $.post('/programs/new', JSON.stringify({'program-type': programType})).done(function(program) {
       $('body').children('.page').hide()
-      $('#classification-page').trigger('show', movie._id).show()
+      $('#classification-page').trigger('show', program._id).show()
     })
   })
 
@@ -78,7 +78,7 @@ function searchPage() {
 
   function load(callback) {
     $loading.show()
-    var url = '/movies/search/'+encodeURIComponent(state.q)
+    var url = '/programs/search/'+encodeURIComponent(state.q)
     var data = $.param({ page:state.page, filters:currentFilters() })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
@@ -128,9 +128,9 @@ function searchPage() {
 
   $results.on('click', 'button.reclassify', function(e) {
     var id = $(this).parents('.search-result-details').data('id')
-    $.post('/movies/' + id + '/reclassification').done(function(movie) {
+    $.post('/programs/' + id + '/reclassification').done(function(program) {
       $('body').children('.page').hide()
-      $('#classification-page').trigger('show', movie._id).show()
+      $('#classification-page').trigger('show', program._id).show()
     })
   })
   $results.on('click', 'button.continue-classification', function(e) {

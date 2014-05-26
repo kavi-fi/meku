@@ -31,7 +31,7 @@ var classification = {
   status: String
 }
 
-var MovieSchema = new Schema({
+var ProgramSchema = new Schema({
   'emeku-id': { type: String, index: true },
   'all-names': { type: [String], index: true },
   name: { type: [String], index: true },
@@ -53,10 +53,10 @@ var MovieSchema = new Schema({
   season: String, episode: String, series: { _id: mongoose.Schema.Types.ObjectId, name: String }
 })
 
-MovieSchema.methods.populateAllNames = function(callback) {
+ProgramSchema.methods.populateAllNames = function(callback) {
   var program = this
   if (program.series._id) {
-    Movie.findById(program.series._id, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }, function(err, parent) {
+    Program.findById(program.series._id, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }, function(err, parent) {
       if (err) return callback(err)
       populate(program, concatNames(parent))
       callback()
@@ -76,7 +76,7 @@ MovieSchema.methods.populateAllNames = function(callback) {
   }
 }
 
-var Movie = exports.Movie = mongoose.model('movies', MovieSchema)
+var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 
 var Account = exports.Account = mongoose.model('accounts', {
   'emeku-id': String,
@@ -125,7 +125,7 @@ var User = exports.User = mongoose.model('users', UserSchema)
 var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
   account: {_id: mongoose.Schema.Types.ObjectId, name: String},
   type: String, // registration, classification or distributor fee
-  movie: mongoose.Schema.Types.ObjectId,
+  program: mongoose.Schema.Types.ObjectId,
   name: String,
   duration: String,
   'registration-date': Date,
@@ -151,4 +151,4 @@ var Director = exports.Director = mongoose.model('directors', DirectorSchema)
 ActorSchema.statics.updateWithNames = updateNamedIndex
 var Actor = exports.Actor = mongoose.model('actors', ActorSchema)
 
-var models = exports.models = [Movie, Account, Provider, User, InvoiceRow, Director, Actor]
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, Director, Actor]

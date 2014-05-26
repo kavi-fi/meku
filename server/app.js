@@ -3,7 +3,7 @@ var _ = require('lodash')
 var path = require('path')
 var mongoose = require('mongoose')
 var schema = require('./schema')
-var Movie = schema.Movie
+var Program = schema.Program
 var User = schema.User
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
@@ -50,10 +50,10 @@ app.post('/logout', function(req, res, next) {
   res.send({})
 })
 
-app.get('/movies/search/:q?', function(req, res) {
+app.get('/programs/search/:q?', function(req, res) {
   var page = req.query.page || 0
   var filters = req.query.filters || []
-  Movie.find(query()).skip(page * 100).limit(100).sort('name').exec(function(err, results) {
+  Program.find(query()).skip(page * 100).limit(100).sort('name').exec(function(err, results) {
     res.send(results)
   })
 
@@ -66,69 +66,69 @@ app.get('/movies/search/:q?', function(req, res) {
   }
 })
 
-app.get('/movies/:id', function(req, res) {
-  Movie.findById(req.params.id, function(err, movie) { res.send(movie) })
+app.get('/programs/:id', function(req, res) {
+  Program.findById(req.params.id, function(err, program) { res.send(program) })
 })
 
-app.post('/movies/new', function(req, res, next) {
+app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body['program-type'])
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
 
   var data = { classifications: [classification.createNew(req.user)], 'program-type': programType }
-  new Movie(data).save(function(err, movie) {
+  new Program(data).save(function(err, program) {
     if (err) return next(err)
-    return res.send(movie)
+    return res.send(program)
   })
 })
 
-app.post('/movies/:id/register', function(req, res, next) {
+app.post('/programs/:id/register', function(req, res, next) {
   var data = {
     'classifications.0.registration-date': new Date(),
     'classifications.0.status': 'registered',
     'classifications.0.author': { _id: req.user._id, name: req.user.name }
   }
-  Movie.findByIdAndUpdate(req.params.id, data, null, function(err, movie) {
+  Program.findByIdAndUpdate(req.params.id, data, null, function(err, program) {
     if (err) return next(err)
     InvoiceRow.create({
-      account: movie.billing,
+      account: program.billing,
       type: 'registration',
-      movie: movie._id,
-      name: movie.name,
-      duration: movie.duration,
-      'registration-date': movie.classifications[0]['registration-date'],
+      program: program._id,
+      name: program.name,
+      duration: program.duration,
+      'registration-date': program.classifications[0]['registration-date'],
       price: 700
     }, function(err, saved) {
       if (err) return next(err)
-      sendEmail(classification.registrationEmail(movie, req.user), function(err) {
+      sendEmail(classification.registrationEmail(program, req.user), function(err) {
         if (err) return next(err)
-        updateActorAndDirectorIndexes(movie, function() {
-          return res.send(movie)
+        updateActorAndDirectorIndexes(program, function() {
+          return res.send(program)
         })
       })
     })
   })
 })
 
-app.post('/movies/:id/reclassification', function(req, res, next) {
-  // create new movie.classifications
-  Movie.findById(req.params.id, function(err, movie) {
+app.post('/programs/:id/reclassification', function(req, res, next) {
+  // create new program.classifications
+  Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
-    movie.classifications = [classification.createNew(req.user)].concat(movie.classifications)
-    movie.save(function(err, saved) {
+    program.classifications = [classification.createNew(req.user)].concat(program.classifications)
+    program.save(function(err, saved) {
       if (err) next(err)
       res.send(saved)
     })
   })
 })
 
-app.post('/movies/:id', function(req, res, next) {
-  Movie.findByIdAndUpdate(req.params.id, req.body, null, function(err, movie) {
+app.post('/programs/:id', function(req, res, next) {
+  Program.findByIdAndUpdate(req.params.id, req.body, null, function(err, program) {
     if (err) return next(err)
-    movie.populateAllNames(function(err) {
+    program.populateAllNames(function(err) {
       if (err) return next(err)
-      movie.save(function(err) {
+      program.save(function(err) {
         if (err) return next(err)
-        return res.send(movie)
+        return res.send(program)
       })
     })
   })

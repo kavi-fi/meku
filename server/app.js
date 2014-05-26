@@ -33,7 +33,13 @@ app.post('/login', function(req, res, next) {
     user.checkPassword(password, function(err, ok) {
       if (err) return next(err)
       if (!ok) return res.send(403)
-      res.cookie('user', { _id: user._id.toString(), username: user.username, name: user.name, role: user.role }, { signed: true })
+      res.cookie('user', {
+        _id: user._id.toString(),
+        username: user.username,
+        name: user.name,
+        role: user.role,
+        email: _.first(user.emails)
+      }, { signed: true })
       res.send({})
     })
   })

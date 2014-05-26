@@ -127,7 +127,7 @@ var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
   type: String, // registration, classification or distributor fee
   program: mongoose.Schema.Types.ObjectId,
   name: String,
-  duration: String,
+  duration: Number,
   'registration-date': Date,
   price: Number // eurocents
 })

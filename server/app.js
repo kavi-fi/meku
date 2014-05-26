@@ -89,15 +89,58 @@ app.post('/programs/:id/register', function(req, res, next) {
   }
   Program.findByIdAndUpdate(req.params.id, data, null, function(err, program) {
     if (err) return next(err)
-    InvoiceRow.create({
-      account: program.billing,
-      type: 'registration',
-      program: program._id,
-      name: program.name,
-      duration: program.duration,
-      'registration-date': program.classifications[0]['registration-date'],
-      price: 700
-    }, function(err, saved) {
+
+    function addInvoicerows(callback) {
+      var currentClassification = _.first(program.classifications)
+      var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(currentClassification.duration)
+        .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
+      var seconds = (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
+
+      if (classification.isReclassification(program)) {
+        // reclassification fee only when "Oikaisupyyntö" and KAVI is the classifier
+        if (currentClassification.reason === 2 && currentClassification.authorOrganization === 1) {
+          InvoiceRow.create({
+            account: program.billing,
+            type: 'reclassification',
+            program: program._id,
+            name: program.name,
+            duration: seconds,
+            'registration-date': currentClassification['registration-date'],
+            price: 74 * 100
+          }, callback)
+        } else {
+          callback(null)
+        }
+      } else {
+        InvoiceRow.create({
+          account: program.billing,
+          type: 'registration',
+          program: program._id,
+          name: program.name,
+          duration: seconds,
+          'registration-date': currentClassification['registration-date'],
+          price: 725
+        }, function(err, saved) {
+          if (err) return next(err)
+          if (req.user.role === 'kavi') {
+            // duraation mukaan laskutus
+            InvoiceRow.create({
+              account: program.billing,
+              type: 'classification',
+              program: program._id,
+              name: program.name,
+              duration: seconds,
+              'registration-date': currentClassification['registration-date'],
+              price: classification.classificationPrice(parseInt(seconds))
+            }, callback)
+          } else {
+            callback(null)
+          }
+        })
+      }
+    }
+
+    addInvoicerows(function(err, _) {
       if (err) return next(err)
       sendEmail(classification.registrationEmail(program, req.user), function(err) {
         if (err) return next(err)

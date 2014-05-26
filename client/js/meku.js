@@ -118,10 +118,6 @@ function navi() {
 function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
 function billingPage() { $('#billing-page').on('show', function() { location.hash = '#laskutus'}) }
 
-function isReclassification(movie) {
-  return movie.classifications.length > 1
-}
-
 function isNotEmpty(val) {
   return (val.trim().length) > 0
 }

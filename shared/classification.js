@@ -66,6 +66,10 @@ exports.fullStatus = function(classifications) {
   }
 }
 
+var isReclassification = exports.isReclassification = function(movie) {
+  return movie.classifications.length > 1
+}
+
 exports.mostValid = function(classifications) {
   if (!classifications || classifications.length == 0) return undefined
   if (classifications.length == 1) return classifications[0]
@@ -106,8 +110,8 @@ exports.registrationEmail = function(movie, user) {
     "<p><%- date %><br/><%- buyer %></p><p>Ilmoitus kuvaohjelman luokittelusta</p>" +
     ((user.role == 'kavi') ? "<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
     ' on <%- date %> tilauksestanne luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
-    ((user.role == 'kavi') ? '<p>Perusteet: <%- publicComments %></p>' : '') +
-    ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a>"</p>' : '') +
+    ((user.role == 'kavi' && isReclassification(movie)) ? '<p>Perusteet: <%- publicComments %></p>' : '') +
+    ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
     '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
     'Mediakasvatus- ja kuvaohjelmayksikkö</p>'

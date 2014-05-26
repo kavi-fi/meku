@@ -160,7 +160,7 @@ function movieDetails() {
   }
 
   function show(movie) {
-    var classification = movie.classifications[0]
+    var currentClassification = _.first(movie.classifications)
 
     $form.data('id', movie._id).show()
       .find('.touched').removeClass('touched').end()
@@ -170,12 +170,12 @@ function movieDetails() {
       .find('input[name="name-other.0"]').val(movie['name-other'][0]).end()
       .find('input[name=year]').val(movie.year).end()
       .find('textarea[name=synopsis]').val(movie.synopsis).end()
-      .find('input[name="classifications.0.buyer"]').val(classification.buyer).end()
-      .find('input[name="classifications.0.billing"]').val(classification.billing).end()
-      .find('input[name="classifications.0.duration"]').val(classification.duration).end()
-      .find('input[name="classifications.0.safe"]').check(classification.safe).end()
-      .find('textarea[name="classifications.0.comments"]').val(classification.comments).end()
-      .find('textarea[name="classifications.0.publicComments"]').val(classification.publicComments).end()
+      .find('input[name="classifications.0.buyer"]').val(currentClassification.buyer).end()
+      .find('input[name="classifications.0.billing"]').val(currentClassification.billing).end()
+      .find('input[name="classifications.0.duration"]').val(currentClassification.duration).end()
+      .find('input[name="classifications.0.safe"]').check(currentClassification.safe).end()
+      .find('textarea[name="classifications.0.comments"]').val(currentClassification.comments).end()
+      .find('textarea[name="classifications.0.publicComments"]').val(currentClassification.publicComments).end()
 
 
     selectEnumAutocomplete({
@@ -249,7 +249,7 @@ function movieDetails() {
       data: enums.format.map(function(f) { return { id: f, text: f }})
     })
 
-    if (isReclassification(movie)) {
+    if (classification.isReclassification(movie)) {
       $billing.select2('enable', false)
       $buyer.select2('enable', false)
 
@@ -258,15 +258,15 @@ function movieDetails() {
       $billing.select2('enable', true)
     }
 
-    if (isReclassification(movie) && movie.classifications[0].reason == 2) {
+    if (classification.isReclassification(movie) && currentClassification.reason == 2) {
       $buyer.select2('enable', true)
       $billing.select2('enable', true)
     }
 
-    $form.find('.category-container').toggle(!classification.safe)
+    $form.find('.category-container').toggle(!currentClassification.safe)
     $form.find('.category-criteria input').removeAttr('checked')
 
-    classification.criteria.forEach(function(id) {
+    currentClassification.criteria.forEach(function(id) {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')
     })
     $form.find('.category-criteria textarea').val()
@@ -277,7 +277,7 @@ function movieDetails() {
       }
     })
 
-    if (isReclassification(movie)) {
+    if (classification.isReclassification(movie)) {
       $form.addClass('reclassification')
       var $movieInfo = $form.find('.movie-info')
       $movieInfo.find('.select2-offscreen').select2('enable', false)

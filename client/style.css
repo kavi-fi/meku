@@ -204,10 +204,9 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }
-.form input[disabled=disabled], .form textarea[disabled=disabled] {background-color: #f4f4f4; }
+.form input:disabled, .form textarea:disabled {background-color: #f4f4f4; }
 
 #program-details .reclassification { display: none; }
-
 #program-details.reclassification .classification { display: none; }
 #program-details.reclassification .reclassification { display: block; }
 
@@ -341,6 +340,11 @@ input[type=text].invalid.touched,
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {
+  background: #fff0f0;
+}
+
+input[type=text].invalid:disabled,
+textarea.invalid:disabled {
   background: #fff0f0;
 }
 

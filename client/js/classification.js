@@ -237,7 +237,7 @@ function programDetails() {
       .find('input[name="classifications.0.buyer"]').val(currentClassification.buyer).end()
       .find('input[name="classifications.0.billing"]').val(currentClassification.billing).end()
       .find('input[name="classifications.0.duration"]').val(currentClassification.duration).end()
-      .find('input[name="classifications.0.safe"]').check(currentClassification.safe).end()
+      .find('input[name="classifications.0.safe"]').prop('checked', !!currentClassification.safe).end()
       .find('textarea[name="classifications.0.comments"]').val(currentClassification.comments).end()
       .find('textarea[name="classifications.0.publicComments"]').val(currentClassification.publicComments).end()
 

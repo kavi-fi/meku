@@ -184,13 +184,6 @@ $.fn.throttledInput = function(fn) {
   })
 }
 
-$.fn.check = function(on) {
-  $(this).each(function() {
-    on ? $(this).prop('checked', 'checked') : $(this).removeProp('checked')
-  })
-  return this
-}
-
 function ageLimitIcon(summary) {
   return summary.pegi
     ? 'images/pegi-'+summary.age.toString().toLowerCase()+'.png'

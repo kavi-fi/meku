@@ -9,6 +9,8 @@ function programDetails() {
 
   renderClassificationCriteria()
 
+  var $throttledAutoSaveFields = $form.find('input[type=text], textarea').not('[name="registration-email"]')
+
   $root.on('show', function(e, programId) {
     if (programId) {
       location.hash = '#luokittelu/'+programId
@@ -83,7 +85,7 @@ function programDetails() {
 
   $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
 
-  $form.find('input[type=text], textarea').not('[name="registration-email"]').throttledInput(function(txt) {
+  $throttledAutoSaveFields.throttledInput(function(txt) {
     if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
     saveProgramField($form.data('id'), $(this).attr('name'), txt)
   })
@@ -272,6 +274,7 @@ function programDetails() {
         $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(txt).parents('.criteria').addClass('has-comment')
       }
     })
+    $throttledAutoSaveFields.trigger('reset')
 
     if (classification.isReclassification(program)) {
       $form.addClass('reclassification')

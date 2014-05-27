@@ -178,6 +178,11 @@ exports.classificationPrice = function(duration) {
   return price[2] * 100
 }
 
+// see enums.reclassificationReason
+exports.isRemediationRequest = function(val) {
+  return val == 3
+}
+
 })(typeof exports === 'undefined'? this['classification']={}: exports)
 
 

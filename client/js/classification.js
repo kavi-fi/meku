@@ -96,7 +96,7 @@ function programDetails() {
   })
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
-    if ($(this).val() == 2) {
+    if (classification.isRemediationRequest($(this).val())) {
       $buyer.select2('enable', true).removeClass('invalid')
       $billing.select2('enable', true).removeClass('invalid')
     } else {
@@ -250,7 +250,7 @@ function programDetails() {
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
-    var enableBillingAndBuyer = !isReclassification || currentClassification.reason == 2
+    var enableBillingAndBuyer = !isReclassification || classification.isRemediationRequest(currentClassification.reason)
     $billing.select2('enable', enableBillingAndBuyer)
     $buyer.select2('enable', enableBillingAndBuyer)
 

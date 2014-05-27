@@ -222,6 +222,7 @@ function programDetails() {
 
   function show(program) {
     var currentClassification = _.first(program.classifications)
+    var isReclassification = classification.isReclassification(program)
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
@@ -249,29 +250,22 @@ function programDetails() {
       .find('input[name="classifications.0.authorOrganization"]').trigger('setVal', authorOrgVal).end()
       .find('input[name="classifications.0.format"]').trigger('setVal', currentClassification.format).end()
 
-      .find('input[name="directors"]').trigger('setVal', program['directors'] || []).end()
-      .find('input[name="actors"]').trigger('setVal', program['actors'] || []).end()
+      .find('input[name=directors]').trigger('setVal', program['directors'] || []).end()
+      .find('input[name=actors]').trigger('setVal', program['actors'] || []).end()
       .find('input[name="classifications.0.buyer"]').trigger('setVal', currentClassification.buyer).end()
       .find('input[name="classifications.0.billing"]').trigger('setVal', currentClassification.billing).end()
 
-    if (classification.isReclassification(program)) {
-      $billing.select2('enable', false)
-      $buyer.select2('enable', false)
-    } else {
-      $buyer.select2('enable', true)
-      $billing.select2('enable', true)
-    }
-    if (classification.isReclassification(program) && currentClassification.reason == 2) {
-      $buyer.select2('enable', true)
-      $billing.select2('enable', true)
-    }
+      .find('.category-container').toggle(!currentClassification.safe).end()
+      .find('.criteria').removeClass('selected').removeClass('has-comment').end()
+      .find('.criteria textarea').val('').end()
 
-    $form.find('.category-container').toggle(!currentClassification.safe)
+    var enableBillingAndBuyer = !isReclassification || currentClassification.reason == 2
+    $billing.select2('enable', enableBillingAndBuyer)
+    $buyer.select2('enable', enableBillingAndBuyer)
 
     currentClassification.criteria.forEach(function(id) {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')
     })
-    $form.find('.category-criteria textarea').val()
     Object.keys(currentClassification['criteria-comments'] || {}).forEach(function(id) {
       var txt = currentClassification['criteria-comments'][id]
       if (isNotEmpty(txt)) {

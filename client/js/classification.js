@@ -233,8 +233,6 @@ function programDetails() {
       .find('input[name="name-other.0"]').val(program['name-other'][0]).end()
       .find('input[name=year]').val(program.year).end()
       .find('textarea[name=synopsis]').val(program.synopsis).end()
-      .find('input[name="classifications.0.buyer"]').val(currentClassification.buyer).end()
-      .find('input[name="classifications.0.billing"]').val(currentClassification.billing).end()
       .find('input[name="classifications.0.duration"]').val(currentClassification.duration).end()
       .find('input[name="classifications.0.safe"]').prop('checked', !!currentClassification.safe).end()
       .find('textarea[name="classifications.0.comments"]').val(currentClassification.comments).end()
@@ -281,10 +279,16 @@ function programDetails() {
   }
 
   function selectEnumAutocomplete(opts) {
-    opts.$el.select2({ data: opts.data, placeholder: "Valitse...", multiple: opts.multiple || false })
-      .on('change', onChange)
-      .on('setVal', setValue)
+    opts.$el.select2({
+      data: opts.data,
+      placeholder: "Valitse...",
+      multiple: opts.multiple || false,
+      initSelection: initSelection
+    }).on('change', onChange).on('setVal', setValue)
 
+    function initSelection(e, callback) {
+      return callback(opts.multiple ? (opts.val || []).map(idToOption) : idToOption(opts.val))
+    }
     function idToOption(id) {
       var opt = _.find(opts.data, function(item) { return item.id === id })
       return opt ? opt : { id: id, text: id }
@@ -328,6 +332,10 @@ function programDetails() {
         return $.get(path).done(function(data) {
           return query.callback({results: data.map(opts.toOption)})
         })
+      },
+      initSelection: function(element, callback) {
+        var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)
+        return callback(val)
       },
       multiple: opts.multiple,
       placeholder: "Valitse...",

@@ -99,12 +99,8 @@ var ageLimit = exports.ageLimit = function(classification) {
 }
 
 exports.registrationEmail = function(program, user) {
-  var linkOther = {
-    url: "http://www.meku.fi/index.php?option=com_docman&task=doc_download&gid=3&Itemid=377&lang=fi",
-    name: "Oikaisuvaatimusohje"
-  }
-  var linkKavi = {url: "http://www.meku.fi/", name: "Valitusosoitus"}
-
+  var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
+  var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
   var subject = "Luokittelupäätös: <%- name %>, <%- year %>, <%- classificationShort %>"
   var text =
     "<p><%- date %><br/><%- buyer %></p><p>" +

@@ -273,8 +273,8 @@ function programDetails() {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')
     })
     $form.find('.category-criteria textarea').val()
-    Object.keys(classification['criteria-comments'] || {}).forEach(function(id) {
-      var txt = classification['criteria-comments'][id]
+    Object.keys(currentClassification['criteria-comments'] || {}).forEach(function(id) {
+      var txt = currentClassification['criteria-comments'][id]
       if (isNotEmpty(txt)) {
         $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(txt).parents('.criteria').addClass('has-comment')
       }

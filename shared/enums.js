@@ -91,9 +91,10 @@ enums.classificationStatus = [
 ]
 
 enums.reclassificationReason = {
-  0: 'KAVIn päätös',
-  1: 'Valitus',
-  2: 'Oikaisupyyntö'
+  0: 'KAVIn oma aloite',
+  1: 'Yleisön palaute',
+  2: 'Valitus',
+  3: 'Oikaisupyyntö'
 }
 
 enums.authorOrganization = {

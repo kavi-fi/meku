@@ -344,7 +344,9 @@ textarea.invalid.touched,
 }
 
 input[type=text].invalid:disabled,
-textarea.invalid:disabled {
+textarea.invalid:disabled,
+.select2-container-disabled.invalid .select2-choices,
+.select2-container-disabled.invalid .select2-choice {
   background: #fff0f0;
 }
 

@@ -23,20 +23,12 @@ function programDetails() {
   })
 
   $form.on('validation', function() {
-    var required = $(".required.invalid, .required-pseudo.invalid")
-      // if in reclassification-mode ignore program info fields
-      .not(".exclude, form.reclassification .program-info .required")
-      // we only care about the original element from which the invalid
-      // class has been removed
+    var required = $form.find('.required.invalid, .required-pseudo.invalid')
+      .not('.exclude')
+      // we only care about the original element from which the invalid class has been removed
       .not('.select2-container.required.invalid')
-      .not('form.classification .reclassification .required')
-      .not('input[disabled=disabled]')
-
-    if (required.length === 0) {
-      $submit.removeAttr('disabled')
-    } else {
-      $submit.attr('disabled', 'disabled')
-    }
+      .not('input:disabled, textarea:disabled')
+    $submit.prop('disabled', required.length > 0)
   })
 
   // validations
@@ -255,8 +247,8 @@ function programDetails() {
       .find('.criteria').removeClass('selected').removeClass('has-comment').end()
       .find('.criteria textarea').val('').end()
 
-      .find('.program-info .select2-offscreen').select2('enable', !isReclassification).end()
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
+      .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
     var enableBillingAndBuyer = !isReclassification || currentClassification.reason == 2
     $billing.select2('enable', enableBillingAndBuyer)
@@ -272,7 +264,6 @@ function programDetails() {
       }
     })
     $throttledAutoSaveFields.trigger('reset')
-
     $form.find('.required').trigger('validate')
     updateSummary(program)
     preview.update(program)

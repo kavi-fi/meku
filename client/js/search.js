@@ -221,8 +221,8 @@ function searchPage() {
     var head = p.classifications[0]
     var canContinue = head && head.status == 'in_process' && (hasRole('kavi') || !head.author || head.author._id == user._id)
     var canReclassify = !canContinue && (hasRole('kavi') || !head || (head.status != 'registered' && head.status != 'in_process'))
-    $e.find('button.continue-classification').toggle(canContinue)
-    $e.find('button.reclassify').toggle(canReclassify)
+    $e.find('button.continue-classification').toggle(!!canContinue)
+    $e.find('button.reclassify').toggle(!!canReclassify)
 
     return $e
   }

@@ -229,6 +229,8 @@ function programDetails() {
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
     $form.data('id', program._id).show()
+      .toggleClass('classification', !isReclassification)
+      .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()
       .find('.invalid').removeClass('invalid').end()
       .find('input[name="name.0"]').val(program.name[0]).end()
@@ -261,6 +263,9 @@ function programDetails() {
       .find('.criteria').removeClass('selected').removeClass('has-comment').end()
       .find('.criteria textarea').val('').end()
 
+      .find('.program-info .select2-offscreen').select2('enable', !isReclassification).end()
+      .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
+
     var enableBillingAndBuyer = !isReclassification || currentClassification.reason == 2
     $billing.select2('enable', enableBillingAndBuyer)
     $buyer.select2('enable', enableBillingAndBuyer)
@@ -275,15 +280,6 @@ function programDetails() {
       }
     })
     $throttledAutoSaveFields.trigger('reset')
-
-    if (classification.isReclassification(program)) {
-      $form.addClass('reclassification')
-      var $programInfo = $form.find('.program-info')
-      $programInfo.find('.select2-offscreen').select2('enable', false)
-      $programInfo.find('input,textarea').attr('disabled', 'disabled')
-    } else {
-      $form.addClass('classification')
-    }
 
     $form.find('.required').trigger('validate')
     updateSummary(program)

@@ -72,13 +72,7 @@ function programDetails() {
 
   function requiredCheckboxGroup($el) {
     function validate() {
-      var valid = $el.find('input:checkbox:checked').length > 0 ? true : false
-      if (valid) {
-        $el.removeClass('invalid')
-      } else {
-        $el.addClass('invalid')
-      }
-      $el.trigger('validation')
+      $el.toggleClass('invalid', $el.find('input:checkbox:checked').length == 0).trigger('validation')
     }
     $el.on('change validate', 'input:checkbox', validate)
   }

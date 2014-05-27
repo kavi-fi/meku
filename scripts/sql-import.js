@@ -65,7 +65,7 @@ function run(job, callback) {
 
 function base(callback) {
   var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where deleted != "1"'
-  batchInserter(q, programMapper, 'Movie', callback)
+  batchInserter(q, programMapper, 'Program', callback)
 
   function programMapper(row) {
     var obj = { 'emeku-id': row.id }
@@ -99,7 +99,7 @@ function names(callback) {
 
   function update(key, obj, callback) {
     if (!obj.name) fixNameless(obj)
-    schema.Movie.update({ 'emeku-id': key }, obj, callback)
+    schema.Program.update({ 'emeku-id': key }, obj, callback)
   }
 
   function nameType(type) {
@@ -122,19 +122,19 @@ function metadata(callback) {
   function actors(callback) {
     console.log('\n> actors')
     var q = 'select p.id, CONCAT_WS(" ", TRIM(n.name), TRIM(n.surname)) as name from meku_audiovisualprograms p join meku_audiov_meku_actors_c j on (p.id = j.meku_audio7d9crograms_ida) join meku_actors n on (j.meku_audio8fcb_actors_idb = n.id) where p.deleted != "1" and j.deleted != "1" and n.deleted != "1"'
-    batchUpdater(q, idToNameMapper, singleFieldUpdater('Movie', 'actors'), callback)
+    batchUpdater(q, idToNameMapper, singleFieldUpdater('Program', 'actors'), callback)
   }
 
   function directors(callback) {
     console.log('\n> directors')
     var q = 'select p.id, CONCAT_WS(" ", TRIM(n.name), TRIM(n.surname)) as name from meku_audiovisualprograms p join meku_audiovku_directors_c j on (p.id = j.meku_audioc912rograms_ida) join meku_directors n on (j.meku_audioffd0rectors_idb = n.id) where p.deleted != "1" and j.deleted != "1" and n.deleted != "1"'
-    batchUpdater(q, idToNameMapper, singleFieldUpdater('Movie', 'directors'), callback)
+    batchUpdater(q, idToNameMapper, singleFieldUpdater('Program', 'directors'), callback)
   }
 
   function productionCompanies(callback) {
     console.log('\n> productionCompanies')
     var q = 'select p.id, pc.name from meku_audiovisualprograms p join meku_audiovon_companies_c j on (p.id = j.meku_audioe15crograms_ida) join meku_production_companies pc on (j.meku_audio8018mpanies_idb = pc.id) where p.deleted != "1" and j.deleted != "1" and pc.deleted != "1"'
-    batchUpdater(q, idToNameMapper, singleFieldUpdater('Movie', 'production-companies'), callback)
+    batchUpdater(q, idToNameMapper, singleFieldUpdater('Program', 'production-companies'), callback)
   }
 
   function idToNameMapper(row, result) {
@@ -263,7 +263,7 @@ function classifications(callback) {
     var tick = progressMonitor(100)
     async.eachLimit(Object.keys(result.programs), 5, function(key, cb) {
       tick('*')
-      schema.Movie.update({ 'emeku-id': key }, { 'classifications': result.programs[key] }, cb)
+      schema.Program.update({ 'emeku-id': key }, { 'classifications': result.programs[key] }, cb)
     }, callback)
   }
 }
@@ -318,20 +318,20 @@ function accounts(callback) {
 function nameIndex(callback) {
   var fields = { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1, 'program-type':1, season:1, episode:1, series:1 }
   var tick = progressMonitor()
-  schema.Movie.find({}, fields).stream().pipe(consumer(onRow, callback))
+  schema.Program.find({}, fields).stream().pipe(consumer(onRow, callback))
 
   function onRow(p, callback) {
     tick()
     p.populateAllNames(function(err) {
       if (err) return callback(err)
-      schema.Movie.update({ _id: p._id }, { 'all-names': p['all-names'] }, callback)
+      schema.Program.update({ _id: p._id }, { 'all-names': p['all-names'] }, callback)
     })
   }
 }
 
 function metadataIndex(callback) {
   var tick = progressMonitor()
-  schema.Movie.find({}, { actors: 1, directors: 1 }).stream().pipe(consumer(onRow, callback))
+  schema.Program.find({}, { actors: 1, directors: 1 }).stream().pipe(consumer(onRow, callback))
 
   function onRow(p, callback) {
     tick()
@@ -354,7 +354,7 @@ function markTrainingProgramsDeleted(callback) {
     if (err) return callback(err)
     async.eachLimit(users, 50, function(u, callback) {
       var q = new RegExp('\\(' + utils.escapeRegExp(u.username) + '\\)')
-      schema.Movie.update({ $or: [ { name: q }, { 'name-fi': q } ] }, { deleted: true }, { multi:true }, function(err, numChanged) {
+      schema.Program.update({ $or: [ { name: q }, { 'name-fi': q } ] }, { deleted: true }, { multi:true }, function(err, numChanged) {
         tick()
         count += numChanged
         callback()
@@ -362,7 +362,7 @@ function markTrainingProgramsDeleted(callback) {
     }, function(err) {
       if (err) return callback(err)
       console.log('\n> Number of test-programs marked as deleted: '+count)
-      schema.Movie.update({ name:[] }, { deleted: 1 }, { multi:true }, callback)
+      schema.Program.update({ name:[] }, { deleted: 1 }, { multi:true }, callback)
     })
   })
 }
@@ -375,9 +375,9 @@ function linkTvSeries(callback) {
 
   function onRow(row, callback) {
     tick()
-    schema.Movie.findOne({ 'emeku-id': row.parentId }, { name:1 }, function(err, parent) {
+    schema.Program.findOne({ 'emeku-id': row.parentId }, { name:1 }, function(err, parent) {
       var update = { season: trimPeriod(row.season), episode: trimPeriod(row.episode), series: { _id: parent._id, name: parent.name[0] } }
-      schema.Movie.update({ 'emeku-id': row.programId }, update, callback)
+      schema.Program.update({ 'emeku-id': row.programId }, update, callback)
     })
   }
   function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
@@ -514,20 +514,20 @@ function wipeMetadataIndex(callback) {
   })
 }
 function wipeNames(callback) {
-  schema.Movie.update({}, { 'name': [], 'name-fi': [], 'name-sv': [], 'name-other': [] }, { multi:true }, callback)
+  schema.Program.update({}, { 'name': [], 'name-fi': [], 'name-sv': [], 'name-other': [] }, { multi:true }, callback)
 }
 function wipeMetadata(callback) {
-  schema.Movie.update({}, { actors: [], directors: [], 'production-companies': [] }, { multi:true }, callback)
+  schema.Program.update({}, { actors: [], directors: [], 'production-companies': [] }, { multi:true }, callback)
 }
 function wipeClassifications(callback) {
-  schema.Movie.update({}, { 'classifications': [] }, { multi:true }, callback)
+  schema.Program.update({}, { 'classifications': [] }, { multi:true }, callback)
 }
 
 function dropCollection(coll, callback) {
   mongoose.connection.db.dropCollection(coll, callback)
 }
 function connectMongoose(callback) {
-  schema.Movie.findOne({}, callback)
+  schema.Program.findOne({}, callback)
 }
 
 var legacyGenres = {

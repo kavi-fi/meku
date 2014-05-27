@@ -117,6 +117,67 @@ function programDetails() {
     }
   })
 
+  selectEnumAutocomplete({
+    $el: $form.find('input.country'),
+    data: Object.keys(enums.countries).map(function(key) { return { id: key, text: enums.countries[key] }}),
+    multiple: true
+  })
+
+  selectEnumAutocomplete({
+    $el: $form.find('input[name="production-companies"]'),
+    data: enums.productionCompanies.map(function(f) { return { id: f, text: f }}),
+    multiple: true
+  })
+
+  selectEnumAutocomplete({
+    $el: $form.find('input[name=genre]'),
+    data: enums.genre.map(function(f) { return { id: f, text: f }}),
+    multiple: true
+  })
+
+  selectEnumAutocomplete({
+    $el: $form.find('input[name="classifications.0.reason"]'),
+    data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
+  })
+
+  selectEnumAutocomplete({
+    $el: $form.find('input[name="classifications.0.authorOrganization"]'),
+    data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } })
+  })
+
+  selectEnumAutocomplete({
+    $el: $form.find('input[name="classifications.0.format"]'),
+    data: enums.format.map(function(f) { return { id: f, text: f }})
+  })
+
+  selectAutocomplete({
+    $el: $form.find('input[name="directors"]'),
+    path: '/directors/search/',
+    multiple: true,
+    allowAdding: true
+  })
+
+  selectAutocomplete({
+    $el: $form.find('input[name="actors"]'),
+    path: '/actors/search/',
+    multiple: true,
+    allowAdding: true
+  })
+
+  selectAutocomplete({
+    $el: $form.find('input[name="classifications.0.buyer"]'),
+    path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber' },
+    toOption: companyToSelect2Option,
+    fromOption: select2OptionToCompany
+  })
+
+  selectAutocomplete({
+    $el: $form.find('input[name="classifications.0.billing"]'),
+    path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber,Classifier' },
+    toOption: companyToSelect2Option,
+    fromOption: select2OptionToCompany
+  })
+
   warningDragOrder($("#summary .summary"))
   warningDragOrder($("#classification .summary"))
 
@@ -161,9 +222,12 @@ function programDetails() {
 
   function show(program) {
     var currentClassification = _.first(program.classifications)
+    var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
+    var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
     $form.data('id', program._id).show()
       .find('.touched').removeClass('touched').end()
+      .find('.invalid').removeClass('invalid').end()
       .find('input[name="name.0"]').val(program.name[0]).end()
       .find('input[name="name-fi.0"]').val(program['name-fi'][0]).end()
       .find('input[name="name-sv.0"]').val(program['name-sv'][0]).end()
@@ -177,87 +241,26 @@ function programDetails() {
       .find('textarea[name="classifications.0.comments"]').val(currentClassification.comments).end()
       .find('textarea[name="classifications.0.publicComments"]').val(currentClassification.publicComments).end()
 
+      .find('input.country').trigger('setVal', program.country).end()
+      .find('input[name="production-companies"]').trigger('setVal', program['production-companies']).end()
+      .find('input[name=genre]').trigger('setVal', program.genre).end()
 
-    selectEnumAutocomplete({
-      $el: $form.find('input.country'),
-      val: program.country,
-      data: Object.keys(enums.countries).map(function(key) { return { id: key, text: enums.countries[key] }}),
-      multiple: true
-    })
+      .find('input[name="classifications.0.reason"]').trigger('setVal', reasonVal).end()
+      .find('input[name="classifications.0.authorOrganization"]').trigger('setVal', authorOrgVal).end()
+      .find('input[name="classifications.0.format"]').trigger('setVal', currentClassification.format).end()
 
-    selectEnumAutocomplete({
-      $el: $form.find('input[name="production-companies"]'),
-      val: program['production-companies'],
-      data: enums.productionCompanies.map(function(f) { return { id: f, text: f }}),
-      multiple: true
-    })
-
-    selectEnumAutocomplete({
-      $el: $form.find('input[name=genre]'),
-      val: program.genre,
-      data: enums.genre.map(function(f) { return { id: f, text: f }}),
-      multiple: true
-    })
-
-    selectAutocomplete({
-      $el: $form.find('input[name="directors"]'),
-      val: program['directors'] || [],
-      path: '/directors/search/',
-      multiple: true,
-      allowAdding: true
-    })
-
-    selectAutocomplete({
-      $el: $form.find('input[name="actors"]'),
-      val: program['actors'] || [],
-      path: '/actors/search/',
-      multiple: true,
-      allowAdding: true
-    })
-
-    selectEnumAutocomplete({
-      $el: $form.find('input[name="classifications.0.reason"]'),
-      val: typeof program.classifications[0].reason == 'number' ? program.classifications[0].reason.toString() : '',
-      data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
-    })
-
-    selectEnumAutocomplete({
-      $el: $form.find('input[name="classifications.0.authorOrganization"]'),
-      val: typeof program.classifications[0].authorOrganization == 'number' ? program.classifications[0].authorOrganization.toString() : '',
-      data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } })
-    })
-
-    selectAutocomplete({
-      $el: $form.find('input[name="classifications.0.buyer"]'),
-      val: program.classifications[0].buyer,
-      path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber' },
-      toOption: companyToSelect2Option,
-      fromOption: select2OptionToCompany
-    })
-
-    selectAutocomplete({
-      $el: $form.find('input[name="classifications.0.billing"]'),
-      val: program.classifications[0].billing,
-      path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber,Classifier' },
-      toOption: companyToSelect2Option,
-      fromOption: select2OptionToCompany
-    })
-
-    selectEnumAutocomplete({
-      $el: $form.find('input[name="classifications.0.format"]'),
-      val: program.classifications[0].format,
-      data: enums.format.map(function(f) { return { id: f, text: f }})
-    })
+      .find('input[name="directors"]').trigger('setVal', program['directors'] || []).end()
+      .find('input[name="actors"]').trigger('setVal', program['actors'] || []).end()
+      .find('input[name="classifications.0.buyer"]').trigger('setVal', currentClassification.buyer).end()
+      .find('input[name="classifications.0.billing"]').trigger('setVal', currentClassification.billing).end()
 
     if (classification.isReclassification(program)) {
       $billing.select2('enable', false)
       $buyer.select2('enable', false)
-
     } else {
       $buyer.select2('enable', true)
       $billing.select2('enable', true)
     }
-
     if (classification.isReclassification(program) && currentClassification.reason == 2) {
       $buyer.select2('enable', true)
       $billing.select2('enable', true)
@@ -292,23 +295,23 @@ function programDetails() {
   }
 
   function selectEnumAutocomplete(opts) {
-    opts.$el.select2({
-      data: opts.data,
-      placeholder: "Valitse...",
-      multiple: opts.multiple || false,
-      initSelection: function(e, callback) {
-        return callback(opts.multiple ? (opts.val || []).map(idToOption) : idToOption(opts.val))
-      }
-    }).on('change', function() {
-        var data = $(this).select2('data')
-        saveProgramField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
-      }).select2('val', opts.val)
+    opts.$el.select2({ data: opts.data, placeholder: "Valitse...", multiple: opts.multiple || false })
+      .on('change', onChange)
+      .on('setVal', setValue)
 
     function idToOption(id) {
       var opt = _.find(opts.data, function(item) { return item.id === id })
       return opt ? opt : { id: id, text: id }
     }
-    opts.$el.trigger('validate')
+    function onChange() {
+      var data = $(this).select2('data')
+      saveProgramField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
+    }
+    function setValue(e) {
+      var arr = Array.prototype.slice.call(arguments, 1).map(idToOption)
+      var data = opts.multiple ? arr : (arr[0] && arr[0] || '')
+      $(this).select2('data', data).trigger('validate')
+    }
   }
 
   function selectAutocomplete(opts) {
@@ -319,7 +322,6 @@ function programDetails() {
       allowAdding: false,
       termMinLength: 0
     }
-
     opts = _.merge(defaults, opts)
 
     var $select = opts.$el
@@ -341,10 +343,6 @@ function programDetails() {
           return query.callback({results: data.map(opts.toOption)})
         })
       },
-      initSelection: function(element, callback) {
-        var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)
-        return callback(val)
-      },
       multiple: opts.multiple,
       placeholder: "Valitse...",
       createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
@@ -354,10 +352,11 @@ function programDetails() {
       var data = $(this).select2('data')
       var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
       saveProgramField($form.data('id'), $(this).attr('name'), val)
+    }).on('setVal', function() {
+      var arr = Array.prototype.slice.call(arguments, 1).map(opts.toOption)
+      var data = opts.multiple ? arr : (arr[0] && arr[0] || '')
+      $(this).select2('data', data).trigger('validate')
     })
-
-    $select.select2('val', opts.val)
-    $select.trigger('validate')
   }
 
   function companyToSelect2Option(x) {

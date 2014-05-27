@@ -267,7 +267,6 @@ function programDetails() {
     }
 
     $form.find('.category-container').toggle(!currentClassification.safe)
-    $form.find('.category-criteria input').removeAttr('checked')
 
     currentClassification.criteria.forEach(function(id) {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')

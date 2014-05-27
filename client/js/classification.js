@@ -266,7 +266,7 @@ function programDetails() {
     $throttledAutoSaveFields.trigger('reset')
     $form.find('.required').trigger('validate')
     updateSummary(program)
-    preview.update(program)
+    preview.reset(program)
   }
 
   function selectEnumAutocomplete(opts) {
@@ -459,6 +459,11 @@ function programDetails() {
       }
     }
 
+    function reset(program) {
+      $emails.find('ul').empty()
+      updatePreview(program)
+    }
+
     function addEmailCheckbox($el, checked, email) {
       $el.append($('<li>').html([
         $('<input>', {
@@ -473,6 +478,6 @@ function programDetails() {
     var addBuyerEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.buyer'))
     var addManualEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.manual'))
 
-    return {update: updatePreview}
+    return { update: updatePreview, reset: reset }
   }
 }

@@ -3,6 +3,7 @@ var async = require('async')
 var utils = require('../shared/utils')
 var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
+var ObjectId = mongoose.Schema.Types.ObjectId
 var Schema = mongoose.Schema
 var bcryptSaltFactor = 12
 
@@ -10,10 +11,10 @@ var address = { street: String, city: String, zip: String, country: String }
 
 var classification = {
   'emeku-id': { type: String, index: true },
-  author: {_id: mongoose.Schema.Types.ObjectId, name: String},
+  author: {_id: ObjectId, name: String},
   authorOrganization: Number,
-  buyer: {_id: mongoose.Schema.Types.ObjectId, name: String},
-  billing: {_id: mongoose.Schema.Types.ObjectId, name: String},
+  buyer: {_id: ObjectId, name: String},
+  billing: {_id: ObjectId, name: String},
   format: String,
   duration: String, // for now matches a regexp in the client
   safe: Boolean,
@@ -50,7 +51,7 @@ var ProgramSchema = new Schema({
   classifications: [classification],
   'program-type': Number, // enums.programType
   gameFormat: String,
-  season: String, episode: String, series: { _id: mongoose.Schema.Types.ObjectId, name: String }
+  season: String, episode: String, series: { _id: ObjectId, name: String }
 })
 
 ProgramSchema.methods.populateAllNames = function(callback) {
@@ -123,9 +124,9 @@ UserSchema.methods.checkPassword = function(pwd, callback) {
 var User = exports.User = mongoose.model('users', UserSchema)
 
 var InvoiceSchema = new Schema({
-  account: {_id: mongoose.Schema.Types.ObjectId, name: String},
+  account: {_id: ObjectId, name: String},
   type: String, // registration, classification or distributor fee
-  program: mongoose.Schema.Types.ObjectId,
+  program: ObjectId,
   name: String,
   duration: Number,
   'registration-date': Date,

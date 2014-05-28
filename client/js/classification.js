@@ -41,8 +41,7 @@ function programDetails() {
   $form.on('submit', function(e) {
     e.preventDefault()
     $.post('/programs/' + $form.data('id') + '/register', function(data) {
-      $form.data('id', '')
-      $form.hide().trigger('show')
+      $form.data('id', '').hide().trigger('show')
       var summary = classification.summary(data, data.classifications[0])
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
         .append($('<span>', {class: 'name'}).text(data.name))
@@ -57,16 +56,13 @@ function programDetails() {
 
   function validateTextChange($el, validatorFn) {
     var validator = validate(validatorFn)
-    $el.on('keyup change validate', validator)
-      .on('blur', function() { $(this).addClass('touched') })
-      .on('paste', function() { var me = this; setTimeout(function() { validator.call(me) }, 0) })
+    $el.on('input change validate', validator).on('blur', function() { $(this).addClass('touched') })
   }
 
   function requiredCheckboxGroup($el) {
-    function validate() {
+    $el.on('change validate', 'input:checkbox', function() {
       $el.toggleClass('invalid', $el.find('input:checkbox:checked').length == 0).trigger('validation')
-    }
-    $el.on('change validate', 'input:checkbox', validate)
+    })
   }
 
   $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
@@ -78,7 +74,7 @@ function programDetails() {
 
   $form.find('input[name="classifications.0.safe"]').change(function() {
     var safe = $(this).is(':checked')
-    $form.find('.category-container').toggle(!safe)
+    $form.find('.category-container').slideToggle(!safe)
     saveProgramField($form.data('id'), $(this).attr('name'), safe)
   })
 

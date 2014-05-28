@@ -101,7 +101,7 @@ var ageLimit = exports.ageLimit = function(classification) {
 exports.registrationEmail = function(program, user) {
   var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
   var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
-  var subject = "Luokittelupäätös: <%- name %>, <%- year %>, <%- classificationShort %>"
+  var subject = "Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>"
   var text =
     "<p><%- date %><br/><%- buyer %></p><p>" +
     (isReclassification(program) ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta</p>") +

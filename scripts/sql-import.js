@@ -269,7 +269,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkAccounts], callback)
 
   function accountBase(callback) {
     var q = 'select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
@@ -303,6 +303,23 @@ function accounts(callback) {
     async.forEach(['root', 'kavi', 'user'], function(u, callback) {
       new schema.User({ username:u, password:u, role:u, name:u, emails:[u+'@fake-meku.fi'] }).save(callback)
     }, callback)
+  }
+
+  function linkAccounts(callback) {
+    // securitygroup:8d4ad931-1055-a4f5-96da-4e3664911855 is meku users, which are linked everywhere, ignoring.
+    var tick = progressMonitor()
+    conn.query('select a.id as accountId, u.id as userId from users u join securitygroups_users sgu on (u.id = sgu.user_id) join securitygroups sg on (sg.id = sgu.securitygroup_id) join securitygroups_records sgr on (sg.id = sgr.securitygroup_id and sgr.module = "Accounts") join accounts a on (sgr.record_id = a.id) where sg.id != "8d4ad931-1055-a4f5-96da-4e3664911855" and u.deleted != "1" and sgu.deleted != "1" and sg.deleted != "1" and sgr.deleted != "1" and a.deleted != "1"')
+      .stream()
+      .pipe(consumer(onRow, callback))
+
+    function onRow(row, callback) {
+      tick()
+      schema.User.findOne({ 'emeku-id': row.userId }, { username: 1 }, function(err, user) {
+        if (err || !user) return callback(err || new Error('No such user '+row.userId))
+        var data = { _id: user._id, name: user.username }
+        schema.Account.update({ 'emeku-id': row.accountId }, { $addToSet: { users: data } }, callback)
+      })
+    }
   }
 
   function idToEmailMapper(row, result) {

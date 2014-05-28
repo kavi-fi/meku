@@ -122,14 +122,14 @@ function programDetails() {
   })
 
   selectAutocomplete({
-    $el: $form.find('input[name="directors"]'),
+    $el: $form.find('input[name=directors]'),
     path: '/directors/search/',
     multiple: true,
     allowAdding: true
   })
 
   selectAutocomplete({
-    $el: $form.find('input[name="actors"]'),
+    $el: $form.find('input[name=actors]'),
     path: '/actors/search/',
     multiple: true,
     allowAdding: true
@@ -149,8 +149,8 @@ function programDetails() {
     fromOption: select2OptionToCompany
   })
 
-  warningDragOrder($("#summary .summary"))
-  warningDragOrder($("#classification .summary"))
+  warningDragOrder($('#summary .summary'))
+  warningDragOrder($('#classification .summary'))
 
   function warningDragOrder($el) {
     $el.on('dragstart', '.warnings .warning', function(e) {
@@ -255,7 +255,7 @@ function programDetails() {
   function selectEnumAutocomplete(opts) {
     opts.$el.select2({
       data: opts.data,
-      placeholder: "Valitse...",
+      placeholder: 'Valitse...',
       multiple: opts.multiple || false,
       initSelection: initSelection
     }).on('change', onChange).on('setVal', setValue)
@@ -312,7 +312,7 @@ function programDetails() {
         return callback(val)
       },
       multiple: opts.multiple,
-      placeholder: "Valitse...",
+      placeholder: 'Valitse...',
       createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
     })
 
@@ -381,7 +381,7 @@ function programDetails() {
 
   function registrationPreview() {
     var $emails = $('#email .emails')
-    var $preview = $("#email .email-preview")
+    var $preview = $('#email .email-preview')
     var currentBuyerId = null
 
     $emails.find('ul').on('change', 'input', function(e) {

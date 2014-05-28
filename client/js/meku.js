@@ -11,7 +11,7 @@ function setup() {
   var login = loginPage()
   var error = errorDialog()
 
-  $.ajaxSetup({dataType: "json", processData: false, contentType: "application/json"})
+  $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json' })
 
   $(document).ajaxError(function(e, req) {
     if (req.status == 403) {

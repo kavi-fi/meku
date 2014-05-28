@@ -395,6 +395,7 @@ function programDetails() {
   function registrationPreview() {
     var $emails = $('#email .emails')
     var $preview = $("#email .email-preview")
+    var currentBuyerId = null
 
     $emails.find('ul').on('change', 'input', function(e) {
       saveEmailState()
@@ -438,8 +439,9 @@ function programDetails() {
       $preview.find('.subject').text(email.subject)
       $preview.find('.body').html(email.body)
 
-      if (cl.buyer) {
-        $.get('/accounts/' + cl.buyer._id).done(function(data) {
+      if (shouldUpdateBuyer(cl)) {
+        currentBuyerId = cl.buyer._id
+        $.get('/accounts/' + currentBuyerId).done(function(data) {
           // remove all email addresses linked to the selected buyer
           $emails.find('ul.buyer li').remove()
 
@@ -455,7 +457,12 @@ function programDetails() {
       }
     }
 
+    function shouldUpdateBuyer(cl) {
+      return cl && cl.buyer && cl.buyer._id != currentBuyerId
+    }
+
     function reset(program) {
+      currentBuyerId = null
       $emails.find('ul').empty()
       updatePreview(program)
     }

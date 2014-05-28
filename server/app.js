@@ -10,6 +10,7 @@ var InvoiceRow = schema.InvoiceRow
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var classification = require('../shared/classification')
+var xml = require('./xmlimport')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
 var app = express()
@@ -168,6 +169,12 @@ app.get('/accounts/:id', function(req, res, next) {
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 
+app.post('/xml/v1/programs/:token', function(req, res, next) {
+  xml.readPrograms(req, function(err, programs) {
+    res.send(programs)
+  })
+})
+
 if (isDev()) {
   var liveReload = require('express-livereload')
   liveReload(app, { watchDir: path.join(__dirname, '../client') })
@@ -185,7 +192,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'POST:/login', 'POST:/logout']
+  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'POST:/login', 'POST:/logout', 'POST:/xml']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

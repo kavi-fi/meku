@@ -8,6 +8,8 @@ function searchPage() {
   var $noMoreResults = $page.find('.no-more-results')
   var $loading = $page.find('.loading')
   var $detailTemplate = $('#templates > .search-result-details').detach()
+
+  var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
   var $newClassificationButton = $page.find('.new-classification button')
 
   var state = { q:'', page: 0 }
@@ -37,7 +39,7 @@ function searchPage() {
     load()
   })
 
-  $('input[name="new-classification-type"]').select2({
+  $newClassificationType.select2({
     data: [
       {id: 1, text: 'Elokuva'},
       {id: 4, text: 'Extra'},
@@ -46,11 +48,35 @@ function searchPage() {
   }).select2('val', 1)
 
   $newClassificationButton.click(function() {
-    var programType = $('input[name="new-classification-type"]').select2('val')
+    var programType = $newClassificationType.select2('val')
     $.post('/programs/new', JSON.stringify({'program-type': programType})).done(function(program) {
       $('body').children('.page').hide()
       $('#classification-page').trigger('show', program._id).show()
     })
+  })
+
+  $results.on('click', '.result', function() {
+    if ($(this).hasClass('selected')) {
+      updateLocationHash()
+      closeDetail()
+    } else {
+      closeDetail()
+      openDetail($(this), true)
+    }
+  })
+
+  $results.on('click', 'button.reclassify', function(e) {
+    var id = $(this).parents('.search-result-details').data('id')
+    $.post('/programs/' + id + '/reclassification').done(function(program) {
+      $('body').children('.page').hide()
+      $('#classification-page').trigger('show', program._id).show()
+    })
+  })
+
+  $results.on('click', 'button.continue-classification', function(e) {
+    var id = $(this).parents('.search-result-details').data('id')
+    $('body').children('.page').hide()
+    $('#classification-page').trigger('show', id).show()
   })
 
   function queryChanged(q) {
@@ -103,16 +129,6 @@ function searchPage() {
     })
   }
 
-  $results.on('click', '.result', function() {
-    if ($(this).hasClass('selected')) {
-      updateLocationHash()
-      closeDetail()
-    } else {
-      closeDetail()
-      openDetail($(this), true)
-    }
-  })
-
   function openDetail($row, animate) {
     var p = $row.data('program')
     updateLocationHash(p._id)
@@ -125,19 +141,6 @@ function searchPage() {
     $results.find('.result.selected').removeClass('selected')
     $results.find('.search-result-details').slideUp(function() { $(this).remove() }).end()
   }
-
-  $results.on('click', 'button.reclassify', function(e) {
-    var id = $(this).parents('.search-result-details').data('id')
-    $.post('/programs/' + id + '/reclassification').done(function(program) {
-      $('body').children('.page').hide()
-      $('#classification-page').trigger('show', program._id).show()
-    })
-  })
-  $results.on('click', 'button.continue-classification', function(e) {
-    var id = $(this).parents('.search-result-details').data('id')
-    $('body').children('.page').hide()
-    $('#classification-page').trigger('show', id).show()
-  })
 
   function updateLocationHash(selectedProgramId) {
     var filters = $filters.filter(':checked').map(function() { return $(this).data('id') }).toArray().join('')

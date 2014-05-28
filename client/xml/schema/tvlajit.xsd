@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+			xmlns="http://meku.herokuapp.com/xml/schema/tvlajit"
+			targetNamespace="http://meku.herokuapp.com/xml/schema/tvlajit">
+	<xsd:annotation>
+		<xsd:documentation>TV-ohjelman genret: '2' - 'Ajankohtaisohjelmat','3' - 'Asiaohjelmat/kulttuuri/lifestyle','4' - 'Urheilu','5' - 'Kotimainen fiktio','6' - 'Ulkomainen fiktio','7' - 'Elokuvat','8' - 'Lasten ohjelmat','9' - 'Opetus- ja tiedeohjelmat','10' - 'Viihde/kevyt musiikki/reality','11' - 'Muu musiikki','12' - 'Muut ohjelmat','1.' - 'Uutiset','1.1' - 'Vakiouutiset','1.2' - 'Muut uutislähetykset','3.1' - 'Asiaohjelmat/lifestyle','3.2' - 'Kulttuuriohjelmat','4.1' - 'Urheilu-uutiset','4.2' - 'Muu urheilu','7.1' - 'Kotimaiset elokuvat','7.2' - 'Ulkomaiset elokuvat','12.1' - 'Ostos-TV','12.2' - 'WWW (peliohjelmat, chatit)'. Esimerkki:&lt;TELEVISIO-OHJELMALAJIT&gt;8 9&lt;/TELEVISIO-OHJELMALAJIT&gt;</xsd:documentation>
+	</xsd:annotation>
+	<xsd:simpleType name="TVLAJIT">
+		<xsd:list>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="1.1"/>
+					<xsd:enumeration value="1.2"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+					<xsd:enumeration value="3.1"/>
+					<xsd:enumeration value="3.2"/>
+					<xsd:enumeration value="4"/>
+					<xsd:enumeration value="4.1"/>
+					<xsd:enumeration value="4.2"/>
+					<xsd:enumeration value="5"/>
+					<xsd:enumeration value="6"/>
+					<xsd:enumeration value="7"/>
+					<xsd:enumeration value="7.1"/>
+					<xsd:enumeration value="7.2"/>
+					<xsd:enumeration value="8"/>
+					<xsd:enumeration value="9"/>
+					<xsd:enumeration value="10"/>
+					<xsd:enumeration value="10.1"/>
+					<xsd:enumeration value="10.2"/>
+					<xsd:enumeration value="11"/>
+					<xsd:enumeration value="12"/>
+					<xsd:enumeration value="12.1"/>
+					<xsd:enumeration value="12.2"/>
+					<xsd:enumeration value="13"/>					
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:list>
+	</xsd:simpleType>
+</xsd:schema>

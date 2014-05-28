@@ -1,0 +1,270 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type="text/xsl" href="specification.xsl" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:term="http://meku.herokuapp.com/xml/schema/term"
+  xmlns:maat="http://meku.herokuapp.com/xml/schema/maat" xmlns:lajit="http://meku.herokuapp.com/xml/schema/lajit" xmlns:tvlajit="http://meku.herokuapp.com/xml/schema/tvlajit"
+  xmlns:pelinlajit="http://meku.herokuapp.com/xml/schema/pelinlajit" xmlns:format="http://meku.herokuapp.com/xml/schema/format"
+  xmlns:peliformat="http://meku.herokuapp.com/xml/schema/peliformat">
+  <!-- import types with lists -->
+  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/peliformat" schemaLocation="peliformattit.xsd"/>
+  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/format" schemaLocation="formattit.xsd"/>
+  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/lajit" schemaLocation="lajit.xsd"/>
+  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/tvlajit" schemaLocation="tvlajit.xsd"/>
+  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/pelinlajit" schemaLocation="pelinlajit.xsd"/>
+  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/maat" schemaLocation="maat.xsd"/>
+  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/term" schemaLocation="termit.xsd"/>
+  <xsd:annotation>
+    <xsd:documentation/>
+  </xsd:annotation>
+  <xsd:element name="ASIAKAS">
+    <xsd:annotation>
+      <xsd:documentation>Vastaanotettava XML-tiedosto alkaa ja loppuu &lt;ASIAKAS&gt;-elementeill&#xE4;. Asiakas-elementin tulee sis&#xE4;lt&#xE4;&#xE4; seuraavat attribuutit ja elementit.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="KUVAOHJELMA" minOccurs="1" maxOccurs="1000">
+          <xsd:annotation>
+            <xsd:documentation>Yksitt&#xE4;inen ilmoitettava tai tarkastutettava kuvaohjelma. Maksimissaan vain 1000 KUVAOHJELMAa yhteen tiedostoon. Ilmoitettaessa enemm&#xE4;n kuin 1000 on k&#xE4;ytett&#xE4;v&#xE4; useampaa tiedostoa.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="ALKUPERAINENNIMI" type="xsd:string" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman virallinen ja alkuperäinen nimi. Pakollinen kentt&#xE4;.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="SUOMALAINENNIMI" type="xsd:string" minOccurs="1" maxOccurs="10">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman suomalainen nimi. Pakollinen kenttä jos elementilla &lt;KUVAOHJELMA&gt; attribuuti "TYPE"='01','02','03','04','06','07','08','10','11'. </xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="RUOTSALAINENNIMI" type="xsd:string" minOccurs="0" maxOccurs="10">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman ruotsalainen nimi.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="MUUNIMI" type="xsd:string" minOccurs="0" maxOccurs="10">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman muu nimi.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="TUOTANTOKAUSI" type="xsd:int" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Sarjan tuotantokausi.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="OSA" type="xsd:int" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Sarjan osa.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="ASIAKKAANTUNNISTE" type="xsd:string" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman yksilöllinen tunniste asiakkaan omassa tietojärjestelmässä. Esimerkki:&lt;ASIAKKAANTUNNISTE&gt;E0327962&lt;/ASIAKKAANTUNNISTE&gt;</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="ESITYSAIKA" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman alkuperäinen esitysaika televisiossa muodossa pv.kk.vvvv hh:mm:ss. Esimerkki:&lt;ESITYSAIKA&gt;11.11.2011 11:11:11&lt;/ESITYSAIKA&gt;</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:pattern
+                      value="((0[1-9])|([12][0-9])|(3[01])).((0[1-9])|(1[012])).((000[1-9])|(00[1-9][0-9])|(0[1-9][0-9]{2})|([1-9][0-9]{3})) (([01][0-9])|(2[0-3]))(:[0-5][0-9]){2}(\.[0-9]+)?"
+                    />
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="MAAT" type="maat:MAANLISTA" minOccurs="0" maxOccurs="1"/>
+              <xsd:choice>
+                <xsd:element name="TELEVISIO-OHJELMALAJIT" type="tvlajit:TVLAJIT" minOccurs="0" maxOccurs="1"/>
+                <xsd:element name="LAJIT" type="lajit:LAJIT" minOccurs="0" maxOccurs="1"/>
+                <xsd:element name="PELINLAJIT" type="pelinlajit:PELINLAJIT" minOccurs="0" maxOccurs="1"/>
+              </xsd:choice>
+              <xsd:element name="VALMISTUMISVUOSI" type="xsd:gYear" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman valmistumisvuosi. Kuvaohjelman kuvaus. Esimerkki:&lt;VALMISTUMISVUOSI&gt;2010&lt;/VALMISTUMISVUOSI&gt;</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="JULKAISUVUOSI" type="xsd:gYear" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman julkaisvuosi. Esimerkki:&lt;JULKAISVUOSI&gt;2011&lt;/JULKAISVUOSI&gt;</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="SYNOPSIS" type="xsd:string" minOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman kuvaus. Pakollinen kenttä.  Esimerkki:&lt;SYNOPSIS&gt;Lomaromansseja 2/2. Romantiikkaa on ilmassa monellakin rintamalla, mutta siinä missä jotkut ovat innokkaampia ja tunteistaan varmoja, toiset arkailevat ja etenevät hitaammin. Kuullaanko pian hääkellojen kilinää?&lt;/SYNOPSIS&gt;</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="TUOTANTOYHTIO" type="xsd:string" minOccurs="0" maxOccurs="10">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman tuotantoyhtiöt. Esimerkki:&lt;TUOTANTOYHTIO&gt;TF1/Société Nationale de Télévision Francaise 1&lt;/TUOTANTOYHTIO&gt;</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="OHJAAJA" minOccurs="0" maxOccurs="10">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman ohjaajien suku- ja etunimet. Esimerkki:&lt;OHJAAJA&gt;&lt;SUKUNIMI&gt;Silverman&lt;/SUKUNIMI&gt;&lt;ETUNIMI&gt;David&lt;/ETUNIMI&gt;&lt;/OHJAAJA&gt;</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="SUKUNIMI" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="ETUNIMI" type="xsd:string" minOccurs="1" maxOccurs="1">
+                      <xsd:annotation>
+                        <xsd:documentation>Kuvaohjelman ohjaajien suku- ja etunimet. Etunimi on pakollinen kenttä.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="NAYTTELIJA" minOccurs="0" maxOccurs="100">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman n&#xE4;yttelij&#xF6;iden suku- ja etunimet. Esimerkki:&lt;NAYTTELIJA&gt;&lt;SUKUNIMI&gt;Simpson&lt;/SUKUNIMI&gt;&lt;ETUNIMI&gt;Bart&lt;/ETUNIMI&gt;&lt;/NAYTTELIJA&gt;</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="SUKUNIMI" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="ETUNIMI" type="xsd:string" minOccurs="1" maxOccurs="1">
+                      <xsd:annotation>
+                        <xsd:documentation>Kuvaohjelman näyttelijöiden suku- ja etunimet. Etunimi on pakollinen kenttä.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="LUOKITTELU" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                  <xsd:documentation>Kuvaohjelman luokittelu. Esimerkki:&lt;LUOKITTELU&gt;
+										&lt;KESTO&gt;01:24:15&lt;/KESTO&gt;
+										&lt;FORMAATTI&gt;DVD&lt;/FORMAATTI&gt;
+										&lt;KOLMIULOTTEINENGRAFIIKKA /&gt;
+										&lt;HUOMAUTUKSIA&gt;FAMILLE FORMIDABLE (UNE),&lt;/HUOMAUTUKSIA&gt;
+										&lt;VALITTUTERMI TYPE="6" KOMMENTI="Sudet uhkaavia ja raatelevat ihmisen." /&gt;
+										&lt;/LUOKITTELU&gt;</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="KESTO" minOccurs="1">
+                      <xsd:annotation>
+                        <xsd:documentation>Kuvaohjelman kesto muodossa hh:mm:ss. Pakollinen kenttä.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:time">
+                          <xsd:pattern value="(([01][0-9])|(2[0-3]))(:[0-5][0-9]){2}(\.[0-9]+)?"/>
+                          <xsd:minInclusive value="00:00:01"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:choice>
+                      <!-- DEFINE "FORMAATTI" FOR MOVIES-->
+                      <xsd:element name="FORMAATTI" type="format:FORMAATTIT" minOccurs="1"/>
+                      <!-- DEFINE "FORMAATTI" FOR GAMES-->
+                      <xsd:element name="PELIFORMAATTI" type="peliformat:PELIFORMAATTIT" minOccurs="0"/>
+                    </xsd:choice>
+                    <xsd:element name="KOLMIULOTTEINENGRAFIIKKA" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="HUOMAUTUKSIA" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="VALITTUTERMI" type="term:VALITTUTERMIT" minOccurs="0" maxOccurs="30"/>
+                    <xsd:element name="LUOKITTELUNMAKSAJA" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Luokittelun maksaja.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:pattern value="Tarjoaja|Luokittelija"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                  </xsd:sequence>
+                  <xsd:attribute name="ID" type="xsd:string"/>
+                  <xsd:attribute name="ANOTTUIKARAJA">
+                    <xsd:annotation>
+                      <xsd:documentation>Anottu ikäraja:   S =&gt; 'S',  7 =&gt; '7+',  12 =&gt; '12+',  16 =&gt; '16+',  18 =&gt; '18+',</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                      <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="S"/>
+                        <xsd:enumeration value="7"/>
+                        <xsd:enumeration value="12"/>
+                        <xsd:enumeration value="16"/>
+                        <xsd:enumeration value="18"/>
+                      </xsd:restriction>
+                    </xsd:simpleType>
+                  </xsd:attribute>
+                  <xsd:attribute name="ANOTTULUOKITTELUSYMBOLIT">
+                    <xsd:annotation>
+                      <xsd:documentation>Anottu luokittelusymbolit: 1 - Väkivalta, 2 - Ahdistus, 3 - Seksi, 4 - Huumeet</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                      <xsd:list>
+                        <xsd:simpleType>
+                          <xsd:restriction base="xsd:byte">
+                            <xsd:minInclusive value="1"/>
+                            <xsd:maxInclusive value="4"/>
+                          </xsd:restriction>
+                        </xsd:simpleType>
+                      </xsd:list>
+                    </xsd:simpleType>
+                  </xsd:attribute>
+                  <xsd:attribute name="REKISTEROINTIPAIVA" use="required">
+                    <xsd:annotation>
+                      <xsd:documentation>Rekisteröintipäivä ja kellonaika milloin luokittelu on luotu muodossa pv.kk.vvvv hh:mm:ss.</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                      <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="((0[1-9])|([12][0-9])|(3[01]))\.((0[1-9])|(1[012]))\.((201[3-9])|(20[2-9][0-9])|21[0-9]{2}) (([01][0-9])|(2[0-3]))(:[0-5][0-9]){2}(\.[0-9]+)?"/>
+                      </xsd:restriction>
+                    </xsd:simpleType>
+                  </xsd:attribute>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="LUOKITTELIJA" type="xsd:string" minOccurs="1" maxOccurs="1">
+                <xsd:annotation><xsd:documentation>Luokittelijan käyttäjätunnus</xsd:documentation></xsd:annotation>
+              </xsd:element>
+              <xsd:element name="ISANTAOHJELMA" type="xsd:string" minOccurs="0" maxOccurs="1">
+                <xsd:annotation><xsd:documentation>Pakollinen TV-sarjan jaksolle. Kertoo isäntäohjelman alkuperäisen nimen.</xsd:documentation></xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+            <xsd:attribute name="ID" type="xsd:string"/>
+            <xsd:attribute name="TYPE" use="required">
+              <xsd:annotation>
+                <xsd:documentation> '01' =&gt; 'Kotimainen elokuva',  '02' =&gt; 'Ulkomainen elokuva',  '03' =&gt; 'TV-sarjan jakso',  '04' =&gt; 'Muu tv-ohjelma', '05'=&gt; 'TV-sarjan nimi' '06' =&gt; 'Traileri',  '07' =&gt; 'Extra',  '08' =&gt; 'Peli',  10 =&gt; 'Yhteistuotanto',  11 =&gt; 'PEGI hyväksytty peli' ,  12 =&gt; 'Muu kuvaohjelma'</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:enumeration value="01"/>
+                  <xsd:enumeration value="02"/>
+                  <xsd:enumeration value="03"/>
+                  <xsd:enumeration value="04"/>
+                  <xsd:enumeration value="06"/>
+                  <xsd:enumeration value="07"/>
+                  <xsd:enumeration value="08"/>
+                  <xsd:enumeration value="10"/>
+                  <xsd:enumeration value="11"/>
+                  <xsd:enumeration value="12"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:attribute>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="NIMI" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>Asiakkaan nimi.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="ID" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>VET:n myöntämä asiakasnumero.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="PVM" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation>Päivämäärä ja kellonaika milloin XML-tiedosto on luotu muodossa pv.kk.vvvv hh:mm:ss.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="LKM" type="xsd:int" use="optional">
+        <xsd:annotation>
+          <xsd:documentation>Ilmoitettavien ja tarkastuttavien kuvaohjelmien kokonaismäärä. Maksimissaan voi olla 1000 kuvaohjelmaa yhdess&#xE4; tiedostossa.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

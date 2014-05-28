@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+			xmlns="http://meku.herokuapp.com/xml/schema/format"
+			targetNamespace="http://meku.herokuapp.com/xml/schema/format">
+<xsd:annotation>
+	<xsd:documentation>Kuvaohjelman formaatti. Pakollinen kenttä.</xsd:documentation>
+</xsd:annotation>
+	<xsd:simpleType name="FORMAATTIT">
+		<xsd:list>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="8 mm"/>
+					<xsd:enumeration value="16 mm"/>
+					<xsd:enumeration value="35 mm"/>
+					<xsd:enumeration value="70 mm"/>
+					<xsd:enumeration value="VHS"/>
+					<xsd:enumeration value="CDkuva"/>
+					<xsd:enumeration value="DVD"/>
+					<xsd:enumeration value="HD DVD"/>
+					<xsd:enumeration value="Blu-ray Disc"/>
+					<xsd:enumeration value="VoD"/>
+					<xsd:enumeration value="Televisio"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:list>
+	</xsd:simpleType>
+</xsd:schema>

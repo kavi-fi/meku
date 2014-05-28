@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+			xmlns="http://meku.herokuapp.com/xml/schema/lajit"
+			targetNamespace="http://meku.herokuapp.com/xml/schema/lajit">
+	<xsd:annotation>
+		<xsd:documentation>Kuvaohjelman genret: '1' - 'Fiktio','2' - 'Animaatio','3' - 'Viihde','4' - 'Seksi / Erotiikka','5' - 'Dokumentti','6' - 'Lasten ohjelmat','9' - 'Muut','1a' - 'Romantiikka','1b' - 'Draama','1c' - 'Historiallinen näytelmä','1d' - 'Trilleri','1e' - 'Seikkailu','1f' - 'Western','1g' - 'Sota','1h' - 'Kauhu','1j' - 'Tieteisseikkailu','1k' - 'Toimintaelokuva','1m' - 'Fantasia','1n' - 'Komedia ja farssi','3c' - 'Musiikki','5a' - 'Opetus','5b' - 'Urheilu','5c' - 'Matkailu','5d' - 'Henkilödokumentti','5e' - 'Luontodokumentti','6a' - 'Lasten animaatio','6b' - 'Lasten fiktio','6c' - 'Muu lastenelokuva','7a' - 'Traileri','7b' - 'Extra','9a' - 'Mainonta','9c' - 'Tietoisku','9d' - 'Kokeiluelokuva','9e' - 'Videotaide'. Esimerkki:&lt;LAJIT&gt;1 2 3&lt;/LAJIT&gt;</xsd:documentation>
+	</xsd:annotation>
+	<xsd:simpleType name="LAJIT">
+		<xsd:list>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+					<xsd:enumeration value="4"/>
+					<xsd:enumeration value="5"/>
+					<xsd:enumeration value="6"/>
+					<xsd:enumeration value="9"/>
+					<xsd:enumeration value="1a"/>
+					<xsd:enumeration value="1b"/>
+					<xsd:enumeration value="1c"/>
+					<xsd:enumeration value="1d"/>
+					<xsd:enumeration value="1e"/>
+					<xsd:enumeration value="1f"/>
+					<xsd:enumeration value="1g"/>
+					<xsd:enumeration value="1h"/>
+					<xsd:enumeration value="1j"/>
+					<xsd:enumeration value="1k"/>
+					<xsd:enumeration value="1m"/>
+					<xsd:enumeration value="1n"/>
+					<xsd:enumeration value="3c"/>
+					<xsd:enumeration value="5a"/>
+					<xsd:enumeration value="5b"/>
+					<xsd:enumeration value="5c"/>
+					<xsd:enumeration value="5d"/>
+					<xsd:enumeration value="5e"/>
+					<xsd:enumeration value="6a"/>
+					<xsd:enumeration value="6b"/>
+					<xsd:enumeration value="6c"/>
+					<xsd:enumeration value="7a"/>
+					<xsd:enumeration value="7b"/>
+					<xsd:enumeration value="9a"/>
+					<xsd:enumeration value="9c"/>
+					<xsd:enumeration value="9d"/>
+					<xsd:enumeration value="9e"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:list>
+	</xsd:simpleType>
+</xsd:schema>

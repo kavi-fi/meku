@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+			xmlns="http://meku.herokuapp.com/xml/schema/pelinlajit"
+			targetNamespace="http://meku.herokuapp.com/xml/schema/pelinlajit">
+	<xsd:annotation>
+		<xsd:documentation>Pelin genret.</xsd:documentation>
+	</xsd:annotation>
+	<xsd:simpleType name="PELINLAJIT">
+		<xsd:list>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="opetus"/>
+					<xsd:enumeration value="seikkailu"/>
+					<xsd:enumeration value="strategia"/>
+					<xsd:enumeration value="toiminta"/>
+					<xsd:enumeration value="rooli"/>
+					<xsd:enumeration value="simulaatio"/>
+					<xsd:enumeration value="tasohyppely"/>
+					<xsd:enumeration value="urheilu"/>
+					<xsd:enumeration value="muu"/>
+					<xsd:enumeration value="r&#xE4;iskint&#xE4;"/>
+					<xsd:enumeration value="autopeli (ajopeli)"/>
+					<xsd:enumeration value="puzzle"/>
+					<xsd:enumeration value="managerointi"/>
+					<xsd:enumeration value="first person shooter (FPS)"/>
+					<xsd:enumeration value="koulutus"/>
+					<xsd:enumeration value="lastenpeli"/>
+					<xsd:enumeration value="onlinepeli"/>
+					<xsd:enumeration value="karaoke"/>
+					<xsd:enumeration value="musiikki"/>
+					<xsd:enumeration value="party"/>						
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:list>
+	</xsd:simpleType>
+</xsd:schema>

@@ -12,6 +12,8 @@ var utils = require('../shared/utils')
 var classification = require('../shared/classification')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 
+express.static.mime.define({ 'text/xml': ['xsd'] })
+
 var app = express()
 
 app.use(express.json())

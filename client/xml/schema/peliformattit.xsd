@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+			xmlns="http://meku.herokuapp.com/xml/schema/peliformat"
+			targetNamespace="http://meku.herokuapp.com/xml/schema/peliformat">
+<xsd:annotation>
+	<xsd:documentation>Pelin formaatti.</xsd:documentation>
+</xsd:annotation>
+	<xsd:simpleType name="PELIFORMAATTIT">
+		<xsd:list>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="360 (Xbox 360)"/>
+					<xsd:enumeration value="3DS (Nintendo 3DS)"/>
+					<xsd:enumeration value="COIN (Kolikkopeli)"/>
+					<xsd:enumeration value="DC (Dreamcast)"/>
+					<xsd:enumeration value="DS (Nintendo DS)"/>
+					<xsd:enumeration value="DVDTV (DVD TV-Games)"/>
+					<xsd:enumeration value="GBA (Game Boy Advance)"/>
+					<xsd:enumeration value="GBC (Game Boy Color)"/>
+					<xsd:enumeration value="GC (GameCube)"/>
+					<xsd:enumeration value="MAC (Mac)"/>
+					<xsd:enumeration value="N64 (N64)"/>
+					<xsd:enumeration value="N-Gage (N-Gage)"/>
+					<xsd:enumeration value="PC (PC)"/>
+					<xsd:enumeration value="PC/MAC (PC/Mac)"/>
+					<xsd:enumeration value="PLM (Palm O/S)"/>
+					<xsd:enumeration value="PS2 (PS2)"/>
+					<xsd:enumeration value="PS3 (PS3)"/>
+					<xsd:enumeration value="PSP (PlayStation Portable)"/>
+					<xsd:enumeration value="PSX (PSone)"/>
+					<xsd:enumeration value="TV (Play TV)"/>
+					<xsd:enumeration value="Wii (Wii)"/>
+					<xsd:enumeration value="XBLA (Xbox Live Arcade)"/>
+					<xsd:enumeration value="XBOX (Xbox)"/>
+					<xsd:enumeration value="Wii U"/>
+					<xsd:enumeration value="PlayStation Vita"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:list>
+	</xsd:simpleType>
+</xsd:schema>

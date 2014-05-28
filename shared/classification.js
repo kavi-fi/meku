@@ -107,7 +107,7 @@ exports.registrationEmail = function(program, user) {
     (isReclassification(program) ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta</p>") +
     ((user.role == 'kavi') ? "<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
     ' on <%- date %> luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
-    ((user.role == 'kavi' && isReclassification(program)) ? '<p>Syy uudelleenluokittelulle: ' + enums.reclassificationReason[program.classifications[0].reason] + '. Perustelut: <%- publicComments %></p>' : '') +
+    ((user.role == 'kavi' && isReclassification(program)) ? '<p>Syy uudelleenluokittelulle: <%- reason %>. Perustelut: <%- publicComments %></p>' : '') +
     ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
     '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
@@ -137,7 +137,8 @@ exports.registrationEmail = function(program, user) {
     classificationShort: classificationSummary.age + ' ' + criteriaText(classificationSummary.warnings),
     link: (user.role == 'kavi') ? linkKavi : linkOther,
     publicComments: classification.publicComments,
-    authorEmail: user.email
+    authorEmail: user.email,
+    reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty'
   }
 
   return {

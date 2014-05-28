@@ -211,6 +211,8 @@ function searchPage() {
       var summary = classification.summary(p, c)
       $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
         .find('.warnings').html(warningIcons(summary)).end()
+        .find('.reason').text(enums.reclassificationReason[c.reason]).prev().toggleClass('hide', !c.reason).end().end()
+        .find('.authorOrganization').text(enums.authorOrganization[c.authorOrganization]).prev().toggleClass('hide', !c.authorOrganization).end().end()
         .find('.buyer').text(c.buyer && c.buyer.name || '').end()
         .find('.billing').text(c.billing && c.billing.name || '').end()
         .find('.format').text(enums.util.isGameType(p) && p.gameFormat || c.format).end()

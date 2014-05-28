@@ -269,7 +269,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkAccounts], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkAccounts, generateApiTokens], callback)
 
   function accountBase(callback) {
     var q = 'select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
@@ -322,6 +322,12 @@ function accounts(callback) {
     }
   }
 
+  function generateApiTokens(callback) {
+    // yle, nelonenmedia, mtv
+    var ids = ['cd5ad00f-3632-3f57-cc9e-4e770b9eeef9', '1db92ef2-ab3d-950d-e053-4e82f88d1df0', 'ae57bb17-a9f2-1f09-a928-4e97f008b792']
+    async.forEach(ids, setApiToken, callback)
+  }
+
   function idToEmailMapper(row, result) {
     if (!result[row.id]) result[row.id] = []
     if (row.primary_address == '1') {
@@ -329,6 +335,10 @@ function accounts(callback) {
     } else {
       result[row.id].push(row.email_address)
     }
+  }
+
+  function setApiToken(accountEmekuId, callback) {
+    schema.Account.update({ 'emeku-id': accountEmekuId }, { apiToken: mongoose.Types.ObjectId().toString() }, callback)
   }
 }
 

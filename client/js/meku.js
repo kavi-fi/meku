@@ -21,13 +21,9 @@ function setup() {
     }
   })
 
-  $('#overlay').on('click', function() {
-    closeDialog()
-  })
+  $('#overlay').on('click', closeDialog)
 
-  $('body').on('click', '.dialog', function(e) {
-    e.stopPropagation()
-  })
+  $('body').on('click', '.dialog', stopPropagation)
 
   var navigation = navi()
   searchPage()
@@ -118,6 +114,8 @@ function navi() {
 function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
 function billingPage() { $('#billing-page').on('show', function() { location.hash = '#laskutus'}) }
 
+function stopPropagation(e) { e.stopPropagation() }
+
 function isNotEmpty(val) {
   return (val.trim().length) > 0
 }
@@ -137,14 +135,19 @@ function isValidYear(txt) {
 
 function validate(f) {
   return function() {
-    var $el = $(this)
-    if (f($el.val())) {
-      $el.removeClass('invalid')
-    } else {
-      $el.addClass('invalid')
-    }
-    $el.trigger('validation', ['kutsuttu validatesta'])
+    $(this).toggleClass('invalid', !f($(this).val())).trigger('validation')
   }
+}
+
+function validateTextChange($el, validatorFn) {
+  var validator = validate(validatorFn)
+  $el.on('input change validate', validator).on('blur', function() { $(this).addClass('touched') })
+}
+
+function requiredCheckboxGroup($el) {
+  $el.on('change validate', 'input:checkbox', function() {
+    $el.toggleClass('invalid', $el.find('input:checkbox:checked').length == 0).trigger('validation')
+  })
 }
 
 function showDialog($html) {

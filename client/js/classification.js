@@ -31,7 +31,6 @@ function programDetails() {
     $submit.prop('disabled', required.length > 0)
   })
 
-  // validations
   validateTextChange($form.find('.required'), isNotEmpty)
   validateTextChange($form.find('.duration'), isValidDuration)
   validateTextChange($form.find('.email'), isEmail)
@@ -54,17 +53,6 @@ function programDetails() {
     })
   })
 
-  function validateTextChange($el, validatorFn) {
-    var validator = validate(validatorFn)
-    $el.on('input change validate', validator).on('blur', function() { $(this).addClass('touched') })
-  }
-
-  function requiredCheckboxGroup($el) {
-    $el.on('change validate', 'input:checkbox', function() {
-      $el.toggleClass('invalid', $el.find('input:checkbox:checked').length == 0).trigger('validation')
-    })
-  }
-
   $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
 
   $throttledAutoSaveFields.throttledInput(function(txt) {
@@ -84,9 +72,8 @@ function programDetails() {
     saveProgramField($form.data('id'), 'classifications.0.criteria', ids)
   })
 
-  $form.on('click', '.category .criteria textarea', function(e) {
-    e.stopPropagation()
-  })
+  $form.on('click', '.category .criteria textarea', stopPropagation)
+
   $form.on('blur', '.category .criteria.has-comment:not(.selected) textarea', function() {
     $(this).parents('.criteria').toggleClass('has-comment', isNotEmpty($(this).val()))
   })

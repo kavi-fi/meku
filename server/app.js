@@ -99,40 +99,17 @@ app.post('/programs/:id/register', function(req, res, next) {
       if (classification.isReclassification(program)) {
         // reclassification fee only when "Oikaisupyyntö" and KAVI is the classifier
         if (currentClassification.reason === 2 && currentClassification.authorOrganization === 1) {
-          InvoiceRow.create({
-            account: program.billing,
-            type: 'reclassification',
-            program: program._id,
-            name: program.name,
-            duration: seconds,
-            'registration-date': currentClassification['registration-date'],
-            price: 74 * 100
-          }, callback)
+          InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
         } else {
           callback(null)
         }
       } else {
-        InvoiceRow.create({
-          account: program.billing,
-          type: 'registration',
-          program: program._id,
-          name: program.name,
-          duration: seconds,
-          'registration-date': currentClassification['registration-date'],
-          price: 725
-        }, function(err, saved) {
+        InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(function(err, saved) {
           if (err) return next(err)
           if (req.user.role === 'kavi') {
             // duraation mukaan laskutus
-            InvoiceRow.create({
-              account: program.billing,
-              type: 'classification',
-              program: program._id,
-              name: program.name,
-              duration: seconds,
-              'registration-date': currentClassification['registration-date'],
-              price: classification.classificationPrice(parseInt(seconds))
-            }, callback)
+            var classificationPrice = classification.classificationPrice(parseInt(seconds))
+            InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
             callback(null)
           }

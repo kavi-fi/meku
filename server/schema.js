@@ -122,7 +122,7 @@ UserSchema.methods.checkPassword = function(pwd, callback) {
 
 var User = exports.User = mongoose.model('users', UserSchema)
 
-var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
+var InvoiceSchema = new Schema({
   account: {_id: mongoose.Schema.Types.ObjectId, name: String},
   type: String, // registration, classification or distributor fee
   program: mongoose.Schema.Types.ObjectId,
@@ -131,6 +131,16 @@ var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', {
   'registration-date': Date,
   price: Number // eurocents
 })
+
+InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, price) {
+  return new this({
+    account: program.billing, type: rowType, program: program._id,
+    name: program.name, duration: durationSeconds, price: price,
+    'registration-date': program.classifications[0]['registration-date']
+  })
+}
+
+var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', InvoiceSchema)
 
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
 var DirectorSchema = new Schema(namedIndex, { _id: false, versionKey: false })

@@ -17,6 +17,7 @@ exports.readPrograms = function (body, callback) {
     map(optional('MAAT', 'country'), function(p) { return p.country ? {country: p.country.split(' ')} : {country: []} }),
     optional('TUOTANTOYHTIO', 'legacy-production-companies'),
     map(requiredAttr('TYPE', 'type'), function(p) { return { type: legacyProgramTypes[p.type] }}),
+    required('SYNOPSIS', 'synopsis'),
     function(xml) { return {
       program: {'legacy-genre': optionListToArray(xml.LAJIT).map(function(g) { return legacyGenres[g] })
           .concat(optionListToArray(xml['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))

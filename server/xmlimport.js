@@ -8,6 +8,7 @@ exports.readPrograms = function (body, callback) {
   var stream = xml.parse(body)
   var programs = []
   var validate = _.reduce([
+    optional('ASIAKKAANTUNNISTE', 'customerId'),
     required('ALKUPERAINENNIMI', 'name'),
     optional('SUOMALAINENNIMI', 'name-fi'),
     optional('RUOTSALAINENNIMI', 'name-sv'),
@@ -71,6 +72,17 @@ function map(validator, f) {
   }
 }
 
+function result(program, errors) {
+  return {program: program || {}, errors: errors || []}
+}
+
+function ok(program) {
+  return {program: program, errors: []}
+}
+function error(msg) {
+  return {program: {}, errors: [msg]}
+}
+
 function ret(program) {
   return function(xml) {
     return {program: program, errors: []}
@@ -79,15 +91,15 @@ function ret(program) {
 
 function required(name, toField) {
   return function(xml) {
-    if (xml[name]) return {program: _.object([[toField, xml[name].$text]]), errors: []}
-    else return {program: {}, errors: ["Pakollinen kenttä puuttuu: " + name]}
+    if (xml[name]) return result(utils.keyValue(toField, xml[name].$text))
+    else return result(null, ["Pakollinen kenttä puuttuu: " + name])
   }
 }
 
 function requiredAttr(name, toField) {
   return function(xml) {
-    if (xml.$[name]) return {program: utils.keyValue(toField, xml.$[name]), errors: []}
-    else return {program: {}, errors: ["Pakollinen attribuutti puuttuu: " + name]}
+    if (xml.$[name]) return ok(utils.keyValue(toField, xml.$[name]))
+    else return error("Pakollinen attribuutti puuttuu: " + name)
   }
 }
 

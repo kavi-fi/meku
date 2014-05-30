@@ -176,10 +176,12 @@ app.post('/xml/v1/programs/:token', function(req, res, next) {
     // creation-date
     // status
     var root = builder.create("ASIAKAS")
-    programs.forEach(function(program) {
+    programs.forEach(function(res) {
+      var program = res.program
       var ele = root.ele('KUVAOHJELMA')
-      ele.ele('STATUS', program.errors.length > 0 ? 'VIRHE' : 'OK')
-      program.errors.forEach(function(msg) {
+      ele.ele('ASIAKKAANTUNNISTE', program.customerId)
+      ele.ele('STATUS', res.errors.length > 0 ? 'VIRHE' : 'OK')
+      res.errors.forEach(function(msg) {
         var err = ele.ele('VIRHE')
         err.ele('KOODI', 'N/A')
         err.ele('SELITYS', msg)

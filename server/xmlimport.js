@@ -1,17 +1,43 @@
 var fs = require('fs'),
     xml = require('xml-object-stream'),
     _ = require('lodash'),
-    moment = require('moment')
+    moment = require('moment'),
+    utils = require('../shared/utils')
 
 exports.readPrograms = function (body, callback) {
   var stream = xml.parse(body)
   var programs = []
+
+  var validate = _.reduce([
+    required('ALKUPERAINENNIMI', 'name'),
+    optional('SUOMALAINENNIMI', 'name-fi'),
+    optional('RUOTSALAINENNIMI', 'name-sv'),
+    optional('MUUNIMI', 'name-other'),
+    optional('VALMISTUMISVUOSI', 'year'),
+    map(optional('MAAT', 'country'), function(p) { return p.country ? {country: p.country.split(' ')} : {country: []} }),
+    optional('TUOTANTOYHTIO', 'legacy-production-companies'),
+    map(requiredAttr('TYPE', 'type'), function(p) { return { type: legacyProgramTypes[p.type] }}),
+    function(xml) { return {
+      program: {'legacy-genre': optionListToArray(xml.LAJIT).map(function(g) { return legacyGenres[g] })
+          .concat(optionListToArray(xml['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))
+          .concat(optionListToArray(xml.PELINLAJIT))},
+      errors: []
+    }},
+    map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
+    map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }})
+  ], function(acc, f) {
+    return flatMap(acc, function(_) { return f })
+  }, ret({}))
+
   stream.each('KUVAOHJELMA', function(program) {
     var criteriaComments = _.object(childrenByName(program.LUOKITTELU, 'VALITTUTERMI').map(function(c) {
       return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
     }))
     var now = new Date()
 
+    programs.push(validate(program))
+
+    /*
     programs.push({
       valid: true,
       program: {
@@ -45,15 +71,64 @@ exports.readPrograms = function (body, callback) {
         }
       }
     })
+    */
   })
   stream.on('end', function() {
     callback(null, programs)
   })
 }
 
-function optional(node) {
-  if (!node || node.$text.length == 0) return null
-  return node.$text
+// validator = Xml -> Result
+// validation = validator -> (program -> validator) -> validator
+function flatMap(validator, f) {
+  return function(xml) {
+    var res = validator(xml)
+    var res2 = f(res.program)(xml)
+    return {program: _.merge(res.program, res2.program), errors: res.errors.concat(res2.errors)}
+  }
+}
+
+function map(validator, f) {
+  return function(xml) {
+    var res = validator(xml)
+    return {program: f(res.program), errors: []}
+  }
+}
+
+function ret(program) {
+  return function(xml) {
+    return {program: program, errors: []}
+  }
+}
+
+function required(name, toField) {
+  return function(xml) {
+    if (xml[name]) return {program: _.object([[toField, xml[name].$text]]), errors: []}
+    else return {program: {}, errors: ["Missing required field " + name]}
+  }
+}
+
+function requiredAttr(name, toField) {
+  return function(xml) {
+    if (xml.$[name]) return {program: utils.keyValue(toField, xml.$[name]), errors: []}
+    else return {program: {}, errors: ["Missing required attribute: " + name]}
+  }
+}
+
+function optional(field, toField) {
+  return function(xml) {
+    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) return {program: utils.keyValue(toField, undefined), errors: []}
+    else return {program: utils.keyValue(toField, xml[field].$text), errors: []}
+  }
+}
+
+function childrenByNameTo(field, toField) {
+  return function(xml) {
+    return {
+      program: utils.keyValue(toField, childrenByName(xml, field)),
+      errors: []
+    }
+  }
 }
 
 function fullname(node) {

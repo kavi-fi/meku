@@ -1,6 +1,7 @@
 var fs = require('fs'),
     xml = require('xml-object-stream'),
-    _ = require('lodash')
+    _ = require('lodash'),
+    moment = require('moment')
 
 exports.readPrograms = function (body, callback) {
   var stream = xml.parse(body)
@@ -9,40 +10,39 @@ exports.readPrograms = function (body, callback) {
     var criteriaComments = _.object(childrenByName(program.LUOKITTELU, 'VALITTUTERMI').map(function(c) {
       return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
     }))
+    var now = new Date()
 
     programs.push({
-      name: [program.ALKUPERAINENNIMI.$text],
-      'name-fi': [program.SUOMALAINENNIMI.$text],
-      'name-sv': [program.RUOTSALAINENNIMI.$text],
-      'name-other': [program.MUUNIMI.$text],
-      year: program.VALMISTUMISVUOSI.$text,
-      country: program.MAAT.$text ? program.MAAT.$text.split(' ') : [],
-      'legacy-production-companies': program.TUOTANTOYHTIO.$text,
-      'program-type': legacyProgramTypes[program.$.TYPE],
-      'legacy-genre': optionListToArray(program.LAJIT).map(function(g) { return legacyGenres[g] })
-        .concat(optionListToArray(program['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))
-        .concat(optionListToArray(program.PELINLAJIT)),
-      directors: childrenByName(program, 'OHJAAJA').map(fullname),
-      actors: childrenByName(program, 'NAYTTELIJA').map(fullname),
-      synopsis: program.SYNOPSIS.$text,
-      season: optional(program.TUOTANTOKAUSI),
-      episode: optional(program.OSA),
-      //gameFormat:
-      classification: {
-        //author: null,
-        format: optional(program.LUOKITTELU.FORMAATTI),
-        duration: optional(program.LUOKITTELU.KESTO), // for now matches a regexp in the client
-        //safe: Boolean,
-        criteria: _.keys(criteriaComments),
-        'criteria-comments': criteriaComments,
-        //pegiWarnings: [String],
-        //'creation-date': Date,
-        //'registration-date': Date,
-        'registration-email-addresses': [],
-        //comments: String,
-        //publicComments: String,
-        //reason: Number,
-        //status: String
+      valid: true,
+      program: {
+        name: [program.ALKUPERAINENNIMI.$text],
+        'name-fi': [program.SUOMALAINENNIMI.$text],
+        'name-sv': [program.RUOTSALAINENNIMI.$text],
+        'name-other': [program.MUUNIMI.$text],
+        year: program.VALMISTUMISVUOSI.$text,
+        country: program.MAAT.$text ? program.MAAT.$text.split(' ') : [],
+        'legacy-production-companies': program.TUOTANTOYHTIO.$text,
+        'program-type': legacyProgramTypes[program.$.TYPE],
+        'legacy-genre': optionListToArray(program.LAJIT).map(function(g) { return legacyGenres[g] })
+          .concat(optionListToArray(program['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))
+          .concat(optionListToArray(program.PELINLAJIT)),
+        directors: childrenByName(program, 'OHJAAJA').map(fullname),
+        actors: childrenByName(program, 'NAYTTELIJA').map(fullname),
+        synopsis: program.SYNOPSIS.$text,
+        season: optional(program.TUOTANTOKAUSI),
+        episode: optional(program.OSA),
+        //gameFormat:
+        classification: {
+          //author: null,
+          format: optional(program.LUOKITTELU.FORMAATTI),
+          duration: optional(program.LUOKITTELU.KESTO), // for now matches a regexp in the client
+          safe: _.isEmpty(criteriaComments) ? true : false,
+          criteria: _.keys(criteriaComments),
+          'criteria-comments': criteriaComments,
+          'creation-date': now,
+          'registration-date': moment(program.LUOKITTELU.$.REKISTEROINTIPAIVA, "DD.MM.YYYY HH:mm:ss").toDate(),
+          status: 'registered'
+        }
       }
     })
   })

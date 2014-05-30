@@ -14,7 +14,8 @@
     "lodash": "2.4.1",
     "sendgrid": "1.0.3",
     "bcrypt": "0.7.8",
-    "async": "0.7.0"
+    "async": "0.7.0",
+    "moment": "2.6.0"
   },
   "devDependencies": {
     "express-livereload": "~0.0.24",

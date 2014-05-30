@@ -7,52 +7,60 @@ var fs = require('fs'),
 exports.readPrograms = function (body, callback) {
   var stream = xml.parse(body)
   var programs = []
-  var validate = _.reduce([
-    optional('ASIAKKAANTUNNISTE', 'customerId'),
-    required('ALKUPERAINENNIMI', 'name'),
-    optional('SUOMALAINENNIMI', 'name-fi'),
-    optional('RUOTSALAINENNIMI', 'name-sv'),
-    optional('MUUNIMI', 'name-other'),
-    optional('VALMISTUMISVUOSI', 'year'),
-    map(optional('MAAT', 'country'), function(p) { return p.country ? {country: p.country.split(' ')} : {country: []} }),
-    optional('TUOTANTOYHTIO', 'legacy-production-companies'),
-    map(requiredAttr('TYPE', 'type'), function(p) { return { 'program-type': legacyProgramTypes[p.type] }}),
-    required('SYNOPSIS', 'synopsis'),
-    optional('TUOTANTOKAUSI', 'season'),
-    optional('OSA', 'episode'),
-    function(xml) { return {
-      program: {'legacy-genre': optionListToArray(xml.LAJIT).map(function(g) { return legacyGenres[g] })
-          .concat(optionListToArray(xml['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))
-          .concat(optionListToArray(xml.PELINLAJIT))},
-      errors: []
-    }},
-    map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
-    map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),
-    node('LUOKITTELU', 'classification', [
-      map(requiredAttr('REKISTEROINTIPAIVA', 'registration-date'), function(p) {
-        return {'registration-date': moment(p['registration-date'], "DD.MM.YYYY HH:mm:ss").toDate()}
-      }),
-      required('FORMAATTI', 'format'),
-      required('KESTO', 'duration'),
-      map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
-        var criteriaComments = _.object(p.criteria.map(function (c) {
-          return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
-        }))
-        return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), 'criteria-comments': criteriaComments}
-      })
-    ])
-  ], function(acc, f) {
-    return flatMap(acc, function(_) { return f })
-  }, ret({}))
 
   stream.each('KUVAOHJELMA', function(program) {
-    programs.push(validate(program))
+    programs.push(validateProgram(program))
   })
 
   stream.on('end', function() {
     callback(null, programs)
   })
 }
+
+var validateProgram = compose([
+  optional('ASIAKKAANTUNNISTE', 'customerId'),
+  required('ALKUPERAINENNIMI', 'name'),
+  optional('SUOMALAINENNIMI', 'name-fi'),
+  optional('RUOTSALAINENNIMI', 'name-sv'),
+  optional('MUUNIMI', 'name-other'),
+  optional('VALMISTUMISVUOSI', 'year'),
+  map(optional('MAAT', 'country'), function(p) {
+    return p.country ? {country: p.country.split(' ')} : {country: []}
+  }),
+  optional('TUOTANTOYHTIO', 'legacy-production-companies'),
+  map(and(requiredAttr('TYPE', 'type'), function(xml) {
+    var type = xml.$.TYPE
+    if (_.has(legacyProgramTypes, type)) return ok({type: legacyProgramTypes[type]})
+    else return error("Virheellinen attribuutti: TYPE")
+  }), function(p) { return { 'program-type': legacyProgramTypes[p.type] }}),
+  required('SYNOPSIS', 'synopsis'),
+  optional('TUOTANTOKAUSI', 'season'),
+  optional('OSA', 'episode'),
+  function(xml) {
+    return ok({
+      'legacy-genre': optionListToArray(xml.LAJIT).map(function(g) { return legacyGenres[g] })
+              .concat(optionListToArray(xml['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))
+              .concat(optionListToArray(xml.PELINLAJIT))
+    })
+  },
+  map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
+  map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),
+  node('LUOKITTELU', 'classification', [
+    and(requiredAttr('REKISTEROINTIPAIVA', 'registration-date'), function(xml) {
+      var d = moment(xml.$.REKISTEROINTIPAIVA, "DD.MM.YYYY HH:mm:ss")
+      if (d.isValid()) return ok({'registration-date': d.toDate()})
+      else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
+    }),
+    required('FORMAATTI', 'format'),
+    required('KESTO', 'duration'),
+    map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
+      var criteriaComments = _.object(p.criteria.map(function (c) {
+        return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
+      }))
+      return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), 'criteria-comments': criteriaComments}
+    })
+  ])
+])
 
 // validator = Xml -> Result
 // validation = validator -> (program -> validator) -> validator
@@ -72,8 +80,21 @@ function map(validator, f) {
   }
 }
 
-function result(program, errors) {
-  return {program: program || {}, errors: errors || []}
+function compose(xs) {
+  return _.reduce(xs, function(acc, f) {
+    return flatMap(acc, function(_) { return f })
+  }, ret({}))
+}
+
+function and(v1, v2) {
+  return function(xml) {
+    var res = v1(xml)
+    if (res.errors.length == 0) {
+      return v2(xml)
+    } else {
+      return res
+    }
+  }
 }
 
 function ok(program) {
@@ -91,8 +112,8 @@ function ret(program) {
 
 function required(name, toField) {
   return function(xml) {
-    if (xml[name]) return result(utils.keyValue(toField, xml[name].$text))
-    else return result(null, ["Pakollinen kenttä puuttuu: " + name])
+    if (xml[name]) return ok(utils.keyValue(toField, xml[name].$text))
+    else return error(["Pakollinen kenttä puuttuu: " + name])
   }
 }
 

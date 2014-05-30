@@ -12,6 +12,7 @@ var utils = require('../shared/utils')
 var classification = require('../shared/classification')
 var xml = require('./xmlimport')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+var builder = require('xmlbuilder')
 
 var app = express()
 
@@ -171,7 +172,21 @@ app.get('/directors/search/:query', queryNameIndex('Director'))
 
 app.post('/xml/v1/programs/:token', function(req, res, next) {
   xml.readPrograms(req, function(err, programs) {
-    res.send(programs)
+    var now = new Date()
+    // creation-date
+    // status
+    var root = builder.create("ASIAKAS")
+    programs.forEach(function(program) {
+      var ele = root.ele('KUVAOHJELMA')
+      ele.ele('STATUS', program.errors.length > 0 ? 'VIRHE' : 'OK')
+      program.errors.forEach(function(msg) {
+        var err = ele.ele('VIRHE')
+        err.ele('KOODI', 'N/A')
+        err.ele('SELITYS', msg)
+      })
+    })
+    console.log(programs)
+    res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
   })
 })
 

@@ -7,7 +7,6 @@ var fs = require('fs'),
 exports.readPrograms = function (body, callback) {
   var stream = xml.parse(body)
   var programs = []
-
   var validate = _.reduce([
     required('ALKUPERAINENNIMI', 'name'),
     optional('SUOMALAINENNIMI', 'name-fi'),
@@ -16,8 +15,10 @@ exports.readPrograms = function (body, callback) {
     optional('VALMISTUMISVUOSI', 'year'),
     map(optional('MAAT', 'country'), function(p) { return p.country ? {country: p.country.split(' ')} : {country: []} }),
     optional('TUOTANTOYHTIO', 'legacy-production-companies'),
-    map(requiredAttr('TYPE', 'type'), function(p) { return { type: legacyProgramTypes[p.type] }}),
+    map(requiredAttr('TYPE', 'type'), function(p) { return { 'program-type': legacyProgramTypes[p.type] }}),
     required('SYNOPSIS', 'synopsis'),
+    optional('TUOTANTOKAUSI', 'season'),
+    optional('OSA', 'episode'),
     function(xml) { return {
       program: {'legacy-genre': optionListToArray(xml.LAJIT).map(function(g) { return legacyGenres[g] })
           .concat(optionListToArray(xml['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))
@@ -25,55 +26,28 @@ exports.readPrograms = function (body, callback) {
       errors: []
     }},
     map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
-    map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }})
+    map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),
+    node('LUOKITTELU', 'classification', [
+      map(requiredAttr('REKISTEROINTIPAIVA', 'registration-date'), function(p) {
+        return {'registration-date': moment(p['registration-date'], "DD.MM.YYYY HH:mm:ss").toDate()}
+      }),
+      required('FORMAATTI', 'format'),
+      required('KESTO', 'duration'),
+      map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
+        var criteriaComments = _.object(p.criteria.map(function (c) {
+          return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
+        }))
+        return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), 'criteria-comments': criteriaComments}
+      })
+    ])
   ], function(acc, f) {
     return flatMap(acc, function(_) { return f })
   }, ret({}))
 
   stream.each('KUVAOHJELMA', function(program) {
-    var criteriaComments = _.object(childrenByName(program.LUOKITTELU, 'VALITTUTERMI').map(function(c) {
-      return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
-    }))
-    var now = new Date()
-
     programs.push(validate(program))
-
-    /*
-    programs.push({
-      valid: true,
-      program: {
-        name: [program.ALKUPERAINENNIMI.$text],
-        'name-fi': [program.SUOMALAINENNIMI.$text],
-        'name-sv': [program.RUOTSALAINENNIMI.$text],
-        'name-other': [program.MUUNIMI.$text],
-        year: program.VALMISTUMISVUOSI.$text,
-        country: program.MAAT.$text ? program.MAAT.$text.split(' ') : [],
-        'legacy-production-companies': program.TUOTANTOYHTIO.$text,
-        'program-type': legacyProgramTypes[program.$.TYPE],
-        'legacy-genre': optionListToArray(program.LAJIT).map(function(g) { return legacyGenres[g] })
-          .concat(optionListToArray(program['TELEVISIO-OHJELMALAJIT']).map(function(g) { return legacyTvGenres[g] }))
-          .concat(optionListToArray(program.PELINLAJIT)),
-        directors: childrenByName(program, 'OHJAAJA').map(fullname),
-        actors: childrenByName(program, 'NAYTTELIJA').map(fullname),
-        synopsis: program.SYNOPSIS.$text,
-        season: optional(program.TUOTANTOKAUSI),
-        episode: optional(program.OSA),
-        //gameFormat:
-        classification: {
-          //author: null,
-          format: optional(program.LUOKITTELU.FORMAATTI),
-          duration: optional(program.LUOKITTELU.KESTO), // for now matches a regexp in the client
-          safe: _.isEmpty(criteriaComments) ? true : false,
-          criteria: _.keys(criteriaComments),
-          'criteria-comments': criteriaComments,
-          'creation-date': now,
-          'registration-date': moment(program.LUOKITTELU.$.REKISTEROINTIPAIVA, "DD.MM.YYYY HH:mm:ss").toDate(),
-          status: 'registered'
-        }
-      }
-    })
-    */
   })
+
   stream.on('end', function() {
     callback(null, programs)
   })
@@ -92,7 +66,8 @@ function flatMap(validator, f) {
 function map(validator, f) {
   return function(xml) {
     var res = validator(xml)
-    return {program: f(res.program), errors: []}
+    if (res.errors.length > 0) return res
+    else return {program: f(res.program), errors: []}
   }
 }
 
@@ -105,14 +80,14 @@ function ret(program) {
 function required(name, toField) {
   return function(xml) {
     if (xml[name]) return {program: _.object([[toField, xml[name].$text]]), errors: []}
-    else return {program: {}, errors: ["Missing required field " + name]}
+    else return {program: {}, errors: ["Pakollinen kenttä puuttuu: " + name]}
   }
 }
 
 function requiredAttr(name, toField) {
   return function(xml) {
     if (xml.$[name]) return {program: utils.keyValue(toField, xml.$[name]), errors: []}
-    else return {program: {}, errors: ["Missing required attribute: " + name]}
+    else return {program: {}, errors: ["Pakollinen attribuutti puuttuu: " + name]}
   }
 }
 
@@ -130,6 +105,16 @@ function childrenByNameTo(field, toField) {
       errors: []
     }
   }
+}
+
+function node(name, toField, validators) {
+  return flatMap(required(name, toField), function(p) {
+    return function (xml) {
+      return _.reduce(validators, function(acc, f) {
+        return flatMap(acc, function(_) { return map(f, function(p) { return utils.keyValue(toField, p)}) })
+      }, ret(p))(xml[name])
+    }
+  })
 }
 
 function fullname(node) {

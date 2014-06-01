@@ -188,6 +188,7 @@ app.post('/xml/v1/programs/:token', function(req, res, next) {
       })
     })
     console.log(programs)
+    res.set('Content-Type', 'application/xml');
     res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
   })
 })

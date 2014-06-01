@@ -1,6 +1,6 @@
 var fs = require('fs'),
     xml = require('xml-object-stream'),
-    enums = require('../shared/enums.js'),
+    enums = require('../shared/enums'),
     _ = require('lodash'),
     moment = require('moment'),
     utils = require('../shared/utils')
@@ -9,12 +9,13 @@ exports.readPrograms = function (body, callback) {
   var stream = xml.parse(body)
   var programs = []
 
-  stream.each('KUVAOHJELMA', function(program) {
-    programs.push(validateProgram(program))
+  stream.each('KUVAOHJELMA', function(xml) {
+    var p = validateProgram(xml)
+    programs.push(p)
   })
 
   stream.on('end', function() {
-    callback(null, programs)
+    return callback(null, programs)
   })
 }
 
@@ -29,11 +30,11 @@ var validateProgram = compose([
     return p.country ? {country: p.country.split(' ')} : {country: []}
   }),
   optional('TUOTANTOYHTIO', 'legacy-production-companies'),
-  map(and(requiredAttr('TYPE', 'type'), function(xml) {
+  and(requiredAttr('TYPE', 'type'), function(xml) {
     var type = xml.$.TYPE
-    if (_.has(enums.legacyProgramTypes, type)) return ok({type: enums.legacyProgramTypes[type]})
+    if (_.has(enums.legacyProgramTypes, type)) return ok({'program-type': enums.legacyProgramTypes[type]})
     else return error("Virheellinen attribuutti: TYPE")
-  }), function(p) { return { 'program-type': enums.legacyProgramTypes[p.type] }}),
+  }),
   required('SYNOPSIS', 'synopsis'),
   optional('TUOTANTOKAUSI', 'season'),
   optional('OSA', 'episode'),
@@ -46,7 +47,7 @@ var validateProgram = compose([
   },
   map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
   map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),
-  node('LUOKITTELU', 'classification', [
+  map(node('LUOKITTELU', 'classification', [
     and(requiredAttr('REKISTEROINTIPAIVA', 'registration-date'), function(xml) {
       var d = moment(xml.$.REKISTEROINTIPAIVA, "DD.MM.YYYY HH:mm:ss")
       if (d.isValid()) return ok({'registration-date': d.toDate()})
@@ -60,7 +61,7 @@ var validateProgram = compose([
       }))
       return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), 'criteria-comments': criteriaComments}
     })
-  ])
+  ]), function(p) { return {classifications: [p.classification]} })
 ])
 
 // validator = Xml -> Result
@@ -69,7 +70,7 @@ function flatMap(validator, f) {
   return function(xml) {
     var res = validator(xml)
     var res2 = f(res.program)(xml)
-    return {program: _.merge(res.program, res2.program), errors: res.errors.concat(res2.errors)}
+    return {program: _.merge(_.cloneDeep(res.program), _.cloneDeep(res2.program)), errors: res.errors.concat(res2.errors)}
   }
 }
 
@@ -160,7 +161,7 @@ function childrenByName(root, name) {
 
 function optionListToArray(field) {
   if (!field || field.$text.length == 0) return []
-  var arr = field.$text.split(',').map(function(s) { return s.replace(/[\^\s]/g, '')} )
+  var arr = field.$text.split(' ').map(function(s) { return s.replace(/[\^\s]/g, '')} )
   return _(arr).compact().uniq().value()
 }
 

@@ -1,5 +1,6 @@
 var express = require('express')
 var _ = require('lodash')
+var async = require('async')
 var path = require('path')
 var mongoose = require('mongoose')
 var schema = require('./schema')
@@ -172,24 +173,37 @@ app.get('/directors/search/:query', queryNameIndex('Director'))
 
 app.post('/xml/v1/programs/:token', function(req, res, next) {
   xml.readPrograms(req, function(err, programs) {
-    var now = new Date()
-    // creation-date
-    // status
     var root = builder.create("ASIAKAS")
-    programs.forEach(function(res) {
-      var program = res.program
+    async.eachSeries(programs, function(data, callback) {
+      var program = data.program
       var ele = root.ele('KUVAOHJELMA')
       ele.ele('ASIAKKAANTUNNISTE', program.customerId)
-      ele.ele('STATUS', res.errors.length > 0 ? 'VIRHE' : 'OK')
-      res.errors.forEach(function(msg) {
-        var err = ele.ele('VIRHE')
-        err.ele('KOODI', 'N/A')
-        err.ele('SELITYS', msg)
+      ele.ele('STATUS', data.errors.length > 0 ? 'VIRHE' : 'OK')
+      data.errors.forEach(function(msg) {
+        var error = ele.ele('VIRHE')
+        error.ele('KOODI', 'N/A')
+        error.ele('SELITYS', msg)
       })
+      
+      var now = new Date()
+      var p = new Program(program)
+      p.classifications[0].status = 'registered'
+      p.classifications[0]['creation-date'] = now
+
+      p.populateAllNames(function(err) {
+        if (err) return next(err)
+        p.save(function(err, saved) {
+          if (err) return next(err)
+          //console.log(saved)
+          //return res.send(program)
+          callback()
+        })
+      })
+    }, function(err) {
+      if (err) throw new Error(err)
+      res.set('Content-Type', 'application/xml');
+      res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
     })
-    console.log(programs)
-    res.set('Content-Type', 'application/xml');
-    res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
   })
 })
 

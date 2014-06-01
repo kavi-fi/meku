@@ -10,7 +10,7 @@ var InvoiceRow = schema.InvoiceRow
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var classification = require('../shared/classification')
-var xml = require('./xmlimport')
+var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var builder = require('xmlbuilder')
 

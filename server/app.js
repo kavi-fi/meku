@@ -173,7 +173,8 @@ app.get('/accounts/:id', function(req, res, next) {
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 
-app.post('/xml/v1/programs/:token', function(req, res, next) {
+app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
+  req.resume()
   xml.readPrograms(req, function(err, programs) {
     var root = builder.create("ASIAKAS")
     async.eachSeries(programs, function(data, callback) {
@@ -220,6 +221,7 @@ app.post('/xml/v1/programs/:token', function(req, res, next) {
   })
 })
 
+
 if (isDev()) {
   var liveReload = require('express-livereload')
   liveReload(app, { watchDir: path.join(__dirname, '../client') })
@@ -248,6 +250,18 @@ function authenticate(req, res, next) {
     return next()
   }
   return res.send(403)
+}
+
+function authenticateXmlApi(req, res, next) {
+  req.pause()
+  Account.findOne({apiToken: req.params.token}, function(err, data) {
+    if (data) {
+      req.customer = data
+      return next()
+    } else {
+      res.send(403)
+    }
+  })
 }
 
 function sendEmail(data, callback) {

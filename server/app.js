@@ -1,5 +1,6 @@
 var express = require('express')
 var _ = require('lodash')
+var async = require('async')
 var path = require('path')
 var mongoose = require('mongoose')
 var schema = require('./schema')
@@ -10,7 +11,9 @@ var InvoiceRow = schema.InvoiceRow
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var classification = require('../shared/classification')
+var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+var builder = require('xmlbuilder')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -170,6 +173,42 @@ app.get('/accounts/:id', function(req, res, next) {
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 
+app.post('/xml/v1/programs/:token', function(req, res, next) {
+  xml.readPrograms(req, function(err, programs) {
+    var root = builder.create("ASIAKAS")
+    async.eachSeries(programs, function(data, callback) {
+      var program = data.program
+      var ele = root.ele('KUVAOHJELMA')
+      ele.ele('ASIAKKAANTUNNISTE', program.customerId)
+      ele.ele('STATUS', data.errors.length > 0 ? 'VIRHE' : 'OK')
+      data.errors.forEach(function(msg) {
+        var error = ele.ele('VIRHE')
+        error.ele('KOODI', 'N/A')
+        error.ele('SELITYS', msg)
+      })
+      
+      var now = new Date()
+      var p = new Program(program)
+      p.classifications[0].status = 'registered'
+      p.classifications[0]['creation-date'] = now
+
+      p.populateAllNames(function(err) {
+        if (err) return next(err)
+        p.save(function(err, saved) {
+          if (err) return next(err)
+          //console.log(saved)
+          //return res.send(program)
+          callback()
+        })
+      })
+    }, function(err) {
+      if (err) throw new Error(err)
+      res.set('Content-Type', 'application/xml');
+      res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
+    })
+  })
+})
+
 if (isDev()) {
   var liveReload = require('express-livereload')
   liveReload(app, { watchDir: path.join(__dirname, '../client') })
@@ -187,7 +226,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'POST:/login', 'POST:/logout']
+  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'POST:/login', 'POST:/logout', 'POST:/xml']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

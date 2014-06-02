@@ -34,6 +34,7 @@ var classification = {
 
 var ProgramSchema = new Schema({
   'emeku-id': { type: String, index: true },
+  customerId: String,
   'all-names': { type: [String], index: true },
   name: { type: [String], index: true },
   'name-fi': [String],
@@ -43,6 +44,7 @@ var ProgramSchema = new Schema({
   country: [String],
   year: String,
   'production-companies': {type: [String], index: true },
+  'legacy-production-companies': String,
   genre: [String],
   'legacy-genre': [String],
   directors: {type: [String], index: true},

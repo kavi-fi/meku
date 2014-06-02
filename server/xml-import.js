@@ -54,7 +54,7 @@ var validateProgram = compose([
       else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
     }),
     required('FORMAATTI', 'format'),
-    required('KESTO', 'duration'),
+    and(required('KESTO'), test('KESTO', utils.isValidDuration, "Virheellinen kesto", 'duration')),
     map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
       var criteriaComments = _.object(p.criteria.map(function (c) {
         return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
@@ -114,7 +114,7 @@ function ret(program) {
 
 function required(name, toField) {
   return function(xml) {
-    if (xml[name]) return ok(utils.keyValue(toField, xml[name].$text))
+    if (xml[name]) return ok(utils.keyValue(toField || name, xml[name].$text))
     else return error(["Pakollinen kenttä puuttuu: " + name])
   }
 }
@@ -128,7 +128,7 @@ function requiredAttr(name, toField) {
 
 function optional(field, toField) {
   return function(xml) {
-    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) return {program: utils.keyValue(toField, undefined), errors: []}
+    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) return {program: utils.keyValue(toField || field, undefined), errors: []}
     else return {program: utils.keyValue(toField, xml[field].$text), errors: []}
   }
 }
@@ -152,6 +152,13 @@ function node(name, toField, validators) {
   })
 }
 
+function test(field, f, msg, toField) {
+  return function(xml) {
+    var text = xml[field].$text
+    if (f(text)) return ok(utils.keyValue(toField || field, text))
+    else return error(msg + " " + text)
+  }
+}
 function fullname(node) {
   return node.ETUNIMI.$text + ' ' + node.SUKUNIMI.$text
 }

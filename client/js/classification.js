@@ -32,7 +32,7 @@ function programDetails() {
   })
 
   validateTextChange($form.find('.required'), isNotEmpty)
-  validateTextChange($form.find('.duration'), isValidDuration)
+  validateTextChange($form.find('.duration'), utils.isValidDuration)
   validateTextChange($form.find('.email'), isEmail)
   validateTextChange($form.find('input[name=year]'), isValidYear)
   requiredCheckboxGroup($form.find('#email .emails'))

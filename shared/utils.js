@@ -30,6 +30,10 @@ utils.seasonEpisodeCode = function(p) {
   function pad(i) { return i < 10 ? '0' + i : ''+i }
 }
 
+utils.isValidDuration = function(txt) {
+  return /(?:(\d+)?:)?(\d+):(\d+)$/.test(txt)
+}
+
 if (isNodeJs()) module.exports = utils
 
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

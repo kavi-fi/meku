@@ -34,7 +34,7 @@ var classification = {
 
 var ProgramSchema = new Schema({
   'emeku-id': { type: String, index: true },
-  customerId: String,
+  customersId: String,
   'all-names': { type: [String], index: true },
   name: { type: [String], index: true },
   'name-fi': [String],

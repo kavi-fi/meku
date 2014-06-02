@@ -20,7 +20,7 @@ exports.readPrograms = function (body, callback) {
 }
 
 var validateProgram = compose([
-  optional('ASIAKKAANTUNNISTE', 'customerId'),
+  required('ASIAKKAANTUNNISTE', 'customersId'),
   required('ALKUPERAINENNIMI', 'name'),
   optional('SUOMALAINENNIMI', 'name-fi'),
   optional('RUOTSALAINENNIMI', 'name-sv'),

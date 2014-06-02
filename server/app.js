@@ -179,32 +179,41 @@ app.post('/xml/v1/programs/:token', function(req, res, next) {
     async.eachSeries(programs, function(data, callback) {
       var program = data.program
       var ele = root.ele('KUVAOHJELMA')
-      ele.ele('ASIAKKAANTUNNISTE', program.customerId)
-      ele.ele('STATUS', data.errors.length > 0 ? 'VIRHE' : 'OK')
-      data.errors.forEach(function(msg) {
-        var error = ele.ele('VIRHE')
-        error.ele('KOODI', 'N/A')
-        error.ele('SELITYS', msg)
-      })
-      
-      if (data.errors.length == 0) {
-        var now = new Date()
-        var p = new Program(program)
-        p.classifications[0].status = 'registered'
-        p.classifications[0]['creation-date'] = now
-        p.populateAllNames(function(err) {
-          if (err) return next(err)
-          p.save(function(err, saved) {
-            if (err) return next(err)
-            callback()
-          })
+      ele.ele('ASIAKKAANTUNNISTE', program.customersId)
+
+      Program.find({customersId: program.customersId}).exec(function(err, duplicates) {
+        if (err) return callback(err)
+
+        if (duplicates.length > 0) {
+          data.errors.push("Kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.customersId)
+        }
+
+        ele.ele('STATUS', data.errors.length > 0 ? 'VIRHE' : 'OK')
+        data.errors.forEach(function(msg) {
+          var error = ele.ele('VIRHE')
+          error.ele('KOODI', 'N/A')
+          error.ele('SELITYS', msg)
         })
-      } else {
-        callback()
-      }
+        
+        if (data.errors.length == 0) {
+          var now = new Date()
+          var p = new Program(program)
+          p.classifications[0].status = 'registered'
+          p.classifications[0]['creation-date'] = now
+          p.populateAllNames(function(err) {
+            if (err) return next(err)
+            p.save(function(err, saved) {
+              if (err) return next(err)
+              callback()
+            })
+          })
+        } else {
+          callback()
+        }
+      })
 
     }, function(err) {
-      if (err) throw new Error(err)
+      if (err) return next(err)
       res.set('Content-Type', 'application/xml');
       res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
     })

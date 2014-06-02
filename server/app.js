@@ -187,20 +187,22 @@ app.post('/xml/v1/programs/:token', function(req, res, next) {
         error.ele('SELITYS', msg)
       })
       
-      var now = new Date()
-      var p = new Program(program)
-      p.classifications[0].status = 'registered'
-      p.classifications[0]['creation-date'] = now
-
-      p.populateAllNames(function(err) {
-        if (err) return next(err)
-        p.save(function(err, saved) {
+      if (data.errors.length == 0) {
+        var now = new Date()
+        var p = new Program(program)
+        p.classifications[0].status = 'registered'
+        p.classifications[0]['creation-date'] = now
+        p.populateAllNames(function(err) {
           if (err) return next(err)
-          //console.log(saved)
-          //return res.send(program)
-          callback()
+          p.save(function(err, saved) {
+            if (err) return next(err)
+            callback()
+          })
         })
-      })
+      } else {
+        callback()
+      }
+
     }, function(err) {
       if (err) throw new Error(err)
       res.set('Content-Type', 'application/xml');

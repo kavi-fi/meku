@@ -147,6 +147,12 @@ InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, 
 
 var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', InvoiceSchema)
 
+var XmlDoc = exports.XmlDoc = mongoose.model('xmldocs', new Schema({
+  date: Date,
+  xml: String,
+  account: {_id: ObjectId, name: String},
+}))
+
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
 var DirectorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
 var ActorSchema = new Schema(namedIndex, { _id: false, versionKey: false })

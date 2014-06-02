@@ -97,9 +97,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     function addInvoicerows(callback) {
       var currentClassification = _.first(program.classifications)
-      var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(currentClassification.duration)
-        .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
-      var seconds = (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
+      var seconds = durationToSeconds(currentClassification.duration)
 
       if (classification.isReclassification(program)) {
         // reclassification fee only when "Oikaisupyyntö" and KAVI is the classifier
@@ -175,6 +173,11 @@ app.get('/directors/search/:query', queryNameIndex('Director'))
 
 app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
   req.resume()
+  var xmlDoc = ""
+  req.on('data', function(chunk) {
+    xmlDoc += chunk.toString('utf-8')
+  })
+
   xml.readPrograms(req, function(err, programs) {
     var root = builder.create("ASIAKAS")
     async.eachSeries(programs, function(data, callback) {
@@ -196,21 +199,30 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
           error.ele('SELITYS', msg)
         })
         
-        if (data.errors.length == 0) {
-          var now = new Date()
-          var p = new Program(program)
-          p.classifications[0].status = 'registered'
-          p.classifications[0]['creation-date'] = now
-          p.populateAllNames(function(err) {
-            if (err) return next(err)
-            p.save(function(err, saved) {
+        var now = new Date()
+        var account = {_id: req.account_id, name: req.account.name}
+        var doc = {xml: xmlDoc, date: now, account: account}
+        new schema.XmlDoc(doc).save(function(err, saved) {
+          if (data.errors.length == 0) {
+            var p = new Program(program)
+            p.classifications[0].status = 'registered'
+            p.classifications[0]['creation-date'] = now
+            p.billing = account
+            var seconds = durationToSeconds(_.first(p.classifications).duration)
+            p.populateAllNames(function(err) {
               if (err) return next(err)
-              callback()
+              p.save(function(err, saved) {
+                if (err) return next(err)
+                InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function(err, saved) {
+                  if (err) return next(err)
+                  callback()
+                })
+              })
             })
-          })
-        } else {
-          callback()
-        }
+          } else {
+            callback()
+          }
+        })
       })
 
     }, function(err) {
@@ -256,7 +268,7 @@ function authenticateXmlApi(req, res, next) {
   req.pause()
   Account.findOne({apiToken: req.params.token}, function(err, data) {
     if (data) {
-      req.customer = data
+      req.account = data
       return next()
     } else {
       res.send(403)
@@ -284,6 +296,12 @@ function updateActorAndDirectorIndexes(program, callback) {
   schema.Actor.updateWithNames(program.actors, function() {
     schema.Director.updateWithNames(program.directors, callback)
   })
+}
+
+function durationToSeconds(duration) {
+  var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(duration)
+    .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
+  return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
 }
 
 function queryNameIndex(schemaName) {

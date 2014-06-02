@@ -26,8 +26,12 @@ var validateProgram = compose([
   optional('RUOTSALAINENNIMI', 'name-sv'),
   optional('MUUNIMI', 'name-other'),
   optional('VALMISTUMISVUOSI', 'year'),
-  map(optional('MAAT', 'country'), function(p) {
-    return p.country ? {country: p.country.split(' ')} : {country: []}
+  flatMap(optional('MAAT'), function(p) {
+    var countries = p.MAAT ? p.MAAT.split(' ') : []
+    return function(xml) {
+      if (_.all(countries, _.curry(_.has)(enums.countries))) return ok({country: countries})
+      else return error('Virheellinen MAAT kenttä: ' + countries)
+    }
   }),
   optional('TUOTANTOYHTIO', 'legacy-production-companies'),
   and(requiredAttr('TYPE', 'type'), function(xml) {
@@ -38,13 +42,13 @@ var validateProgram = compose([
   required('SYNOPSIS', 'synopsis'),
   optional('TUOTANTOKAUSI', 'season'),
   optional('OSA', 'episode'),
-  function(xml) {
-    return ok({
-      'legacy-genre': optionListToArray(xml.LAJIT).map(function(g) { return enums.legacyGenres[g] })
-              .concat(optionListToArray(xml['TELEVISIO-OHJELMALAJIT']).map(function(g) { return enums.legacyTvGenres[g] }))
-              .concat(optionListToArray(xml.PELINLAJIT))
-    })
-  },
+  map(compose([
+    enumList('LAJIT', enums.legacyGenres),
+    enumList('TELEVISIO-OHJELMALAJIT', enums.legacyTvGenres)
+    //listToEnum('PELINLAJIT', enums.legacyGenres)
+  ]), function(p) {
+    return { 'legacy-genre': p.LAJIT.concat(p['TELEVISIO-OHJELMALAJIT']) }
+  }),
   map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
   map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),
   map(node('LUOKITTELU', 'classification', [
@@ -114,7 +118,8 @@ function ret(program) {
 
 function required(name, toField) {
   return function(xml) {
-    if (xml[name]) return ok(utils.keyValue(toField || name, xml[name].$text))
+    toField = toField || name
+    if (xml[name]) return ok(utils.keyValue(toField, xml[name].$text))
     else return error(["Pakollinen kenttä puuttuu: " + name])
   }
 }
@@ -128,7 +133,8 @@ function requiredAttr(name, toField) {
 
 function optional(field, toField) {
   return function(xml) {
-    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) return {program: utils.keyValue(toField || field, undefined), errors: []}
+    toField = toField || field
+    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) return {program: utils.keyValue(toField, undefined), errors: []}
     else return {program: utils.keyValue(toField, xml[field].$text), errors: []}
   }
 }
@@ -139,6 +145,14 @@ function childrenByNameTo(field, toField) {
       program: utils.keyValue(toField, childrenByName(xml, field)),
       errors: []
     }
+  }
+}
+
+function enumList(field, _enum) {
+  return function(xml) {
+    var values = optionListToArray(xml[field]).map(function(g) { return _enum[g] })
+    if (_.all(values, function(v) { return v !== undefined })) return ok(utils.keyValue(field, values))
+    else return error("Virheellinen kenttä " + field)
   }
 }
 

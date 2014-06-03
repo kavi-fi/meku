@@ -174,11 +174,17 @@ app.get('/directors/search/:query', queryNameIndex('Director'))
 app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
   req.resume()
   var xmlDoc = ""
-  req.on('data', function(chunk) {
-    xmlDoc += chunk.toString('utf-8')
-  })
+  req.on('data', function(chunk) { xmlDoc += chunk })
 
   xml.readPrograms(req, function(err, programs) {
+
+    if (programs.length == 0) {
+      var error = builder.create('VIRHE')
+      error.ele('KOODI', 'N/A')
+      error.ele('SELITYS', 'Yhtään kuvaohjelmaa ei voitu lukea')
+      return res.send(error.end({ pretty: true, indent: '  ', newline: '\n' }))
+    }
+
     var root = builder.create("ASIAKAS")
     async.eachSeries(programs, function(data, callback) {
       var program = data.program
@@ -201,7 +207,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
         
         var now = new Date()
         var account = {_id: req.account_id, name: req.account.name}
-        var doc = {xml: xmlDoc, date: now, account: account}
+        var doc = {xml: xmlDoc.toString('utf-8'), date: now, account: account}
         new schema.XmlDoc(doc).save(function(err, saved) {
           if (data.errors.length == 0) {
             var p = new Program(program)

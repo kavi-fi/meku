@@ -202,9 +202,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
   })
 
   function writeError(err, parent) {
-    var error = parent.ele('VIRHE')
-    error.ele('KOODI', 'N/A')
-    error.ele('SELITYS', err)
+    parent.ele('VIRHE', err)
   }
 
   function handleXmlProgram(data, callback) {

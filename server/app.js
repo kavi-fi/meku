@@ -188,13 +188,14 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     var root = builder.create("ASIAKAS")
     async.eachSeries(programs, function(data, callback) {
       var program = data.program
+      program.customersId = { account: req.account._id, id: program.externalId }
       var ele = root.ele('KUVAOHJELMA')
-      ele.ele('ASIAKKAANTUNNISTE', program.customersId)
+      ele.ele('ASIAKKAANTUNNISTE', program.externalId)
 
-      Program.find({customersId: program.customersId}).exec(function(err, duplicates) {
+      Program.findOne({ customersId: program.customersId }).exec(function(err, duplicate) {
         if (err) return callback(err)
 
-        if (duplicates.length > 0) {
+        if (duplicate) {
           data.errors.push("Kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.customersId)
         }
 

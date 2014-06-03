@@ -25,7 +25,7 @@ var validateProgram = compose([
     if (_.has(enums.legacyProgramTypes, type)) return ok({'program-type': enums.legacyProgramTypes[type]})
     else return error("Virheellinen attribuutti: TYPE")
   }),
-  required('ASIAKKAANTUNNISTE', 'customersId'),
+  required('ASIAKKAANTUNNISTE', 'externalId'),
   required('ALKUPERAINENNIMI', 'name'),
   flatMap(requiredAttr('TYPE', 'type'), function(p) {
     var allButTvOrOther = ['01','02','03','04','06','07','08','10','11']

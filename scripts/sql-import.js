@@ -17,7 +17,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries nameIndex
+   node scripts/sql-import.js base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries linkCustomersIds nameIndex
 
  Should remove programs which have no classifications? -> ~7400
    check how many are tv-series-names?
@@ -32,6 +32,7 @@ var tasks = {
   nameIndex: nameIndex,
   wipeMetadataIndex: wipeMetadataIndex, metadataIndex: metadataIndex,
   markTrainingProgramsDeleted: markTrainingProgramsDeleted,
+  linkCustomersIds: linkCustomersIds,
   linkTvSeries: linkTvSeries
 }
 
@@ -408,6 +409,24 @@ function linkTvSeries(callback) {
     })
   }
   function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
+}
+
+function linkCustomersIds(callback) {
+  schema.Account.find({}, { 'emeku-id':1 }, function(err, accounts) {
+    if (err) return callback(err)
+    var accountMap = _.indexBy(accounts, 'emeku-id')
+
+    var tick = progressMonitor()
+    conn.query('select id, ref_id, provider_id from meku_audiovisualprograms where ref_id is not null')
+      .stream()
+      .pipe(consumer(onRow, callback))
+
+    function onRow(row, callback) {
+      tick()
+      var update = { customersId: { account: accountMap[row.provider_id]._id, id: row.ref_id } }
+      schema.Program.update({ 'emeku-id': row.id }, update, callback)
+    }
+  })
 }
 
 function batcher(num) {

@@ -34,6 +34,7 @@ var validateProgram = compose([
   }),
   optional('RUOTSALAINENNIMI', 'name-sv'),
   optional('MUUNIMI', 'name-other'),
+  optional('JULKAISUVUOSI', 'year'),
   optional('VALMISTUMISVUOSI', 'year'),
   flatMap(optional('MAAT'), function(p) {
     var countries = p.MAAT ? p.MAAT.split(' ') : []

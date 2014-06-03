@@ -125,10 +125,6 @@ function isEmail(txt) {
   return regexp.test(txt)
 }
 
-function isValidYear(txt) {
-  return /^\d{4}$/.test(txt) && parseInt(txt) > 1889
-}
-
 function validate(f) {
   return function() {
     $(this).toggleClass('invalid', !f($(this).val())).trigger('validation')

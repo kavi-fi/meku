@@ -34,6 +34,10 @@ utils.isValidDuration = function(txt) {
   return /(?:(\d+)?:)?(\d+):(\d+)$/.test(txt)
 }
 
+utils.isValidYear = function(txt) {
+  return /^\d{4}$/.test(txt) && parseInt(txt) > 1889
+}
+
 if (isNodeJs()) module.exports = utils
 
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

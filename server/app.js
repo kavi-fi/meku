@@ -216,6 +216,10 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       return writeErrAndReturn(data.errors)
     }
 
+    if (!utils.isValidYear(program.year)) {
+      return writeErrAndReturn("Virheellinen vuosi: " + program.year)
+    }
+
     program.customersId = { account: req.account._id, id: program.externalId }
     Program.findOne({ customersId: program.customersId }).exec(function(err, duplicate) {
       if (err) return callback(err)

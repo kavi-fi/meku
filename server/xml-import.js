@@ -151,6 +151,14 @@ function required(name, toField) {
   }
 }
 
+function requiredNode(name, toField) {
+  return function(xml) {
+    toField = toField || name
+    if (xml[name]) return ok(utils.keyValue(toField, xml[name].$text))
+    else return error(["Pakollinen elementti puuttuu: " + name])
+  }
+}
+
 function requiredAttr(name, toField) {
   return function(xml) {
     if (xml.$[name]) return ok(utils.keyValue(toField, xml.$[name]))
@@ -184,7 +192,7 @@ function enumList(field, _enum) {
 }
 
 function node(name, toField, validators) {
-  return flatMap(required(name, toField), function(p) {
+  return flatMap(requiredNode(name, toField), function(p) {
     return function (xml) {
       return _.reduce(validators, function(acc, f) {
         return flatMap(acc, function(_) { return map(f, function(p) { return utils.keyValue(toField, p)}) })

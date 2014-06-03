@@ -20,9 +20,18 @@ exports.readPrograms = function (body, callback) {
 }
 
 var validateProgram = compose([
+  and(requiredAttr('TYPE', 'type'), function(xml) {
+    var type = xml.$.TYPE
+    if (_.has(enums.legacyProgramTypes, type)) return ok({'program-type': enums.legacyProgramTypes[type]})
+    else return error("Virheellinen attribuutti: TYPE")
+  }),
   required('ASIAKKAANTUNNISTE', 'customersId'),
   required('ALKUPERAINENNIMI', 'name'),
-  optional('SUOMALAINENNIMI', 'name-fi'),
+  flatMap(requiredAttr('TYPE', 'type'), function(p) {
+    var allButTvOrOther = ['01','02','03','04','06','07','08','10','11']
+    if (_.contains(allButTvOrOther, p.type)) return required('SUOMALAINENNIMI', 'name-fi')
+    else return optional('SUOMALAINENNIMI', 'name-fi')
+  }),
   optional('RUOTSALAINENNIMI', 'name-sv'),
   optional('MUUNIMI', 'name-other'),
   optional('VALMISTUMISVUOSI', 'year'),
@@ -34,11 +43,6 @@ var validateProgram = compose([
     }
   }),
   optional('TUOTANTOYHTIO', 'legacy-production-companies'),
-  and(requiredAttr('TYPE', 'type'), function(xml) {
-    var type = xml.$.TYPE
-    if (_.has(enums.legacyProgramTypes, type)) return ok({'program-type': enums.legacyProgramTypes[type]})
-    else return error("Virheellinen attribuutti: TYPE")
-  }),
   required('SYNOPSIS', 'synopsis'),
   optional('TUOTANTOKAUSI', 'season'),
   optional('OSA', 'episode'),
@@ -74,7 +78,8 @@ function flatMap(validator, f) {
   return function(xml) {
     var res = validator(xml)
     var res2 = f(res.program)(xml)
-    return {program: _.merge(_.cloneDeep(res.program), _.cloneDeep(res2.program)), errors: res.errors.concat(res2.errors)}
+    var errors = _.flatten(res.errors.concat(res2.errors))
+    return {program: _.merge(_.cloneDeep(res.program), _.cloneDeep(res2.program)), errors: errors}
   }
 }
 

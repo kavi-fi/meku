@@ -48,8 +48,8 @@ var validateProgram = compose([
   optional('OSA', 'episode'),
   map(compose([
     enumList('LAJIT', enums.legacyGenres),
-    enumList('TELEVISIO-OHJELMALAJIT', enums.legacyTvGenres)
-    //listToEnum('PELINLAJIT', enums.legacyGenres)
+    enumList('TELEVISIO-OHJELMALAJIT', enums.legacyTvGenres),
+    inList('PELINLAJIT', enums.legacyGameGenres)
   ]), function(p) {
     return { 'legacy-genre': p.LAJIT.concat(p['TELEVISIO-OHJELMALAJIT']) }
   }),
@@ -191,6 +191,15 @@ function enumList(field, _enum) {
   }
 }
 
+function inList(field, list) {
+  return function(xml) {
+    var values = optionListToArray(xml[field])
+    var exists = values.map(_.curry(_.contains)(list))
+    if (_.all(exists)) return ok(utils.keyValue(field, values))
+    else return error("Virheellinen kenttä " + field)
+  }
+}
+
 function node(name, toField, validators) {
   return flatMap(requiredNode(name, toField), function(p) {
     return function (xml) {
@@ -215,9 +224,10 @@ function childrenByName(root, name) {
   return root.$children.filter(function(e) { return e.$name == name })
 }
 
-function optionListToArray(field) {
+function optionListToArray(field, sep) {
+  sep = sep || ' '
   if (!field || field.$text.length == 0) return []
-  var arr = field.$text.split(' ').map(function(s) { return s.replace(/[\^\s]/g, '')} )
+  var arr = field.$text.split(sep).map(function(s) { return s.replace(/[\^\s]/g, '')} )
   return _(arr).compact().uniq().value()
 }
 

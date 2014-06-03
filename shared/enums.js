@@ -347,6 +347,29 @@ enums.legacyTvGenres = {
   '13': 'Populaarikulttuuri'
 }
 
+enums.legacyGameGenres = [
+  "opetus",
+  "seikkailu",
+  "strategia",
+  "toiminta",
+  "rooli",
+  "simulaatio",
+  "tasohyppely",
+  "urheilu",
+  "muu",
+  "r&#xE4;iskint&#xE4;",
+  "autopeli (ajopeli)",
+  "puzzle",
+  "managerointi",
+  "first person shooter (FPS)",
+  "koulutus",
+  "lastenpeli",
+  "onlinepeli",
+  "karaoke",
+  "musiikki",
+  "party"
+]
+
 enums.legacyProgramTypes = {
   '01': 1,       //'Kotimainen elokuva' -> movie
   '02': 1,       //'Ulkomainen elokuva' -> movie

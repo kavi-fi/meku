@@ -172,74 +172,88 @@ app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 
 app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
+  var now = new Date()
+  var account = { _id: req.account._id, name: req.account.name }
+  var root = builder.create("ASIAKAS")
   req.resume()
   var xmlDoc = ""
   req.on('data', function(chunk) { xmlDoc += chunk })
+  req.on('end', function() {
+    var doc = { xml: xmlDoc.toString('utf-8'), date: now, account: account }
+    new schema.XmlDoc(doc).save(function(err) {
+      if (err) console.error(err)
+    })
+  })
 
   xml.readPrograms(req, function(err, programs) {
-
     if (programs.length == 0) {
-      var error = builder.create('VIRHE')
-      error.ele('KOODI', 'N/A')
-      error.ele('SELITYS', 'Yhtään kuvaohjelmaa ei voitu lukea')
+      writeError('Yhtään kuvaohjelmaa ei voitu lukea', root)
       return res.send(error.end({ pretty: true, indent: '  ', newline: '\n' }))
     }
 
-    var root = builder.create("ASIAKAS")
-    async.eachSeries(programs, function(data, callback) {
-      var program = data.program
-      program.customersId = { account: req.account._id, id: program.externalId }
-      var ele = root.ele('KUVAOHJELMA')
-      ele.ele('ASIAKKAANTUNNISTE', program.externalId)
-
-      Program.findOne({ customersId: program.customersId }).exec(function(err, duplicate) {
-        if (err) return callback(err)
-
-        if (duplicate) {
-          data.errors.push("Kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.externalId)
-        }
-
-        ele.ele('STATUS', data.errors.length > 0 ? 'VIRHE' : 'OK')
-        data.errors.forEach(function(msg) {
-          var error = ele.ele('VIRHE')
-          error.ele('KOODI', 'N/A')
-          error.ele('SELITYS', msg)
-        })
-        
-        var now = new Date()
-        var account = {_id: req.account_id, name: req.account.name}
-        var doc = {xml: xmlDoc.toString('utf-8'), date: now, account: account}
-        new schema.XmlDoc(doc).save(function(err, saved) {
-          if (data.errors.length == 0) {
-            var p = new Program(program)
-            p.classifications[0].status = 'registered'
-            p.classifications[0]['creation-date'] = now
-            p.billing = account
-            var seconds = durationToSeconds(_.first(p.classifications).duration)
-            p.populateAllNames(function(err) {
-              if (err) return next(err)
-              p.save(function(err, saved) {
-                if (err) return next(err)
-                InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function(err, saved) {
-                  if (err) return next(err)
-                  callback()
-                })
-              })
-            })
-          } else {
-            callback()
-          }
-        })
-      })
-
-    }, function(err) {
-      if (err) return next(err)
+    async.eachSeries(programs, handleXmlProgram, function(err) {
+      if (err) {
+        writeError('Järjestelmävirhe: ' + err, root)
+        console.error(err)
+      }
       res.set('Content-Type', 'application/xml');
-      res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
+      res.send(err ? 500 : 200, root.end({ pretty: true, indent: '  ', newline: '\n' }))
     })
   })
-})
 
+  function writeError(err, parent) {
+    var error = parent.ele('VIRHE')
+    error.ele('KOODI', 'N/A')
+    error.ele('SELITYS', err)
+  }
+
+  function handleXmlProgram(data, callback) {
+    var program = data.program
+    var ele = root.ele('KUVAOHJELMA')
+    ele.ele('ASIAKKAANTUNNISTE', program.externalId)
+
+    if (data.errors.length > 0) {
+      return writeErrAndReturn(data.errors)
+    }
+
+    program.customersId = { account: req.account._id, id: program.externalId }
+    Program.findOne({ customersId: program.customersId }).exec(function(err, duplicate) {
+      if (err) return callback(err)
+
+      if (duplicate) {
+        return writeErrAndReturn("Kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.externalId)
+      }
+
+      var user = _.find(req.account.users, { name: program.classifications[0].author.name })
+      if (user) {
+        program.classifications[0].author._id = user._id
+      } else {
+        return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + program.classifications[0].author.name)
+      }
+
+      ele.ele('STATUS', 'OK')
+      var p = new Program(program)
+      p.classifications[0].status = 'registered'
+      p.classifications[0]['creation-date'] = now
+      p.billing = account
+      var seconds = durationToSeconds(_.first(p.classifications).duration)
+      p.populateAllNames(function(err) {
+        if (err) return callback(err)
+        p.save(function(err) {
+          if (err) return callback(err)
+          InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(callback)
+        })
+      })
+    })
+
+    function writeErrAndReturn(errors) {
+      ele.ele('STATUS', 'VIRHE')
+      if (!_.isArray(errors)) errors = [errors]
+      errors.forEach(function(msg) { writeError(msg, ele) })
+      callback()
+    }
+  }
+})
 
 if (isDev()) {
   var liveReload = require('express-livereload')
@@ -273,7 +287,7 @@ function authenticate(req, res, next) {
 
 function authenticateXmlApi(req, res, next) {
   req.pause()
-  Account.findOne({apiToken: req.params.token}, function(err, data) {
+  Account.findOne({apiToken: req.params.token}).lean().exec(function(err, data) {
     if (data) {
       req.account = data
       return next()

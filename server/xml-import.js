@@ -145,7 +145,8 @@ function ret(program) {
 function required(name, toField) {
   return function(xml) {
     toField = toField || name
-    if (xml[name]) return ok(utils.keyValue(toField, xml[name].$text))
+    var val = xml[name]
+    if (val && val.$text !== '' && val.$text !== undefined) return ok(utils.keyValue(toField, xml[name].$text))
     else return error(["Pakollinen kenttä puuttuu: " + name])
   }
 }

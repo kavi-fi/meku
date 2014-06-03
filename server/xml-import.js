@@ -48,9 +48,9 @@ var validateProgram = compose([
   optional('TUOTANTOKAUSI', 'season'),
   optional('OSA', 'episode'),
   map(compose([
-    enumList('LAJIT', enums.legacyGenres),
-    enumList('TELEVISIO-OHJELMALAJIT', enums.legacyTvGenres),
-    inList('PELINLAJIT', enums.legacyGameGenres)
+    valuesInEnum('LAJIT', enums.legacyGenres),
+    valuesInEnum('TELEVISIO-OHJELMALAJIT', enums.legacyTvGenres),
+    valuesInList('PELINLAJIT', enums.legacyGameGenres)
   ]), function(p) {
     return { 'legacy-genre': p.LAJIT.concat(p['TELEVISIO-OHJELMALAJIT']).concat(p.PELINLAJIT) }
   }),
@@ -185,7 +185,7 @@ function childrenByNameTo(field, toField) {
   }
 }
 
-function enumList(field, _enum) {
+function valuesInEnum(field, _enum) {
   return function(xml) {
     var values = optionListToArray(xml[field]).map(function(g) { return _enum[g] })
     if (_.all(values, function(v) { return v !== undefined })) return ok(utils.keyValue(field, values))
@@ -193,7 +193,7 @@ function enumList(field, _enum) {
   }
 }
 
-function inList(field, list) {
+function valuesInList(field, list) {
   return function(xml) {
     var values = optionListToArray(xml[field])
     var exists = values.map(_.curry(_.contains)(list))

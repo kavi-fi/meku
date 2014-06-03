@@ -196,7 +196,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
         if (err) return callback(err)
 
         if (duplicate) {
-          data.errors.push("Kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.customersId)
+          data.errors.push("Kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.externalId)
         }
 
         ele.ele('STATUS', data.errors.length > 0 ? 'VIRHE' : 'OK')

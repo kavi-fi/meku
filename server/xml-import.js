@@ -61,7 +61,9 @@ var validateProgram = compose([
       if (d.isValid()) return ok({'registration-date': d.toDate()})
       else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
     }),
-    required('FORMAATTI', 'format'),
+    mapError(or(required('FORMAATTI', 'format'), required('PELIFORMAATTI', 'gameFormat')), function(errors) {
+      return "FORMAATTI tai PELIFORMAATTI puuttuu"
+    }),
     and(required('KESTO'), test('KESTO', utils.isValidDuration, "Virheellinen kesto", 'duration')),
     map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
       var criteriaComments = _.object(p.criteria.map(function (c) {
@@ -69,7 +71,7 @@ var validateProgram = compose([
       }))
       return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), 'criteria-comments': criteriaComments}
     })
-  ]), function(p) { return {classifications: [p.classification]} })
+  ]), function(p) { return {classifications: [p.classification], gameFormat: p.classification.gameFormat} })
 ])
 
 // validator = Xml -> Result
@@ -91,6 +93,14 @@ function map(validator, f) {
   }
 }
 
+function mapError(v, f) {
+  return function(xml) {
+    var res = v(xml)
+    if (res.errors.length > 0) return error([f(res.errors)])
+    else return res
+  }
+}
+
 function compose(xs) {
   return _.reduce(xs, function(acc, f) {
     return flatMap(acc, function(_) { return f })
@@ -101,6 +111,17 @@ function and(v1, v2) {
   return function(xml) {
     var res = v1(xml)
     if (res.errors.length == 0) {
+      return v2(xml)
+    } else {
+      return res
+    }
+  }
+}
+
+function or(v1, v2) {
+  return function(xml) {
+    var res = v1(xml)
+    if (res.errors.length > 0) {
       return v2(xml)
     } else {
       return res

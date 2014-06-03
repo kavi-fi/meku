@@ -150,7 +150,7 @@ var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', InvoiceSchem
 var XmlDoc = exports.XmlDoc = mongoose.model('xmldocs', new Schema({
   date: Date,
   xml: String,
-  account: {_id: ObjectId, name: String},
+  account: {_id: ObjectId, name: String}
 }))
 
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
@@ -172,4 +172,4 @@ var Director = exports.Director = mongoose.model('directors', DirectorSchema)
 ActorSchema.statics.updateWithNames = updateNamedIndex
 var Actor = exports.Actor = mongoose.model('actors', ActorSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, Director, Actor]
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor]

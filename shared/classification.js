@@ -15,7 +15,7 @@ var summary = exports.summary = function(program, classification) {
       .map(function(id) { return enums.classificationCriteria[id - 1] })
       .filter(function(c) { return c.age == maxAgeLimit })
       .map(function(c) { return {id: c.id, category: c.category} })
-      .reduce(function(accum, c) { if (accum.indexOf(c) == -1) accum.push(c); return accum }, [])
+      .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
     if (classification['warning-order'].length > 0) {
       var order = classification['warning-order']
       warnings = warnings.sort(function(a, b) {
@@ -27,13 +27,12 @@ var summary = exports.summary = function(program, classification) {
 }
 
 var classificationText = function(classification) {
-  var criteria = criteriaText(classification.warnings)
   if (classification.age === 'S') {
     return 'Kuvaohjelma on sallittu.'
   } else {
     return 'Kuvaohjelman ikäraja on ' + classification.age
          + ' vuotta ja ' + (classification.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
-         + criteria + '.'
+         + criteriaText(classification.warnings) + '.'
   }
 }
 

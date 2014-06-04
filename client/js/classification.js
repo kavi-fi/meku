@@ -359,7 +359,7 @@ function programDetails() {
 
   function updateSummary(program) {
     var summary = classification.summary(program, program.classifications[0])
-    var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w, class:'warning ' + w, draggable:true }).add($('<span>', { class:'drop-target' })) }))
+    var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w.category, class:'warning ' + w.category, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = commentToHtml(program.synopsis ? program.synopsis : '-')
     var countries = enums.util.toCountryString(program.country)
     var comments = commentToHtml(program.classifications[0].publicComments || '')

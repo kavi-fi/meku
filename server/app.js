@@ -124,7 +124,7 @@ app.post('/programs/:id/register', function(req, res, next) {
       if (err) return next(err)
       sendEmail(classification.registrationEmail(program, req.user), function(err) {
         if (err) return next(err)
-        updateActorAndDirectorIndexes(program, function() {
+        updateMetadataIndexes(program, function() {
           return res.send(program)
         })
       })
@@ -170,6 +170,7 @@ app.get('/accounts/:id', function(req, res, next) {
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
+app.get('/production-companies/search/:query', queryNameIndex('ProductionCompany'))
 
 app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
   var now = new Date()
@@ -347,6 +348,11 @@ function isDev() {
 function updateActorAndDirectorIndexes(program, callback) {
   schema.Actor.updateWithNames(program.actors, function() {
     schema.Director.updateWithNames(program.directors, callback)
+  })
+}
+function updateMetadataIndexes(program, callback) {
+  schema.ProductionCompany.updateWithNames(program['production-companies'], function() {
+    updateActorAndDirectorIndexes(program, callback)
   })
 }
 

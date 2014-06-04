@@ -94,10 +94,11 @@ function programDetails() {
     multiple: true
   })
 
-  selectEnumAutocomplete({
+  selectAutocomplete({
     $el: $form.find('input[name="production-companies"]'),
-    data: enums.productionCompanies.map(function(f) { return { id: f, text: f }}),
-    multiple: true
+    path: '/production-companies/search/',
+    multiple: true,
+    allowAdding: true
   })
 
   selectEnumAutocomplete({

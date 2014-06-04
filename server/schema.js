@@ -43,8 +43,7 @@ var ProgramSchema = new Schema({
   deleted: Boolean,
   country: [String],
   year: String,
-  'production-companies': {type: [String], index: true },
-  'legacy-production-companies': String,
+  'production-companies': [String],
   genre: [String],
   'legacy-genre': [String],
   directors: {type: [String], index: true},
@@ -156,6 +155,7 @@ var XmlDoc = exports.XmlDoc = mongoose.model('xmldocs', new Schema({
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
 var DirectorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
 var ActorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
+var ProductionCompanySchema = new Schema(namedIndex, { _id: false, versionKey: false })
 
 function updateNamedIndex(array, callback) {
   var that = this
@@ -169,7 +169,11 @@ function updateNamedIndex(array, callback) {
 
 DirectorSchema.statics.updateWithNames = updateNamedIndex
 var Director = exports.Director = mongoose.model('directors', DirectorSchema)
+
 ActorSchema.statics.updateWithNames = updateNamedIndex
 var Actor = exports.Actor = mongoose.model('actors', ActorSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor]
+ProductionCompanySchema.statics.updateWithNames = updateNamedIndex
+var ProductionCompany = exports.ProductionCompany = mongoose.model('productionCompanies', ProductionCompanySchema)
+
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany]

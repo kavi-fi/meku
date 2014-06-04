@@ -164,7 +164,7 @@
                     <xsd:element name="VALITTUTERMI" type="term:VALITTUTERMIT" minOccurs="0" maxOccurs="30"/>
                     <xsd:element name="LUOKITTELUNMAKSAJA" minOccurs="0">
                       <xsd:annotation>
-                        <xsd:documentation>Luokittelun maksaja.</xsd:documentation>
+                        <xsd:documentation>Luokittelun maksaja. Tätä kenttää ei tällä hetkellä käytetä mihinkään. Kenttä ei ole pakollinen.</xsd:documentation>
                       </xsd:annotation>
                       <xsd:simpleType>
                         <xsd:restriction base="xsd:string">

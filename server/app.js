@@ -243,7 +243,10 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
         if (err) return callback(err)
         p.save(function(err) {
           if (err) return callback(err)
-          InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(callback)
+          InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function(err) {
+            if (err) return callback(err)
+            updateActorAndDirectorIndexes(p, callback)
+          })
         })
       })
     })

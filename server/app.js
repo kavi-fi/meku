@@ -239,7 +239,8 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
         var p = new Program(program)
         p.classifications[0].status = 'registered'
         p.classifications[0]['creation-date'] = now
-        p.billing = account
+        p.classifications[0].billing = account
+        p.classifications[0].buyer = account
         var seconds = durationToSeconds(_.first(p.classifications).duration)
         p.populateAllNames(function(err) {
           if (err) return callback(err)

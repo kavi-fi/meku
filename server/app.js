@@ -188,7 +188,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
   xml.readPrograms(req, function(err, programs) {
     if (programs.length == 0) {
       writeError('Yhtään kuvaohjelmaa ei voitu lukea', root)
-      return res.send(error.end({ pretty: true, indent: '  ', newline: '\n' }))
+      return res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
     }
 
     async.eachSeries(programs, handleXmlProgram, function(err) {

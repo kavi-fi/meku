@@ -75,7 +75,7 @@ ProgramSchema.methods.populateAllNames = function(callback) {
     p['all-names'] = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
   }
   function concatNames(p) {
-    return p.name.concat(p['name-fi']).concat(p['name-sv']).concat(p['name-other'])
+    return p.name.concat(p['name-fi'] || []).concat(p['name-sv'] || []).concat(p['name-other'] || [])
   }
 }
 

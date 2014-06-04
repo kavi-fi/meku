@@ -34,16 +34,17 @@ enums.programType = {
   0: { type: 'unknown', fi: '?' },
   1: { type: 'movie', fi: 'Elokuva' },
   2: { type: 'series', fi: 'TV-sarjan nimi' },
-  3: { type: 'tv', fi: 'TV' },
-  4: { type: 'extra', fi: 'Extra' },
-  5: { type: 'trailer', fi: 'Traileri' },
-  6: { type: 'game', fi: 'Peli' },
-  7: { type: 'pegi', fi: 'PEGI-peli' }
+  3: { type: 'episode', fi: 'TV-sarjan jakso' },
+  4: { type: 'other-tv', fi: 'Muu TV-ohjelma' },
+  5: { type: 'extra', fi: 'Extra' },
+  6: { type: 'trailer', fi: 'Traileri' },
+  7: { type: 'game', fi: 'Peli' },
+  8: { type: 'pegi', fi: 'PEGI-peli' }
 }
-enums.util.isTvShow = function(p) { return p['program-type'] == 3 }
-enums.util.isGameType = function(p) { return p['program-type'] == 6 || p['program-type'] == 7 }
-enums.util.isPegiGame = function(p) { return p['program-type'] == 7 }
-enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 7 }
+enums.util.isTvEpisode = function(p) { return p['program-type'] == 3 }
+enums.util.isGameType = function(p) { return p['program-type'] == 7 || p['program-type'] == 8 }
+enums.util.isPegiGame = function(p) { return p['program-type'] == 8 }
+enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 8 }
 
 enums.genre = [
   'Fiktio',
@@ -375,13 +376,13 @@ enums.legacyProgramTypes = {
   '02': 1,       //'Ulkomainen elokuva' -> movie
   '02b': 0,    // 'TESTI' -> unknown
   '03': 3,       //'TV-sarjan jakso' -> tv
-  '04': 3,       // 'Muu tv-ohjelma' -> tv
+  '04': 4,       // 'Muu tv-ohjelma' -> tv
   '05': 2,       // 'TV-sarjan nimi' -> series
-  '06': 5,       // 'Traileri' -> trailer
-  '07': 4,       // 'Extra' -> extra
-  '08': 6,       // 'Peli' -> game
+  '06': 6,       // 'Traileri' -> trailer
+  '07': 5,       // 'Extra' -> extra
+  '08': 7,       // 'Peli' -> game
   '10': 0,      // 'Yhteistuotanto' -> unknown
-  '11': 7,      // 'PEGI hyväksytty peli' -> game
+  '11': 8,      // 'PEGI hyväksytty peli' -> pegi-game
   '12': 0       // 'Muu kuvaohjelma' -> unknown
 }
 

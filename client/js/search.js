@@ -42,8 +42,8 @@ function searchPage() {
   $newClassificationType.select2({
     data: [
       {id: 1, text: 'Elokuva'},
-      {id: 4, text: 'Extra'},
-      {id: 5, text: 'Trailer'}
+      {id: 5, text: 'Extra'},
+      {id: 6, text: 'Trailer'}
     ]
   }).select2('val', 1)
 

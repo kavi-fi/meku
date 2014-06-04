@@ -16,7 +16,7 @@ utils.escapeRegExp = function(str) {
 }
 
 utils.seasonEpisodeCode = function(p) {
-  if (!enums.util.isTvShow(p)) return ''
+  if (!enums.util.isTvEpisode(p)) return ''
   var ints = { season: parseInt(p.season), episode: parseInt(p.episode) }
   if (ints.season == p.season && ints.episode == p.episode) {
     return 'S' + pad(ints.season)+ 'E' + pad(ints.episode)

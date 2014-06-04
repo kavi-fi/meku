@@ -178,7 +178,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page .result > span:nth-child(1) { float: left; font-weight: bold; max-width: 430px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 #search-page .result > span:nth-child(2) { float: left; padding-left: 14px; }
 #search-page .result > span:nth-child(3) { float: right; font-weight: bold; display: inline-block; width: 40px; text-align: right; padding-right: 20px; }
-#search-page .result > span:nth-child(4) { float: right; font-size: 11px; width: 70px; }
+#search-page .result > span:nth-child(4) { float: right; font-size: 11px; width: 80px; }
 #search-page .result > span:nth-child(5) { float: right; text-align: right; padding-right: 20px; }
 #search-page .result.selected { border-bottom: none; }
 #search-page .highlight { color: #00BB88; }

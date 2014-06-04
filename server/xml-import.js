@@ -10,8 +10,7 @@ exports.readPrograms = function (body, callback) {
   var programs = []
 
   stream.each('KUVAOHJELMA', function(xml) {
-    var p = validateProgram(xml)
-    programs.push(p)
+    programs.push(validateProgram(xml))
   })
 
   stream.on('end', function() {
@@ -85,7 +84,7 @@ function flatMap(validator, f) {
   return function(xml) {
     var res = validator(xml)
     var res2 = f(res.program)(xml)
-    var errors = _.flatten(res.errors.concat(res2.errors))
+    var errors = _(res.errors.concat(res2.errors)).flatten().uniq().value()
     return {program: _.merge(_.cloneDeep(res.program), _.cloneDeep(res2.program)), errors: errors}
   }
 }

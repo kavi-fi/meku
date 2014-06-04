@@ -47,6 +47,9 @@ var validateProgram = compose([
   required('SYNOPSIS', 'synopsis'),
   optional('TUOTANTOKAUSI', 'season'),
   optional('OSA', 'episode'),
+  flatMap(requiredAttr('TYPE', 'type'), function(p) {
+    return p.type == '03' ? required('ISANTAOHJELMA', 'parentTvSeriesName') : optional('ISANTAOHJELMA', 'parentTvSeriesName')
+  }),
   map(compose([
     valuesInEnum('LAJIT', enums.legacyGenres),
     valuesInEnum('TELEVISIO-OHJELMALAJIT', enums.legacyTvGenres),

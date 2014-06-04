@@ -233,23 +233,48 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
         return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + program.classifications[0].author.name)
       }
 
-      ele.ele('STATUS', 'OK')
-      var p = new Program(program)
-      p.classifications[0].status = 'registered'
-      p.classifications[0]['creation-date'] = now
-      p.billing = account
-      var seconds = durationToSeconds(_.first(p.classifications).duration)
-      p.populateAllNames(function(err) {
+      verifyParentProgram(program, function(err) {
         if (err) return callback(err)
-        p.save(function(err) {
+        ele.ele('STATUS', 'OK')
+        var p = new Program(program)
+        p.classifications[0].status = 'registered'
+        p.classifications[0]['creation-date'] = now
+        p.billing = account
+        var seconds = durationToSeconds(_.first(p.classifications).duration)
+        p.populateAllNames(function(err) {
           if (err) return callback(err)
-          InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function(err) {
+          p.save(function(err) {
             if (err) return callback(err)
-            updateActorAndDirectorIndexes(p, callback)
+            InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function(err) {
+              if (err) return callback(err)
+              updateActorAndDirectorIndexes(p, callback)
+            })
           })
         })
       })
     })
+
+    function verifyParentProgram(program, callback) {
+      if (!enums.util.isTvEpisode(program)) return callback()
+      var parentName = program.parentTvSeriesName.trim()
+      Program.findOne({ 'program-type': 2, name: parentName }, function(err, parent) {
+        if (err) return callback(err)
+        if (!parent) {
+          parent = new Program({ 'program-type': 2, name: [parentName] })
+          parent.populateAllNames(function(err) {
+            if (err) return callback(err)
+            parent.save(function(err, saved) {
+              if (err) return callback(err)
+              program.series = { _id: saved._id, name: saved.name[0] }
+              callback()
+            })
+          })
+        } else {
+          program.series = { _id: parent._id, name: parent.name[0] }
+          callback()
+        }
+      })
+    }
 
     function writeErrAndReturn(errors) {
       ele.ele('STATUS', 'VIRHE')

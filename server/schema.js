@@ -55,7 +55,7 @@ var ProgramSchema = new Schema({
   gameFormat: String,
   season: String, episode: String, series: { _id: ObjectId, name: String }
 })
-
+ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.methods.populateAllNames = function(callback) {
   var program = this
   if (program.series._id) {

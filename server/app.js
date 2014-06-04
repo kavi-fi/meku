@@ -219,7 +219,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     }
 
     program.customersId = { account: req.account._id, id: program.externalId }
-    Program.findOne({ customersId: program.customersId }).exec(function(err, duplicate) {
+    Program.findOne({ customersId: program.customersId }, { _id: 1 }).lean().exec(function(err, duplicate) {
       if (err) return callback(err)
 
       if (duplicate) {

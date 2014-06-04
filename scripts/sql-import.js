@@ -17,7 +17,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries linkCustomersIds nameIndex
+   node scripts/sql-import.js base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
 
  Should remove programs which have no classifications? -> ~7400
    check how many are tv-series-names?
@@ -270,7 +270,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkAccounts, generateApiTokens], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens], callback)
 
   function accountBase(callback) {
     var q = 'select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
@@ -306,21 +306,17 @@ function accounts(callback) {
     }, callback)
   }
 
-  function linkAccounts(callback) {
+  function linkUserAccounts(callback) {
+    conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and a.deleted != "1"')
+      .stream()
+      .pipe(consumer(pushUserToAccount, callback))
+  }
+
+  function linkSecurityGroupAccounts(callback) {
     // securitygroup:8d4ad931-1055-a4f5-96da-4e3664911855 is meku users, which are linked everywhere, ignoring.
-    var tick = progressMonitor()
     conn.query('select a.id as accountId, u.id as userId from users u join securitygroups_users sgu on (u.id = sgu.user_id) join securitygroups sg on (sg.id = sgu.securitygroup_id) join securitygroups_records sgr on (sg.id = sgr.securitygroup_id and sgr.module = "Accounts") join accounts a on (sgr.record_id = a.id) where sg.id != "8d4ad931-1055-a4f5-96da-4e3664911855" and u.deleted != "1" and sgu.deleted != "1" and sg.deleted != "1" and sgr.deleted != "1" and a.deleted != "1"')
       .stream()
-      .pipe(consumer(onRow, callback))
-
-    function onRow(row, callback) {
-      tick()
-      schema.User.findOne({ 'emeku-id': row.userId }, { username: 1 }, function(err, user) {
-        if (err || !user) return callback(err || new Error('No such user '+row.userId))
-        var data = { _id: user._id, name: user.username }
-        schema.Account.update({ 'emeku-id': row.accountId }, { $addToSet: { users: data } }, callback)
-      })
-    }
+      .pipe(consumer(pushUserToAccount, callback))
   }
 
   function generateApiTokens(callback) {
@@ -336,6 +332,14 @@ function accounts(callback) {
     } else {
       result[row.id].push(row.email_address)
     }
+  }
+
+  function pushUserToAccount(row, callback) {
+    schema.User.findOne({ 'emeku-id': row.userId }, { username: 1 }, function (err, user) {
+      if (err || !user) return callback(err || new Error('No such user ' + row.userId))
+      var data = { _id: user._id, name: user.username }
+      schema.Account.update({ 'emeku-id': row.accountId }, { $addToSet: { users: data } }, callback)
+    })
   }
 
   function setApiToken(accountEmekuId, callback) {

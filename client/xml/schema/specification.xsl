@@ -430,7 +430,7 @@ background-image: -webkit-gradient(
 				Valtion elokuvatarkastamon (VET) sähköinen kuvaohjelmien rekisteröintijärjestelmä (E-ILMO) valmistautuu vastaanottamaan seuraavanmuotoista XML-dataa. XML-tiedoston alkuun tulee XML:n versionumero sekä koodaustapa. Sen jälkeen tiedosto koostuu yhdestä ASIAKAS-elementistä sekä yhdestä tai useammasta KUVAOHJELMA-elementistä. Nämä kuvaohjelmat ovat joko ilmoitettavia tai tarkastutettavia kuvaohjelmia.
 
 				<div>
-					<span class="elements">&lt;?XML </span><span class="attributes">Version</span>="1.0" <span class="attributes">Encoding</span>="UTF-8" <span class="elements">?&gt;</span>
+					<span class="elements">&lt;?XML </span><span class="attributes">version</span>="1.0" <span class="attributes">encoding</span>="UTF-8" <span class="elements">?&gt;</span>
 				</div>
 				<div class="left">
 					<span class="elements">&lt;ASIAKAS </span><span class="attributes">NIMI</span>="Telkkari Oy" <span class="attributes">ID</span>="12345" <span class="attributes">PVM</span>="07.11.2011 16:00:00" <span class="attributes">LKM</span>="22"<span class="elements">&gt;</span>
@@ -451,7 +451,7 @@ background-image: -webkit-gradient(
 			<div class="sugar">ESIMERKKI</div>
 			<div class="sugar_tab">
 			<div class="left">
-<span class="elements">&lt;?XML </span><span class="attributes">Version</span>="1.0" <span class="attributes">Encoding</span>="UTF-8" <span class="elements">?&gt;</span>
+<span class="elements">&lt;?XML </span><span class="attributes">version</span>="1.0" <span class="attributes">encoding</span>="UTF-8" <span class="elements">?&gt;</span>
 <div class="left"><span class="elements">&lt;ASIAKAS NIMI=&quot;Telkkari Oy&quot; ID=&quot;123&quot; PVM=&quot;20.09.2011 10:5:54&quot; LKM=&quot;22&quot;&gt;</span><br /><br />
 	<div class="left">
 	<span class="elements">&lt;KUVAOHJELMA <span class="attributes">TYPE</span>=&quot;01&quot;&gt;</span>

@@ -42,7 +42,7 @@ var validateProgram = compose([
       else return error('Virheellinen MAAT kenttä: ' + countries)
     }
   }),
-  optional('TUOTANTOYHTIO', 'legacy-production-companies'),
+  map(childrenByNameTo('TUOTANTOYHTIO', 'production-companies'), function(p) { return { 'production-companies': p['production-companies'].map(text) } }),
   required('SYNOPSIS', 'synopsis'),
   optional('TUOTANTOKAUSI', 'season'),
   optional('OSA', 'episode'),
@@ -220,6 +220,9 @@ function test(field, f, msg, toField) {
     if (f(text)) return ok(utils.keyValue(toField || field, text))
     else return error(msg + " " + text)
   }
+}
+function text(node) {
+  return node.$text
 }
 function fullname(node) {
   return node.ETUNIMI.$text + ' ' + node.SUKUNIMI.$text

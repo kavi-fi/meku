@@ -21,10 +21,7 @@
     </xsd:annotation>
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element name="KUVAOHJELMA" minOccurs="1" maxOccurs="1000">
-          <xsd:annotation>
-            <xsd:documentation>Yksitt&#xE4;inen ilmoitettava tai tarkastutettava kuvaohjelma. Maksimissaan vain 1000 KUVAOHJELMAa yhteen tiedostoon. Ilmoitettaessa enemm&#xE4;n kuin 1000 on k&#xE4;ytett&#xE4;v&#xE4; useampaa tiedostoa.</xsd:documentation>
-          </xsd:annotation>
+        <xsd:element name="KUVAOHJELMA" minOccurs="1">
           <xsd:complexType>
             <xsd:sequence>
               <xsd:element name="ALKUPERAINENNIMI" type="xsd:string" minOccurs="1" maxOccurs="1">
@@ -87,7 +84,7 @@
               </xsd:element>
               <xsd:element name="JULKAISUVUOSI" type="xsd:gYear" minOccurs="0" maxOccurs="1">
                 <xsd:annotation>
-                  <xsd:documentation>Kuvaohjelman julkaisvuosi. Esimerkki:&lt;JULKAISVUOSI&gt;2011&lt;/JULKAISVUOSI&gt;</xsd:documentation>
+                  <xsd:documentation>Kuvaohjelman julkaisvuosi. Esimerkki:&lt;JULKAISUVUOSI&gt;2011&lt;/JULKAISUVUOSI&gt;</xsd:documentation>
                 </xsd:annotation>
               </xsd:element>
               <xsd:element name="SYNOPSIS" type="xsd:string" minOccurs="1">
@@ -173,36 +170,6 @@
                       </xsd:simpleType>
                     </xsd:element>
                   </xsd:sequence>
-                  <xsd:attribute name="ID" type="xsd:string"/>
-                  <xsd:attribute name="ANOTTUIKARAJA">
-                    <xsd:annotation>
-                      <xsd:documentation>Anottu ikäraja:   S =&gt; 'S',  7 =&gt; '7+',  12 =&gt; '12+',  16 =&gt; '16+',  18 =&gt; '18+',</xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                      <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="S"/>
-                        <xsd:enumeration value="7"/>
-                        <xsd:enumeration value="12"/>
-                        <xsd:enumeration value="16"/>
-                        <xsd:enumeration value="18"/>
-                      </xsd:restriction>
-                    </xsd:simpleType>
-                  </xsd:attribute>
-                  <xsd:attribute name="ANOTTULUOKITTELUSYMBOLIT">
-                    <xsd:annotation>
-                      <xsd:documentation>Anottu luokittelusymbolit: 1 - Väkivalta, 2 - Ahdistus, 3 - Seksi, 4 - Huumeet</xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                      <xsd:list>
-                        <xsd:simpleType>
-                          <xsd:restriction base="xsd:byte">
-                            <xsd:minInclusive value="1"/>
-                            <xsd:maxInclusive value="4"/>
-                          </xsd:restriction>
-                        </xsd:simpleType>
-                      </xsd:list>
-                    </xsd:simpleType>
-                  </xsd:attribute>
                   <xsd:attribute name="REKISTEROINTIPAIVA" use="required">
                     <xsd:annotation>
                       <xsd:documentation>Rekisteröintipäivä ja kellonaika milloin luokittelu on luotu muodossa pv.kk.vvvv hh:mm:ss.</xsd:documentation>
@@ -222,7 +189,6 @@
                 <xsd:annotation><xsd:documentation>Pakollinen TV-sarjan jaksolle. Kertoo isäntäohjelman alkuperäisen nimen.</xsd:documentation></xsd:annotation>
               </xsd:element>
             </xsd:sequence>
-            <xsd:attribute name="ID" type="xsd:string"/>
             <xsd:attribute name="TYPE" use="required">
               <xsd:annotation>
                 <xsd:documentation> '01' =&gt; 'Kotimainen elokuva',  '02' =&gt; 'Ulkomainen elokuva',  '03' =&gt; 'TV-sarjan jakso',  '04' =&gt; 'Muu tv-ohjelma', '05'=&gt; 'TV-sarjan nimi' '06' =&gt; 'Traileri',  '07' =&gt; 'Extra',  '08' =&gt; 'Peli',  10 =&gt; 'Yhteistuotanto',  11 =&gt; 'PEGI hyväksytty peli' ,  12 =&gt; 'Muu kuvaohjelma'</xsd:documentation>
@@ -245,26 +211,6 @@
           </xsd:complexType>
         </xsd:element>
       </xsd:sequence>
-      <xsd:attribute name="NIMI" type="xsd:string" use="required">
-        <xsd:annotation>
-          <xsd:documentation>Asiakkaan nimi.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:attribute>
-      <xsd:attribute name="ID" type="xsd:string" use="required">
-        <xsd:annotation>
-          <xsd:documentation>VET:n myöntämä asiakasnumero.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:attribute>
-      <xsd:attribute name="PVM" type="xsd:string" use="required">
-        <xsd:annotation>
-          <xsd:documentation>Päivämäärä ja kellonaika milloin XML-tiedosto on luotu muodossa pv.kk.vvvv hh:mm:ss.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:attribute>
-      <xsd:attribute name="LKM" type="xsd:int" use="optional">
-        <xsd:annotation>
-          <xsd:documentation>Ilmoitettavien ja tarkastuttavien kuvaohjelmien kokonaismäärä. Maksimissaan voi olla 1000 kuvaohjelmaa yhdess&#xE4; tiedostossa.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:attribute>
     </xsd:complexType>
   </xsd:element>
 </xsd:schema>

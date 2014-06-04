@@ -138,7 +138,7 @@
     <xsl:apply-templates select="xs:annotation"/>
     <xsl:if test="descendant::xs:attribute">
       <table border="1" id ="attr_{@name}">
-        <caption>ATTRIBUUTTIT</caption>
+        <caption>ATTRIBUUTIT</caption>
         <xsl:apply-templates select="xs:complexType/xs:attribute"
           mode="attributes"/>
       </table>
@@ -433,7 +433,7 @@ background-image: -webkit-gradient(
 					<span class="elements">&lt;?XML </span><span class="attributes">version</span>="1.0" <span class="attributes">encoding</span>="UTF-8" <span class="elements">?&gt;</span>
 				</div>
 				<div class="left">
-					<span class="elements">&lt;ASIAKAS </span><span class="attributes">NIMI</span>="Telkkari Oy" <span class="attributes">ID</span>="12345" <span class="attributes">PVM</span>="07.11.2011 16:00:00" <span class="attributes">LKM</span>="22"<span class="elements">&gt;</span>
+					<span class="elements">&lt;ASIAKAS </span>
 					<div  class="left">
 						<span class="elements">&lt;KUVAOHJELMA </span><span class="attributes">TYPE</span>="01"&gt;...<span class="elements">&lt;/KUVAOHJELMA&gt;</span>
 					</div>
@@ -452,7 +452,7 @@ background-image: -webkit-gradient(
 			<div class="sugar_tab">
 			<div class="left">
 <span class="elements">&lt;?XML </span><span class="attributes">version</span>="1.0" <span class="attributes">encoding</span>="UTF-8" <span class="elements">?&gt;</span>
-<div class="left"><span class="elements">&lt;ASIAKAS NIMI=&quot;Telkkari Oy&quot; ID=&quot;123&quot; PVM=&quot;20.09.2011 10:5:54&quot; LKM=&quot;22&quot;&gt;</span><br /><br />
+<div class="left"><span class="elements">&lt;ASIAKAS&gt;</span><br /><br />
 	<div class="left">
 	<span class="elements">&lt;KUVAOHJELMA <span class="attributes">TYPE</span>=&quot;01&quot;&gt;</span>
 		<div class="left"><span class="elements">&lt;ALKUPERAINENNIMI&gt;</span>Uskomaton uusperhe<span class="elements">&lt;/ALKUPERAINENNIMI&gt;</span></div>
@@ -480,7 +480,7 @@ background-image: -webkit-gradient(
 		&lt;/NAYTTELIJA&gt;</span>
 		</div>
 		<div class="left">
-		<span class="elements">&lt;LUOKITTELU <span class="attributes">ANOTTUIKARAJA</span>=&quot;7&quot; <span class="attributes">ANOTTULUOKITTELUSYMBOLIT</span>=&quot;1 4&quot;&gt;</span>
+		<span class="elements">&lt;LUOKITTELU&gt;</span>
 			<div class="left"><span class="elements">&lt;KESTO&gt;</span>23:00:00<span class="elements">&lt;/KESTO&gt;</span></div>
 			<div class="left"><span class="elements">&lt;FORMAATTI&gt;</span>VoD<span class="elements">&lt;/FORMAATTI&gt;</span></div>
 			<div class="left"><span class="elements">&lt;KOLMIULOTTEINENGRAFIIKKA /&gt;</span></div>
@@ -507,7 +507,7 @@ background-image: -webkit-gradient(
 		<div class="left"><span class="elements">&lt;SYNOPSIS&gt;</span>Some description<span class="elements">&lt;/SYNOPSIS&gt;</span></div>
 		<div class="left"><span class="elements">&lt;TUOTANTOYHTIO&gt;</span>Columbia pictures<span class="elements">&lt;/TUOTANTOYHTIO&gt;</span></div>
 		<div class="left">
-		<span class="elements">&lt;LUOKITTELU <span class="attributes">ANOTTUIKARAJA</span>=&quot;16&quot; <span class="attributes">ANOTTULUOKITTELUSYMBOLIT</span>=&quot;2 3&quot;&gt;</span>
+		<span class="elements">&lt;LUOKITTELU&gt;</span>
 			<div class="left"><span class="elements">&lt;KESTO&gt;</span>01:14:24<span class="elements">&lt;/KESTO&gt;</span></div>
 			<div class="left"><span class="elements">&lt;FORMAATTI&gt;</span>DVD<span class="elements">&lt;/FORMAATTI&gt;</span></div>
 			<div class="left"><span class="elements">&lt;VALITTUTERMI <span class="attributes">KRITEERI</span>=&quot;18&quot; <span class="attributes">KOMMENTI</span>=&quot;comment1&quot;/&gt;</span></div>
@@ -529,7 +529,7 @@ background-image: -webkit-gradient(
 		<div class="left"><span class="elements">&lt;SYNOPSIS&gt;</span>Some description<span class="elements">&lt;/SYNOPSIS&gt;</span></div>
 		<div class="left"><span class="elements">&lt;TUOTANTOYHTIO&gt;</span>Columbia picture<span class="elements">s&lt;/TUOTANTOYHTIO&gt;</span></div>
 		<div class="left">
-		<span class="elements">&lt;LUOKITTELU <span class="attributes">ANOTTUIKARAJA</span>=&quot;12&quot; <span class="attributes">ANOTTULUOKITTELUSYMBOLIT</span>=&quot;1&quot;&gt;</span>
+		<span class="elements">&lt;LUOKITTELU&gt;</span>
 		<div class="left"><span class="elements">&lt;KESTO&gt;</span>00:34:24<span class="elements">&lt;/KESTO&gt;</span></div>
 			<div class="left"><span class="elements">&lt;FORMAATTI&gt;</span>VoD<span class="elements">&lt;/FORMAATTI&gt;</span></div>
 			<div class="left"><span class="elements">&lt;VALITTUTERMI <span class="attributes">KRITEERI</span>=&quot;6&quot; /&gt;</span></div>
@@ -540,15 +540,6 @@ background-image: -webkit-gradient(
 	<span class="elements">&lt;/KUVAOHJELMA&gt;</span>
 	</div>
 	<br />
-	<div class="left">
-	<span class="elements">&lt;KUVAOHJELMA <span class="attributes">TYPE</span>=&quot;05&quot;&gt;</span>
-		<div class="left"><span class="elements">&lt;ALKUPERAINENNIMI&gt;</span>Lost in Space episode 2 (SPOTTI)<span class="elements">&lt;/ALKUPERAINENNIMI&gt;</span></div>
-		<div class="left"><span class="elements">&lt;ASIAKKAANTUNNISTE&gt;</span>E0327123<span class="elements">&lt;/ASIAKKAANTUNNISTE&gt;</span></div>
-		<div class="left"><span class="elements">&lt;LUOKITTELU <span class="attributes">ANOTTUIKARAJA</span>=&quot;16&quot; <span class="attributes">ANOTTULUOKITTELUSYMBOLIT</span>=&quot;3&quot; /&gt;</span></div>
-		<div class="left"><span class="elements">&lt;LUOKITTELIJA&gt;</span>MEMAPI<span class="elements">&lt;/LUOKITTELIJA&gt;</span></div>
-		<div class="left"><span class="elements">&lt;ISANTAOHJELMA&gt;</span>Lost in Space episode 2<span class="elements">&lt;/ISANTAOHJELMA&gt;</span></div>
-	<span class="elements">&lt;/KUVAOHJELMA&gt;</span>
-	</div>
 	<br />
 <span class="elements">&lt;/ASIAKAS&gt;</span>
 </div>
@@ -703,7 +694,7 @@ background-image: -webkit-gradient(
 			 var tmpNode29 = new YAHOO.widget.TextNode('LAJIT', tmpNode2, true);
 			 var tmpNode210 = new YAHOO.widget.TextNode('PELINLAJIT', tmpNode2, true);
 			 var tmpNode211 = new YAHOO.widget.TextNode('VALMISTUMISVUOSI', tmpNode2, true);
-			 var tmpNode212 = new YAHOO.widget.TextNode('JULKAISVUOSI', tmpNode2, true);
+			 var tmpNode212 = new YAHOO.widget.TextNode('JULKAISUVUOSI', tmpNode2, true);
 			 var tmpNode213 = new YAHOO.widget.TextNode('SYNOPSIS', tmpNode2, true);
 			 var tmpNode214 = new YAHOO.widget.TextNode('TUOTANTOYHTIO', tmpNode2, true);
 			 

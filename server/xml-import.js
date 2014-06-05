@@ -73,7 +73,7 @@ var validateProgram = compose([
       var criteriaComments = _.object(p.criteria.map(function (c) {
         return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
       }))
-      return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), 'criteria-comments': criteriaComments}
+      return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), criteriaComments: criteriaComments}
     })
   ]), function(p) { return {classifications: [p.classification], gameFormat: p.classification.gameFormat} })
 ])

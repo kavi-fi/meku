@@ -19,7 +19,7 @@ var classification = {
   duration: String, // for now matches a regexp in the client
   safe: Boolean,
   criteria: [Number],
-  'criteria-comments': {},
+  criteriaComments: {},
   'warning-order': [String],
   'legacy-age-limit': String,
   pegiWarnings: [String],

@@ -241,10 +241,10 @@ function programDetails() {
     currentClassification.criteria.forEach(function(id) {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')
     })
-    Object.keys(currentClassification['criteria-comments'] || {}).forEach(function(id) {
-      var txt = currentClassification['criteria-comments'][id]
+    Object.keys(currentClassification.criteriaComments || {}).forEach(function(id) {
+      var txt = currentClassification.criteriaComments[id]
       if (isNotEmpty(txt)) {
-        $form.find('textarea[name="classifications.0.criteria-comments.'+id+'"]').val(txt).parents('.criteria').addClass('has-comment')
+        $form.find('textarea[name="classifications.0.criteriaComments.'+id+'"]').val(txt).parents('.criteria').addClass('has-comment')
       }
     })
     $throttledAutoSaveFields.trigger('reset')
@@ -344,7 +344,7 @@ function programDetails() {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
           .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
           .append($('<p>').text(c.description))
-          .append($('<textarea>', { name:'classifications.0.criteria-comments.' + c.id, placeholder:'Kommentit...' }))
+          .append($('<textarea>', { name:'classifications.0.criteriaComments.' + c.id, placeholder:'Kommentit...' }))
       })
       $('.category-container .' + category).append($criteria)
     })

@@ -239,7 +239,7 @@ function searchPage() {
       var category = enums.classificationCategoriesFI[cr.category]
       return $('<div>')
         .append($('<label>').text(category + ' ('+cr.id+')'))
-        .append($('<span>').text(c['criteria-comments'] && c['criteria-comments'][cr.id] || ''))
+        .append($('<span>').text(c.criteriaComments && c.criteriaComments[cr.id] || ''))
     })
   }
 }

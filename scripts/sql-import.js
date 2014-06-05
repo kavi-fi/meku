@@ -205,8 +205,8 @@ function classifications(callback) {
         obj.criteria.push(cId)
         var comment = trim(row.text)
         if (comment) {
-          if (!obj['criteria-comments']) obj['criteria-comments'] = {}
-          obj['criteria-comments'][cId] = comment
+          if (!obj.criteriaComments) obj.criteriaComments = {}
+          obj.criteriaComments[cId] = comment
         }
         done()
       }, function(err) {

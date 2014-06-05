@@ -20,7 +20,7 @@ var classification = {
   safe: Boolean,
   criteria: [Number],
   criteriaComments: {},
-  'warning-order': [String],
+  warningOrder: [String],
   'legacy-age-limit': String,
   pegiWarnings: [String],
   'creation-date': Date,

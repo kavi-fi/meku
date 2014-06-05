@@ -188,7 +188,7 @@ function programDetails() {
         $('<span>', { class:'drop-target' })
       ])
       var newOrder = $el.find('.warnings .warning').map(function() { return $(this).data('id') }).get()
-      saveProgramField($form.data('id'), 'classifications.0.warning-order', newOrder)
+      saveProgramField($form.data('id'), 'classifications.0.warningOrder', newOrder)
     })
   }
 

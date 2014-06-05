@@ -16,8 +16,8 @@ var summary = exports.summary = function(program, classification) {
       .filter(function(c) { return c.age == maxAgeLimit })
       .map(function(c) { return {id: c.id, category: c.category} })
       .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
-    if (classification['warning-order'].length > 0) {
-      var order = classification['warning-order']
+    if (classification.warningOrder.length > 0) {
+      var order = classification.warningOrder
       warnings = warnings.sort(function(a, b) {
         return order.indexOf(a.category) - order.indexOf(b.category)
       })

@@ -172,7 +172,7 @@ function classifications(callback) {
         if (row.program_type == '11') {
           classification['legacy-age-limit'] = row.pegi_age_level
         }
-        if (row.descriptors) classification['warning-order'] = optionListToArray(row.descriptors)
+        if (row.descriptors) classification.warningOrder = optionListToArray(row.descriptors)
         classification.provider_id = row.provider_id
         classification.comments = trimConcat(row.description, row.opinions, '\n')
         classification['creation-date'] = readAsUTCDate(row.date_entered)

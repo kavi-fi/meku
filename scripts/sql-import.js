@@ -175,8 +175,8 @@ function classifications(callback) {
         if (row.descriptors) classification.warningOrder = optionListToArray(row.descriptors)
         classification.provider_id = row.provider_id
         classification.comments = trimConcat(row.description, row.opinions, '\n')
-        classification['creation-date'] = readAsUTCDate(row.date_entered)
-        classification['registration-date'] = readAsUTCDate(row.reg_date)
+        classification.creationDate = readAsUTCDate(row.date_entered)
+        classification.registrationDate = readAsUTCDate(row.reg_date)
         classification.assigned_user_id = row.assigned_user_id
         classification.status = row.status
         if (row.program_type == '11') classification.pegiWarnings = optionListToArray(row.pegi_descriptors)
@@ -255,7 +255,7 @@ function classifications(callback) {
     })
     Object.keys(result.programs).forEach(function(key) {
       var arr = result.programs[key]
-      if (arr.length > 1) result.programs[key] = _.sortBy(arr, 'registration-date').reverse()
+      if (arr.length > 1) result.programs[key] = _.sortBy(arr, 'registrationDate').reverse()
     })
     callback(null, result)
   }

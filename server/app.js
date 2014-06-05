@@ -88,7 +88,7 @@ app.post('/programs/new', function(req, res, next) {
 
 app.post('/programs/:id/register', function(req, res, next) {
   var data = {
-    'classifications.0.registration-date': new Date(),
+    'classifications.0.registrationDate': new Date(),
     'classifications.0.status': 'registered',
     'classifications.0.author': { _id: req.user._id, name: req.user.name }
   }
@@ -234,7 +234,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
           ele.ele('STATUS', 'OK')
           var p = new Program(program)
           p.classifications[0].status = 'registered'
-          p.classifications[0]['creation-date'] = now
+          p.classifications[0].creationDate = now
           p.classifications[0].billing = account
           p.classifications[0].buyer = account
           p.populateAllNames(function (err) {

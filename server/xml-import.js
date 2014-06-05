@@ -60,9 +60,9 @@ var validateProgram = compose([
   map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),
   map(required('LUOKITTELIJA', 'author'), function(p) { return { classifications: [{ author: { name: p.author } }] }}),
   map(node('LUOKITTELU', 'classification', [
-    and(requiredAttr('REKISTEROINTIPAIVA', 'registration-date'), function(xml) {
+    and(requiredAttr('REKISTEROINTIPAIVA', 'registrationDate'), function(xml) {
       var d = moment(xml.$.REKISTEROINTIPAIVA, "DD.MM.YYYY HH:mm:ss")
-      if (d.isValid()) return ok({'registration-date': d.toDate()})
+      if (d.isValid()) return ok({ registrationDate: d.toDate() })
       else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
     }),
     mapError(or(required('FORMAATTI', 'format'), required('PELIFORMAATTI', 'gameFormat')), function(errors) {

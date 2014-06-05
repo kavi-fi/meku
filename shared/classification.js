@@ -46,9 +46,9 @@ var status = exports.status = function (classification) {
     case 'registered':
     case 'reclassification1':
     case 'reclassification3':
-      return 'Rekisteröity '+moment(classification['registration-date']).format(df)
+      return 'Rekisteröity '+moment(classification.registrationDate).format(df)
     case 'in_process':
-      return 'Luonnos tallennettu '+moment(classification['creation-date']).format(df)
+      return 'Luonnos tallennettu '+moment(classification.creationDate).format(df)
     default:
       return 'Unknown status: '+classification.status
   }
@@ -149,7 +149,7 @@ exports.registrationEmail = function(program, user) {
 
 exports.createNew = function(user) {
   return {
-    'creation-date':new Date(),
+    creationDate: new Date(),
     status: 'in_process',
     author: { _id: user._id, name: user.name }
   }

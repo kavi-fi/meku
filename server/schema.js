@@ -23,8 +23,8 @@ var classification = {
   warningOrder: [String],
   legacyAgeLimit: String,
   pegiWarnings: [String],
-  'creation-date': Date,
-  'registration-date': Date,
+  creationDate: Date,
+  registrationDate: Date,
   'registration-email-addresses': [{email: String, manual: Boolean}],
   comments: String,
   publicComments: String,
@@ -132,7 +132,7 @@ var InvoiceSchema = new Schema({
   program: ObjectId,
   name: String,
   duration: Number,
-  'registration-date': Date,
+  registrationDate: Date,
   price: Number // eurocents
 })
 
@@ -140,7 +140,7 @@ InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, 
   return new this({
     account: program.billing, type: rowType, program: program._id,
     name: program.name, duration: durationSeconds, price: price,
-    'registration-date': program.classifications[0]['registration-date']
+    registrationDate: program.classifications[0].registrationDate
   })
 }
 

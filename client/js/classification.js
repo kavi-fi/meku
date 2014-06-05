@@ -193,6 +193,7 @@ function programDetails() {
   }
 
   function show(program) {
+    $(window).scrollTop(0)
     var currentClassification = _.first(program.classifications)
     var isReclassification = classification.isReclassification(program)
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''

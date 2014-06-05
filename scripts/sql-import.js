@@ -135,7 +135,7 @@ function metadata(callback) {
   function productionCompanies(callback) {
     console.log('\n> productionCompanies')
     var q = 'select p.id, pc.name from meku_audiovisualprograms p join meku_audiovon_companies_c j on (p.id = j.meku_audioe15crograms_ida) join meku_production_companies pc on (j.meku_audio8018mpanies_idb = pc.id) where p.deleted != "1" and j.deleted != "1" and pc.deleted != "1"'
-    batchUpdater(q, idToNameMapper, singleFieldUpdater('Program', 'production-companies'), callback)
+    batchUpdater(q, idToNameMapper, singleFieldUpdater('Program', 'productionCompanies'), callback)
   }
 
   function idToNameMapper(row, result) {
@@ -567,7 +567,7 @@ function wipeNames(callback) {
   schema.Program.update({}, { name: [], nameFi: [], nameSv: [], nameOther: [] }, { multi:true }, callback)
 }
 function wipeMetadata(callback) {
-  schema.Program.update({}, { actors: [], directors: [], 'production-companies': [] }, { multi:true }, callback)
+  schema.Program.update({}, { actors: [], directors: [], productionCompanies: [] }, { multi:true }, callback)
 }
 function wipeClassifications(callback) {
   schema.Program.update({}, { 'classifications': [] }, { multi:true }, callback)

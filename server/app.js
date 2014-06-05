@@ -170,7 +170,7 @@ app.get('/accounts/:id', function(req, res, next) {
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
-app.get('/production-companies/search/:query', queryNameIndex('ProductionCompany'))
+app.get('/productionCompanies/search/:query', queryNameIndex('ProductionCompany'))
 
 app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
   var now = new Date()
@@ -365,7 +365,7 @@ function updateActorAndDirectorIndexes(program, callback) {
   })
 }
 function updateMetadataIndexes(program, callback) {
-  schema.ProductionCompany.updateWithNames(program['production-companies'], function() {
+  schema.ProductionCompany.updateWithNames(program.productionCompanies, function() {
     updateActorAndDirectorIndexes(program, callback)
   })
 }

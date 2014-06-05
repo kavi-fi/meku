@@ -95,8 +95,8 @@ function programDetails() {
   })
 
   selectAutocomplete({
-    $el: $form.find('input[name="production-companies"]'),
-    path: '/production-companies/search/',
+    $el: $form.find('input[name=productionCompanies]'),
+    path: '/productionCompanies/search/',
     multiple: true,
     allowAdding: true
   })
@@ -215,7 +215,7 @@ function programDetails() {
       .find('textarea[name="classifications.0.publicComments"]').val(currentClassification.publicComments).end()
 
       .find('input.country').trigger('setVal', program.country).end()
-      .find('input[name="production-companies"]').trigger('setVal', program['production-companies']).end()
+      .find('input[name=productionCompanies]').trigger('setVal', program.productionCompanies).end()
       .find('input[name=genre]').trigger('setVal', program.genre).end()
 
       .find('input[name="classifications.0.reason"]').trigger('setVal', reasonVal).end()

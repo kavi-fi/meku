@@ -43,7 +43,7 @@ var ProgramSchema = new Schema({
   deleted: Boolean,
   country: [String],
   year: String,
-  'production-companies': [String],
+  productionCompanies: [String],
   genre: [String],
   'legacy-genre': [String],
   directors: {type: [String], index: true},

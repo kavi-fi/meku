@@ -42,7 +42,7 @@ var validateProgram = compose([
       else return error('Virheellinen MAAT kenttä: ' + countries)
     }
   }),
-  map(childrenByNameTo('TUOTANTOYHTIO', 'production-companies'), function(p) { return { 'production-companies': p['production-companies'].map(text) } }),
+  map(childrenByNameTo('TUOTANTOYHTIO', 'productionCompanies'), function(p) { return { productionCompanies: p.productionCompanies.map(text) } }),
   required('SYNOPSIS', 'synopsis'),
   optional('TUOTANTOKAUSI', 'season'),
   optional('OSA', 'episode'),

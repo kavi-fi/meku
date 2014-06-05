@@ -261,7 +261,7 @@ function programDetails() {
     $billing.select2('enable', enableBillingAndBuyer)
     $buyer.select2('enable', enableBillingAndBuyer)
 
-    $form.find('input[name=series]').select2('enable', !isReclassification && enums.util.isTvEpisode(program))
+    $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
 
     currentClassification.criteria.forEach(function(id) {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')

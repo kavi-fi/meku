@@ -116,11 +116,11 @@ exports.registrationEmail = function(program, user) {
   var classification = _.first(program.classifications)
   var buyer = classification.buyer ? classification.buyer.name : ''
   var classificationSummary = summary(program, classification)
-  var recipients = classification['registration-email-addresses'].map(function(e) { return e.email })
+  var recipients = classification.registrationEmailAddresses.map(function(e) { return e.email })
 
   function previousRecipients(classifications) {
     if (classifications.length > 1) {
-      return classifications[1]['registration-email-addresses'].map(function(email) { return email.email })
+      return classifications[1].registrationEmailAddresses.map(function(email) { return email.email })
     } else {
       return []
     }

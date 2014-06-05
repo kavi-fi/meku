@@ -412,9 +412,9 @@ function programDetails() {
 
     function updatePreview(program) {
       var cl = _.first(program.classifications)
-      var buyerEmails = cl['registration-email-addresses']
+      var buyerEmails = cl.registrationEmailAddresses
         .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
-      var manualEmails = cl['registration-email-addresses']
+      var manualEmails = cl.registrationEmailAddresses
         .filter(function(email) { return email.manual }).map(function(e) { return e.email })
 
       var manualInDom = $emails.find('ul.manual li input').map(function() { return $(this).val() }).get()
@@ -460,7 +460,7 @@ function programDetails() {
         $('<input>', {
           type: 'checkbox',
           checked: checked || false,
-          name: 'classifications.0.registration-email-addresses',
+          name: 'classifications.0.registrationEmailAddresses',
           value: email
         }),
         $('<span>').text(email)

@@ -25,7 +25,7 @@ var classification = {
   pegiWarnings: [String],
   creationDate: Date,
   registrationDate: Date,
-  'registration-email-addresses': [{email: String, manual: Boolean}],
+  registrationEmailAddresses: [{email: String, manual: Boolean}],
   comments: String,
   publicComments: String,
   reason: Number,

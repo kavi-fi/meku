@@ -42,6 +42,7 @@ function searchPage() {
   $newClassificationType.select2({
     data: [
       {id: 1, text: 'Elokuva'},
+      {id: 3, text: 'TV-sarjan jakso'},
       {id: 5, text: 'Extra'},
       {id: 6, text: 'Trailer'}
     ]

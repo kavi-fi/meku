@@ -55,12 +55,10 @@ app.post('/logout', function(req, res, next) {
   res.send({})
 })
 
-app.get('/programs/search/:q?', function(req, res) {
+app.get('/programs/search/:q?', function(req, res, next) {
   var page = req.query.page || 0
   var filters = req.query.filters || []
-  Program.find(query()).skip(page * 100).limit(100).sort('name').exec(function(err, results) {
-    res.send(results)
-  })
+  Program.find(query()).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
   function query() {
     var q = { deleted: { $ne:true } }
@@ -71,8 +69,8 @@ app.get('/programs/search/:q?', function(req, res) {
   }
 })
 
-app.get('/programs/:id', function(req, res) {
-  Program.findById(req.params.id, function(err, program) { res.send(program) })
+app.get('/programs/:id', function(req, res, next) {
+  Program.findById(req.params.id, respond(res, next))
 })
 
 app.post('/programs/new', function(req, res, next) {
@@ -80,10 +78,7 @@ app.post('/programs/new', function(req, res, next) {
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
 
   var data = { classifications: [classification.createNew(req.user)], programType: programType }
-  new Program(data).save(function(err, program) {
-    if (err) return next(err)
-    return res.send(program)
-  })
+  new Program(data).save(respond(res, next))
 })
 
 app.post('/programs/:id/register', function(req, res, next) {
@@ -137,10 +132,7 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
     program.classifications = [classification.createNew(req.user)].concat(program.classifications)
-    program.save(function(err, saved) {
-      if (err) next(err)
-      res.send(saved)
-    })
+    program.save(respond(res, next))
   })
 })
 
@@ -149,23 +141,18 @@ app.post('/programs/:id', function(req, res, next) {
     if (err) return next(err)
     program.populateAllNames(function(err) {
       if (err) return next(err)
-      program.save(function(err) {
-        if (err) return next(err)
-        return res.send(program)
-      })
+      program.save(respond(res, next))
     })
   })
 })
 
 app.get('/accounts/search/:query', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
-  Account.find({name: new RegExp("^" + req.params.query, 'i'), roles: { $in: roles }}).limit(20).exec(function(err, data) {
-    return res.send(data)
-  })
+  Account.find({name: new RegExp("^" + req.params.query, 'i'), roles: { $in: roles }}).limit(20).exec(respond(res, next))
 })
 
 app.get('/accounts/:id', function(req, res, next) {
-  Account.findById(req.params.id, function(err, account) { res.send(account) })
+  Account.findById(req.params.id, respond(res, next))
 })
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
@@ -377,11 +364,12 @@ function durationToSeconds(duration) {
 }
 
 function queryNameIndex(schemaName) {
-  return function(req, res) {
+  return function(req, res, next) {
     var q = {}
     var parts = toMongoArrayQuery(req.params.query)
     if (parts) q.parts = parts
     schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').exec(function(err, docs) {
+      if (err) return next(err)
       res.send(_.pluck(docs || [], 'name'))
     })
   }
@@ -397,5 +385,12 @@ function toMongoArrayQuery(string) {
     } else {
       return new RegExp('^' + utils.escapeRegExp(s))
     }
+  }
+}
+
+function respond(res, next) {
+  return function(err, data) {
+    if (err) return next(err)
+    res.send(data)
   }
 }

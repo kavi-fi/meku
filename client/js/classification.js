@@ -209,6 +209,7 @@ function programDetails() {
 
     $form.data('id', program._id).show()
       .find('.programTypeName').text(enums.programType[program.programType].fi).end()
+      .toggleClass('tv-episode', enums.util.isTvEpisode(program))
       .toggleClass('classification', !isReclassification)
       .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()

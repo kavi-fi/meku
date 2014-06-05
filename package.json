@@ -16,7 +16,8 @@
     "bcrypt": "0.7.8",
     "async": "0.7.0",
     "moment": "2.6.0",
-		"xmlbuilder": "2.2.1"
+    "xmlbuilder": "2.2.1",
+    "xml-object-stream": "0.2.0"
   },
   "devDependencies": {
     "express-livereload": "~0.0.24",

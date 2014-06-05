@@ -167,10 +167,10 @@ function classifications(callback) {
         if (row.format) classification.format = mapFormat(row.format)
         if (row.runtime) classification.duration = row.runtime
         if (row.age_level) {
-          classification['legacy-age-limit'] = row.age_level
+          classification.legacyAgeLimit = row.age_level
         }
         if (row.program_type == '11') {
-          classification['legacy-age-limit'] = row.pegi_age_level
+          classification.legacyAgeLimit = row.pegi_age_level
         }
         if (row.descriptors) classification.warningOrder = optionListToArray(row.descriptors)
         classification.provider_id = row.provider_id
@@ -250,7 +250,7 @@ function classifications(callback) {
     Object.keys(result.classifications).forEach(function(key) {
       var obj = result.classifications[key]
       if (obj.criteria && obj.criteria.length > 0) {
-        delete obj['legacy-age-limit']
+        delete obj.legacyAgeLimit
       }
     })
     Object.keys(result.programs).forEach(function(key) {

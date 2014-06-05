@@ -7,7 +7,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
 var summary = exports.summary = function(program, classification) {
   if (enums.util.isPegiGame(program)) {
-    return { pegi: true, age: classification['legacy-age-limit'], warnings: classification.pegiWarnings }
+    return { pegi: true, age: classification.legacyAgeLimit, warnings: classification.pegiWarnings }
   } else {
     if (classification.safe) return { age:'S', warnings:[] }
     var maxAgeLimit = ageLimit(classification)
@@ -78,13 +78,12 @@ exports.mostValid = function(classifications) {
   } else {
     return head
   }
-
 }
 
 var ageLimit = exports.ageLimit = function(classification) {
   if (!classification) return '-'
   if (classification.safe) return 'S'
-  if (classification.criteria.length == 0 && classification['legacy-age-limit']) return classification['legacy-age-limit']
+  if (classification.criteria.length == 0 && classification.legacyAgeLimit) return classification.legacyAgeLimit
   return _(classification.criteria)
     .map(function(id) { return enums.classificationCriteria[id - 1] })
     .pluck('age')

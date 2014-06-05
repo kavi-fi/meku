@@ -28,11 +28,11 @@ var validateProgram = compose([
   required('ALKUPERAINENNIMI', 'name'),
   flatMap(requiredAttr('TYPE', 'type'), function(p) {
     var allButTvOrOther = ['01','02','03','04','06','07','08','10','11']
-    if (_.contains(allButTvOrOther, p.type)) return required('SUOMALAINENNIMI', 'name-fi')
-    else return optional('SUOMALAINENNIMI', 'name-fi')
+    if (_.contains(allButTvOrOther, p.type)) return required('SUOMALAINENNIMI', 'nameFi')
+    else return optional('SUOMALAINENNIMI', 'nameFi')
   }),
-  optional('RUOTSALAINENNIMI', 'name-sv'),
-  optional('MUUNIMI', 'name-other'),
+  optional('RUOTSALAINENNIMI', 'nameSv'),
+  optional('MUUNIMI', 'nameOther'),
   optional('JULKAISUVUOSI', 'year'),
   optional('VALMISTUMISVUOSI', 'year'),
   flatMap(optional('MAAT'), function(p) {

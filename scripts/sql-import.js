@@ -105,14 +105,14 @@ function names(callback) {
 
   function nameType(type) {
     if (type == '1A') return 'name'
-    if (type == '1B') return 'name-other' // ???
-    if (type == '2S') return 'name-fi'
-    if (type == '3R') return 'name-sv'
-    if (type == '4M') return 'name-other'
+    if (type == '1B') return 'nameOther' // ???
+    if (type == '2S') return 'nameFi'
+    if (type == '3R') return 'nameSv'
+    if (type == '4M') return 'nameOther'
   }
 
   function fixNameless(doc) {
-    var name = doc['name-fi'][0] || doc['name-sv'][0] || doc['name-other'][0]
+    var name = doc.nameFi[0] || doc.nameSv[0] || doc.nameOther[0]
     if (name) doc.name = [name]
   }
 }
@@ -348,7 +348,7 @@ function accounts(callback) {
 }
 
 function nameIndex(callback) {
-  var fields = { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1, 'program-type':1, season:1, episode:1, series:1 }
+  var fields = { name:1, nameFi:1, nameSv: 1, nameOther: 1, programType:1, season:1, episode:1, series:1 }
   var tick = progressMonitor()
   schema.Program.find({}, fields).stream().pipe(consumer(onRow, callback))
 
@@ -356,7 +356,7 @@ function nameIndex(callback) {
     tick()
     p.populateAllNames(function(err) {
       if (err) return callback(err)
-      schema.Program.update({ _id: p._id }, { 'all-names': p['all-names'] }, callback)
+      schema.Program.update({ _id: p._id }, { allNames: p.allNames }, callback)
     })
   }
 }
@@ -379,14 +379,14 @@ function markTrainingProgramsDeleted(callback) {
   // CHECK: e.g.
   // * Armadillo OK
   // * Requiem for a dream (no valid entries, broken in emeku...)
-  // * Antichrist (LUJUPI) is on name-fi
+  // * Antichrist (LUJUPI) is on nameFi
   var tick = progressMonitor(1)
   var count = 0
   schema.User.find({ username: { $ne: 'VET' } }, { username: 1 }, function(err, users) {
     if (err) return callback(err)
     async.eachLimit(users, 50, function(u, callback) {
       var q = new RegExp('\\(' + utils.escapeRegExp(u.username) + '\\)')
-      schema.Program.update({ $or: [ { name: q }, { 'name-fi': q } ] }, { deleted: true }, { multi:true }, function(err, numChanged) {
+      schema.Program.update({ $or: [ { name: q }, { nameFi: q } ] }, { deleted: true }, { multi:true }, function(err, numChanged) {
         tick()
         count += numChanged
         callback()
@@ -564,7 +564,7 @@ function wipeMetadataIndex(callback) {
   })
 }
 function wipeNames(callback) {
-  schema.Program.update({}, { 'name': [], 'name-fi': [], 'name-sv': [], 'name-other': [] }, { multi:true }, callback)
+  schema.Program.update({}, { name: [], nameFi: [], nameSv: [], nameOther: [] }, { multi:true }, callback)
 }
 function wipeMetadata(callback) {
   schema.Program.update({}, { actors: [], directors: [], 'production-companies': [] }, { multi:true }, callback)

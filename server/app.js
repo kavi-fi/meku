@@ -65,7 +65,7 @@ app.get('/programs/search/:q?', function(req, res) {
   function query() {
     var q = { deleted: { $ne:true } }
     var nameQuery = toMongoArrayQuery(req.params.q)
-    if (nameQuery) q['all-names'] = nameQuery
+    if (nameQuery) q.allNames = nameQuery
     if (filters.length > 0) q['program-type'] = { $in: filters }
     return q
   }

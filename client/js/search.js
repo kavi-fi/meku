@@ -187,7 +187,7 @@ function searchPage() {
   }
 
   function renderDetails(p) {
-    var names = { n: p.name.join(', '), fi: p['name-fi'].join(', '), sv: p['name-sv'].join(', '), other: p['name-other'].join(', ')}
+    var names = { n: p.name.join(', '), fi: p.nameFi.join(', '), sv: p.nameSv.join(', '), other: p.nameOther.join(', ')}
     var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
     var classificationStatusText = classification.fullStatus(p.classifications).map(function(t) { return $('<span>').text(t) })
@@ -195,9 +195,9 @@ function searchPage() {
       .data('id', p._id)
       .find('.primary-name').text(p.name[0]).end()
       .find('.name').text(names.n).end()
-      .find('.name-fi').text(names.fi).end()
-      .find('.name-sv').text(names.sv).prev().toggleClass('hide', !names.sv).end().end()
-      .find('.name-other').text(names.other).prev().toggleClass('hide', !names.other).end().end()
+      .find('.nameFi').text(names.fi).end()
+      .find('.nameSv').text(names.sv).prev().toggleClass('hide', !names.sv).end().end()
+      .find('.nameOther').text(names.other).prev().toggleClass('hide', !names.other).end().end()
       .find('.series').text(series).prev().toggleClass('hide', !series).end().end()
       .find('.episode').text(episode).prev().toggleClass('hide', !episode).end().end()
       .find('.country').text(enums.util.toCountryString(p.country)).end()

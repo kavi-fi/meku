@@ -35,11 +35,11 @@ var classification = {
 var ProgramSchema = new Schema({
   'emeku-id': { type: String, index: true },
   customersId: { account: ObjectId, id: String },
-  'all-names': { type: [String], index: true },
+  allNames: { type: [String], index: true },
   name: { type: [String], index: true },
-  'name-fi': [String],
-  'name-sv': [String],
-  'name-other': [String],
+  nameFi: [String],
+  nameSv: [String],
+  nameOther: [String],
   deleted: Boolean,
   country: [String],
   year: String,
@@ -58,7 +58,7 @@ ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.methods.populateAllNames = function(callback) {
   var program = this
   if (program.series._id) {
-    Program.findById(program.series._id, { name:1, 'name-fi':1, 'name-sv': 1, 'name-other': 1 }, function(err, parent) {
+    Program.findById(program.series._id, { name:1, nameFi:1, nameSv: 1, nameOther: 1 }, function(err, parent) {
       if (err) return callback(err)
       populate(program, concatNames(parent))
       callback()
@@ -71,10 +71,10 @@ ProgramSchema.methods.populateAllNames = function(callback) {
   function populate(p, extraNames) {
     var words = concatNames(p).concat([utils.seasonEpisodeCode(p)]).concat(extraNames)
     words = words.map(function(s) { return (s + ' ' + s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1')).split(/\s+/) })
-    p['all-names'] = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
+    p.allNames = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
   }
   function concatNames(p) {
-    return p.name.concat(p['name-fi'] || []).concat(p['name-sv'] || []).concat(p['name-other'] || [])
+    return p.name.concat(p.nameFi || []).concat(p.nameSv || []).concat(p.nameOther || [])
   }
 }
 

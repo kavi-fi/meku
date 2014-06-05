@@ -9,7 +9,7 @@ function programDetails() {
 
   renderClassificationCriteria()
 
-  var $throttledAutoSaveFields = $form.find('input[type=text], textarea').not('[name="registration-email"]')
+  var $throttledAutoSaveFields = $form.find('input[type=text], input[type=number], textarea').not('[name="registration-email"]')
 
   $root.on('show', function(e, programId) {
     if (programId) {
@@ -56,7 +56,7 @@ function programDetails() {
   $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
 
   $throttledAutoSaveFields.throttledInput(function(txt) {
-    if ($(this).hasClass('invalid') && $(this).val().length > 0) return false
+    if (($(this).is(':invalid') || $(this).hasClass('invalid')) && $(this).val().length > 0) return false
     saveProgramField($form.data('id'), $(this).attr('name'), txt)
   })
 
@@ -244,7 +244,10 @@ function programDetails() {
       .find('input[name=actors]').trigger('setVal', program['actors'] || []).end()
       .find('input[name="classifications.0.buyer"]').trigger('setVal', currentClassification.buyer).end()
       .find('input[name="classifications.0.billing"]').trigger('setVal', currentClassification.billing).end()
+
       .find('input[name=series]').trigger('setVal', program.series).end()
+      .find('input[name=season]').val(program.season).end()
+      .find('input[name=episode]').val(program.episode).end()
 
       .find('.category-container').toggle(!currentClassification.safe).end()
       .find('.criteria').removeClass('selected').removeClass('has-comment').end()

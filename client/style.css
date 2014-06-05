@@ -198,6 +198,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .search-result-details button.reclassify, .search-result-details button.continue-classification { display: none; float: right; }
 
 #classification-page input[type=text],
+#classification-page input[type=number],
 .select2-container-multi .select2-choices {
   width: 280px;
 }
@@ -211,6 +212,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #program-details.reclassification .reclassification { display: block; }
 
 input[type=text],
+input[type=number],
 input[type=password],
 textarea,
 .select2-container-multi .select2-choices,
@@ -225,6 +227,7 @@ textarea,
 }
 
 input[type=text]:focus,
+input[type=number]:focus,
 input[type=password]:focus,
 textarea:focus,
 .select2-container-active .select2-choices,
@@ -234,7 +237,7 @@ textarea:focus,
   box-shadow:         0px 0px 5px 0px rgba(67,169,255,0.50), 0px 2px 2px 0px rgba(0,0,0,0.10);
 }
 
-input[type=text], input[type=password], textarea, .select2-container-multi .select2-choices .select2-search-field input {
+input[type=text], input[type=number], input[type=password], textarea, .select2-container-multi .select2-choices .select2-search-field input {
   padding: 8px 10px !important;
 }
 
@@ -319,6 +322,7 @@ label {
 .select2-drop.select2-drop-above.select2-drop-active.required { border-top: 1px solid #00BB88; border-bottom: none; }
 
 input[type=text].required,
+input[type=number].required,
 textarea.required,
 .select2-container.required .select2-choices,
 .select2-container.required .select2-choice {
@@ -337,6 +341,7 @@ textarea.invalid,
 }
 
 input[type=text].invalid.touched,
+input[type=number]:invalid, input[type=number]:invalid.touched,
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {
@@ -344,6 +349,7 @@ textarea.invalid.touched,
 }
 
 input[type=text].invalid:disabled,
+input[type=number]:invalid:disabled,
 textarea.invalid:disabled,
 .select2-container-disabled.invalid .select2-choices,
 .select2-container-disabled.invalid .select2-choice {
@@ -361,6 +367,9 @@ textarea.invalid:disabled,
 
 #program-details .movie-field { display: none; }
 #program-details.type-movie .movie-field { display: block; }
+
+#program-details .season-episode-fields input + label { width: 50px; }
+#program-details .season-episode-fields input { width: 92px; }
 
 #classification h2 { margin: 0 0 10px 0; }
 #classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }

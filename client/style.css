@@ -357,7 +357,10 @@ textarea.invalid:disabled,
 #program-details .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
 
 #program-details .tv-episode-field { display: none; }
-#program-details.tv-episode .tv-episode-field { display: block; }
+#program-details.type-tv-episode .tv-episode-field { display: block; }
+
+#program-details .movie-field { display: none; }
+#program-details.type-movie .movie-field { display: block; }
 
 #classification h2 { margin: 0 0 10px 0; }
 #classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }

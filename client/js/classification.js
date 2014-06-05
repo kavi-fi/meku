@@ -102,8 +102,14 @@ function programDetails() {
   })
 
   selectEnumAutocomplete({
-    $el: $form.find('input[name=genre]'),
-    data: enums.genre.map(function(f) { return { id: f, text: f }}),
+    $el: $form.find('input[name=genre].movie-genre'),
+    data: enums.movieGenre.map(function(f) { return { id: f, text: f }}),
+    multiple: true
+  })
+
+  selectEnumAutocomplete({
+    $el: $form.find('input[name=genre].tv-genre'),
+    data: enums.tvGenre.map(function(f) { return { id: f, text: f }}),
     multiple: true
   })
 
@@ -209,7 +215,8 @@ function programDetails() {
 
     $form.data('id', program._id).show()
       .find('.programTypeName').text(enums.programType[program.programType].fi).end()
-      .toggleClass('tv-episode', enums.util.isTvEpisode(program))
+      .toggleClass('type-movie', enums.util.isMovieType(program))
+      .toggleClass('type-tv-episode', enums.util.isTvEpisode(program))
       .toggleClass('classification', !isReclassification)
       .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()

@@ -42,11 +42,12 @@ enums.programType = {
   8: { type: 'pegi', fi: 'PEGI-peli' }
 }
 enums.util.isTvEpisode = function(p) { return p.programType == 3 }
+enums.util.isMovieType = function(p) { return p.programType == 1 || p.programType == 5 || p.programType == 6 }
 enums.util.isGameType = function(p) { return p.programType == 7 || p.programType == 8 }
 enums.util.isPegiGame = function(p) { return p.programType == 8 }
 enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 8 }
 
-enums.genre = [
+enums.movieGenre = [
   'Fiktio',
   'Animaatio',
   'Viihde',
@@ -79,6 +80,33 @@ enums.genre = [
   'Kokeiluelokuva',
   'Videotaide',
   'Muut'
+]
+
+enums.tvGenre = [
+  'Ajankohtaisohjelmat',
+  'Asiaohjelmat',
+  'Elokuvat',
+  'Kotimainen fiktio',
+  'Kotimaiset elokuvat',
+  'Kulttuuri',
+  'Lasten ohjelmat',
+  'Lifestyle',
+  'Musiikki',
+  'Muu urheilu',
+  'Muut ohjelmat',
+  'Muut uutislähetykset',
+  'Opetus- ja tiedeohjelmat',
+  'Ostos-TV',
+  'Populaarikulttuuri',
+  'Reality',
+  'Ulkomainen fiktio',
+  'Ulkomaiset elokuvat',
+  'Urheilu',
+  'Urheilu-uutiset',
+  'Uutiset',
+  'Vakiouutiset',
+  'Viihde',
+  'WWW (peliohjelmat, chatit)'
 ]
 
 enums.classificationStatus = [

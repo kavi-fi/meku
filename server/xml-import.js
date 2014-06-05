@@ -21,7 +21,7 @@ exports.readPrograms = function (body, callback) {
 var validateProgram = compose([
   and(requiredAttr('TYPE', 'type'), function(xml) {
     var type = xml.$.TYPE
-    if (_.has(enums.legacyProgramTypes, type)) return ok({'program-type': enums.legacyProgramTypes[type]})
+    if (_.has(enums.legacyProgramTypes, type)) return ok({ programType: enums.legacyProgramTypes[type] })
     else return error("Virheellinen attribuutti: TYPE")
   }),
   required('ASIAKKAANTUNNISTE', 'externalId'),

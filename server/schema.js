@@ -50,7 +50,7 @@ var ProgramSchema = new Schema({
   actors: {type: [String], index: true},
   synopsis: String,
   classifications: [classification],
-  'program-type': Number, // enums.programType
+  programType: Number, // enums.programType
   gameFormat: String,
   season: String, episode: String, series: { _id: ObjectId, name: String }
 })

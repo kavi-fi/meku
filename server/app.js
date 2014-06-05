@@ -66,7 +66,7 @@ app.get('/programs/search/:q?', function(req, res) {
     var q = { deleted: { $ne:true } }
     var nameQuery = toMongoArrayQuery(req.params.q)
     if (nameQuery) q.allNames = nameQuery
-    if (filters.length > 0) q['program-type'] = { $in: filters }
+    if (filters.length > 0) q.programType = { $in: filters }
     return q
   }
 })
@@ -76,10 +76,10 @@ app.get('/programs/:id', function(req, res) {
 })
 
 app.post('/programs/new', function(req, res, next) {
-  var programType = parseInt(req.body['program-type'])
+  var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
 
-  var data = { classifications: [classification.createNew(req.user)], 'program-type': programType }
+  var data = { classifications: [classification.createNew(req.user)], programType: programType }
   new Program(data).save(function(err, program) {
     if (err) return next(err)
     return res.send(program)
@@ -273,10 +273,10 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     function verifyParentProgram(program, callback) {
       if (!enums.util.isTvEpisode(program)) return callback()
       var parentName = program.parentTvSeriesName.trim()
-      Program.findOne({ 'program-type': 2, name: parentName }, function(err, parent) {
+      Program.findOne({ programType: 2, name: parentName }, function(err, parent) {
         if (err) return callback(err)
         if (!parent) {
-          parent = new Program({ 'program-type': 2, name: [parentName] })
+          parent = new Program({ programType: 2, name: [parentName] })
           parent.populateAllNames(function(err) {
             if (err) return callback(err)
             parent.save(function(err, saved) {

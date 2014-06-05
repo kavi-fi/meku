@@ -49,7 +49,7 @@ function searchPage() {
 
   $newClassificationButton.click(function() {
     var programType = $newClassificationType.select2('val')
-    $.post('/programs/new', JSON.stringify({'program-type': programType})).done(function(program) {
+    $.post('/programs/new', JSON.stringify({ programType: programType})).done(function(program) {
       $('body').children('.page').hide()
       $('#classification-page').trigger('show', program._id).show()
     })
@@ -155,7 +155,7 @@ function searchPage() {
       .append($('<span>').text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>').text(countryAndYear(p)))
       .append($('<span>').text(classification.ageLimit(c)))
-      .append($('<span>').text(enums.programType[p['program-type']].fi))
+      .append($('<span>').text(enums.programType[p.programType].fi))
       .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
 
     function name(p) {

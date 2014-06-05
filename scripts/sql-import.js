@@ -70,7 +70,7 @@ function base(callback) {
 
   function programMapper(row) {
     var obj = { 'emeku-id': row.id }
-    obj['program-type'] = enums.legacyProgramTypes[row.program_type] || 0
+    obj.programType = enums.legacyProgramTypes[row.program_type] || 0
     if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
     if (row.year && row.year != 'undefined') obj.year = row.year
     if (row.countries) obj.country = optionListToArray(row.countries)

@@ -41,9 +41,9 @@ enums.programType = {
   7: { type: 'game', fi: 'Peli' },
   8: { type: 'pegi', fi: 'PEGI-peli' }
 }
-enums.util.isTvEpisode = function(p) { return p['program-type'] == 3 }
-enums.util.isGameType = function(p) { return p['program-type'] == 7 || p['program-type'] == 8 }
-enums.util.isPegiGame = function(p) { return p['program-type'] == 8 }
+enums.util.isTvEpisode = function(p) { return p.programType == 3 }
+enums.util.isGameType = function(p) { return p.programType == 7 || p.programType == 8 }
+enums.util.isPegiGame = function(p) { return p.programType == 8 }
 enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 8 }
 
 enums.genre = [

@@ -139,15 +139,23 @@ function programDetails() {
   selectAutocomplete({
     $el: $form.find('input[name="classifications.0.buyer"]'),
     path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber' },
-    toOption: companyToSelect2Option,
-    fromOption: select2OptionToCompany
+    toOption: idNamePairToSelect2Option,
+    fromOption: select2OptionToIdNamePair
   })
 
   selectAutocomplete({
     $el: $form.find('input[name="classifications.0.billing"]'),
     path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber,Classifier' },
-    toOption: companyToSelect2Option,
-    fromOption: select2OptionToCompany
+    toOption: idNamePairToSelect2Option,
+    fromOption: select2OptionToIdNamePair
+  })
+
+  selectAutocomplete({
+    $el: $form.find('input[name=series]'),
+    path: '/series/search/',
+    toOption: idNamePairToSelect2Option,
+    fromOption: select2OptionToIdNamePair,
+    allowAdding: true
   })
 
   warningDragOrder($('#summary .summary'))
@@ -228,6 +236,7 @@ function programDetails() {
       .find('input[name=actors]').trigger('setVal', program['actors'] || []).end()
       .find('input[name="classifications.0.buyer"]').trigger('setVal', currentClassification.buyer).end()
       .find('input[name="classifications.0.billing"]').trigger('setVal', currentClassification.billing).end()
+      .find('input[name=series]').trigger('setVal', program.series).end()
 
       .find('.category-container').toggle(!currentClassification.safe).end()
       .find('.criteria').removeClass('selected').removeClass('has-comment').end()
@@ -295,7 +304,7 @@ function programDetails() {
 
     function createSearchChoice(term, data) {
       if (_.indexOf(data, term) === -1) {
-        return {id: term, text: term}
+        return {id: term, text: term, isNew: true }
       }
     }
 
@@ -330,13 +339,13 @@ function programDetails() {
     })
   }
 
-  function companyToSelect2Option(x) {
+  function idNamePairToSelect2Option(x) {
     return {id: x._id, text: x.name}
   }
 
-  function select2OptionToCompany(x) {
-    if (x === null) return null
-    return {_id: x.id, name: x.text}
+  function select2OptionToIdNamePair(x) {
+    if (!x) return null
+    return { _id: x.isNew ? null : x.id, name: x.text }
   }
 
   function renderClassificationCriteria() {

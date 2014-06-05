@@ -146,6 +146,16 @@ app.post('/programs/:id', function(req, res, next) {
   })
 })
 
+app.get('/series/search/:query', function(req, res, next) {
+  var q = { programType: 2 }
+  var parts = toMongoArrayQuery(req.params.query)
+  if (parts) q.allNames = parts
+  Program.find(q, { name: 1 }).lean().limit(20).sort('name').exec(function(err, data) {
+    if (err) return next(err)
+    res.send(_.map(data, function(d) { return { _id: d._id, name: d.name[0] } }))
+  })
+})
+
 app.get('/accounts/search/:query', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   Account.find({name: new RegExp("^" + req.params.query, 'i'), roles: { $in: roles }}).limit(20).exec(respond(res, next))

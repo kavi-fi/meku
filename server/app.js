@@ -82,13 +82,33 @@ app.post('/programs/new', function(req, res, next) {
 })
 
 app.post('/programs/:id/register', function(req, res, next) {
-  var data = {
-    'classifications.0.registrationDate': new Date(),
-    'classifications.0.status': 'registered',
-    'classifications.0.author': { _id: req.user._id, name: req.user.name }
-  }
-  Program.findByIdAndUpdate(req.params.id, data, null, function(err, program) {
+  Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
+
+    program.classifications[0].registrationDate = new Date()
+    program.classifications[0].status = 'registered'
+    program.classifications[0].author = { _id: req.user._id, name: req.user.name }
+
+    verifyTvSeries(program, function(err) {
+      if (err) return next(err)
+      program.save(function(err) {
+        if (err) return next(err)
+        addInvoicerows(function(err, _) {
+          if (err) return next(err)
+          sendEmail(classification.registrationEmail(program, req.user), function(err) {
+            if (err) return next(err)
+            updateMetadataIndexes(program, function() {
+              return res.send(program)
+            })
+          })
+        })
+      })
+    })
+
+    function verifyTvSeries(program, callback) {
+      if (!enums.util.isTvEpisode(program)) return callback(program)
+      createParentProgram(program, program.series.name.trim(), callback)
+    }
 
     function addInvoicerows(callback) {
       var currentClassification = _.first(program.classifications)
@@ -115,15 +135,6 @@ app.post('/programs/:id/register', function(req, res, next) {
       }
     }
 
-    addInvoicerows(function(err, _) {
-      if (err) return next(err)
-      sendEmail(classification.registrationEmail(program, req.user), function(err) {
-        if (err) return next(err)
-        updateMetadataIndexes(program, function() {
-          return res.send(program)
-        })
-      })
-    })
   })
 })
 
@@ -273,15 +284,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       Program.findOne({ programType: 2, name: parentName }, function(err, parent) {
         if (err) return callback(err)
         if (!parent) {
-          parent = new Program({ programType: 2, name: [parentName] })
-          parent.populateAllNames(function(err) {
-            if (err) return callback(err)
-            parent.save(function(err, saved) {
-              if (err) return callback(err)
-              program.series = { _id: saved._id, name: saved.name[0] }
-              callback()
-            })
-          })
+          createParentProgram(program, parentName, callback)
         } else {
           program.series = { _id: parent._id, name: parent.name[0] }
           callback()
@@ -297,6 +300,18 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     }
   }
 })
+
+function createParentProgram(program, parentName, callback) {
+  var parent = new Program({ programType: 2, name: [parentName] })
+  parent.populateAllNames(function(err) {
+    if (err) return callback(err)
+    parent.save(function(err, saved) {
+      if (err) return callback(err)
+      program.series = { _id: saved._id, name: saved.name[0] }
+      callback()
+    })
+  })
+}
 
 if (isDev()) {
   var liveReload = require('express-livereload')

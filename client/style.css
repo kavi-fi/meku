@@ -210,6 +210,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #program-details .reclassification { display: none; }
 #program-details.reclassification .classification { display: none; }
 #program-details.reclassification .reclassification { display: block; }
+#program-details.reclassification .reclassification label { width: 140px; }
 
 input[type=text],
 input[type=number],

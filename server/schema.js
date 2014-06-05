@@ -83,7 +83,6 @@ var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 var Account = exports.Account = mongoose.model('accounts', {
   'emeku-id': String,
   name: {type: String, index: true},
-  'billing-address': address,
   roles: [String],
   emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],

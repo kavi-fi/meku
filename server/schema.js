@@ -85,7 +85,7 @@ var Account = exports.Account = mongoose.model('accounts', {
   name: {type: String, index: true},
   'billing-address': address,
   roles: [String],
-  'email-addresses': [String],
+  emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],
   apiToken: String
 })

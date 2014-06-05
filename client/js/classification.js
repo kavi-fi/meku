@@ -433,7 +433,7 @@ function programDetails() {
           // remove all email addresses linked to the selected buyer
           $emails.find('ul.buyer li').remove()
 
-          data['email-addresses'].forEach(function(email) {
+          data.emailAddresses.forEach(function(email) {
             if (notIn(buyerEmails, email)) {
               addBuyerEmailCheckbox(false, email)
             } else {

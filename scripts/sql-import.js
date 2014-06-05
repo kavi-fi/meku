@@ -280,7 +280,7 @@ function accounts(callback) {
 
   function accountEmailAddresses(callback) {
     var q = 'select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts"'
-    batchUpdater(q, idToEmailMapper, singleFieldUpdater('Account', 'email-addresses'), callback)
+    batchUpdater(q, idToEmailMapper, singleFieldUpdater('Account', 'emailAddresses'), callback)
   }
 
   function providers(callback) {

@@ -10,7 +10,7 @@ var bcryptSaltFactor = 12
 var address = { street: String, city: String, zip: String, country: String }
 
 var classification = {
-  'emeku-id': { type: String, index: true },
+  emekuId: { type: String, index: true },
   author: {_id: ObjectId, name: String},
   authorOrganization: Number,
   buyer: {_id: ObjectId, name: String},
@@ -33,7 +33,7 @@ var classification = {
 }
 
 var ProgramSchema = new Schema({
-  'emeku-id': { type: String, index: true },
+  emekuId: { type: String, index: true },
   customersId: { account: ObjectId, id: String },
   allNames: { type: [String], index: true },
   name: { type: [String], index: true },
@@ -81,7 +81,7 @@ ProgramSchema.methods.populateAllNames = function(callback) {
 var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 
 var Account = exports.Account = mongoose.model('accounts', {
-  'emeku-id': String,
+  emekuId: String,
   name: {type: String, index: true},
   roles: [String],
   emailAddresses: [String],
@@ -90,12 +90,12 @@ var Account = exports.Account = mongoose.model('accounts', {
 })
 
 var Provider = exports.Provider = mongoose.model('providers', {
-  'emeku-id': String,
+  emekuId: String,
   name: String
 })
 
 var UserSchema = new Schema({
-  'emeku-id': String,
+  emekuId: String,
   emails: [String],
   username: { type: String, index: { unique: true } },
   password: String,

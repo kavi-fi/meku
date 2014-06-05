@@ -69,7 +69,7 @@ function base(callback) {
   batchInserter(q, programMapper, 'Program', callback)
 
   function programMapper(row) {
-    var obj = { 'emeku-id': row.id }
+    var obj = { emekuId: row.id }
     obj.programType = enums.legacyProgramTypes[row.program_type] || 0
     if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
     if (row.year && row.year != 'undefined') obj.year = row.year
@@ -100,7 +100,7 @@ function names(callback) {
 
   function update(key, obj, callback) {
     if (!obj.name) fixNameless(obj)
-    schema.Program.update({ 'emeku-id': key }, obj, callback)
+    schema.Program.update({ emekuId: key }, obj, callback)
   }
 
   function nameType(type) {
@@ -163,7 +163,7 @@ function classifications(callback) {
       .stream()
       .pipe(consumer(function(row, done) {
         tick()
-        var classification = { 'emeku-id': row.classificationId }
+        var classification = { emekuId: row.classificationId }
         if (row.format) classification.format = mapFormat(row.format)
         if (row.runtime) classification.duration = row.runtime
         if (row.age_level) {
@@ -217,7 +217,7 @@ function classifications(callback) {
   function mapUsers(result, callback) {
     schema.User.find({}, function(err, users) {
       if (err) return callback(err)
-      var userMap = _.indexBy(users, 'emeku-id')
+      var userMap = _.indexBy(users, 'emekuId')
       _.values(result.classifications).forEach(function(c) {
         if (c.assigned_user_id) {
           var u = userMap[c.assigned_user_id]
@@ -231,7 +231,7 @@ function classifications(callback) {
   function mapBuyers(result, callback) {
     schema.Account.find({}, function(err, accounts) {
       if (err) return callback(err)
-      var accountMap = _.indexBy(accounts, 'emeku-id')
+      var accountMap = _.indexBy(accounts, 'emekuId')
       _.values(result.classifications).forEach(function(c) {
         if (!c.provider_id || c.provider_id == '0') return
         // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
@@ -264,7 +264,7 @@ function classifications(callback) {
     var tick = progressMonitor(100)
     async.eachLimit(Object.keys(result.programs), 5, function(key, cb) {
       tick('*')
-      schema.Program.update({ 'emeku-id': key }, { 'classifications': result.programs[key] }, cb)
+      schema.Program.update({ emekuId: key }, { 'classifications': result.programs[key] }, cb)
     }, callback)
   }
 }
@@ -274,7 +274,7 @@ function accounts(callback) {
 
   function accountBase(callback) {
     var q = 'select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
-    function onRow(row) { return { 'emeku-id': row.id, name: trim(row.name), roles: optionListToArray(row.customer_type) } }
+    function onRow(row) { return { emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type) } }
     batchInserter(q, onRow, 'Account', callback)
   }
 
@@ -285,13 +285,13 @@ function accounts(callback) {
 
   function providers(callback) {
     var q = 'select id, name from accounts where customer_type like "%Location_of_providing%" and deleted != "1"'
-    function onRow(row) { return { 'emeku-id': row.id, name: trim(row.name) } }
+    function onRow(row) { return { emekuId: row.id, name: trim(row.name) } }
     batchInserter(q, onRow, 'Provider', callback)
   }
 
   function userBase(callback) {
     var q = 'select id, user_name, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users'
-    function onRow(row) { return { 'emeku-id': row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }
+    function onRow(row) { return { emekuId: row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }
     batchInserter(q, onRow, 'User', callback)
   }
 
@@ -335,15 +335,15 @@ function accounts(callback) {
   }
 
   function pushUserToAccount(row, callback) {
-    schema.User.findOne({ 'emeku-id': row.userId }, { username: 1 }, function (err, user) {
+    schema.User.findOne({ emekuId: row.userId }, { username: 1 }, function (err, user) {
       if (err || !user) return callback(err || new Error('No such user ' + row.userId))
       var data = { _id: user._id, name: user.username }
-      schema.Account.update({ 'emeku-id': row.accountId }, { $addToSet: { users: data } }, callback)
+      schema.Account.update({ emekuId: row.accountId }, { $addToSet: { users: data } }, callback)
     })
   }
 
   function setApiToken(accountEmekuId, callback) {
-    schema.Account.update({ 'emeku-id': accountEmekuId }, { apiToken: mongoose.Types.ObjectId().toString() }, callback)
+    schema.Account.update({ emekuId: accountEmekuId }, { apiToken: mongoose.Types.ObjectId().toString() }, callback)
   }
 }
 
@@ -407,18 +407,18 @@ function linkTvSeries(callback) {
 
   function onRow(row, callback) {
     tick()
-    schema.Program.findOne({ 'emeku-id': row.parentId }, { name:1 }, function(err, parent) {
+    schema.Program.findOne({ emekuId: row.parentId }, { name:1 }, function(err, parent) {
       var update = { season: trimPeriod(row.season), episode: trimPeriod(row.episode), series: { _id: parent._id, name: parent.name[0] } }
-      schema.Program.update({ 'emeku-id': row.programId }, update, callback)
+      schema.Program.update({ emekuId: row.programId }, update, callback)
     })
   }
   function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
 }
 
 function linkCustomersIds(callback) {
-  schema.Account.find({}, { 'emeku-id':1 }, function(err, accounts) {
+  schema.Account.find({}, { emekuId:1 }, function(err, accounts) {
     if (err) return callback(err)
-    var accountMap = _.indexBy(accounts, 'emeku-id')
+    var accountMap = _.indexBy(accounts, 'emekuId')
 
     var tick = progressMonitor()
     conn.query('select id, ref_id, provider_id from meku_audiovisualprograms where ref_id is not null')
@@ -428,7 +428,7 @@ function linkCustomersIds(callback) {
     function onRow(row, callback) {
       tick()
       var update = { customersId: { account: accountMap[row.provider_id]._id, id: row.ref_id } }
-      schema.Program.update({ 'emeku-id': row.id }, update, callback)
+      schema.Program.update({ emekuId: row.id }, update, callback)
     }
   })
 }
@@ -513,7 +513,7 @@ function consumer(onRow, callback) {
 
 function singleFieldUpdater(schemaName, fieldName) {
   return function(key, obj, callback) {
-    schema[schemaName].update({ 'emeku-id': key }, utils.keyValue(fieldName, obj), callback)
+    schema[schemaName].update({ emekuId: key }, utils.keyValue(fieldName, obj), callback)
   }
 }
 

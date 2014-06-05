@@ -54,7 +54,7 @@ var validateProgram = compose([
     valuesInEnum('TELEVISIO-OHJELMALAJIT', enums.legacyTvGenres),
     valuesInList('PELINLAJIT', enums.legacyGameGenres)
   ]), function(p) {
-    return { 'legacy-genre': p.LAJIT.concat(p['TELEVISIO-OHJELMALAJIT']).concat(p.PELINLAJIT) }
+    return { legacyGenre: p.LAJIT.concat(p['TELEVISIO-OHJELMALAJIT']).concat(p.PELINLAJIT) }
   }),
   map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
   map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),

@@ -45,7 +45,7 @@ var ProgramSchema = new Schema({
   year: String,
   productionCompanies: [String],
   genre: [String],
-  'legacy-genre': [String],
+  legacyGenre: [String],
   directors: {type: [String], index: true},
   actors: {type: [String], index: true},
   synopsis: String,

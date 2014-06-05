@@ -78,7 +78,7 @@ function base(callback) {
     var legacyGenre = optionListToArray(row.genre).map(function(g) { return enums.legacyGenres[g] })
       .concat(optionListToArray(row.tv_program_genre).map(function(g) { return enums.legacyTvGenres[g] }))
       .concat(optionListToArray(row.game_genre))
-    if (legacyGenre) obj['legacy-genre'] = _(legacyGenre).compact().uniq().value()
+    if (legacyGenre) obj.legacyGenre = _(legacyGenre).compact().uniq().value()
     if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = row.game_format
     return obj
   }

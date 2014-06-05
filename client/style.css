@@ -362,8 +362,12 @@ textarea.invalid:disabled,
 #program-details input.duration { margin-bottom: 3px }
 #program-details .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
 
+#program-details .tv-field { display: none; }
+#program-details.type-tv-other .tv-field { display: block; }
+
 #program-details .tv-episode-field { display: none; }
 #program-details.type-tv-episode .tv-episode-field { display: block; }
+#program-details.type-tv-episode .tv-field { display: block; }
 
 #program-details .movie-field { display: none; }
 #program-details.type-movie .movie-field { display: block; }

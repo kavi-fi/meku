@@ -217,6 +217,7 @@ function programDetails() {
       .find('.programTypeName').text(enums.programType[program.programType].fi).end()
       .toggleClass('type-movie', enums.util.isMovieType(program))
       .toggleClass('type-tv-episode', enums.util.isTvEpisode(program))
+      .toggleClass('type-tv-other', enums.util.isOtherTv(program))
       .toggleClass('classification', !isReclassification)
       .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()

@@ -286,10 +286,6 @@ label, input {
   vertical-align: baseline;
 }
 
-label[for=synopsis] {
-  vertical-align: top;
-}
-
 label {
   width: 140px;
   text-align: right;
@@ -357,7 +353,11 @@ textarea.invalid:disabled,
 }
 
 #classification-page .new-program { margin-top: 10px }
+
 #program-details { display: none; }
+
+#program-details label { width: 145px; }
+#program-details label[for=synopsis] { vertical-align: top; padding-top: 9px; }
 
 #program-details input.duration { margin-bottom: 3px }
 #program-details .duration-hint { float:right; font-size: 75%; padding-right: 8px; }

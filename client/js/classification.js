@@ -469,7 +469,6 @@ function programDetails() {
         $.get('/accounts/' + currentBuyerId).done(function(data) {
           // remove all email addresses linked to the selected buyer
           $emails.find('ul.buyer li').remove()
-
           data.emailAddresses.forEach(function(email) {
             if (notIn(buyerEmails, email)) {
               addBuyerEmailCheckbox(false, email)
@@ -479,6 +478,8 @@ function programDetails() {
           })
           $emails.find('ul li input:checkbox').trigger('validate')
         })
+      } else {
+        $emails.find('ul li input:checkbox').trigger('validate')
       }
     }
 

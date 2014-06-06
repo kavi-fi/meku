@@ -65,7 +65,7 @@ function run(job, callback) {
 }
 
 function base(callback) {
-  var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where deleted != "1"'
+  var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where program_type != "11" and deleted != "1"'
   batchInserter(q, programMapper, 'Program', callback)
 
   function programMapper(row) {
@@ -154,12 +154,11 @@ function classifications(callback) {
     var tick = progressMonitor()
     var result = { programs: {}, classifications: {} }
     conn.query('select p.id as programId, p.program_type, c.id as classificationId, p.provider_id, ' +
-        ' c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.date_entered, c.reg_date, c.assigned_user_id, c.status,' +
-        ' c.pegi_descriptors, c.pegi_age_level' +
+        ' c.format, c.runtime, c.age_level, c.descriptors, c.description, c.opinions, c.date_entered, c.reg_date, c.assigned_user_id, c.status' +
         ' from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
-        ' where p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "in_pocess" and c.status != "in_process"')
+        ' where p.program_type != "11" and p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "in_pocess" and c.status != "in_process"')
       .stream()
       .pipe(consumer(function(row, done) {
         tick()
@@ -169,9 +168,6 @@ function classifications(callback) {
         if (row.age_level) {
           classification.legacyAgeLimit = row.age_level
         }
-        if (row.program_type == '11') {
-          classification.legacyAgeLimit = row.pegi_age_level
-        }
         if (row.descriptors) classification.warningOrder = optionListToArray(row.descriptors)
         classification.provider_id = row.provider_id
         classification.comments = trimConcat(row.description, row.opinions, '\n')
@@ -179,7 +175,6 @@ function classifications(callback) {
         classification.registrationDate = readAsUTCDate(row.reg_date)
         classification.assigned_user_id = row.assigned_user_id
         classification.status = row.status
-        if (row.program_type == '11') classification.pegiWarnings = optionListToArray(row.pegi_descriptors)
         if (!result.programs[row.programId]) result.programs[row.programId] = []
         result.programs[row.programId].push(classification)
         result.classifications[row.classificationId] = classification

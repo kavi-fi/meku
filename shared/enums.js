@@ -77,16 +77,13 @@ enums.programType = {
   4: { type: 'other-tv', fi: 'Muu TV-ohjelma' },
   5: { type: 'extra', fi: 'Extra' },
   6: { type: 'trailer', fi: 'Traileri' },
-  7: { type: 'game', fi: 'Peli' },
-  8: { type: 'pegi', fi: 'PEGI-peli' }
+  7: { type: 'game', fi: 'Peli' }
 }
 enums.util.isTvEpisode = function(p) { return p.programType == 3 }
 enums.util.isOtherTv = function(p) { return p.programType == 4 }
 enums.util.isMovieType = function(p) { return p.programType == 1 || p.programType == 5 || p.programType == 6 }
-enums.util.isGameType = function(p) { return p.programType == 7 || p.programType == 8 }
-enums.util.isGame = function(p) { return p.programType == 7 }
-enums.util.isPegiGame = function(p) { return p.programType == 8 }
-enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 8 }
+enums.util.isGameType = function(p) { return p.programType == 7 }
+enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 7 }
 
 enums.movieGenre = [
   'Fiktio',
@@ -439,7 +436,7 @@ enums.legacyProgramTypes = {
   '07': 5,       // 'Extra' -> extra
   '08': 7,       // 'Peli' -> game
   '10': 0,      // 'Yhteistuotanto' -> unknown
-  '11': 8,      // 'PEGI hyväksytty peli' -> pegi-game
+  // '11': 0,   // 'PEGI hyväksytty peli' -> pegi-game (disabled)
   '12': 0       // 'Muu kuvaohjelma' -> unknown
 }
 

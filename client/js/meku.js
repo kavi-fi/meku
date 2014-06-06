@@ -180,14 +180,10 @@ $.fn.throttledInput = function(fn) {
 }
 
 function ageLimitIcon(summary) {
-  return summary.pegi
-    ? 'images/pegi-'+summary.age.toString().toLowerCase()+'.png'
-    : 'images/agelimit-'+summary.age.toString().toLowerCase()+'.png'
+  return 'images/agelimit-'+summary.age.toString().toLowerCase()+'.png'
 }
 function warningIcons(summary) {
-  return summary.pegi
-    ? summary.warnings.map(function(w) { return $('<span>', { class:'warning pegi-' + w.toLowerCase() }) })
-    : summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w.category }) })
+  return summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w.category }) })
 }
 
 function notIn(arr, el) {

@@ -6,24 +6,20 @@ if (typeof module !== 'undefined' && module.exports) {
 (function(exports) {
 
 var summary = exports.summary = function(program, classification) {
-  if (enums.util.isPegiGame(program)) {
-    return { pegi: true, age: classification.legacyAgeLimit, warnings: classification.pegiWarnings }
-  } else {
-    if (classification.safe) return { age:'S', warnings:[] }
-    var maxAgeLimit = ageLimit(classification)
-    var warnings = _(classification.criteria)
-      .map(function(id) { return enums.classificationCriteria[id - 1] })
-      .filter(function(c) { return c.age == maxAgeLimit })
-      .map(function(c) { return {id: c.id, category: c.category} })
-      .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
-    if (classification.warningOrder.length > 0) {
-      var order = classification.warningOrder
-      warnings = warnings.sort(function(a, b) {
-        return order.indexOf(a.category) - order.indexOf(b.category)
-      })
-    }
-    return { age: maxAgeLimit, warnings: warnings }
+  if (classification.safe) return { age:'S', warnings:[] }
+  var maxAgeLimit = ageLimit(classification)
+  var warnings = _(classification.criteria)
+    .map(function(id) { return enums.classificationCriteria[id - 1] })
+    .filter(function(c) { return c.age == maxAgeLimit })
+    .map(function(c) { return {id: c.id, category: c.category} })
+    .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
+  if (classification.warningOrder.length > 0) {
+    var order = classification.warningOrder
+    warnings = warnings.sort(function(a, b) {
+      return order.indexOf(a.category) - order.indexOf(b.category)
+    })
   }
+  return { age: maxAgeLimit, warnings: warnings }
 }
 
 var classificationText = function(classification) {

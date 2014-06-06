@@ -22,7 +22,6 @@ var classification = {
   criteriaComments: {},
   warningOrder: [String],
   legacyAgeLimit: String,
-  pegiWarnings: [String],
   creationDate: Date,
   registrationDate: Date,
   registrationEmailAddresses: [{email: String, manual: Boolean}],

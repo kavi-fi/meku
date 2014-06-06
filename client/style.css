@@ -65,15 +65,6 @@ textarea { resize: vertical; }
 .warning-summary .warnings .warning.fear { background-image: url('images/fear.png'); }
 .warning-summary .warnings .warning.drugs { background-image: url('images/drugs.png'); }
 .warning-summary .warnings .warning.violence { background-image: url('images/violence.png'); }
-.warning-summary .warnings .warning.pegi-sex { background-image: url('images/pegi-sex.png'); }
-.warning-summary .warnings .warning.pegi-fear { background-image: url('images/pegi-fear.png'); }
-.warning-summary .warnings .warning.pegi-drugs { background-image: url('images/pegi-drugs.png'); }
-.warning-summary .warnings .warning.pegi-online { background-image: url('images/pegi-online.png'); }
-.warning-summary .warnings .warning.pegi-gambling { background-image: url('images/pegi-gambling.png'); }
-.warning-summary .warnings .warning.pegi-violence { background-image: url('images/pegi-violence.png'); }
-.warning-summary .warnings .warning.pegi-bad_language { background-image: url('images/pegi-bad-language.png'); }
-.warning-summary .warnings .warning.pegi-discrimination { background-image: url('images/pegi-discrimination.png'); }
-
 .warning-summary .warnings { display: inline-block; }
 .warning-summary .warnings .warning { display: inline-block; background: transparent no-repeat; background-size: 40px; width: 40px; height: 40px; }
 

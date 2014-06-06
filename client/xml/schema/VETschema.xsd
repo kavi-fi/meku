@@ -191,7 +191,7 @@
             </xsd:sequence>
             <xsd:attribute name="TYPE" use="required">
               <xsd:annotation>
-                <xsd:documentation> '01' =&gt; 'Kotimainen elokuva',  '02' =&gt; 'Ulkomainen elokuva',  '03' =&gt; 'TV-sarjan jakso',  '04' =&gt; 'Muu tv-ohjelma', '05'=&gt; 'TV-sarjan nimi' '06' =&gt; 'Traileri',  '07' =&gt; 'Extra',  '08' =&gt; 'Peli',  10 =&gt; 'Yhteistuotanto',  11 =&gt; 'PEGI hyväksytty peli' ,  12 =&gt; 'Muu kuvaohjelma'</xsd:documentation>
+                <xsd:documentation> '01' =&gt; 'Kotimainen elokuva',  '02' =&gt; 'Ulkomainen elokuva',  '03' =&gt; 'TV-sarjan jakso',  '04' =&gt; 'Muu tv-ohjelma', '05'=&gt; 'TV-sarjan nimi' '06' =&gt; 'Traileri',  '07' =&gt; 'Extra',  '08' =&gt; 'Peli',  10 =&gt; 'Yhteistuotanto',  12 =&gt; 'Muu kuvaohjelma'</xsd:documentation>
               </xsd:annotation>
               <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
@@ -203,7 +203,6 @@
                   <xsd:enumeration value="07"/>
                   <xsd:enumeration value="08"/>
                   <xsd:enumeration value="10"/>
-                  <xsd:enumeration value="11"/>
                   <xsd:enumeration value="12"/>
                 </xsd:restriction>
               </xsd:simpleType>

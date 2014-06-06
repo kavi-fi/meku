@@ -112,6 +112,12 @@ function programDetails() {
   })
 
   selectEnumAutocomplete({
+    $el: $form.find('input[name=genre].game-genre'),
+    data: enums.legacyGameGenres.map(function(f) { return { id: f, text: f }}),
+    multiple: true
+  })
+
+  selectEnumAutocomplete({
     $el: $form.find('input[name="classifications.0.reason"]'),
     data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
   })

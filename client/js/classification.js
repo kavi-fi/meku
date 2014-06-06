@@ -218,6 +218,7 @@ function programDetails() {
       .toggleClass('type-movie', enums.util.isMovieType(program))
       .toggleClass('type-tv-episode', enums.util.isTvEpisode(program))
       .toggleClass('type-tv-other', enums.util.isOtherTv(program))
+      .toggleClass('type-game', enums.util.isGame(program))
       .toggleClass('classification', !isReclassification)
       .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()
@@ -262,6 +263,8 @@ function programDetails() {
     $buyer.select2('enable', enableBillingAndBuyer)
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
+    $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGame(program))
+    $form.find('input[name="classifications.0.format"], input[name="classifications.0.duration"]').prop('disabled', enums.util.isGame(program))
 
     currentClassification.criteria.forEach(function(id) {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')

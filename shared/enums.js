@@ -84,6 +84,7 @@ enums.util.isTvEpisode = function(p) { return p.programType == 3 }
 enums.util.isOtherTv = function(p) { return p.programType == 4 }
 enums.util.isMovieType = function(p) { return p.programType == 1 || p.programType == 5 || p.programType == 6 }
 enums.util.isGameType = function(p) { return p.programType == 7 || p.programType == 8 }
+enums.util.isGame = function(p) { return p.programType == 7 }
 enums.util.isPegiGame = function(p) { return p.programType == 8 }
 enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 8 }
 

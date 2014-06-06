@@ -45,7 +45,8 @@ function searchPage() {
       {id: 3, text: 'TV-sarjan jakso'},
       {id: 4, text: 'Muu TV-ohjelma'},
       {id: 5, text: 'Extra'},
-      {id: 6, text: 'Trailer'}
+      {id: 6, text: 'Trailer'},
+      {id: 7, text: 'Peli'}
     ]
   }).select2('val', 1)
 

@@ -373,6 +373,8 @@ textarea.invalid:disabled,
 #program-details .movie-field { display: none; }
 #program-details.type-movie .movie-field { display: block; }
 
+#program-details.type-game .non-game-field { display: none; }
+
 #program-details .season-episode-fields input + label { width: 50px; }
 #program-details .season-episode-fields input { width: 92px; }
 

@@ -115,8 +115,10 @@
           </div>
           <div class="movie-field"><label>Genre</label><input class="movie-genre" name="genre" type="hidden" /></div>
           <div class="tv-field"><label>Genre</label><input class="tv-genre" name="genre" type="hidden" /></div>
-          <label>Ohjaajat</label><input name="directors" class="required" type="hidden"/>
-          <label>Näyttelijät</label><input name="actors" class="" type="hidden"/>
+          <div class="non-game-field">
+            <label>Ohjaajat</label><input name="directors" class="required" type="hidden"/>
+            <label>Näyttelijät</label><input name="actors" class="" type="hidden"/>
+          </div>
           <label for="synopsis">Synopsis</label><textarea id="synopsis" name="synopsis" class="required"></textarea>
         </div>
       </div>
@@ -146,7 +148,7 @@
           <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
           <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="hidden" />
         </div>
-        <div class="right">
+        <div class="right non-game-field">
           <label>Ohjelman formaatti</label><input name="classifications.0.format" class="required format" type="hidden"/>
           <label>Kesto</label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
           <span class="duration-hint">hh:mm:ss</span>

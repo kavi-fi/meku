@@ -186,7 +186,7 @@ function ageLimitIcon(summary) {
 }
 function warningIcons(summary) {
   return summary.pegi
-    ? summary.warnings.map(function(w) { return $('<span>', { class:'warning pegi-' + w.category.toLowerCase() }) })
+    ? summary.warnings.map(function(w) { return $('<span>', { class:'warning pegi-' + w.toLowerCase() }) })
     : summary.warnings.map(function(w) { return $('<span>', { class:'warning ' + w.category }) })
 }
 

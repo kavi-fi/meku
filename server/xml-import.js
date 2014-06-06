@@ -18,10 +18,18 @@ exports.readPrograms = function (body, callback) {
   })
 }
 
-var format = and(required('FORMAATTI'), valueInList('FORMAATTI', enums.format, 'format'))
-var gameFormat = and(required('PELIFORMAATTI'), valueInList('PELIFORMAATTI', enums.gameFormat, 'gameFormat'))
+var format = flatMap(requiredAttr('TYPE', 'type'), function(p) {
+  var cls = _.curry(node)('LUOKITTELU', 'classification')
+  if (p.type == '08') {
+    return map(cls([and(required('PELIFORMAATTI'), valueInList('PELIFORMAATTI', enums.gameFormat, 'gameFormat'))]), function(p) {
+      return {gameFormat: p.classification.gameFormat}
+    })
+  } else {
+    return cls([and(required('FORMAATTI'), valueInList('FORMAATTI', enums.format, 'format'))])
+  }
+})
 
-var validateProgram = compose([
+var validateProgram = map(compose([
   and(requiredAttr('TYPE', 'type'), function(xml) {
     var type = xml.$.TYPE
     if (_.has(enums.legacyProgramTypes, type)) return ok({ programType: enums.legacyProgramTypes[type] })
@@ -61,14 +69,14 @@ var validateProgram = compose([
   }),
   map(childrenByNameTo('OHJAAJA', 'directors'), function(p) { return {directors: p.directors.map(fullname) }}),
   map(childrenByNameTo('NAYTTELIJA', 'actors'), function(p) { return {actors: p.actors.map(fullname) }}),
-  map(required('LUOKITTELIJA', 'author'), function(p) { return { classifications: [{ author: { name: p.author } }] }}),
-  map(node('LUOKITTELU', 'classification', [
+  map(required('LUOKITTELIJA', 'author'), function(p) { return { classification: { author: { name: p.author } } }}),
+  format,
+  node('LUOKITTELU', 'classification', [
     and(requiredAttr('REKISTEROINTIPAIVA', 'registrationDate'), function(xml) {
       var d = moment(xml.$.REKISTEROINTIPAIVA, "DD.MM.YYYY HH:mm:ss")
       if (d.isValid()) return ok({ registrationDate: d.toDate() })
       else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
     }),
-    mapError(or(format, gameFormat), function(errors) { return "Virheellinen FORMAATTI tai PELIFORMAATTI" }),
     and(required('KESTO'), test('KESTO', utils.isValidDuration, "Virheellinen kesto", 'duration')),
     map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
       var criteriaComments = _.object(p.criteria.map(function (c) {
@@ -76,8 +84,8 @@ var validateProgram = compose([
       }))
       return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), criteriaComments: criteriaComments}
     })
-  ]), function(p) { return {classifications: [p.classification], gameFormat: p.classification.gameFormat} })
-])
+  ])
+]), function(p) { p.classifications = [p.classification]; delete p.classification; return p})
 
 // validator = Xml -> Result
 // validation = validator -> (program -> validator) -> validator
@@ -205,10 +213,11 @@ function valuesInList(field, list) {
   }
 }
 
-function valueInList(field, list) {
+function valueInList(field, list, toField) {
   return function(xml) {
+    toField = toField || field
     var value = xml[field].$text
-    if (_.contains(list, value)) return ok(utils.keyValue(field, value))
+    if (_.contains(list, value)) return ok(utils.keyValue(toField, value))
     else return error("Virheellinen kenttä " + field)
   }
 }

@@ -78,11 +78,16 @@ var validateProgram = map(compose([
       else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
     }),
     and(required('KESTO'), test('KESTO', utils.isValidDuration, "Virheellinen kesto", 'duration')),
-    map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
+    flatMap(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
+      var validCriteria = enums.classificationCriteria.map(function(x) { return x.id })
+      var errors = _.flatten(p.criteria.map(function(c) {
+        return and(requiredAttr('KRITEERI'), attrInList('KRITEERI', validCriteria))(c).errors
+      }))
+      if (errors.length > 0) return function() { return {program: {}, errors: errors } }
       var criteriaComments = _.object(p.criteria.map(function (c) {
         return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
       }))
-      return {safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), criteriaComments: criteriaComments}
+      return function () { return ok({safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), criteriaComments: criteriaComments}) }
     })
   ])
 ]), function(p) { p.classifications = [p.classification]; delete p.classification; return p})
@@ -219,6 +224,14 @@ function valueInList(field, list, toField) {
     var value = xml[field].$text
     if (_.contains(list, value)) return ok(utils.keyValue(toField, value))
     else return error("Virheellinen kenttä " + field)
+  }
+}
+
+function attrInList(attr, list) {
+  return function(xml) {
+    var value = xml.$[attr]
+    if (_.contains(list.map(function(x) { return x.toString() }), value)) return ok(utils.keyValue(attr, value))
+    else return error("Virheellinen arvo atribuutille " + attr + ": " + value)
   }
 }
 

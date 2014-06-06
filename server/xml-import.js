@@ -18,6 +18,9 @@ exports.readPrograms = function (body, callback) {
   })
 }
 
+var format = and(required('FORMAATTI'), valueInList('FORMAATTI', enums.format, 'format'))
+var gameFormat = and(required('PELIFORMAATTI'), valueInList('PELIFORMAATTI', enums.gameFormat, 'gameFormat'))
+
 var validateProgram = compose([
   and(requiredAttr('TYPE', 'type'), function(xml) {
     var type = xml.$.TYPE
@@ -65,12 +68,7 @@ var validateProgram = compose([
       if (d.isValid()) return ok({ registrationDate: d.toDate() })
       else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
     }),
-    mapError(or(
-      and(required('FORMAATTI'), valueInList('FORMAATTI', enums.format, 'format')),
-      and(required('PELIFORMAATTI'), valueInList('PELIFORMAATTI', enums.gameFormat, 'format'))
-    ), function(errors) {
-      return "FORMAATTI tai PELIFORMAATTI virheellinen"
-    }),
+    mapError(or(format, gameFormat), function(errors) { return "Virheellinen FORMAATTI tai PELIFORMAATTI" }),
     and(required('KESTO'), test('KESTO', utils.isValidDuration, "Virheellinen kesto", 'duration')),
     map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
       var criteriaComments = _.object(p.criteria.map(function (c) {
@@ -129,10 +127,7 @@ function or(v1, v2) {
   return function(xml) {
     var res = v1(xml)
     if (res.errors.length > 0) {
-      var res2 = v2(xml)
-      console.log(res.errors)
-      console.log(res2.errors)
-      return {program: res2.program, errors: _.flatten(res.errors.concat(res2.errors))}
+      return v2(xml)
     } else {
       return res
     }

@@ -80,11 +80,9 @@ function programDetails() {
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
     if (classification.isRemediationRequest($(this).val())) {
-      $buyer.select2('enable', true).removeClass('invalid')
-      $billing.select2('enable', true).removeClass('invalid')
+      $buyer.add($billing).select2('enable', true).removeClass('invalid')
     } else {
-      $buyer.select2('enable', false).select2('val', '', true)
-      $billing.select2('enable', false).select2('val', '', true)
+      $buyer.add($billing).select2('enable', false).select2('val', '', true)
     }
   })
 
@@ -258,9 +256,7 @@ function programDetails() {
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
-    var enableBillingAndBuyer = !isReclassification || classification.isRemediationRequest(currentClassification.reason)
-    $billing.select2('enable', enableBillingAndBuyer)
-    $buyer.select2('enable', enableBillingAndBuyer)
+    $buyer.add($billing).select2('enable', !isReclassification || classification.isRemediationRequest(currentClassification.reason))
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
     $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGame(program))

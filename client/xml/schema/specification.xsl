@@ -427,8 +427,7 @@ background-image: -webkit-gradient(
 	  <h3>XML-skeema: "http://meku.herokuapp.com/xml/schema/VETschema.xsd"</h3>
 	  </div>
 			<div class="sugar_tab">
-				Valtion elokuvatarkastamon (VET) sähköinen kuvaohjelmien rekisteröintijärjestelmä (E-ILMO) valmistautuu vastaanottamaan seuraavanmuotoista XML-dataa. XML-tiedoston alkuun tulee XML:n versionumero sekä koodaustapa. Sen jälkeen tiedosto koostuu yhdestä ASIAKAS-elementistä sekä yhdestä tai useammasta KUVAOHJELMA-elementistä. Nämä kuvaohjelmat ovat joko ilmoitettavia tai tarkastutettavia kuvaohjelmia.
-
+				KAVIn kuvaohjelmien rekisteröintijärjestelmä valmistautuu vastaanottamaan seuraavanmuotoista XML-dataa. XML-datan koodaus tulee olla UTF-8 joka ilmoitetaan XML-deklaraatiossa. Sen jälkeen tiedosto koostuu yhdestä ASIAKAS-elementistä sekä yhdestä tai useammasta KUVAOHJELMA-elementistä.
 				<div>
 					<span class="elements">&lt;?XML </span><span class="attributes">version</span>="1.0" <span class="attributes">encoding</span>="UTF-8" <span class="elements">?&gt;</span>
 				</div>

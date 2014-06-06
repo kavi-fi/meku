@@ -21,6 +21,45 @@ enums.format = [
   'Muu'
 ]
 
+enums.gameFormat = [
+  '360 (Xbox 360)',
+  'PC',
+  'PS2',
+  'PS3',
+  '360',
+  'DVD',
+  'MAC',
+  'PC/MAC',
+  'XBOX',
+  'N64',
+  'DS',
+  'GBA',
+  'PSP',
+  'GC',
+  'Wii',
+  'PSX',
+  'N-Gage',
+  'GBC',
+  'PLM',
+  'COIN',
+  'PC (PC)',
+  'DC',
+  'XBLA',
+  'DVDTV',
+  'TV',
+  'PS',
+  'DVDTV (DVD TV-Games)',
+  'COIN (Kolikkopeli)',
+  'PS3 (PS3)',
+  'Pokemon Mini',
+  'DS (Nintendo DS)',
+  'Wii (Wii)',
+  'GC (GameCube)',
+  'N64 (N64)',
+  'Xbox One',
+  'PS4'
+]
+
 enums.roles = {
   'Provider': 'Tarjoaja',
   'Location_of_providing': 'Tarjoamispaikka',

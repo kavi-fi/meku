@@ -37,16 +37,20 @@ var criteriaText = exports.criteriaText = function(warnings) {
 }
 
 var status = exports.status = function (classification) {
-  var df = 'D.M.YYYY [klo] H:mm'
   switch (classification.status) {
     case 'registered':
     case 'reclassification1':
     case 'reclassification3':
-      return 'Rekisteröity '+moment(classification.registrationDate).format(df)
+      return 'Rekisteröity '+asDate(classification.registrationDate)
     case 'in_process':
-      return 'Luonnos tallennettu '+moment(classification.creationDate).format(df)
+      return 'Luonnos tallennettu '+asDate(classification.creationDate)
     default:
       return 'Unknown status: '+classification.status
+  }
+
+  function asDate(date) {
+    var df = 'D.M.YYYY [klo] H:mm'
+    return date ? moment(date).format(df) : ''
   }
 }
 

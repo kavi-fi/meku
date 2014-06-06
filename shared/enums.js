@@ -375,7 +375,7 @@ enums.legacyGameGenres = [
   "tasohyppely",
   "urheilu",
   "muu",
-  "r&#xE4;iskint&#xE4;",
+  "räiskintä",
   "autopeli (ajopeli)",
   "puzzle",
   "managerointi",

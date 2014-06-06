@@ -207,8 +207,8 @@ function searchPage() {
       .find('.year').text(p.year).end()
       .find('.productionCompanies').text(p.productionCompanies.join(', ')).end()
       .find('.genre').text(p.genre.join(', ') || p.legacyGenre.join(', ')).end()
-      .find('.directors').text(p.directors.join(', ')).end()
-      .find('.actors').text(p.actors.join(', ')).end()
+      .find('.directors').text(p.directors.join(', ')).prev().toggleClass('hide', p.directors.length == 0).end().end()
+      .find('.actors').text(p.actors.join(', ')).prev().toggleClass('hide', p.actors.length == 0).end().end()
       .find('.synopsis').text(p.synopsis).end()
       .find('.status').html(classificationStatusText).end()
 
@@ -222,7 +222,7 @@ function searchPage() {
         .find('.buyer').text(c.buyer && c.buyer.name || '').end()
         .find('.billing').text(c.billing && c.billing.name || '').end()
         .find('.format').text(enums.util.isGameType(p) && p.gameFormat || c.format).end()
-        .find('.duration').text(c.duration).end()
+        .find('.duration').text(c.duration).prev().toggleClass('hide', c.duration == undefined).end().end()
         .find('.criteria').html(renderClassificationCriteria(c)).end()
     }
 

@@ -100,6 +100,11 @@ function programDetails() {
   })
 
   selectEnumAutocomplete({
+    $el: $form.find('input[name=gameFormat]'),
+    data: enums.gameFormat.map(function(f) { return { id: f, text: f }})
+  })
+
+  selectEnumAutocomplete({
     $el: $form.find('input[name=genre].movie-genre'),
     data: enums.movieGenre.map(function(f) { return { id: f, text: f }}),
     multiple: true
@@ -240,6 +245,7 @@ function programDetails() {
 
       .find('input.country').trigger('setVal', program.country).end()
       .find('input[name=productionCompanies]').trigger('setVal', program.productionCompanies).end()
+      .find('input[name=gameFormat]').trigger('setVal', program.gameFormat).end()
       .find('input[name=genre]').trigger('setVal', program.genre).end()
 
       .find('input[name="classifications.0.reason"]').trigger('setVal', reasonVal).end()
@@ -266,6 +272,7 @@ function programDetails() {
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
     $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGame(program))
+    $form.find('input[name=gameFormat]').prop('disabled', isReclassification || !enums.util.isGame(program))
     $form.find('input[name="classifications.0.format"], input[name="classifications.0.duration"]').prop('disabled', enums.util.isGame(program))
 
     currentClassification.criteria.forEach(function(id) {

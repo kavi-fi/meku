@@ -79,12 +79,12 @@
               </xsd:choice>
               <xsd:element name="VALMISTUMISVUOSI" type="xsd:gYear" minOccurs="0" maxOccurs="1">
                 <xsd:annotation>
-                  <xsd:documentation>Kuvaohjelman valmistumisvuosi. Kuvaohjelman kuvaus. Esimerkki:&lt;VALMISTUMISVUOSI&gt;2010&lt;/VALMISTUMISVUOSI&gt;</xsd:documentation>
+                  <xsd:documentation>Kuvaohjelman valmistumisvuosi. Esimerkki:&lt;VALMISTUMISVUOSI&gt;2010&lt;/VALMISTUMISVUOSI&gt;</xsd:documentation>
                 </xsd:annotation>
               </xsd:element>
               <xsd:element name="JULKAISUVUOSI" type="xsd:gYear" minOccurs="0" maxOccurs="1">
                 <xsd:annotation>
-                  <xsd:documentation>Kuvaohjelman julkaisvuosi. Esimerkki:&lt;JULKAISUVUOSI&gt;2011&lt;/JULKAISUVUOSI&gt;</xsd:documentation>
+                  <xsd:documentation>Kuvaohjelman julkaisuvuosi. Esimerkki:&lt;JULKAISUVUOSI&gt;2011&lt;/JULKAISUVUOSI&gt;</xsd:documentation>
                 </xsd:annotation>
               </xsd:element>
               <xsd:element name="SYNOPSIS" type="xsd:string" minOccurs="1">

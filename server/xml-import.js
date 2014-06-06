@@ -65,8 +65,11 @@ var validateProgram = compose([
       if (d.isValid()) return ok({ registrationDate: d.toDate() })
       else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
     }),
-    mapError(or(required('FORMAATTI', 'format'), required('PELIFORMAATTI', 'gameFormat')), function(errors) {
-      return "FORMAATTI tai PELIFORMAATTI puuttuu"
+    mapError(or(
+      and(required('FORMAATTI'), valueInList('FORMAATTI', enums.format, 'format')),
+      and(required('PELIFORMAATTI'), valueInList('PELIFORMAATTI', enums.gameFormat, 'format'))
+    ), function(errors) {
+      return "FORMAATTI tai PELIFORMAATTI virheellinen"
     }),
     and(required('KESTO'), test('KESTO', utils.isValidDuration, "Virheellinen kesto", 'duration')),
     map(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
@@ -126,7 +129,10 @@ function or(v1, v2) {
   return function(xml) {
     var res = v1(xml)
     if (res.errors.length > 0) {
-      return v2(xml)
+      var res2 = v2(xml)
+      console.log(res.errors)
+      console.log(res2.errors)
+      return {program: res2.program, errors: _.flatten(res.errors.concat(res2.errors))}
     } else {
       return res
     }
@@ -200,6 +206,14 @@ function valuesInList(field, list) {
     var values = optionListToArray(xml[field])
     var exists = values.map(_.curry(_.contains)(list))
     if (_.all(exists)) return ok(utils.keyValue(field, values))
+    else return error("Virheellinen kenttä " + field)
+  }
+}
+
+function valueInList(field, list) {
+  return function(xml) {
+    var value = xml[field].$text
+    if (_.contains(list, value)) return ok(utils.keyValue(field, value))
     else return error("Virheellinen kenttä " + field)
   }
 }

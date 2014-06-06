@@ -106,7 +106,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     })
 
     function verifyTvSeries(program, callback) {
-      if (!enums.util.isTvEpisode(program)) return callback(program)
+      if (!enums.util.isTvEpisode(program)) return callback()
       createParentProgram(program, program.series.name.trim(), callback)
     }
 

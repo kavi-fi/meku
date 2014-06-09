@@ -168,8 +168,8 @@ function billingPage() {
   }).bind('datepicker-change',function(event, obj) {
     fetchInvoiceRows(obj.date1, obj.date2)
   })
-  var first = moment().subtract('years', 3).startOf('month')
-  var last = moment().endOf('month')
+  var first = moment().subtract('months', 1).startOf('month')
+  var last = moment().subtract('months', 1).endOf('month')
   $datePicker.data('dateRangePicker').setDateRange(first.format(format),last.format(format))
   fetchInvoiceRows(first, last)
 

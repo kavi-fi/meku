@@ -114,7 +114,70 @@ function navi() {
 }
 
 function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
-function billingPage() { $('#billing-page').on('show', function() { location.hash = '#laskutus'}) }
+function billingPage() {
+  $.dateRangePickerLanguages.fi = {
+    'selected': 'Valittu:',
+    'day':'Päivä',
+    'days': ' päivää',
+    'apply': 'Sulje',
+    'week-1' : 'MA',
+    'week-2' : 'TI',
+    'week-3' : 'KE',
+    'week-4' : 'TO',
+    'week-5' : 'PE',
+    'week-6' : 'LA',
+    'week-7' : 'SU',
+    'month-name': ['Maaliskuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
+    'shortcuts' : 'Valitse',
+    'past': 'Past',
+    'following':'Seuraavat',
+    'previous' : 'edellinen',
+    'prev-week' : 'viikko',
+    'prev-month' : 'kuukausi',
+    'prev-year' : 'vuosi',
+    'next':'seuraava',
+    'next-week':'viikko',
+    'next-month':'kuukausi',
+    'next-year':'vuosi',
+    'less-than' : 'Date range should not be more than %d days',
+    'more-than' : 'Date range should not be less than %d days',
+    'default-more' : 'Please select a date range longer than %d days',
+    'default-single' : 'Please select a date',
+    'default-less' : 'Please select a date range less than %d days',
+    'default-range' : 'Please select a date range between %d and %d days',
+    'default-default': 'Ole hyvä ja valitse alku- ja loppupäivä'
+  }
+
+  var $page = $('#billing-page')
+  var $datePicker = $page.find('.datepicker')
+  var formatWire = "MM-DD-YYYY"
+  var format = 'DD.MM.YYYY'
+
+  $datePicker.click(function(e) {
+    e.preventDefault()
+  })
+
+  $datePicker.dateRangePicker({
+    language: 'fi',
+    format: format,
+    separator: ' - ',
+    startOfWeek: 'monday',
+    shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']},
+    getValue: function() { return $datePicker.find('span').text() },
+    setValue: function(s) { $datePicker.find('span').text(s) }
+  }).bind('datepicker-change',function(event, obj) {
+    var begin = moment(obj.date1).format(formatWire)
+    var end = moment(obj.date2).format(formatWire)
+    $.get('/invoicerows/' + begin + '/' + end).done(function(rows) {
+      console.log(rows)
+    })
+  });
+  var first = moment().subtract('months', 1).startOf('month')
+  var last = moment().subtract('months', 1).endOf('month')
+  $datePicker.data('dateRangePicker').setDateRange(first.format(format),last.format(format))
+
+  $page.on('show', function() { location.hash = '#laskutus'})
+}
 
 function stopPropagation(e) { e.stopPropagation() }
 

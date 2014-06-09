@@ -564,6 +564,24 @@ textarea.invalid:disabled,
 #email .emails ul input { margin-right: 10px; }
 #email .emails input.email.invalid.touched { background-color: #F0FFF0; }
 
+#billing-page .datepicker {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #e1e1e1;
+  color: #777;
+  padding: 4px 5px;
+  text-decoration: none;
+}
+
+#billing-page .datepicker span {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+#billing-page .datepicker i {
+  color: #000;
+}
+
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

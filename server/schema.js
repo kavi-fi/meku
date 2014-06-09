@@ -130,7 +130,7 @@ var InvoiceSchema = new Schema({
   program: ObjectId,
   name: String,
   duration: Number,
-  registrationDate: Date,
+  registrationDate: {type: Date, index: true},
   price: Number // eurocents
 })
 

@@ -2,6 +2,7 @@ var express = require('express')
 var _ = require('lodash')
 var async = require('async')
 var path = require('path')
+var moment = require('moment')
 var mongoose = require('mongoose')
 var schema = require('./schema')
 var Program = schema.Program
@@ -179,6 +180,15 @@ app.get('/accounts/:id', function(req, res, next) {
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 app.get('/productionCompanies/search/:query', queryNameIndex('ProductionCompany'))
+
+app.get('/invoicerows/:begin/:end', function(req, res, next) {
+  var format = "MM-DD-YYYY"
+  begin = moment(req.params.begin, format)
+  end = moment(req.params.end, format)
+  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}, function(err, rows) {
+    res.send(rows)
+  })
+})
 
 app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
   var now = new Date()

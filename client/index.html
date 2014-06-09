@@ -3,6 +3,8 @@
 <head>
   <link href="vendor/normalize-3.0.1.css" media="all" rel="stylesheet" />
   <link href="vendor/select2-3.4.6/select2.css" rel="stylesheet"/>
+  <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="vendor/jquery-date-range-picker/daterangepicker.css" />
   <link href="style.css" media="all" rel="stylesheet" />
   <script src="vendor/jquery-2.1.0.min.js"></script>
   <script src="vendor/lodash.min.js"></script>
@@ -11,6 +13,7 @@
   <script src="vendor/jquery.cookie-1.4.1.js"></script>
   <script src="vendor/jquery.highlight-3-custom.js"></script>
   <script src="vendor/moment-2.6.0.min.js"></script>
+  <script src="vendor/jquery-date-range-picker/jquery.daterangepicker.js"></script>
   <script src="shared/enums.js"></script>
   <script src="shared/classification.js"></script>
   <script src="shared/utils.js"></script>
@@ -255,7 +258,14 @@
   </div>
 
   <div id="buyer-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
-  <div id="billing-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
+
+  <div id="billing-page" class="page">
+    <div class="row">
+      <div class="content">
+        <p>Rekisteröinnit ja luokittelut väliltä <a class="datepicker" href="#"><span></span><i class="icon-calendar"></i></a></p>
+      </div>
+    </div>
+  </div>
 
   <div id="templates">
     <div class="search-result-details">

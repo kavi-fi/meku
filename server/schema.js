@@ -135,11 +135,13 @@ var InvoiceSchema = new Schema({
 })
 
 InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, price) {
-  return new this({
-    account: program.billing, type: rowType, program: program._id,
+  var row = new this({
+    type: rowType, program: program._id,
     name: program.name, duration: durationSeconds, price: price,
     registrationDate: program.classifications[0].registrationDate
   })
+  row.account = program.classifications[0].billing
+  return row
 }
 
 var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', InvoiceSchema)

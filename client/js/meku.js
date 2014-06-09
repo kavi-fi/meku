@@ -166,15 +166,45 @@ function billingPage() {
     getValue: function() { return $datePicker.find('span').text() },
     setValue: function(s) { $datePicker.find('span').text(s) }
   }).bind('datepicker-change',function(event, obj) {
-    var begin = moment(obj.date1).format(formatWire)
-    var end = moment(obj.date2).format(formatWire)
-    $.get('/invoicerows/' + begin + '/' + end).done(function(rows) {
-      console.log(rows)
-    })
-  });
-  var first = moment().subtract('months', 1).startOf('month')
-  var last = moment().subtract('months', 1).endOf('month')
+    fetchInvoiceRows(obj.date1, obj.date2)
+  })
+  var first = moment().subtract('years', 3).startOf('month')
+  var last = moment().endOf('month')
   $datePicker.data('dateRangePicker').setDateRange(first.format(format),last.format(format))
+  fetchInvoiceRows(first, last)
+
+  function fetchInvoiceRows(date1, date2) {
+    var begin = moment(date1).format(formatWire)
+    var end = moment(date2).format(formatWire)
+    $.get('/invoicerows/' + begin + '/' + end).done(function(rows) {
+      var $accounts = $page.find('.accounts')
+      var accounts = _.groupBy(rows, function(x) { return x.account.name })
+      $accounts.empty()
+      _.pairs(accounts).forEach(function(account) {
+        var name = account[0]
+        var rows = account[1]
+        var $rows = $("#templates").find('.invoice-account table').clone()
+        var $account = $('<div>').html($('<span>').text(name))
+        rows.forEach(function(row) {
+          var $row = $("#templates").find('.invoicerow tr').clone()
+          $row
+            .find('.type').text(enums.invoiceRowType[row.type]).end()
+            .find('.name').text(row.name).end()
+            .find('.duration').text(utils.secondsToDuration(row.duration)).end()
+            .find('.registrationDate').text(moment(row.registrationDate).format(format)).end()
+            .find('.price').text(formatCentsAsEuros(row.price)).end()
+          $rows.find('tbody').append($row)
+        })
+        $rows.find('tfoot span').text(formatCentsAsEuros(_.reduce(rows, function(acc, row) { return acc + row.price }, 0)))
+        $account.append($rows)
+        $accounts.append($account)
+      })
+    })
+  }
+
+  function formatCentsAsEuros(cents) {
+    return cents / 100 + ' €'
+  }
 
   $page.on('show', function() { location.hash = '#laskutus'})
 }

@@ -253,6 +253,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
           var p = new Program(program)
           p.classifications[0].status = 'registered'
           p.classifications[0].creationDate = now
+          p.classifications[0].registrationDate = now
           p.classifications[0].billing = account
           p.classifications[0].buyer = account
           p.populateAllNames(function (err) {
@@ -260,7 +261,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
             p.save(function (err) {
               if (err) return callback(err)
               var seconds = durationToSeconds(_.first(p.classifications).duration)
-              InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err) {
+              InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
                 if (err) return callback(err)
                 updateActorAndDirectorIndexes(p, callback)
               })

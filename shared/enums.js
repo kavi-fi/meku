@@ -171,6 +171,11 @@ enums.authorOrganization = {
   3: 'KHO'
 }
 
+enums.invoiceRowType = {
+  registration: 'Kuvaohjelman rekisteröinti',
+  classification: 'MEKUn luokittelu'
+}
+
 enums.countries = {
   'AE': 'Arabiemiirikunnat',
   'AF': 'Afganistan',

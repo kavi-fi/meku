@@ -81,8 +81,12 @@ var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 
 var Account = exports.Account = mongoose.model('accounts', {
   emekuId: String,
+  sequenceId: Number,
   name: {type: String, index: true},
   roles: [String],
+  yTunnus: String,
+  billing: address,
+  eInvoice: { address:String, operator:String },
   emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],
   apiToken: String
@@ -126,7 +130,7 @@ var User = exports.User = mongoose.model('users', UserSchema)
 
 var InvoiceSchema = new Schema({
   account: {_id: ObjectId, name: String},
-  type: String, // registration, classification or distributor fee
+  type: String, // registration, classification, reclassification or distributor fee
   program: ObjectId,
   name: String,
   duration: Number,
@@ -176,4 +180,12 @@ var Actor = exports.Actor = mongoose.model('actors', ActorSchema)
 ProductionCompanySchema.statics.updateWithNames = updateNamedIndex
 var ProductionCompany = exports.ProductionCompany = mongoose.model('productionCompanies', ProductionCompanySchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany]
+var SequenceSchema = new Schema({ _id:String, seq:Number }, { _id: false, versionKey: false })
+SequenceSchema.statics.next = function(seqName, callback) {
+  this.findOneAndUpdate({ _id: seqName }, { $inc: { seq: 1 } }, { new: true }, function(err, doc) {
+    return callback(err, err ? null : doc.seq)
+  })
+}
+var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
+
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence]

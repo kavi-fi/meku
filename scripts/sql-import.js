@@ -11,20 +11,20 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
 
 /*
  Dependencies:
-   base & names before everything
+   sequences & base & names before everything
    accounts before classifications
    linkTvSeries before nameIndex
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
+   node scripts/sql-import.js sequences base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
 
  Should remove programs which have no classifications? -> ~7400
    check how many are tv-series-names?
 */
 
 var tasks = {
-  wipe: wipe, base: base,
+  wipe: wipe, sequences: sequences, base: base,
   wipeMetadata: wipeMetadata, metadata: metadata,
   wipeNames: wipeNames, names: names,
   wipeClassifications: wipeClassifications, classifications: classifications,
@@ -34,6 +34,7 @@ var tasks = {
   markTrainingProgramsDeleted: markTrainingProgramsDeleted,
   linkCustomersIds: linkCustomersIds,
   linkTvSeries: linkTvSeries
+
 }
 
 if (process.argv.length < 3) {
@@ -265,11 +266,20 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens, accountSequence], callback)
 
   function accountBase(callback) {
-    var q = 'select id, name, customer_type from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
-    function onRow(row) { return { emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type) } }
+    var q = 'select id, name, customer_type, sic_code,' +
+      ' bills_lang, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
+      ' e_invoice, e_invoice_operator' +
+      ' from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
+    function onRow(row) {
+      return {
+        emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code), billingLanguage: trim(row.bills_lang),
+        billing: { street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: trim(row.billing_address_country) },
+        eInvoice: { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
+      }
+    }
     batchInserter(q, onRow, 'Account', callback)
   }
 
@@ -318,6 +328,19 @@ function accounts(callback) {
     // yle, nelonenmedia, mtv
     var ids = ['cd5ad00f-3632-3f57-cc9e-4e770b9eeef9', '1db92ef2-ab3d-950d-e053-4e82f88d1df0', 'ae57bb17-a9f2-1f09-a928-4e97f008b792']
     async.forEach(ids, setApiToken, callback)
+  }
+
+  function accountSequence(callback) {
+    schema.Account.find({}, function(err, docs) {
+      if (err) callback(new Error())
+      async.forEach(docs, function(doc, callback) {
+        schema.Sequence.next('Account', function(err, seq) {
+          if (err) callback(new Error())
+          doc.sequenceId = seq
+          doc.save(callback)
+        })
+      }, callback)
+    })
   }
 
   function idToEmailMapper(row, result) {
@@ -426,6 +449,12 @@ function linkCustomersIds(callback) {
       schema.Program.update({ emekuId: row.id }, update, callback)
     }
   })
+}
+
+function sequences(callback) {
+  async.forEach(['Account', 'Program'], createSequence, callback)
+
+  function createSequence(s, callback) { new schema.Sequence({ _id: s, seq: 0 }).save(callback) }
 }
 
 function batcher(num) {

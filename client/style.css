@@ -575,6 +575,7 @@ textarea.invalid:disabled,
 
 #billing-page .datepicker span { display: inline-block; margin-right: 5px; }
 #billing-page .datepicker i { color: #000; }
+#billing-page h4 { margin: 0; padding: 0; }
 #billing-page table { margin-left: 50px; width: 100%; }
 #billing-page table thead th, #billing-page table tbody td { padding: 4px; }
 #billing-page table tbody td.type { width: 200px; }

@@ -184,7 +184,7 @@ app.get('/productionCompanies/search/:query', queryNameIndex('ProductionCompany'
 app.get('/invoicerows/:begin/:end', function(req, res, next) {
   var format = "MM-DD-YYYY"
   begin = moment(req.params.begin, format)
-  end = moment(req.params.end, format)
+  end = moment(req.params.end, format).add('days', 1)
   InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}, function(err, rows) {
     res.send(rows)
   })

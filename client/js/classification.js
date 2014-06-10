@@ -20,6 +20,7 @@ function programDetails() {
     } else {
       location.hash = '#luokittelu'
     }
+    $form.find('.private-comments').toggle(hasRole('kavi'))
   })
 
   $form.on('validation', function() {

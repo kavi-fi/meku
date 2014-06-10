@@ -117,7 +117,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 
       if (classification.isReclassification(program)) {
         // reclassification fee only when "Oikaisupyyntö" and KAVI is the classifier
-        if (currentClassification.reason === 2 && currentClassification.authorOrganization === 1) {
+        if (currentClassification.reason === 3 && currentClassification.authorOrganization === 1) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
         } else {
           callback(null)

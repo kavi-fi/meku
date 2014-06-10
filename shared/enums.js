@@ -173,7 +173,8 @@ enums.authorOrganization = {
 
 enums.invoiceRowType = {
   registration: 'Kuvaohjelman rekisteröinti',
-  classification: 'MEKUn luokittelu'
+  classification: 'KAVIn luokittelu',
+  reclassification: 'KAVIn uudelleenluokittelu'
 }
 
 enums.countries = {

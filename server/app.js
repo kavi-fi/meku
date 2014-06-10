@@ -341,7 +341,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'POST:/login', 'POST:/logout', 'POST:/xml']
+  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema', 'POST:/login', 'POST:/logout', 'POST:/xml']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

@@ -182,8 +182,9 @@ function billingPage() {
       _.pairs(accounts).forEach(function(account) {
         var name = account[0]
         var rows = account[1]
-        var $rows = $("#templates").find('.invoice-account table').clone()
-        var $account = $('<div>').html($('<span>').text(name))
+        var $account = $("#templates").find('.invoice-account').clone()
+        var $rows = $account.find('table')
+        $account.find('.name').text(name)
         rows.forEach(function(row) {
           var $row = $("#templates").find('.invoicerow tr').clone()
           $row
@@ -195,7 +196,6 @@ function billingPage() {
           $rows.find('tbody').append($row)
         })
         $rows.find('tfoot span').text(formatCentsAsEuros(_.reduce(rows, function(acc, row) { return acc + row.price }, 0)))
-        $account.append($rows)
         $accounts.append($account)
       })
     })

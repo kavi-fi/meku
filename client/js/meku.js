@@ -167,10 +167,6 @@ function billingPage() {
   }).bind('datepicker-change',function(event, obj) {
     fetchInvoiceRows(obj.date1, obj.date2)
   })
-  var first = moment().subtract('months', 1).startOf('month')
-  var last = moment().subtract('months', 1).endOf('month')
-  $datePicker.data('dateRangePicker').setDateRange(first.format(format),last.format(format))
-  fetchInvoiceRows(first, last)
 
   function fetchInvoiceRows(date1, date2) {
     var begin = moment(date1).format(format)
@@ -205,7 +201,13 @@ function billingPage() {
     return cents / 100 + ' €'
   }
 
-  $page.on('show', function() { location.hash = '#laskutus'})
+  $page.on('show', function() {
+    location.hash = '#laskutus'
+    var first = moment().subtract('months', 1).startOf('month')
+    var last = moment().subtract('months', 1).endOf('month')
+    $datePicker.data('dateRangePicker').setDateRange(first.format(format),last.format(format))
+    fetchInvoiceRows(first, last)
+  })
 }
 
 function stopPropagation(e) { e.stopPropagation() }

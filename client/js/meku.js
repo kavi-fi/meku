@@ -7,6 +7,38 @@ function setup() {
   $.fn.select2.defaults.formatNoMatches = 'Ei tuloksia'
   $.fn.select2.defaults.formatSearching = 'Haetaan...'
   $.fn.select2.defaults.adaptDropdownCssClass = function(c) {  return c == 'required' ? c : null }
+  $.dateRangePickerLanguages.fi = {
+    'selected': 'Valittu:',
+    'day':'Päivä',
+    'days': ' päivää',
+    'apply': 'Sulje',
+    'week-1' : 'MA',
+    'week-2' : 'TI',
+    'week-3' : 'KE',
+    'week-4' : 'TO',
+    'week-5' : 'PE',
+    'week-6' : 'LA',
+    'week-7' : 'SU',
+    'month-name': ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
+    'shortcuts' : 'Valitse',
+    'past': 'Past',
+    'following':'Seuraavat',
+    'previous' : 'edellinen',
+    'prev-week' : 'viikko',
+    'prev-month' : 'kuukausi',
+    'prev-year' : 'vuosi',
+    'next':'seuraava',
+    'next-week':'viikko',
+    'next-month':'kuukausi',
+    'next-year':'vuosi',
+    'less-than' : 'Date range should not be more than %d days',
+    'more-than' : 'Date range should not be less than %d days',
+    'default-more' : 'Please select a date range longer than %d days',
+    'default-single' : 'Please select a date',
+    'default-less' : 'Please select a date range less than %d days',
+    'default-range' : 'Please select a date range between %d and %d days',
+    'default-default': 'Ole hyvä ja valitse alku- ja loppupäivä'
+  }
 
   var login = loginPage()
   var error = errorDialog()
@@ -115,38 +147,6 @@ function navi() {
 
 function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
 function billingPage() {
-  $.dateRangePickerLanguages.fi = {
-    'selected': 'Valittu:',
-    'day':'Päivä',
-    'days': ' päivää',
-    'apply': 'Sulje',
-    'week-1' : 'MA',
-    'week-2' : 'TI',
-    'week-3' : 'KE',
-    'week-4' : 'TO',
-    'week-5' : 'PE',
-    'week-6' : 'LA',
-    'week-7' : 'SU',
-    'month-name': ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
-    'shortcuts' : 'Valitse',
-    'past': 'Past',
-    'following':'Seuraavat',
-    'previous' : 'edellinen',
-    'prev-week' : 'viikko',
-    'prev-month' : 'kuukausi',
-    'prev-year' : 'vuosi',
-    'next':'seuraava',
-    'next-week':'viikko',
-    'next-month':'kuukausi',
-    'next-year':'vuosi',
-    'less-than' : 'Date range should not be more than %d days',
-    'more-than' : 'Date range should not be less than %d days',
-    'default-more' : 'Please select a date range longer than %d days',
-    'default-single' : 'Please select a date',
-    'default-less' : 'Please select a date range less than %d days',
-    'default-range' : 'Please select a date range between %d and %d days',
-    'default-default': 'Ole hyvä ja valitse alku- ja loppupäivä'
-  }
 
   var $page = $('#billing-page')
   var $datePicker = $page.find('.datepicker')
@@ -154,6 +154,10 @@ function billingPage() {
 
   $datePicker.click(function(e) {
     e.preventDefault()
+  })
+
+  $page.on('click', 'input[name="account-select"]', function(e) {
+    $(this).parent().find('.rows input[name="row-select"]').prop('checked', $(this).prop('checked'))
   })
 
   $datePicker.dateRangePicker({

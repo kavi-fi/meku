@@ -150,7 +150,6 @@ function billingPage() {
 
   var $page = $('#billing-page')
   var $datePicker = $page.find('.datepicker')
-  var formatWire = "MM-DD-YYYY"
   var format = 'DD.MM.YYYY'
 
   $datePicker.click(function(e) {
@@ -174,8 +173,8 @@ function billingPage() {
   fetchInvoiceRows(first, last)
 
   function fetchInvoiceRows(date1, date2) {
-    var begin = moment(date1).format(formatWire)
-    var end = moment(date2).format(formatWire)
+    var begin = moment(date1).format(format)
+    var end = moment(date2).format(format)
     $.get('/invoicerows/' + begin + '/' + end).done(function(rows) {
       var $accounts = $page.find('.accounts')
       var accounts = _.groupBy(rows, function(x) { return x.account.name })

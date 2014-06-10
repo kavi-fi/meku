@@ -127,7 +127,7 @@ function billingPage() {
     'week-5' : 'PE',
     'week-6' : 'LA',
     'week-7' : 'SU',
-    'month-name': ['Maaliskuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
+    'month-name': ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
     'shortcuts' : 'Valitse',
     'past': 'Past',
     'following':'Seuraavat',

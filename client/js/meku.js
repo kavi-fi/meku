@@ -150,6 +150,7 @@ function billingPage() {
 
   var $page = $('#billing-page')
   var $datePicker = $page.find('.datepicker')
+  var $loadButton = $page.find('button')
   var format = 'DD.MM.YYYY'
 
   $datePicker.click(function(e) {
@@ -172,6 +173,14 @@ function billingPage() {
     fetchInvoiceRows(obj.date1, obj.date2)
   })
 
+  function toggleLoadButton() {
+    if ($page.find('.rows input[type=checkbox]:checked').length > 0) {
+      $loadButton.show()
+    } else {
+      $loadButton.hide()
+    }
+  }
+
   function fetchInvoiceRows(date1, date2) {
     var begin = moment(date1).format(format)
     var end = moment(date2).format(format)
@@ -179,6 +188,7 @@ function billingPage() {
       var $accounts = $page.find('.accounts')
       var accounts = _.groupBy(rows, function(x) { return x.account.name })
       $accounts.empty()
+
       _.pairs(accounts).forEach(function(account) {
         var name = account[0]
         var rows = account[1]
@@ -197,7 +207,9 @@ function billingPage() {
         })
         $rows.find('tfoot span').text(formatCentsAsEuros(_.reduce(rows, function(acc, row) { return acc + row.price }, 0)))
         $accounts.append($account)
+
       })
+      toggleLoadButton()
     })
   }
 

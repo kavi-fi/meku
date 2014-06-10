@@ -587,6 +587,7 @@ textarea.invalid:disabled,
 #billing-page table .price { text-align: right; }
 #billing-page table tfoot .total { text-align: right; }
 #billing-page table tfoot .total span { font-weight: bold; }
+#billing-page .hide {display: none;}
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

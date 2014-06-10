@@ -81,7 +81,11 @@ var validateProgram = map(compose([
     flatMap(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
       var validCriteria = enums.classificationCriteria.map(function(x) { return x.id })
       var errors = _.flatten(p.criteria.map(function(c) {
-        return and(requiredAttr('KRITEERI'), attrInList('KRITEERI', validCriteria))(c).errors
+        return and(requiredAttr('KRITEERI'), function(xml) {
+          var criteria = parseInt(xml.$.KRITEERI)
+          if (_.contains(validCriteria, criteria)) return ok({})
+          else return error('Virheellinen attribuutti KRITEERI ' + criteria)
+        })(c).errors
       }))
       if (errors.length > 0) return function() { return {program: {}, errors: errors } }
       var criteriaComments = _.object(p.criteria.map(function (c) {

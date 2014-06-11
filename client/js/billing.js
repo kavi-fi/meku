@@ -2,6 +2,8 @@ function billingPage() {
   var $page = $('#billing-page')
   var $datePicker = $page.find('.datepicker')
   var $proeButton = $page.find('button')
+  var $accounts = $page.find('.accounts')
+  var detailRenderer = programBox()
   var format = 'DD.MM.YYYY'
 
   $page.on('click', 'input[name=invoiceId]', toggleLoadButton)
@@ -9,6 +11,16 @@ function billingPage() {
   $page.on('click', 'input[name="account-select"]', function() {
     $(this).parent().find('.rows input[name=invoiceId]').prop('checked', $(this).prop('checked'))
     toggleLoadButton()
+  })
+
+  $page.on('click', '.name', function() {
+    var $row = $(this).parents('tr')
+    if ($row.hasClass('selected')) {
+      closeDetail()
+    } else {
+      closeDetail()
+      $.get('/programs/' + $(this).data('id')).done(function (p) { openDetail($row, p) })
+    }
   })
 
   $datePicker.dateRangePicker({
@@ -47,7 +59,7 @@ function billingPage() {
           $row
             .find('input[type=checkbox]').val(row._id).end()
             .find('.type').text(enums.invoiceRowType[row.type]).end()
-            .find('.name').text(row.name).end()
+            .find('.name').text(row.name).data('id', row.program).end()
             .find('.duration').text(utils.secondsToDuration(row.duration)).end()
             .find('.registrationDate').text(moment(row.registrationDate).format(format)).end()
             .find('.price').text(formatCentsAsEuros(row.price)).end()
@@ -62,6 +74,17 @@ function billingPage() {
 
   function formatCentsAsEuros(cents) {
     return cents / 100 + ' €'
+  }
+
+  function openDetail($row, program) {
+    var $detail = detailRenderer.render(program)
+    $row.addClass('selected').after($detail)
+    $detail.wrap('<tr><td colspan="6" class="program-box-container"></td></tr>').slideDown()
+  }
+
+  function closeDetail() {
+    $accounts.find('.rows tr.selected').removeClass('selected')
+    $accounts.find('.program-box').slideUp(function() { $(this).parents('.program-box-container').remove() }).end()
   }
 
   $page.on('show', function(e, begin, end) {

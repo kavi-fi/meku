@@ -179,7 +179,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .program-box .agelimit, .program-box .warning { margin-right: 8px; }
 .program-box .status { display: inline-block; font-size: 14px; white-space: nowrap; }
 .program-box .status span { display: block; }
-.program-box h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding-right: 15px; }
+.program-box h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding: 0 15px 0 0; border-bottom: none; }
 .program-box h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
 .program-box label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
 .program-box .hide { display: none; }
@@ -582,13 +582,14 @@ textarea.invalid:disabled,
 #billing-page table { margin-left: 50px; width: 100%; }
 #billing-page table thead th, #billing-page table tbody td { padding: 4px; }
 #billing-page table tbody td.type { width: 200px; }
-#billing-page table tbody td.name { width: 410px; }
+#billing-page table tbody td.name { width: 410px; color: #00BB88; cursor: pointer; }
 #billing-page table .duration { text-align: right; }
 #billing-page table .registrationDate { text-align: right; }
 #billing-page table .price { text-align: right; }
 #billing-page table tfoot .total { text-align: right; }
 #billing-page table tfoot .total span { font-weight: bold; }
 #billing-page .hide {display: none;}
+#billing-page .program-box-container { padding: 0 0 10px 0; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

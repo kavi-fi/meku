@@ -13,7 +13,7 @@ function billingPage() {
     toggleLoadButton()
   })
 
-  $page.on('click', '.name', function() {
+  $page.on('click', '.rows .name', function() {
     var $row = $(this).parents('tr')
     if ($row.hasClass('selected')) {
       closeDetail()

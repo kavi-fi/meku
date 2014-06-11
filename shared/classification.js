@@ -172,7 +172,7 @@ exports.classificationPrice = function(duration) {
 
   if (duration == 0) return priceList[0][2] * 100
 
-  if (duration > (240 * 60)) return 1.82 * (duration / 60)
+  if (duration > (240 * 60)) return Math.round(1.82 * (duration / 60))
 
   var price = _.find(priceList, function(price) {
     var min = (price[0] * 60), max = (price[1] * 60)

@@ -249,9 +249,11 @@ function validateTextChange($el, validatorFn) {
 }
 
 function requiredCheckboxGroup($el) {
-  $el.on('change validate', 'input:checkbox', function() {
+  function validate() {
     $el.toggleClass('invalid', $el.find('input:checkbox:checked').length == 0).trigger('validation')
-  })
+  }
+  $el.on('validate', validate)
+  $el.on('change validate', 'input:checkbox', validate)
 }
 
 function showDialog($html) {

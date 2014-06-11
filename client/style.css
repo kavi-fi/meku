@@ -361,6 +361,7 @@ textarea.invalid:disabled,
 #program-details .tv-episode-field { display: none; }
 #program-details.type-tv-episode .tv-episode-field { display: block; }
 #program-details.type-tv-episode .tv-field { display: block; }
+#program-details.type-tv-episode .non-tv-episode-field { display: none; }
 
 #program-details .movie-field { display: none; }
 #program-details.type-movie .movie-field { display: block; }

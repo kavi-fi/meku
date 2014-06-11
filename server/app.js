@@ -192,6 +192,7 @@ app.get('/invoicerows/:begin/:end', function(req, res, next) {
 app.post('/proe', express.urlencoded(), function(req, res, next) {
   var dates = { begin: req.body.begin, end: req.body.end }
   var invoiceIds = req.body.invoiceId
+  if (!Array.isArray(invoiceIds)) invoiceIds = [invoiceIds]
   InvoiceRow.find({ _id: { $in: invoiceIds }}).sort('registrationDate').lean().exec(function(err, rows) {
     var accountIds = _(rows).map(function(i) { return i.account._id.toString() }).uniq().value()
     Account.find({ _id: { $in: accountIds } }).lean().exec(function(err, accounts) {

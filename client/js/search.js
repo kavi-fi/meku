@@ -7,11 +7,11 @@ function searchPage() {
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
   var $loading = $page.find('.loading')
-  var $detailTemplate = $('#templates > .search-result-details').detach()
 
   var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
   var $newClassificationButton = $page.find('.new-classification button')
 
+  var detailRenderer = programBox()
   var state = { q:'', page: 0 }
 
   $page.on('show', function(e, q, filters, programId) {
@@ -69,7 +69,7 @@ function searchPage() {
   })
 
   $results.on('click', 'button.reclassify', function(e) {
-    var id = $(this).parents('.search-result-details').data('id')
+    var id = $(this).parents('.program-box').data('id')
     $.post('/programs/' + id + '/reclassification').done(function(program) {
       $('body').children('.page').hide()
       $('#classification-page').trigger('show', program._id).show()
@@ -77,7 +77,7 @@ function searchPage() {
   })
 
   $results.on('click', 'button.continue-classification', function(e) {
-    var id = $(this).parents('.search-result-details').data('id')
+    var id = $(this).parents('.program-box').data('id')
     $('body').children('.page').hide()
     $('#classification-page').trigger('show', id).show()
   })
@@ -135,14 +135,23 @@ function searchPage() {
   function openDetail($row, animate) {
     var p = $row.data('program')
     updateLocationHash(p._id)
-    var $details = renderDetails(p)
+    var $details = detailRenderer.render(p)
+    toggleDetailButtons($details, p)
     $row.addClass('selected').after($details)
     animate ? $details.slideDown() : $details.show()
   }
 
   function closeDetail() {
     $results.find('.result.selected').removeClass('selected')
-    $results.find('.search-result-details').slideUp(function() { $(this).remove() }).end()
+    $results.find('.program-box').slideUp(function() { $(this).remove() }).end()
+  }
+
+  function toggleDetailButtons($detail, p) {
+    var head = p.classifications[0]
+    var canContinue = head && head.status == 'in_process' && (hasRole('kavi') || !head.author || head.author._id == user._id)
+    var canReclassify = !canContinue && (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered' && head.status != 'in_process'))
+    $detail.find('button.continue-classification').toggle(!!canContinue)
+    $detail.find('button.reclassify').toggle(!!canReclassify)
   }
 
   function updateLocationHash(selectedProgramId) {
@@ -187,63 +196,5 @@ function searchPage() {
         return x
       }
     }
-  }
-
-  function renderDetails(p) {
-    var names = { n: p.name.join(', '), fi: p.nameFi.join(', '), sv: p.nameSv.join(', '), other: p.nameOther.join(', ')}
-    var series = p.series && p.series.name || undefined
-    var episode = utils.seasonEpisodeCode(p)
-    var classificationStatusText = classification.fullStatus(p.classifications).map(function(t) { return $('<span>').text(t) })
-    var $e = $detailTemplate.clone()
-      .data('id', p._id)
-      .find('.primary-name').text(p.name[0]).end()
-      .find('.name').text(names.n).end()
-      .find('.nameFi').text(names.fi).end()
-      .find('.nameSv').text(names.sv).prev().toggleClass('hide', !names.sv).end().end()
-      .find('.nameOther').text(names.other).prev().toggleClass('hide', !names.other).end().end()
-      .find('.series').text(series).prev().toggleClass('hide', !series).end().end()
-      .find('.episode').text(episode).prev().toggleClass('hide', !episode).end().end()
-      .find('.country').text(enums.util.toCountryString(p.country)).end()
-      .find('.year').text(p.year).end()
-      .find('.productionCompanies').text(p.productionCompanies.join(', ')).end()
-      .find('.genre').text(p.genre.join(', ') || p.legacyGenre.join(', ')).end()
-      .find('.directors').text(p.directors.join(', ')).prev().toggleClass('hide', p.directors.length == 0).end().end()
-      .find('.actors').text(p.actors.join(', ')).prev().toggleClass('hide', p.actors.length == 0).end().end()
-      .find('.synopsis').text(p.synopsis).end()
-      .find('.status').html(classificationStatusText).end()
-
-    var c = classification.mostValid(p.classifications)
-    if (c) {
-      var summary = classification.summary(p, c)
-      $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
-        .find('.warnings').html(warningIcons(summary)).end()
-        .find('.reason').text(enums.reclassificationReason[c.reason]).prev().toggleClass('hide', c.reason == undefined).end().end()
-        .find('.author').text(c.author ? c.author.name : '').prev().toggleClass('hide', c.author == undefined).end()
-        .find('.authorOrganization').text(enums.authorOrganization[c.authorOrganization]).prev().toggleClass('hide', c.authorOrganization == undefined).end().end()
-        .find('.buyer').text(c.buyer && c.buyer.name || '').end()
-        .find('.billing').text(c.billing && c.billing.name || '').end()
-        .find('.format').text(enums.util.isGameType(p) && p.gameFormat || c.format).end()
-        .find('.duration').text(c.duration).prev().toggleClass('hide', c.duration == undefined).end().end()
-        .find('.criteria').html(renderClassificationCriteria(c)).end()
-    }
-
-    var head = p.classifications[0]
-    var canContinue = head && head.status == 'in_process' && (hasRole('kavi') || !head.author || head.author._id == user._id)
-    var canReclassify = !canContinue && (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered' && head.status != 'in_process'))
-    $e.find('button.continue-classification').toggle(!!canContinue)
-    $e.find('button.reclassify').toggle(!!canReclassify)
-
-    return $e
-  }
-
-  function renderClassificationCriteria(c) {
-    if (!c.criteria) return ''
-    return c.criteria.map(function(id) {
-      var cr = enums.classificationCriteria[id - 1]
-      var category = enums.classificationCategoriesFI[cr.category]
-      return $('<div>')
-        .append($('<label>').text(category + ' ('+cr.id+')'))
-        .append($('<span>').text(c.criteriaComments && c.criteriaComments[cr.id] || ''))
-    })
   }
 }

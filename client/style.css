@@ -173,19 +173,19 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page .result.selected { border-bottom: none; }
 #search-page .highlight { color: #00BB88; }
 
-.search-result-details { display: none; background: #fff; padding: 20px 30px 50px 40px; font-size: 13px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); }
-.search-result-details .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
-.search-result-details .warning-summary { vertical-align: middle; margin-right: 14px; }
-.search-result-details .agelimit, .search-result-details .warning { margin-right: 8px; }
-.search-result-details .status { display: inline-block; font-size: 14px; white-space: nowrap; }
-.search-result-details .status span { display: block; }
-.search-result-details h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding-right: 15px; }
-.search-result-details h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
-.search-result-details label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
-.search-result-details .hide { display: none; }
-.search-result-details .criteria label { text-transform: capitalize; }
-.search-result-details .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
-.search-result-details button.reclassify, .search-result-details button.continue-classification { display: none; float: right; }
+.program-box { display: none; background: #fff; padding: 20px 30px 50px 40px; font-size: 13px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); }
+.program-box .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
+.program-box .warning-summary { vertical-align: middle; margin-right: 14px; }
+.program-box .agelimit, .program-box .warning { margin-right: 8px; }
+.program-box .status { display: inline-block; font-size: 14px; white-space: nowrap; }
+.program-box .status span { display: block; }
+.program-box h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding-right: 15px; }
+.program-box h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
+.program-box label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
+.program-box .hide { display: none; }
+.program-box .criteria label { text-transform: capitalize; }
+.program-box .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
+.program-box button.reclassify, .program-box button.continue-classification { display: none; float: right; }
 
 #classification-page input[type=text],
 #classification-page input[type=number],

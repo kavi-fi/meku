@@ -57,6 +57,12 @@ utils.secondsToDuration = function(seconds) {
   return time
 }
 
+utils.hasRole = function (user, role) {
+  var roles = ['root', 'kavi', 'user']
+  if (!user) return false
+  return roles.indexOf(role) >= roles.indexOf(user.role)
+}
+
 if (isNodeJs()) module.exports = utils
 
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

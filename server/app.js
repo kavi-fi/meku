@@ -126,7 +126,7 @@ app.post('/programs/:id/register', function(req, res, next) {
       } else {
         InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(function(err, saved) {
           if (err) return next(err)
-          if (req.user.role === 'kavi') {
+          if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
             var classificationPrice = classification.classificationPrice(parseInt(seconds))
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)

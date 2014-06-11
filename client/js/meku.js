@@ -313,7 +313,5 @@ function parseUserCookie() {
 }
 
 function hasRole(role) {
-  var roles = ['root', 'kavi', 'user']
-  if (!user) return false
-  return roles.indexOf(role) >= roles.indexOf(user.role)
+  return utils.hasRole(user, role)
 }

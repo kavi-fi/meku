@@ -282,7 +282,9 @@ function classificationPage() {
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
     $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGameType(program))
     $form.find('input[name=gameFormat]').prop('disabled', isReclassification || !enums.util.isGameType(program))
-    $form.find('input[name="classifications.0.format"], input[name="classifications.0.duration"]').prop('disabled', enums.util.isGameType(program))
+    $form.find('input[name="classifications.0.format"]').prop('disabled', enums.util.isGameType(program))
+    var enableDuration = !enums.util.isGameType(program) || hasRole('kavi')
+    $form.find('input[name="classifications.0.duration"]').prop('disabled', !enableDuration).parent().toggle(enableDuration)
 
     currentClassification.criteria.forEach(function(id) {
       $form.find('.criteria[data-id=' + id + ']').addClass('selected')

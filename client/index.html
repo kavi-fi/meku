@@ -156,10 +156,14 @@
           <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
           <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="hidden" />
         </div>
-        <div class="right non-game-field">
-          <label>Ohjelman formaatti</label><input name="classifications.0.format" class="required format" type="hidden"/>
-          <label>Kesto</label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
-          <span class="duration-hint">hh:mm:ss</span>
+        <div class="right">
+          <div class="non-game-field">
+            <label>Ohjelman formaatti</label><input name="classifications.0.format" class="required format" type="hidden"/>
+          </div>
+          <div>
+            <label><span class="game-field">Luokittelun kesto</span><span class="non-game-field">Kesto</span></label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
+            <span class="duration-hint">hh:mm:ss</span>
+          </div>
         </div>
       </div>
     </div>

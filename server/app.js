@@ -128,7 +128,7 @@ app.post('/programs/:id/register', function(req, res, next) {
           if (err) return next(err)
           if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
-            var classificationPrice = classification.classificationPrice(seconds)
+            var classificationPrice = classification.price(program, seconds)
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
             callback(null)

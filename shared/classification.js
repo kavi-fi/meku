@@ -155,9 +155,17 @@ exports.createNew = function(user) {
   }
 }
 
-exports.classificationPrice = function(duration) {
-  // https://kavi.fi/fi/meku/kuvaohjelmat/maksut
 
+exports.price = function(program, duration) {
+  // https://kavi.fi/fi/meku/kuvaohjelmat/maksut
+  return enums.util.isGameType(program) ? exports.gameClassificationPrice(duration) : exports.classificationPrice(duration)
+}
+
+exports.gameClassificationPrice = function(duration) {
+  return Math.min(80 + (~~(duration / (30 * 60))) * 36, 370) * 100
+}
+
+exports.classificationPrice = function(duration) {
   // min, max, price €
   var priceList = [
     [0, 30, 55],

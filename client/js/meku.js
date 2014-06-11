@@ -59,7 +59,7 @@ function setup() {
 
   var navigation = navi()
   searchPage()
-  programDetails()
+  classificationPage()
   buyerPage()
   billingPage()
   navigation.start()

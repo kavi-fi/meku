@@ -1,4 +1,4 @@
-function programDetails() {
+function classificationPage() {
   var $root = $('#classification-page')
   var $form = $('#program-details')
   var $summary = $('.summary')

@@ -7,8 +7,6 @@ var ObjectId = mongoose.Schema.Types.ObjectId
 var Schema = mongoose.Schema
 var bcryptSaltFactor = 12
 
-var address = { street: String, city: String, zip: String, country: String }
-
 var classification = {
   emekuId: { type: String, index: true },
   author: {_id: ObjectId, name: String},
@@ -85,7 +83,7 @@ var Account = exports.Account = mongoose.model('accounts', {
   name: {type: String, index: true},
   roles: [String],
   yTunnus: String,
-  billing: address,
+  billing: { street: String, city: String, zip: String, country: String, language: String, invoiceText: String },
   eInvoice: { address:String, operator:String },
   emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],

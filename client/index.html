@@ -93,7 +93,6 @@
   </div>
 
   <div id="classification-page" class="page">
-
   <form id="program-details" data-id="">
     <div class="row">
       <div class="program-info form content">
@@ -264,9 +263,13 @@
   <div id="billing-page" class="page">
     <div class="row">
       <div class="content">
-        <p>Rekisteröinnit ja luokittelut väliltä <a class="datepicker" href="#"><span></span><i class="icon-calendar"></i></a></p>
-        <div class="accounts"></div>
-        <button class="hide">Luo Proe-tiedosto</button>
+        <p>Rekisteröinnit ja luokittelut väliltä <span class="datepicker"><span></span><i class="icon-calendar"></i></span></p>
+        <form method="POST" action="/proe">
+          <input type="hidden" name="begin" />
+          <input type="hidden" name="end" />
+          <div class="accounts"></div>
+          <button class="hide">Luo Proe-tiedosto</button>
+        </form>
       </div>
     </div>
   </div>
@@ -363,7 +366,7 @@
     <div class="invoicerow">
       <table>
         <tr>
-          <td><input type="checkbox" name="row-select" checked="checked" /></td>
+          <td><input type="checkbox" name="invoiceId" checked="checked" /></td>
           <td class="type"></td>
           <td class="name"></td>
           <td class="duration"></td>

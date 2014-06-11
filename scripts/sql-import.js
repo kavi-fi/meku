@@ -270,13 +270,16 @@ function accounts(callback) {
 
   function accountBase(callback) {
     var q = 'select id, name, customer_type, sic_code,' +
-      ' bills_lang, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
+      ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator' +
       ' from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
     function onRow(row) {
       return {
-        emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code), billingLanguage: trim(row.bills_lang),
-        billing: { street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: trim(row.billing_address_country) },
+        emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        billing: {
+          street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: trim(row.billing_address_country),
+          language: trim(row.bills_lang), invoiceText: trim(row.bills_text)
+        },
         eInvoice: { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
       }
     }

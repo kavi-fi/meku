@@ -146,19 +146,18 @@ function navi() {
 }
 
 function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
-function billingPage() {
 
+function billingPage() {
   var $page = $('#billing-page')
   var $datePicker = $page.find('.datepicker')
-  var $loadButton = $page.find('button')
+  var $proeButton = $page.find('button')
   var format = 'DD.MM.YYYY'
 
-  $datePicker.click(function(e) {
-    e.preventDefault()
-  })
+  $page.on('click', 'input[name=invoiceId]', toggleLoadButton)
 
-  $page.on('click', 'input[name="account-select"]', function(e) {
-    $(this).parent().find('.rows input[name="row-select"]').prop('checked', $(this).prop('checked'))
+  $page.on('click', 'input[name="account-select"]', function() {
+    $(this).parent().find('.rows input[name=invoiceId]').prop('checked', $(this).prop('checked'))
+    toggleLoadButton()
   })
 
   $datePicker.dateRangePicker({
@@ -174,17 +173,16 @@ function billingPage() {
   })
 
   function toggleLoadButton() {
-    if ($page.find('.rows input[type=checkbox]:checked').length > 0) {
-      $loadButton.show()
-    } else {
-      $loadButton.hide()
-    }
+    $proeButton.toggle($page.find('.rows input[type=checkbox]:checked').length > 0)
   }
 
   function fetchInvoiceRows(date1, date2) {
     var begin = moment(date1).format(format)
     var end = moment(date2).format(format)
+    location.hash = '#laskutus/'+begin+'/'+end
     $.get('/invoicerows/' + begin + '/' + end).done(function(rows) {
+      $page.find('input[name=begin]').val(begin)
+      $page.find('input[name=end]').val(end)
       var $accounts = $page.find('.accounts')
       var accounts = _.groupBy(rows, function(x) { return x.account.name })
       $accounts.empty()
@@ -198,6 +196,7 @@ function billingPage() {
         rows.forEach(function(row) {
           var $row = $("#templates").find('.invoicerow tr').clone()
           $row
+            .find('input[type=checkbox]').val(row._id).end()
             .find('.type').text(enums.invoiceRowType[row.type]).end()
             .find('.name').text(row.name).end()
             .find('.duration').text(utils.secondsToDuration(row.duration)).end()
@@ -207,7 +206,6 @@ function billingPage() {
         })
         $rows.find('tfoot span').text(formatCentsAsEuros(_.reduce(rows, function(acc, row) { return acc + row.price }, 0)))
         $accounts.append($account)
-
       })
       toggleLoadButton()
     })
@@ -217,12 +215,16 @@ function billingPage() {
     return cents / 100 + ' €'
   }
 
-  $page.on('show', function() {
-    location.hash = '#laskutus'
-    var first = moment().subtract('months', 1).startOf('month')
-    var last = moment().subtract('months', 1).endOf('month')
-    $datePicker.data('dateRangePicker').setDateRange(first.format(format),last.format(format))
-    fetchInvoiceRows(first, last)
+  $page.on('show', function(e, begin, end) {
+    if (begin && end) {
+      begin = moment(begin, format)
+      end = moment(end, format)
+    } else {
+      begin = moment().subtract('months', 1).startOf('month')
+      end = moment().subtract('months', 1).endOf('month')
+    }
+    $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
+    fetchInvoiceRows(begin, end)
   })
 }
 

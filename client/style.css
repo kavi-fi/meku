@@ -565,6 +565,7 @@ textarea.invalid:disabled,
 #email .emails input.email.invalid.touched { background-color: #F0FFF0; }
 
 #billing-page .datepicker {
+  cursor: pointer;
   border: 1px solid #ccc;
   border-radius: 3px;
   background-color: #e1e1e1;

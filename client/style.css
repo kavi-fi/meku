@@ -592,6 +592,7 @@ textarea.invalid:disabled,
 #billing-page table tfoot .total span { font-weight: bold; }
 #billing-page .hide {display: none;}
 #billing-page .program-box-container { padding: 0 0 10px 0; }
+#billing-page .deselected td + td { opacity: 0.4; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

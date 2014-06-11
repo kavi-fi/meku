@@ -6,10 +6,18 @@ function billingPage() {
   var detailRenderer = programBox()
   var format = 'DD.MM.YYYY'
 
-  $page.on('click', 'input[name=invoiceId]', toggleLoadButton)
+  $page.on('click', 'input[name=invoiceId]', function() {
+    updateSum($(this).parents('.rows'))
+    $(this).parents('tr').toggleClass('deselected', !$(this).prop('checked'))
+    toggleLoadButton()
+  })
 
   $page.on('click', 'input[name="account-select"]', function() {
-    $(this).parent().find('.rows input[name=invoiceId]').prop('checked', $(this).prop('checked'))
+    var check = $(this).prop('checked')
+    var $rows = $(this).parent().find('.rows')
+    $rows.find('input[name=invoiceId]').prop('checked', check)
+    $rows.find('tbody tr').toggleClass('deselected', !check)
+    updateSum($rows)
     toggleLoadButton()
   })
 
@@ -35,10 +43,6 @@ function billingPage() {
     fetchInvoiceRows(obj.date1, obj.date2)
   })
 
-  function toggleLoadButton() {
-    $proeButton.toggle($page.find('.rows input[type=checkbox]:checked').length > 0)
-  }
-
   function fetchInvoiceRows(date1, date2) {
     var begin = moment(date1).format(format)
     var end = moment(date2).format(format)
@@ -56,7 +60,7 @@ function billingPage() {
         $account.find('.name').text(name)
         rows.forEach(function(row) {
           var $row = $("#templates").find('.invoicerow tr').clone()
-          $row
+          $row.data(row)
             .find('input[type=checkbox]').val(row._id).end()
             .find('.type').text(enums.invoiceRowType[row.type]).end()
             .find('.name').text(row.name).data('id', row.program).end()
@@ -65,15 +69,24 @@ function billingPage() {
             .find('.price').text(formatCentsAsEuros(row.price)).end()
           $rows.find('tbody').append($row)
         })
-        $rows.find('tfoot span').text(formatCentsAsEuros(_.reduce(rows, function(acc, row) { return acc + row.price }, 0)))
+        updateSum($rows)
         $accounts.append($account)
       })
       toggleLoadButton()
     })
   }
 
+  function toggleLoadButton() {
+    $proeButton.toggle($page.find('.rows input[type=checkbox]:checked').length > 0)
+  }
+
+  function updateSum($rows) {
+    var sum = $rows.find('input[name=invoiceId]:checked').parents('tr').map(function() { return $(this).data().price }).toArray().reduce(function(a,b) { return a + b }, 0)
+    $rows.find('tfoot span').text(formatCentsAsEuros(sum))
+  }
+
   function formatCentsAsEuros(cents) {
-    return cents / 100 + ' €'
+    return (cents / 100).toFixed(2) + ' €'
   }
 
   function openDetail($row, program) {

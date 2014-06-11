@@ -251,6 +251,8 @@ function classificationPage() {
       .find('input[name=gameFormat]').trigger('setVal', program.gameFormat).end()
       .find('input[name=genre]').trigger('setVal', program.genre).end()
 
+      .find('span.author').text(user.name).end()
+
       .find('input[name="classifications.0.reason"]').trigger('setVal', reasonVal).end()
       .find('input[name="classifications.0.authorOrganization"]').trigger('setVal', authorOrgVal).end()
       .find('input[name="classifications.0.format"]').trigger('setVal', currentClassification.format).end()

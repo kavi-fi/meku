@@ -102,8 +102,8 @@ exports.registrationEmail = function(program, user) {
   var subject = "Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>"
   var text =
     "<p><%- date %><br/><%- buyer %></p><p>" +
-    (isReclassification(program) ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta</p>") +
-    ((user.role == 'kavi') ? "<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
+    (isReclassification(program) ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
+    "<p>" + ((user.role == 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
     ' on <%- date %> luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
     ((user.role == 'kavi' && isReclassification(program)) ? '<p>Syy uudelleenluokittelulle: <%- reason %>. Perustelut: <%- publicComments %></p>' : '') +
     ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +

@@ -218,6 +218,7 @@ function searchPage() {
       $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
         .find('.warnings').html(warningIcons(summary)).end()
         .find('.reason').text(enums.reclassificationReason[c.reason]).prev().toggleClass('hide', c.reason == undefined).end().end()
+        .find('.author').text(c.author ? c.author.name : '').prev().toggleClass('hide', c.author == undefined).end()
         .find('.authorOrganization').text(enums.authorOrganization[c.authorOrganization]).prev().toggleClass('hide', c.authorOrganization == undefined).end().end()
         .find('.buyer').text(c.buyer && c.buyer.name || '').end()
         .find('.billing').text(c.billing && c.billing.name || '').end()

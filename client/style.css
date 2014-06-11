@@ -582,7 +582,7 @@ textarea.invalid:disabled,
 #billing-page table { margin-left: 50px; width: 100%; }
 #billing-page table thead th, #billing-page table tbody td { padding: 4px; }
 #billing-page table tbody td.type { width: 200px; }
-#billing-page table tbody td.name { width: 420px; }
+#billing-page table tbody td.name { width: 410px; }
 #billing-page table .duration { text-align: right; }
 #billing-page table .registrationDate { text-align: right; }
 #billing-page table .price { text-align: right; }

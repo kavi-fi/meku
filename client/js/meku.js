@@ -183,11 +183,9 @@ function billingPage() {
     $.get('/invoicerows/' + begin + '/' + end).done(function(rows) {
       $page.find('input[name=begin]').val(begin)
       $page.find('input[name=end]').val(end)
-      var $accounts = $page.find('.accounts')
-      var accounts = _.groupBy(rows, function(x) { return x.account.name })
-      $accounts.empty()
+      var $accounts = $page.find('.accounts').empty()
 
-      _.pairs(accounts).forEach(function(account) {
+      _(rows).groupBy(function(x) { return x.account.name }).pairs().sortBy(function(t) { return t[0] }).forEach(function(account) {
         var name = account[0]
         var rows = account[1]
         var $account = $("#templates").find('.invoice-account').clone()

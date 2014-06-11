@@ -186,17 +186,22 @@ app.get('/invoicerows/:begin/:end', function(req, res, next) {
   var format = "DD.MM.YYYY"
   var begin = moment(req.params.begin, format)
   var end = moment(req.params.end, format).add('days', 1)
-  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}, respond(res, next))
+  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').exec(respond(res, next))
 })
 
 app.post('/proe', express.urlencoded(), function(req, res, next) {
   var dates = { begin: req.body.begin, end: req.body.end }
   var invoiceIds = req.body.invoiceId
-  InvoiceRow.find({ _id: { $in: invoiceIds }}).lean().exec(function(err, rows) {
+  InvoiceRow.find({ _id: { $in: invoiceIds }}).sort('registrationDate').lean().exec(function(err, rows) {
     var accountIds = _(rows).map(function(i) { return i.account._id.toString() }).uniq().value()
     Account.find({ _id: { $in: accountIds } }).lean().exec(function(err, accounts) {
       var accountMap = _.indexBy(accounts, '_id')
-      var data = _(rows).groupBy(function(x) { return x.account._id }).pairs().map(function(t) { return { account: accountMap[t[0]], rows: t[1] } }).value()
+
+      function accountId(row) { return row.account._id }
+      function toNamedTuple(pair) { return { account: accountMap[pair[0]], rows: pair[1] } }
+      function accountName(tuple) { return tuple.account.name }
+
+      var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
       var result = proe(dates, data)
       res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
       res.setHeader('Content-Type', 'text/plain')

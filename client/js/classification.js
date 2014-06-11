@@ -29,6 +29,7 @@ function classificationPage() {
       // we only care about the original element from which the invalid class has been removed
       .not('.select2-container.required.invalid')
       .not('input:disabled, textarea:disabled')
+      .not('.reclassification:not(:visible) .required.invalid')
     $submit.prop('disabled', required.length > 0)
   })
 
@@ -220,6 +221,7 @@ function classificationPage() {
     $(window).scrollTop(0)
     var currentClassification = _.first(program.classifications)
     var isReclassification = classification.isReclassification(program)
+    var isExternalReclassification = isReclassification && user.role == 'user'
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
@@ -269,7 +271,11 @@ function classificationPage() {
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
-    $buyer.add($billing).select2('enable', !isReclassification || classification.isRemediationRequest(currentClassification.reason))
+    $buyer.add($billing).select2('enable', (!isReclassification || classification.isRemediationRequest(currentClassification.reason)) || isExternalReclassification)
+
+    if (isExternalReclassification) {
+      $form.find('.author-and-reason ').hide()
+    }
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
     $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGameType(program))

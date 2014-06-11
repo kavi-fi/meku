@@ -31,7 +31,7 @@ utils.seasonEpisodeCode = function(p) {
 }
 
 utils.isValidDuration = function(txt) {
-  var m = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(txt)
+  var m = /(?:(\d+)?:)(\d+):(\d+)$/.exec(txt)
   if (m) {
     var mins = parseInt(m[2])
     var seconds = parseInt(m[3])

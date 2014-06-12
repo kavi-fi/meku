@@ -214,6 +214,12 @@ $.fn.throttledInput = function(fn) {
   })
 }
 
+function renderWarningSummary(summary) {
+  return $('#templates > .warning-summary').clone()
+    .find('.agelimit').attr('src', ageLimitIcon(summary)).end()
+    .find('.warnings').html(warningIcons(summary)).end()
+}
+
 function ageLimitIcon(summary) {
   return 'images/agelimit-'+summary.age.toString().toLowerCase()+'.png'
 }

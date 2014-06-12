@@ -166,9 +166,9 @@ function searchPage() {
       .data('program', p)
       .append($('<span>').text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>').text(countryAndYear(p)))
-      .append($('<span>').text(classification.ageLimit(c)))
-      .append($('<span>').text(enums.programType[p.programType].fi))
       .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
+      .append($('<span>').text(enums.programType[p.programType].fi))
+      .append($('<span>').append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
 
     function name(p) {
       return _.compact([p.name[0], utils.seasonEpisodeCode(p)]).join(' ')

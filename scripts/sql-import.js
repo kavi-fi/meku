@@ -278,7 +278,7 @@ function accounts(callback) {
         emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
         billing: {
           street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: trim(row.billing_address_country),
-          language: trim(row.bills_lang), invoiceText: trim(row.bills_text)
+          language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text)
         },
         eInvoice: { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
       }
@@ -366,6 +366,8 @@ function accounts(callback) {
   function setApiToken(accountEmekuId, callback) {
     schema.Account.update({ emekuId: accountEmekuId }, { apiToken: mongoose.Types.ObjectId().toString() }, callback)
   }
+
+  function langCode(lang) { return lang == 'Swedish' ? 'SE' : 'FI' }
 }
 
 function nameIndex(callback) {

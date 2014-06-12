@@ -112,7 +112,7 @@ function createProe(dateRange, accountRows) {
   }
 
   function languageCode(lang) {
-    return [0, 'fi', 'sv', 'en'].indexOf(lang || 'fi')
+    return [0, 'FI', 'SE', 'EN'].indexOf(lang || 'FI')
   }
 
   function hasEInvoice(account) {

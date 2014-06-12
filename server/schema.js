@@ -83,7 +83,7 @@ var Account = exports.Account = mongoose.model('accounts', {
   name: {type: String, index: true},
   roles: [String],
   yTunnus: String,
-  billing: { street: String, city: String, zip: String, country: String, language: String, invoiceText: String },
+  billing: { street: String, city: String, zip: String, country: String, language: String, invoiceText: String }, // lang in [FI,SV,EN]
   eInvoice: { address:String, operator:String },
   emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],

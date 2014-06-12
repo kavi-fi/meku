@@ -52,6 +52,8 @@ function classificationPage() {
         ]))
         .append($('<p>', {class: 'registration-date'}).text(classification.status(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
+      $("#search-page").trigger('show').show()
+      $(window).scrollTop(0)
     })
   })
 

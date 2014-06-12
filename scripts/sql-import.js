@@ -277,7 +277,7 @@ function accounts(callback) {
       return {
         emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
         billing: {
-          street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: trim(row.billing_address_country),
+          street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)),
           language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text)
         },
         eInvoice: { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
@@ -368,6 +368,23 @@ function accounts(callback) {
   }
 
   function langCode(lang) { return lang == 'Swedish' ? 'SE' : 'FI' }
+
+  function legacyCountryToCode(country) {
+    if (!country) return 'FI'
+    var mapping = {
+      'suomi': 'FI',
+      'finland': 'FI',
+      'helsinki': 'FI',
+      'ahvenanmaa': 'FI',
+      'united kingdom': 'GB',
+      'sweden': 'SE',
+      'sverige': 'SE',
+      'denmark': 'DK'
+    }
+    var result = mapping[country.toLowerCase()]
+    if (!result) throw new Error('No legacyCountryCode for "'+country+'"')
+    return result
+  }
 }
 
 function nameIndex(callback) {

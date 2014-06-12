@@ -38,7 +38,11 @@ function programBox() {
         .find('.billing').text(c.billing && c.billing.name || '').end()
         .find('.format').text(enums.util.isGameType(p) && p.gameFormat || c.format).end()
         .find('.duration').text(c.duration).prev().toggleClass('hide', c.duration == undefined).end().end()
+        .find('.comments').text(c.comments).end()
         .find('.criteria').html(renderClassificationCriteria(c)).end()
+
+      var $comments = $e.find('.comments')
+      $comments.add($comments.prev()).toggleClass('hide', !hasRole('kavi'))
     }
     return $e
   }

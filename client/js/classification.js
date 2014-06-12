@@ -46,10 +46,7 @@ function classificationPage() {
       var summary = classification.summary(data, data.classifications[0])
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
         .append($('<span>', {class: 'name'}).text(data.name))
-        .append($('<div>', {class: 'agelimit warning-summary'}).append([
-          $('<img>', {src: ageLimitIcon(summary) }),
-          $('<div>', {class: 'warnings'}).html(warningIcons(summary))
-        ]))
+        .append(renderWarningSummary(summary))
         .append($('<p>', {class: 'registration-date'}).text(classification.status(data.classifications[0])))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
       $("#search-page").trigger('show').show()

@@ -25,6 +25,11 @@ $.fn.throttledInput = function(fn) {
   })
 }
 
+$.fn.labeledText = function(txt) {
+  this.text(txt).add(this.prev()).toggleClass('hide', !txt)
+  return this
+}
+
 function renderWarningSummary(summary) {
   return $('#templates > .warning-summary').clone()
     .find('.agelimit').attr('src', ageLimitIcon(summary)).end()

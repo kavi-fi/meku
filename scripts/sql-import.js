@@ -21,6 +21,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
 
  Should remove programs which have no classifications? -> ~7400
    check how many are tv-series-names?
+ Pre-deployment: Check that sequence start numbers are ok.
 */
 
 var tasks = {
@@ -66,11 +67,12 @@ function run(job, callback) {
 }
 
 function base(callback) {
+  var seq = 1
   var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where program_type != "11" and deleted != "1"'
   batchInserter(q, programMapper, 'Program', callback)
 
   function programMapper(row) {
-    var obj = { emekuId: row.id }
+    var obj = { emekuId: row.id, sequenceId:seq++ }
     obj.programType = enums.legacyProgramTypes[row.program_type] || 0
     if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
     if (row.year && row.year != 'undefined') obj.year = row.year
@@ -266,16 +268,17 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens, accountSequence], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens], callback)
 
   function accountBase(callback) {
+    var seq = 1
     var q = 'select id, name, customer_type, sic_code,' +
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator' +
       ' from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
     function onRow(row) {
       return {
-        emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        emekuId: row.id, sequenceId:seq++, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
         billing: {
           street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)),
           language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text)
@@ -331,19 +334,6 @@ function accounts(callback) {
     // yle, nelonenmedia, mtv
     var ids = ['cd5ad00f-3632-3f57-cc9e-4e770b9eeef9', '1db92ef2-ab3d-950d-e053-4e82f88d1df0', 'ae57bb17-a9f2-1f09-a928-4e97f008b792']
     async.forEach(ids, setApiToken, callback)
-  }
-
-  function accountSequence(callback) {
-    schema.Account.find({}, function(err, docs) {
-      if (err) callback(new Error())
-      async.forEach(docs, function(doc, callback) {
-        schema.Sequence.next('Account', function(err, seq) {
-          if (err) callback(new Error())
-          doc.sequenceId = seq
-          doc.save(callback)
-        })
-      }, callback)
-    })
   }
 
   function idToEmailMapper(row, result) {
@@ -474,9 +464,9 @@ function linkCustomersIds(callback) {
 }
 
 function sequences(callback) {
-  async.forEach(['Account', 'Program'], createSequence, callback)
+  async.forEach([[500, 'Account'], [100000, 'Program']], createSequence, callback)
 
-  function createSequence(s, callback) { new schema.Sequence({ _id: s, seq: 0 }).save(callback) }
+  function createSequence(t, callback) { new schema.Sequence({ _id: t[1], seq: t[0] }).save(callback) }
 }
 
 function batcher(num) {

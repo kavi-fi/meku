@@ -31,6 +31,7 @@ var classification = {
 
 var ProgramSchema = new Schema({
   emekuId: { type: String, index: true },
+  sequenceId: { type: Number, index: { unique: true } },
   customersId: { account: ObjectId, id: String },
   allNames: { type: [String], index: true },
   name: { type: [String], index: true },
@@ -52,6 +53,8 @@ var ProgramSchema = new Schema({
   season: String, episode: String, series: { _id: ObjectId, name: String }
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
+ProgramSchema.pre('save', ensureSequenceId('Program'))
+
 ProgramSchema.methods.populateAllNames = function(callback) {
   var program = this
   if (program.series._id) {
@@ -85,9 +88,9 @@ Program.publicFields = {
   'classifications.comments':0, 'classifications.criteriaComments':0
 }
 
-var Account = exports.Account = mongoose.model('accounts', {
+var AccountSchema = new Schema({
   emekuId: String,
-  sequenceId: Number,
+  sequenceId: { type: Number, index: { unique: true } },
   name: {type: String, index: true},
   roles: [String],
   yTunnus: String,
@@ -97,6 +100,8 @@ var Account = exports.Account = mongoose.model('accounts', {
   users: [{ _id: ObjectId, name: String }],
   apiToken: String
 })
+var Account = exports.Account = mongoose.model('accounts', AccountSchema)
+AccountSchema.pre('save', ensureSequenceId('Account'))
 
 var Provider = exports.Provider = mongoose.model('providers', {
   emekuId: String,
@@ -138,6 +143,7 @@ var InvoiceSchema = new Schema({
   account: {_id: ObjectId, name: String},
   type: String, // registration, classification, reclassification or distributor fee
   program: ObjectId,
+  programSequenceId: Number,
   name: String,
   duration: Number,
   registrationDate: {type: Date, index: true},
@@ -146,7 +152,7 @@ var InvoiceSchema = new Schema({
 
 InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, price) {
   var row = new this({
-    type: rowType, program: program._id,
+    type: rowType, program: program._id, programSequenceId: program.sequenceId,
     name: program.name, duration: durationSeconds, price: price,
     registrationDate: program.classifications[0].registrationDate
   })
@@ -195,3 +201,15 @@ SequenceSchema.statics.next = function(seqName, callback) {
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
 var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence]
+
+function ensureSequenceId(sequenceName) {
+  return function(next) {
+    var me = this
+    if (me.sequenceId) return next()
+    Sequence.next(sequenceName, function (err, seq) {
+      if (err) return next(err)
+      me.sequenceId = seq
+      next()
+    })
+  }
+}

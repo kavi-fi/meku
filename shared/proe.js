@@ -77,7 +77,7 @@ function createProe(dateRange, accountRows) {
   }
 
   function billingRow(id, invoice) {
-    var txt = ' ' + [invoice.program, moment(invoice.registrationDate).format(dateFormat), invoice.name].join(' ')
+    var txt = ' ' + [invoice.programSequenceId, moment(invoice.registrationDate).format(dateFormat), invoice.name].join(' ')
     return header(id, '2')
       + '00' // alv-koodi
       + pad(txt, 65)

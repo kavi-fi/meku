@@ -20,7 +20,9 @@
     $(function() {
       loadTemplates(function() {
         publicSearchPage()
-        $('#search-page').trigger('show').show()
+        var hash = parseLocationHash()
+        if (hash) hash.shift()
+        $('#search-page').trigger('show', hash).show()
       })
     })
   </script>

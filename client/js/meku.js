@@ -127,13 +127,12 @@ function navi() {
   })
 
   function start() {
-    var hash = location.hash
-    if (hash == '') {
+    var hash = parseLocationHash()
+    if (!hash) {
       $navi.find('a:first').click()
     } else {
-      var parts = hash.split('/').map(decodeURIComponent)
-      var $a = $navi.find('a[href='+parts.shift()+']')
-      show($a).trigger('show', parts)
+      var $a = $navi.find('a[href='+hash.shift()+']')
+      show($a).trigger('show', hash)
     }
   }
 

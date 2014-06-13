@@ -23,6 +23,8 @@ function classificationPage() {
     $form.find('.private-comments').toggle(hasRole('kavi'))
   })
 
+  $form.find('textarea').autosize()
+
   $form.on('validation', function() {
     var required = $form.find('.required.invalid, .required-pseudo.invalid')
       .not('.exclude')
@@ -300,6 +302,7 @@ function classificationPage() {
     $form.find('.required').trigger('validate')
     updateSummary(program)
     preview.reset(program)
+    $form.find('textarea').trigger('autosize.resize')
   }
 
   function selectEnumAutocomplete(opts) {

@@ -353,6 +353,7 @@ textarea.invalid:disabled,
 
 #program-details { display: none; }
 
+#program-details textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
 #program-details label { width: 145px; }
 #program-details label[for=synopsis] { vertical-align: top; padding-top: 9px; }
 

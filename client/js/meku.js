@@ -48,7 +48,7 @@ function setup() {
   $(document).ajaxError(function(e, req) {
     if (req.status == 403) {
       login.show()
-    } else {
+    } else if (req.statusText != 'abort') {
       error.show()
     }
   })
@@ -214,6 +214,18 @@ $.fn.throttledInput = function(fn) {
   })
 }
 
+function switchLatestDeferred() {
+  var current = null
+  return function(deferred, $spinner) {
+    if ($spinner) {
+      setTimeout(function() { if (deferred.state() == 'pending') $spinner.addClass('active') }, 150)
+      deferred.done(function() { $spinner.removeClass('active') })
+    }
+    if (current && current.state() == 'pending') current.abort()
+    return current = deferred
+  }
+}
+
 function renderWarningSummary(summary) {
   return $('#templates > .warning-summary').clone()
     .find('.agelimit').attr('src', ageLimitIcon(summary)).end()
@@ -239,4 +251,8 @@ function parseUserCookie() {
 
 function hasRole(role) {
   return utils.hasRole(user, role)
+}
+
+function spinner() {
+  return $('<div>', { class:'spinner' }).html('<span/><span/><span/>')
 }

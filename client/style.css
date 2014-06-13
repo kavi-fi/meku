@@ -579,6 +579,7 @@ textarea.invalid:disabled,
   text-decoration: none;
 }
 
+#billing-page .header { height: 30px; line-height: 30px; margin-bottom: 20px; }
 #billing-page .datepicker span { display: inline-block; margin-right: 5px; }
 #billing-page .datepicker i { color: #000; }
 #billing-page input[type=checkbox] { margin-right: 5px; }
@@ -603,3 +604,52 @@ textarea.invalid:disabled,
 .tt-suggestion { padding: 3px 20px;  }
 .tt-suggestion.tt-cursor { color: #fff; background-color: #0097cf; }
 .tt-suggestion p { margin: 0; }
+
+.spinner { display: none; height: 20px; width: 20px; position: relative; margin-left: 16px; vertical-align: text-bottom; }
+.spinner.active { display: inline-block; }
+.spinner span { position: absolute; display: block; background-color: #888888; width: 5px; height: 5px; border-radius: 2px; }
+.spinner span:nth-child(1) {
+  -webkit-animation-timing-function: cubic-bezier(0.5, 0.3, 0.9, 0.9);
+  -webkit-animation-name: rotate-spinner;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-transform-origin: 2px 10px;
+  animation-timing-function: cubic-bezier(0.5, 0.3, 0.9, 0.9);
+  animation-name: rotate-spinner;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  transform-origin: 2px 10px;
+
+}
+.spinner span:nth-child(2) {
+  -webkit-animation-timing-function: cubic-bezier(0.5, 0.5, 0.9, 0.9);
+  -webkit-animation-name: rotate-spinner;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-transform-origin: 2px 10px;
+  animation-timing-function: cubic-bezier(0.5, 0.5, 0.9, 0.9);
+  animation-name: rotate-spinner;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  transform-origin: 2px 10px;
+}
+.spinner span:nth-child(3) {
+  -webkit-animation-timing-function: cubic-bezier(0.5, 0.7, 0.9, 0.9);
+  -webkit-animation-name: rotate-spinner;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-transform-origin: 2px 10px;
+  animation-timing-function: cubic-bezier(0.5, 0.7, 0.9, 0.9);
+  animation-name: rotate-spinner;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  transform-origin: 2px 10px;
+}
+@-webkit-keyframes rotate-spinner {
+  0% { -webkit-transform: rotate(0deg) scale(1); }
+  100% { -webkit-transform: rotate(1440deg) scale(1); }
+}
+@keyframes rotate-spinner {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(1440deg) scale(1); }
+}

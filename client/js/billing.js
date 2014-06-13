@@ -6,6 +6,10 @@ function billingPage() {
   var detailRenderer = programBox()
   var format = 'DD.MM.YYYY'
 
+  var $spinner = spinner().appendTo($page.find('.header'))
+
+  var latestAjax = switchLatestDeferred()
+
   $page.on('click', 'input[name=invoiceId]', function() {
     updateSum($(this).parents('.rows'))
     $(this).parents('tr').toggleClass('deselected', !$(this).prop('checked'))
@@ -47,7 +51,7 @@ function billingPage() {
     var begin = moment(date1).format(format)
     var end = moment(date2).format(format)
     location.hash = '#laskutus/'+begin+'/'+end
-    $.get('/invoicerows/' + begin + '/' + end).done(function(rows) {
+    latestAjax($.get('/invoicerows/' + begin + '/' + end), $spinner).done(function(rows) {
       $page.find('input[name=begin]').val(begin)
       $page.find('input[name=end]').val(end)
       var $accounts = $page.find('.accounts').empty()

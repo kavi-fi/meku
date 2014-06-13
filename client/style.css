@@ -6,6 +6,7 @@ body {
   color: #444444;
 }
 
+.hide { display: none !important; }
 #login-overlay, #error-overlay { z-index: 2; }
 #login, #error-dialog { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
 #login > div, #error-dialog > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
@@ -184,7 +185,6 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .program-box h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding: 0 15px 0 0; border-bottom: none; }
 .program-box h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
 .program-box label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
-.program-box .hide { display: none; }
 .program-box .criteria label { text-transform: capitalize; }
 .program-box .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
 .program-box button.reclassify, .program-box button.continue-classification { display: none; float: right; }

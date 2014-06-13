@@ -29,7 +29,6 @@ function classificationPage() {
       // we only care about the original element from which the invalid class has been removed
       .not('.select2-container.required.invalid')
       .not('input:disabled, textarea:disabled')
-      .not('.reclassification:not(:visible) .required.invalid')
     $submit.prop('disabled', required.length > 0)
   })
 
@@ -274,10 +273,11 @@ function classificationPage() {
 
     $buyer.add($billing).select2('enable', (!isReclassification || classification.isRemediationRequest(currentClassification.reason)) || isExternalReclassification)
 
-    if (isExternalReclassification) {
-      $form.find('.author-and-reason ').hide()
-      $form.find('.comments .public-comments').hide()
-    }
+    $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
+      .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
+
+    $form.find('.author-and-reason ').toggleClass('hide', isExternalReclassification)
+      .find('input').select2('enable', !isExternalReclassification || isReclassification)
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
     $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGameType(program))

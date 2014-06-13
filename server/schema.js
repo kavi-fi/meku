@@ -81,6 +81,7 @@ Program.publicFields = {
   emekuId:0, customersId:0, allNames:0,
   'classifications.emekuId':0, 'classifications.author':0, 'classifications.format': 0,
   'classifications.billing': 0, 'classifications.buyer': 0, 'classifications.registrationEmailAddresses':0,
+  'classifications.authorOrganization': 0, 'classifications.reason': 0,
   'classifications.comments':0, 'classifications.criteriaComments':0
 }
 

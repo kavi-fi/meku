@@ -85,7 +85,7 @@ function searchPage(baseUrl) {
     $input.val(q || '').trigger('reset')
     setFilters(filters)
     queryChanged(q || '')
-    loadUntil(programId)
+    loadUntil(programId, function() { $input.focus() })
   })
 
   $button.click(function() { $input.trigger('fire') })
@@ -121,11 +121,11 @@ function searchPage(baseUrl) {
     $noResults.add($noMoreResults).hide()
   }
 
-  function loadUntil(selectedProgramId) {
+  function loadUntil(selectedProgramId, callback) {
     load(function() {
       if (!selectedProgramId) {
         updateLocationHash()
-        return
+        return callback()
       }
       var $selected = $results.find('.result[data-id='+selectedProgramId+']')
       if ($selected.length > 0) {
@@ -134,7 +134,7 @@ function searchPage(baseUrl) {
         $('body,html').animate({ scrollTop: top })
       } else if (state.page < 20) {
         state.page++
-        loadUntil(selectedProgramId)
+        loadUntil(selectedProgramId, callback)
       }
     })
   }

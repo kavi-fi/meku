@@ -10,6 +10,7 @@ function programBox() {
     var classificationStatusText = classification.fullStatus(p.classifications).map(function(t) { return $('<span>').text(t) })
     var $e = $detailTemplate.clone()
       .data('id', p._id)
+      .find('.sequenceId').text(p.sequenceId).end()
       .find('.primary-name').text(p.name[0]).end()
       .find('.name').text(names.n).end()
       .find('.nameFi').labeledText(names.fi).end()

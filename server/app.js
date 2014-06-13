@@ -71,9 +71,16 @@ function search(responseFields, req, res, next) {
   Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
   function query() {
+    var terms = req.params.q
     var q = { deleted: { $ne:true } }
-    var nameQuery = toMongoArrayQuery(req.params.q)
-    if (nameQuery) q.allNames = nameQuery
+    var nameQuery = toMongoArrayQuery(terms)
+    if (nameQuery) {
+      if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
+        q.$or = [{ allNames:nameQuery }, { sequenceId: terms }]
+      } else {
+        q.allNames = nameQuery
+      }
+    }
     if (filters.length > 0) q.programType = { $in: filters }
     return q
   }

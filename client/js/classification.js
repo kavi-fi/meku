@@ -295,6 +295,7 @@ function classificationPage() {
         $form.find('textarea[name="classifications.0.criteriaComments.'+id+'"]').val(txt).parents('.criteria').addClass('has-comment')
       }
     })
+
     $throttledAutoSaveFields.trigger('reset')
     $form.find('.required').trigger('validate')
     updateSummary(program)
@@ -501,6 +502,8 @@ function classificationPage() {
     function reset(program) {
       currentBuyerId = null
       $emails.find('ul').empty()
+      program.classifications[0].registrationEmailAddresses.map(function(e) { return e.email })
+        .forEach(addBuyerEmailCheckbox(true))
       updatePreview(program)
     }
 
@@ -515,6 +518,7 @@ function classificationPage() {
         $('<span>').text(email)
       ]))
     }
+
     var addBuyerEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.buyer'))
     var addManualEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.manual'))
 

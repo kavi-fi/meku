@@ -40,9 +40,6 @@ function programBox() {
         .find('.duration').labeledText(c.duration).end()
         .find('.comments').labeledText(c.comments).end()
         .find('.criteria').html(renderClassificationCriteria(c)).end()
-
-      var $comments = $e.find('.comments')
-      $comments.add($comments.prev()).toggleClass('hide', !c.comments || !hasRole('kavi'))
     }
     return $e
   }

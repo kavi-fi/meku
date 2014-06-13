@@ -57,24 +57,28 @@ app.post('/logout', function(req, res, next) {
   res.send({})
 })
 
-app.get('/public/search/:q?', search(Program.publicFields))
-app.get('/programs/search/:q?', search())
+app.get('/public/search/:q?', function(req, res, next) {
+  search(Program.publicFields, req, res, next)
+})
+app.get('/programs/search/:q?', function(req, res, next) {
+  var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
+  search(fields, req, res, next)
+})
 
-function search(responseFields) {
-  return function(req, res, next) {
-    var page = req.query.page || 0
-    var filters = req.query.filters || []
-    Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
+function search(responseFields, req, res, next) {
+  var page = req.query.page || 0
+  var filters = req.query.filters || []
+  Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
-    function query() {
-      var q = { deleted: { $ne:true } }
-      var nameQuery = toMongoArrayQuery(req.params.q)
-      if (nameQuery) q.allNames = nameQuery
-      if (filters.length > 0) q.programType = { $in: filters }
-      return q
-    }
+  function query() {
+    var q = { deleted: { $ne:true } }
+    var nameQuery = toMongoArrayQuery(req.params.q)
+    if (nameQuery) q.allNames = nameQuery
+    if (filters.length > 0) q.programType = { $in: filters }
+    return q
   }
 }
+
 app.get('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, respond(res, next))
 })

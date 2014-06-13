@@ -39,6 +39,7 @@ function programBox() {
         .find('.format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
         .find('.duration').labeledText(c.duration).end()
         .find('.comments').labeledText(c.comments).end()
+        .find('.publicComments').labeledText(c.publicComments).end()
         .find('.criteria').html(renderClassificationCriteria(c)).end()
     }
     return $e

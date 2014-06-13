@@ -82,9 +82,9 @@ function searchPage(baseUrl) {
   var state = { q:'', page: 0 }
 
   $page.on('show', function(e, q, filters, programId) {
-    $input.val(q || '').trigger('reset')
+    if (q) $input.val(q).trigger('reset')
     setFilters(filters)
-    queryChanged(q || '')
+    queryChanged($input.val().trim())
     loadUntil(programId, function() { $input.focus() })
   })
 

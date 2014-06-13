@@ -1,5 +1,75 @@
-function searchPage() {
+function publicSearchPage() {
+  searchPage('/public/search/')
+
   var $page = $('#search-page')
+  $page.find('.new-classification').remove()
+
+  $page.on('showDetails', '.program-box', function(e, program) {
+    var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program._id+']')
+    var subject = encodeURIComponent('Kuvaohjelman uudelleenluokittelupyyntö')
+    var q = '?subject='+subject+'&body='+body
+    $(this).find('.request-reclassification').attr('href', 'mailto:kavi@kavi.fi'+q).show()
+  })
+}
+
+function internalSearchPage() {
+  searchPage('/programs/search/')
+
+  var $page = $('#search-page')
+  var $results = $page.find('.results')
+  var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
+  var $newClassificationButton = $page.find('.new-classification button')
+
+  $newClassificationType.select2({
+    data: [
+      {id: 1, text: 'Elokuva'},
+      {id: 3, text: 'TV-sarjan jakso'},
+      {id: 4, text: 'Muu TV-ohjelma'},
+      {id: 5, text: 'Extra'},
+      {id: 6, text: 'Trailer'},
+      {id: 7, text: 'Peli'}
+    ]
+  }).select2('val', 1)
+
+  $page.on('showDetails', '.program-box', function(e, program) {
+    toggleDetailButtons($(this), program)
+  })
+
+  $newClassificationButton.click(function () {
+    var programType = $newClassificationType.select2('val')
+    $.post('/programs/new', JSON.stringify({ programType: programType })).done(function(program) {
+      showClassificationPage(program._id)
+    })
+  })
+
+  $results.on('click', 'button.reclassify', function(e) {
+    var id = $(this).parents('.program-box').data('id')
+    $.post('/programs/' + id + '/reclassification').done(function(program) {
+      showClassificationPage(program._id)
+    })
+  })
+
+  $results.on('click', 'button.continue-classification', function(e) {
+    var id = $(this).parents('.program-box').data('id')
+    showClassificationPage(id)
+  })
+
+  function toggleDetailButtons($detail, p) {
+    var head = p.classifications[0]
+    var canContinue = head && head.status == 'in_process' && (hasRole('kavi') || !head.author || head.author._id == user._id)
+    var canReclassify = !canContinue && (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered' && head.status != 'in_process'))
+    $detail.find('button.continue-classification').toggle(!!canContinue)
+    $detail.find('button.reclassify').toggle(!!canReclassify)
+  }
+
+  function showClassificationPage(programId) {
+    $('body').children('.page').hide()
+    $('#classification-page').trigger('show', programId).show()
+  }
+}
+
+function searchPage(baseUrl) {
+  var $page = $('#search-page').html($('#templates .search-page').clone())
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
   var $filters = $page.find('.filters input[type=checkbox]')
@@ -7,9 +77,6 @@ function searchPage() {
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
   var $loading = $page.find('.loading')
-
-  var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
-  var $newClassificationButton = $page.find('.new-classification button')
 
   var detailRenderer = programBox()
   var state = { q:'', page: 0 }
@@ -39,25 +106,6 @@ function searchPage() {
     load()
   })
 
-  $newClassificationType.select2({
-    data: [
-      {id: 1, text: 'Elokuva'},
-      {id: 3, text: 'TV-sarjan jakso'},
-      {id: 4, text: 'Muu TV-ohjelma'},
-      {id: 5, text: 'Extra'},
-      {id: 6, text: 'Trailer'},
-      {id: 7, text: 'Peli'}
-    ]
-  }).select2('val', 1)
-
-  $newClassificationButton.click(function() {
-    var programType = $newClassificationType.select2('val')
-    $.post('/programs/new', JSON.stringify({ programType: programType})).done(function(program) {
-      $('body').children('.page').hide()
-      $('#classification-page').trigger('show', program._id).show()
-    })
-  })
-
   $results.on('click', '.result', function() {
     if ($(this).hasClass('selected')) {
       updateLocationHash()
@@ -66,20 +114,6 @@ function searchPage() {
       closeDetail()
       openDetail($(this), true)
     }
-  })
-
-  $results.on('click', 'button.reclassify', function(e) {
-    var id = $(this).parents('.program-box').data('id')
-    $.post('/programs/' + id + '/reclassification').done(function(program) {
-      $('body').children('.page').hide()
-      $('#classification-page').trigger('show', program._id).show()
-    })
-  })
-
-  $results.on('click', 'button.continue-classification', function(e) {
-    var id = $(this).parents('.program-box').data('id')
-    $('body').children('.page').hide()
-    $('#classification-page').trigger('show', id).show()
   })
 
   function queryChanged(q) {
@@ -107,7 +141,7 @@ function searchPage() {
 
   function load(callback) {
     $loading.show()
-    var url = '/programs/search/'+encodeURIComponent(state.q)
+    var url = baseUrl+encodeURIComponent(state.q)
     var data = $.param({ page:state.page, filters:currentFilters() })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
@@ -136,22 +170,14 @@ function searchPage() {
     var p = $row.data('program')
     updateLocationHash(p._id)
     var $details = detailRenderer.render(p)
-    toggleDetailButtons($details, p)
     $row.addClass('selected').after($details)
     animate ? $details.slideDown() : $details.show()
+    $details.trigger('showDetails', p)
   }
 
   function closeDetail() {
     $results.find('.result.selected').removeClass('selected')
     $results.find('.program-box').slideUp(function() { $(this).remove() }).end()
-  }
-
-  function toggleDetailButtons($detail, p) {
-    var head = p.classifications[0]
-    var canContinue = head && head.status == 'in_process' && (hasRole('kavi') || !head.author || head.author._id == user._id)
-    var canReclassify = !canContinue && (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered' && head.status != 'in_process'))
-    $detail.find('button.continue-classification').toggle(!!canContinue)
-    $detail.find('button.reclassify').toggle(!!canReclassify)
   }
 
   function updateLocationHash(selectedProgramId) {

@@ -57,20 +57,24 @@ app.post('/logout', function(req, res, next) {
   res.send({})
 })
 
-app.get('/programs/search/:q?', function(req, res, next) {
-  var page = req.query.page || 0
-  var filters = req.query.filters || []
-  Program.find(query()).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
+app.get('/public/search/:q?', search(Program.publicFields))
+app.get('/programs/search/:q?', search())
 
-  function query() {
-    var q = { deleted: { $ne:true } }
-    var nameQuery = toMongoArrayQuery(req.params.q)
-    if (nameQuery) q.allNames = nameQuery
-    if (filters.length > 0) q.programType = { $in: filters }
-    return q
+function search(responseFields) {
+  return function(req, res, next) {
+    var page = req.query.page || 0
+    var filters = req.query.filters || []
+    Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
+
+    function query() {
+      var q = { deleted: { $ne:true } }
+      var nameQuery = toMongoArrayQuery(req.params.q)
+      if (nameQuery) q.allNames = nameQuery
+      if (filters.length > 0) q.programType = { $in: filters }
+      return q
+    }
   }
-})
-
+}
 app.get('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, respond(res, next))
 })
@@ -385,7 +389,11 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var whitelist = ['GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema', 'POST:/login', 'POST:/logout', 'POST:/xml']
+  var whitelist = [
+    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html', 'GET:/public/search/',
+    'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
+    'POST:/login', 'POST:/logout', 'POST:/xml'
+  ]
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

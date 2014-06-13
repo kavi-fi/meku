@@ -28,7 +28,7 @@ body {
 
 #templates { display: none; }
 
-button {
+button, a.button {
   border-radius: 3px;
   background: -o-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
   background: -moz-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
@@ -39,22 +39,23 @@ button {
   padding: 10px 20px;
   color: #fff;
 }
+a.button { text-decoration: none; }
 
-button:hover {
+button:hover, a.button:hover {
   border-radius: 3px;
   background: #00BB88;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20);
 }
 
-button:active {
+button:active, a.button:active {
   border-radius: 3px;
   background: #009966;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20);
 }
 
-button:focus { outline: none; }
+button:focus, a.button:focus { outline: none; }
 
-button[disabled=disabled], button:disabled { color: gray; }
+button[disabled=disabled], button:disabled, a.button.disabled { color: gray; }
 
 ol { list-style-type: none; margin: 0; }
 
@@ -187,7 +188,8 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .program-box label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
 .program-box .criteria label { text-transform: capitalize; }
 .program-box .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
-.program-box button.reclassify, .program-box button.continue-classification { display: none; float: right; }
+.program-box .buttons { float: right; }
+.program-box .buttons button, .program-box .buttons a { display: none }
 
 #classification-page input[type=text],
 #classification-page input[type=number],

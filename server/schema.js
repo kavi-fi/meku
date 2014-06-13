@@ -77,6 +77,13 @@ ProgramSchema.methods.populateAllNames = function(callback) {
 
 var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 
+Program.publicFields = {
+  emekuId:0, customersId:0, allNames:0,
+  'classifications.emekuId':0, 'classifications.author':0, 'classifications.format': 0,
+  'classifications.billing': 0, 'classifications.buyer': 0, 'classifications.registrationEmailAddresses':0,
+  'classifications.comments':0, 'classifications.criteriaComments':0
+}
+
 var Account = exports.Account = mongoose.model('accounts', {
   emekuId: String,
   sequenceId: Number,

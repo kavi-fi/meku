@@ -596,7 +596,7 @@ textarea.invalid:disabled,
 #billing-page table .duration { text-align: right; }
 #billing-page table .registrationDate { text-align: right; }
 #billing-page table .price { text-align: right; }
-#billing-page table tfoot .total { text-align: right; }
+#billing-page table tfoot .total { text-align: right; padding: 4px; }
 #billing-page table tfoot .total span { font-weight: bold; }
 #billing-page button { display: none; }
 #billing-page .program-box-container { padding: 0 0 10px 0; }

@@ -81,7 +81,7 @@ function billingPage() {
   }
 
   function toggleLoadButton() {
-    $proeButton.toggleClass('hide', $page.find('.rows input[type=checkbox]:checked').length == 0)
+    $proeButton.toggle($page.find('.rows input[type=checkbox]:checked').length > 0)
   }
 
   function updateSum($rows) {

@@ -598,7 +598,7 @@ textarea.invalid:disabled,
 #billing-page table .price { text-align: right; }
 #billing-page table tfoot .total { text-align: right; }
 #billing-page table tfoot .total span { font-weight: bold; }
-#billing-page .hide {display: none;}
+#billing-page button { display: none; }
 #billing-page .program-box-container { padding: 0 0 10px 0; }
 #billing-page .deselected td + td { opacity: 0.4; }
 

@@ -6,7 +6,7 @@ function billingPage() {
   var detailRenderer = programBox()
   var format = 'DD.MM.YYYY'
 
-  var $spinner = spinner().appendTo($page.find('.header'))
+  var $spinner = spinner().appendTo($page.find('.date-selection'))
 
   var latestAjax = switchLatestDeferred()
 

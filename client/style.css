@@ -583,7 +583,7 @@ textarea.invalid:disabled,
   text-decoration: none;
 }
 
-#billing-page .header { height: 30px; line-height: 30px; margin-bottom: 20px; }
+#billing-page .date-selection { height: 30px; line-height: 30px; margin-bottom: 20px; }
 #billing-page .datepicker span { display: inline-block; margin-right: 5px; }
 #billing-page .datepicker i { color: #000; }
 #billing-page input[type=checkbox] { margin-right: 5px; }

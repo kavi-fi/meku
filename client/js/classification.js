@@ -278,7 +278,7 @@ function classificationPage() {
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
       .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
 
-    $form.find('.author-and-reason ').toggleClass('hide', isExternalReclassification)
+    $form.find('.author-and-reason').toggleClass('hide', isExternalReclassification)
       .find('input').select2('enable', !isExternalReclassification || isReclassification)
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))

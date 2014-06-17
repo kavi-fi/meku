@@ -63,6 +63,11 @@ utils.hasRole = function (user, role) {
   return roles.indexOf(role) >= roles.indexOf(user.role)
 }
 
+utils.asDate = function (date) {
+  var df = 'D.M.YYYY [klo] H:mm'
+  return date ? moment(date).format(df) : ''
+}
+
 if (isNodeJs()) module.exports = utils
 
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

@@ -1,6 +1,7 @@
 if (typeof module !== 'undefined' && module.exports) {
   _ = require('lodash')
   enums = require('./enums')
+  utils = require('./utils')
 }
 
 (function(exports) {
@@ -41,16 +42,11 @@ var status = exports.status = function (classification) {
     case 'registered':
     case 'reclassification1':
     case 'reclassification3':
-      return 'Rekisteröity '+asDate(classification.registrationDate)
+      return 'Rekisteröity ' + utils.asDate(classification.registrationDate)
     case 'in_process':
-      return 'Luonnos tallennettu '+asDate(classification.creationDate)
+      return 'Luonnos tallennettu ' + utils.asDate(classification.creationDate)
     default:
       return 'Unknown status: '+classification.status
-  }
-
-  function asDate(date) {
-    var df = 'D.M.YYYY [klo] H:mm'
-    return date ? moment(date).format(df) : ''
   }
 }
 

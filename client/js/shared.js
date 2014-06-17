@@ -26,7 +26,7 @@ $.fn.throttledInput = function(fn) {
 }
 
 $.fn.labeledText = function(txt) {
-  this.text(txt).add(this.prev()).toggleClass('hide', !txt)
+  this.text(txt).add(this.prev('label')).toggleClass('hide', !txt)
   return this
 }
 

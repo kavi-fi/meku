@@ -177,20 +177,24 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 #search-page .result.selected { border-bottom: none; }
 #search-page .highlight { color: #00BB88; }
 
-.program-box { display: none; background: #fff; padding: 20px 30px 50px 40px; font-size: 13px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; }
+.program-box { display: none; background: #fff; padding: 20px 40px 50px 40px; font-size: 13px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; }
 .program-box .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
 .program-box .warning-summary { vertical-align: middle; margin-right: 14px; }
 .program-box .agelimit, .program-box .warning { margin-right: 8px; }
-.program-box .status { display: inline-block; font-size: 14px; white-space: nowrap; }
-.program-box .status span { display: block; }
-.program-box h2 { color: #000; font-weight: normal; display: inline-block; line-height: 40px; margin: 0; float:left; padding: 0 15px 0 0; border-bottom: none; }
+.program-box .classifications { display: inline-block; font-size: 14px; white-space: nowrap; }
+.program-box .classifications span { display: block; }
+.program-box .classifications a { color: #4499FF; }
+.program-box h2 { color: #000; font-weight: normal; margin: 0; padding: 0 15px 0 0; }
 .program-box h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
 .program-box label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
 .program-box .criteria label { text-transform: capitalize; }
-.program-box .column { display:inline-block; width: 200px; vertical-align:top; margin-right: 10px; }
+.program-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 .program-box .buttons { float: right; }
 .program-box .buttons button, .program-box .buttons a { display: none }
 .program-box .sequenceId { position: absolute; bottom: 5px; right: 5px; color: #d8d8d8; }
+.program-box .classification { color: #49f; cursor: pointer; text-decoration: underline; }
+.program-box .classification.selected { color: #0b8; text-decoration: none; cursor: default; }
+.program-box .classification.selected .icon-play { font-size: 10px; }
 
 #classification-page input[type=text],
 #classification-page input[type=number],
@@ -203,7 +207,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .form input:disabled, .form textarea:disabled {background-color: #f4f4f4; }
 
 #program-details .reclassification { display: none; }
-#program-details.reclassification .classification { display: none; }
+#program-details.reclassification .classifications { display: none; }
 #program-details.reclassification .reclassification { display: block; }
 #program-details.reclassification .reclassification label { width: 140px; }
 

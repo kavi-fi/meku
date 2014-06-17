@@ -464,7 +464,7 @@ function linkCustomersIds(callback) {
 }
 
 function sequences(callback) {
-  async.forEach([[500, 'Account'], [100000, 'Program']], createSequence, callback)
+  async.forEach([[500, 'Account'], [200000, 'Program']], createSequence, callback)
 
   function createSequence(t, callback) { new schema.Sequence({ _id: t[1], seq: t[0] }).save(callback) }
 }

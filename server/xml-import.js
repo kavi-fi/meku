@@ -72,11 +72,6 @@ var validateProgram = map(compose([
   map(required('LUOKITTELIJA', 'author'), function(p) { return { classification: { author: { name: p.author } } }}),
   format,
   node('LUOKITTELU', 'classification', [
-    and(requiredAttr('REKISTEROINTIPAIVA', 'registrationDate'), function(xml) {
-      var d = moment(xml.$.REKISTEROINTIPAIVA, "DD.MM.YYYY HH:mm:ss")
-      if (d.isValid()) return ok({ registrationDate: d.toDate() })
-      else return error("Virheellinen aikaformaatti: " + 'REKISTEROINTIPAIVA')
-    }),
     and(required('KESTO'), test('KESTO', utils.isValidDuration, "Virheellinen kesto", 'duration')),
     flatMap(childrenByNameTo('VALITTUTERMI', 'criteria'), function(p) {
       var validCriteria = enums.classificationCriteria.map(function(x) { return x.id })

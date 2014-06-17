@@ -55,11 +55,15 @@ function internalSearchPage() {
   })
 
   function toggleDetailButtons($detail, p) {
-    var head = p.classifications[0]
-    var canContinue = head && head.status == 'in_process' && (hasRole('kavi') || !head.author || head.author._id == user._id)
-    var canReclassify = !canContinue && (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered' && head.status != 'in_process'))
-    $detail.find('button.continue-classification').toggle(!!canContinue)
-    $detail.find('button.reclassify').toggle(!!canReclassify)
+    if (p.draftClassifications && p.draftClassifications[user._id]) {
+      $detail.find('button.continue-classification').show()
+      $detail.find('button.reclassify').hide()
+    } else {
+      var head = p.classifications[0]
+      var canReclassify = (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered'))
+      $detail.find('button.continue-classification').hide()
+      $detail.find('button.reclassify').toggle(!!canReclassify)
+    }
   }
 
   function showClassificationPage(programId) {

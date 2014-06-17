@@ -51,18 +51,12 @@ var status = exports.status = function (classification) {
 }
 
 exports.fullStatus = function(classifications) {
-  if (!classifications || classifications.length == 0) return ['Ei luokiteltu']
-  if (classifications.length == 1) return [status(classifications[0])]
-  var head = classifications[0]
-  if (head.status == 'in_process') {
-    return [status(classifications[1]), status(head)]
-  } else {
-    return [status(head)]
-  }
+  return ['classification.fullStatus is deprecated']
 }
 
-var isReclassification = exports.isReclassification = function(program) {
-  return program.classifications.length > 1
+var isReclassification = exports.isReclassification = function(program, classification) {
+  if (program.classifications.length == 0) return false
+  return _.any(program.classifications, function(c) { return String(classification._id) != String(c._id) })
 }
 
 exports.mostValid = function(classifications) {
@@ -92,16 +86,17 @@ var ageLimit = exports.ageLimit = function(classification) {
   }
 }
 
-exports.registrationEmail = function(program, user) {
+exports.registrationEmail = function(program, classification, user) {
   var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
   var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
   var subject = "Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>"
+  var reclassification = isReclassification(program, classification)
   var text =
     "<p><%- date %><br/><%- buyer %></p><p>" +
-    (isReclassification(program) ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
+    (reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
     "<p>" + ((user.role == 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
     ' on <%- date %> luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
-    ((user.role == 'kavi' && isReclassification(program)) ? '<p>Syy uudelleenluokittelulle: <%- reason %>. Perustelut: <%- publicComments %></p>' : '') +
+    ((user.role == 'kavi' && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>. Perustelut: <%- publicComments %></p>' : '') +
     ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
     '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
@@ -109,14 +104,14 @@ exports.registrationEmail = function(program, user) {
 
   var now = new Date()
   var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
-  var classification = _.first(program.classifications)
   var buyer = classification.buyer ? classification.buyer.name : ''
   var classificationSummary = summary(program, classification)
   var recipients = classification.registrationEmailAddresses.map(function(e) { return e.email })
 
   function previousRecipients(classifications) {
-    if (classifications.length > 1) {
-      return classifications[1].registrationEmailAddresses.map(function(email) { return email.email })
+    var old = _(classifications).filter(function(c) { return String(c._id) != String(classification._id) })
+    if (old.length > 1) {
+      return old[1].registrationEmailAddresses.map(function(email) { return email.email })
     } else {
       return []
     }
@@ -142,15 +137,6 @@ exports.registrationEmail = function(program, user) {
     body: _.template(text, data)
   }
 }
-
-exports.createNew = function(user) {
-  return {
-    creationDate: new Date(),
-    status: 'in_process',
-    author: { _id: user._id, name: user.name }
-  }
-}
-
 
 exports.price = function(program, duration) {
   // https://kavi.fi/fi/meku/kuvaohjelmat/maksut

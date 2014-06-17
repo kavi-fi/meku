@@ -155,16 +155,18 @@ function classificationPage() {
 
   selectAutocomplete({
     $el: $form.find('input[name="classifications.0.buyer"]'),
-    path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber' },
+    path: function (term) { return '/accounts/user/search?q=' + encodeURIComponent(term) + '&roles=Subscriber' },
     toOption: idNamePairToSelect2Option,
-    fromOption: select2OptionToIdNamePair
+    fromOption: select2OptionToIdNamePair,
+    termMinLength: 0
   })
 
   selectAutocomplete({
     $el: $form.find('input[name="classifications.0.billing"]'),
-    path: function (term) { return '/accounts/search/' + encodeURIComponent(term) + '?roles=Subscriber,Classifier' },
+    path: function (term) { return '/accounts/user/search?q=' + encodeURIComponent(term) + '&roles=Subscriber,Classifier' },
     toOption: idNamePairToSelect2Option,
-    fromOption: select2OptionToIdNamePair
+    fromOption: select2OptionToIdNamePair,
+    termMinLength: 0
   })
 
   selectAutocomplete({
@@ -337,7 +339,7 @@ function classificationPage() {
       fromOption: function(x) { return x.id },
       multiple: false,
       allowAdding: false,
-      termMinLength: 0
+      termMinLength: 1
     }
     opts = _.merge(defaults, opts)
 
@@ -352,7 +354,7 @@ function classificationPage() {
     $select.select2({
       query: function(query) {
         var len = $.trim(query.term).length
-        if (len === 0 || len < opts.termMinLength) {
+        if (len < opts.termMinLength) {
           return query.callback({results: []})
         }
         var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + query.term

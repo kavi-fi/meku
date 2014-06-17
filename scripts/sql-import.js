@@ -68,7 +68,7 @@ function run(job, callback) {
 
 function base(callback) {
   var seq = 1
-  var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where program_type != "11" and deleted != "1"'
+  var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where (program_type != "11" or program_type is null) and deleted != "1"'
   batchInserter(q, programMapper, 'Program', callback)
 
   function programMapper(row) {
@@ -161,7 +161,7 @@ function classifications(callback) {
         ' from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
-        ' where p.program_type != "11" and p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "in_pocess" and c.status != "in_process"')
+        ' where (p.program_type != "11" or p.program_type is null) and p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "in_pocess" and c.status != "in_process"')
       .stream()
       .pipe(consumer(function(row, done) {
         tick()

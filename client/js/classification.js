@@ -158,7 +158,7 @@ function classificationPage() {
     path: function (term) { return '/accounts/user/search?q=' + encodeURIComponent(term) + '&roles=Subscriber' },
     toOption: idNamePairToSelect2Option,
     fromOption: select2OptionToIdNamePair,
-    termMinLength: 0
+    termMinLength: hasRole('kavi') ? 1 : 0
   })
 
   selectAutocomplete({
@@ -166,7 +166,7 @@ function classificationPage() {
     path: function (term) { return '/accounts/user/search?q=' + encodeURIComponent(term) + '&roles=Subscriber,Classifier' },
     toOption: idNamePairToSelect2Option,
     fromOption: select2OptionToIdNamePair,
-    termMinLength: 0
+    termMinLength: hasRole('kavi') ? 1 : 0
   })
 
   selectAutocomplete({

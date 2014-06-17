@@ -209,7 +209,8 @@ app.get('/series/search/:query', function(req, res, next) {
 
 app.get('/accounts/user/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
-  var q = { 'users._id': req.user._id, roles: { $in: roles }}
+  var q = { roles: { $in: roles }}
+  if (!utils.hasRole(req.user, 'kavi')) q['users._id'] = req.user._id
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + req.query.q, 'i')
   Account.find(q).limit(20).exec(respond(res, next))
 })

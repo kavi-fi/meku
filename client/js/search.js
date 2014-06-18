@@ -32,9 +32,7 @@ function internalSearchPage() {
   }).select2('val', 1)
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    if (!enums.util.isTvSeriesName(program)) {
-      toggleDetailButtons($(this), program)
-    }
+    toggleDetailButtons($(this), program)
   })
 
   $newClassificationButton.click(function () {
@@ -57,14 +55,16 @@ function internalSearchPage() {
   })
 
   function toggleDetailButtons($detail, p) {
-    if (p.draftClassifications && p.draftClassifications[user._id]) {
-      $detail.find('button.continue-classification').show()
-      $detail.find('button.reclassify').hide()
-    } else {
-      var head = p.classifications[0]
-      var canReclassify = (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered'))
-      $detail.find('button.continue-classification').hide()
-      $detail.find('button.reclassify').toggle(!!canReclassify)
+    if (!enums.util.isTvSeriesName(p)) {
+      if (p.draftClassifications && p.draftClassifications[user._id]) {
+        $detail.find('button.continue-classification').show()
+        $detail.find('button.reclassify').hide()
+      } else {
+        var head = p.classifications[0]
+        var canReclassify = (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered'))
+        $detail.find('button.continue-classification').hide()
+        $detail.find('button.reclassify').toggle(!!canReclassify)
+      }
     }
   }
 

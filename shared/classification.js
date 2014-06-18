@@ -37,23 +37,6 @@ var criteriaText = exports.criteriaText = function(warnings) {
   return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
 }
 
-var status = exports.status = function (classification) {
-  switch (classification.status) {
-    case 'registered':
-    case 'reclassification1':
-    case 'reclassification3':
-      return 'Rekisteröity ' + utils.asDate(classification.registrationDate)
-    case 'in_process':
-      return 'Luonnos tallennettu ' + utils.asDate(classification.creationDate)
-    default:
-      return 'Unknown status: '+classification.status
-  }
-}
-
-exports.fullStatus = function(classifications) {
-  return ['classification.fullStatus is deprecated']
-}
-
 var isReclassification = exports.isReclassification = function(program, classification) {
   if (program.classifications.length == 0) return false
   return _.any(program.classifications, function(c) { return String(classification._id) != String(c._id) })

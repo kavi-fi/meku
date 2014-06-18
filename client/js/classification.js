@@ -391,7 +391,7 @@ function classificationPage() {
   }
 
   function idNamePairToSelect2Option(x) {
-    return {id: x._id, text: x.name}
+    return {id: x._id === null ? x.name : x._id, text: x.name}
   }
 
   function select2OptionToIdNamePair(x) {

@@ -268,7 +268,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoAccounts, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens], callback)
 
   function accountBase(callback) {
     var seq = 1
@@ -311,12 +311,6 @@ function accounts(callback) {
     batchUpdater(q, idToEmailMapper, singleFieldUpdater('User', 'emails'), callback)
   }
 
-  function demoUsers(callback) {
-    async.forEach(['root', 'kavi', 'user'], function(u, callback) {
-      new schema.User({ username:u, password:u, role:u, name:u, emails:[u+'@fake-meku.fi'] }).save(callback)
-    }, callback)
-  }
-
   function linkUserAccounts(callback) {
     conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and a.deleted != "1"')
       .stream()
@@ -328,6 +322,29 @@ function accounts(callback) {
     conn.query('select a.id as accountId, u.id as userId from users u join securitygroups_users sgu on (u.id = sgu.user_id) join securitygroups sg on (sg.id = sgu.securitygroup_id) join securitygroups_records sgr on (sg.id = sgr.securitygroup_id and sgr.module = "Accounts") join accounts a on (sgr.record_id = a.id) where sg.id != "8d4ad931-1055-a4f5-96da-4e3664911855" and u.deleted != "1" and sgu.deleted != "1" and sg.deleted != "1" and sgr.deleted != "1" and a.deleted != "1"')
       .stream()
       .pipe(consumer(pushUserToAccount, callback))
+  }
+
+  function demoAccounts(callback) {
+    var accounts = [
+      {name: "DEMO tilaaja 1", roles: ['Subscriber'], emailAddresses: [], users: [], yTunnus: 'DEMO1' },
+      {name: "DEMO tilaaja 2", roles: ['Subscriber'], emailAddresses: [], users: [], yTunnus: 'DEMO2' },
+      {name: "DEMO tilaaja 3", roles: ['Subscriber', 'Classifier'], emailAddresses: [], users: [], yTunnus: 'DEMO3' },
+    ]
+    async.each(accounts, function(a, callback) {
+      new schema.Account(a).save(callback)
+    }, callback)
+  }
+
+  function demoUsers(callback) {
+    async.forEach(['root', 'kavi', 'user'], function(u, callback) {
+      new schema.User({ username:u, password:u, role:u, name:u, emails:[u+'@fake-meku.fi'] }).save(function(err, saved) {
+        if (err) return callback(err)
+        var data = {_id: saved._id, name: saved.username}
+        async.eachSeries(['DEMO1', 'DEMO2', 'DEMO3'], function(y, callback) {
+          schema.Account.update({yTunnus: y}, { $addToSet: { users: data } }, callback)
+        }, callback)
+      })
+    }, callback)
   }
 
   function generateApiTokens(callback) {

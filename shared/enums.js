@@ -165,12 +165,17 @@ enums.reclassificationReason = {
   3: 'Oikaisupyyntö'
 }
 
+enums.isOikaisupyynto = function(c) { return c.reason === 3 }
+
 enums.authorOrganization = {
-  0: 'Luokittelija',
+  0: 'Ulkopuolinen',
   1: 'KAVIn virkailija',
   2: 'Kuvalautakunta',
   3: 'KHO'
 }
+
+enums.authorOrganizationIsExternal = function(c) { return !c.authorOrganization }
+enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }
 
 enums.invoiceRowType = {
   registration: 'Kuvaohjelman rekisteröinti',

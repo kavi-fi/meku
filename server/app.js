@@ -137,11 +137,12 @@ app.post('/programs/:id/register', function(req, res, next) {
       var seconds = durationToSeconds(currentClassification.duration)
 
       if (classification.isReclassification(program, currentClassification)) {
-        // reclassification fee only when "Oikaisupyyntö" and KAVI is the classifier
-        if (currentClassification.reason === 3 && currentClassification.authorOrganization === 1) {
+        if (enums.isOikaisupyynto(currentClassification) && enums.authorOrganizationIsKavi(currentClassification)) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
+        } else if (enums.authorOrganizationIsExternal(currentClassification)) {
+          InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(callback)
         } else {
-          callback(null)
+          callback()
         }
       } else {
         InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(function(err, saved) {
@@ -151,7 +152,7 @@ app.post('/programs/:id/register', function(req, res, next) {
             var classificationPrice = classification.price(program, seconds)
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
-            callback(null)
+            callback()
           }
         })
       }

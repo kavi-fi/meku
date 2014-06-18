@@ -92,12 +92,8 @@ exports.registrationEmail = function(program, classification, user) {
   var recipients = classification.registrationEmailAddresses.map(function(e) { return e.email })
 
   function previousRecipients(classifications) {
-    var old = _(classifications).filter(function(c) { return String(c._id) != String(classification._id) })
-    if (old.length > 1) {
-      return old[1].registrationEmailAddresses.map(function(email) { return email.email })
-    } else {
-      return []
-    }
+    var old = _.find(classifications, function(c) { return String(c._id) != String(classification._id) })
+    return old ? old.registrationEmailAddresses.map(function(email) { return email.email }) : []
   }
 
   var data = {

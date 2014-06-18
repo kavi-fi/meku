@@ -32,7 +32,9 @@ function internalSearchPage() {
   }).select2('val', 1)
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    toggleDetailButtons($(this), program)
+    if (!enums.util.isTvSeriesName(program)) {
+      toggleDetailButtons($(this), program)
+    }
   })
 
   $newClassificationButton.click(function () {

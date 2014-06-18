@@ -168,6 +168,7 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
       newClassification.registrationEmailAddresses = emails
       if (!program.draftClassifications) program.draftClassifications = {}
       program.draftClassifications[req.user._id] = newClassification
+      program.markModified('draftClassifications')
       program.save(respond(res, next))
     })
   })

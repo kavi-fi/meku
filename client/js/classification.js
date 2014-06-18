@@ -519,7 +519,9 @@ function classificationPage() {
     function reset(program) {
       currentBuyerId = null
       $emails.find('ul').empty()
-      draftClassification(program).registrationEmailAddresses.map(function(e) { return e.email })
+      draftClassification(program).registrationEmailAddresses
+        .filter(function(e) { return !e.manual })
+         .map(function(e) { return e.email })
         .forEach(addBuyerEmailCheckbox(true))
       updatePreview(program)
     }

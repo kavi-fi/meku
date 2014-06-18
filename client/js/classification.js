@@ -72,6 +72,7 @@ function classificationPage() {
   $form.on('click', '.category .criteria', function() {
     $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
     var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
+    if ($(this).hasClass('selected')) $(this).find('textarea').focus()
     saveProgramField($form.data('id'), 'classifications.0.criteria', ids)
   })
 

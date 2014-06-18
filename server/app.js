@@ -129,7 +129,8 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     function verifyTvSeries(program, callback) {
       if (!enums.util.isTvEpisode(program)) return callback()
-      createParentProgram(program, program.series.name.trim(), callback)
+      else if (program.series._id == null) createParentProgram(program, program.series.name.trim(), callback)
+      else return callback()
     }
 
     function addInvoicerows(currentClassification, callback) {

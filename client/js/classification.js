@@ -525,15 +525,8 @@ function classificationPage() {
     }
 
     function addEmailCheckbox($el, checked, email) {
-      $el.append($('<li>').html([
-        $('<input>', {
-          type: 'checkbox',
-          checked: checked || false,
-          name: 'classifications.0.registrationEmailAddresses',
-          value: email
-        }),
-        $('<span>').text(email)
-      ]))
+      var $input = $('<input>', { type: 'checkbox', checked: !!checked, name: 'classifications.0.registrationEmailAddresses', value: email })
+      $el.append($('<li>').append($('<label>').append($input).append($('<span>').text(email))))
     }
 
     var addBuyerEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.buyer'))

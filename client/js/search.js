@@ -54,8 +54,17 @@ function internalSearchPage() {
     showClassificationPage(id)
   })
 
+  $results.on('click', 'button.categorize', function(e) {
+    showCategorizationForm()
+  })
+
+
   function toggleDetailButtons($detail, p) {
-    if (enums.util.isTvSeriesName(p)) {
+    if (enums.util.isUnknown(p) && hasRole('kavi')) {
+      $detail.find('button.continue-classification').hide()
+      $detail.find('button.reclassify').hide()
+      $detail.find('button.categorize').show()
+    } else if (enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
     } else if (p.draftClassifications && p.draftClassifications[user._id]) {
@@ -72,6 +81,10 @@ function internalSearchPage() {
   function showClassificationPage(programId) {
     $('body').children('.page').hide()
     $('#classification-page').trigger('show', programId).show()
+  }
+
+  function showCategorizationForm() {
+    $('.categorization-form').show()
   }
 }
 

@@ -17,7 +17,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js sequences base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
+   node scripts/sql-import.js sequences base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted markUnclassifiedProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
 
  Should remove programs which have no classifications? -> ~7400
    check how many are tv-series-names?
@@ -33,6 +33,7 @@ var tasks = {
   nameIndex: nameIndex,
   wipeMetadataIndex: wipeMetadataIndex, metadataIndex: metadataIndex,
   markTrainingProgramsDeleted: markTrainingProgramsDeleted,
+  markUnclassifiedProgramsDeleted: markUnclassifiedProgramsDeleted,
   linkCustomersIds: linkCustomersIds,
   linkTvSeries: linkTvSeries
 
@@ -444,6 +445,10 @@ function markTrainingProgramsDeleted(callback) {
       schema.Program.update({ name:[] }, { deleted: 1 }, { multi:true }, callback)
     })
   })
+}
+
+function markUnclassifiedProgramsDeleted(callback) {
+  schema.Program.update({ 'classifications.0': { $exists: false } }, { $set: { deleted: true } }, callback)
 }
 
 function linkTvSeries(callback) {

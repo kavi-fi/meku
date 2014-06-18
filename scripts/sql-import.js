@@ -448,7 +448,8 @@ function markTrainingProgramsDeleted(callback) {
 }
 
 function markUnclassifiedProgramsDeleted(callback) {
-  schema.Program.update({ 'classifications.0': { $exists: false } }, { $set: { deleted: true } }, callback)
+  var q = { 'classifications.0': { $exists: false }, programType: { $ne: 2 } }
+  schema.Program.update(q, { $set: { deleted: true } }, { multi: true }, callback)
 }
 
 function linkTvSeries(callback) {

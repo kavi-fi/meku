@@ -127,12 +127,14 @@ function classificationPage() {
 
   selectEnumAutocomplete({
     $el: $form.find('input[name="classifications.0.reason"]'),
-    data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } })
+    data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } }),
+    fromOption: select2OptionToInt
   })
 
   selectEnumAutocomplete({
     $el: $form.find('input[name="classifications.0.authorOrganization"]'),
-    data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } })
+    data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } }),
+    fromOption: select2OptionToInt
   })
 
   selectEnumAutocomplete({
@@ -309,12 +311,15 @@ function classificationPage() {
   }
 
   function selectEnumAutocomplete(opts) {
-    opts.$el.select2({
+    opts = _.merge({
       data: opts.data,
       placeholder: 'Valitse...',
       multiple: opts.multiple || false,
-      initSelection: initSelection
-    }).on('change', onChange).on('setVal', setValue)
+      initSelection: initSelection,
+      fromOption: function(x) { return x.id },
+    }, opts)
+
+    opts.$el.select2(opts).on('change', onChange).on('setVal', setValue)
 
     function initSelection(e, callback) {
       return callback(opts.multiple ? (opts.val || []).map(idToOption) : idToOption(opts.val))
@@ -325,7 +330,8 @@ function classificationPage() {
     }
     function onChange() {
       var data = $(this).select2('data')
-      saveProgramField($form.data('id'), $(this).attr('name'), opts.multiple ? _.pluck(data, 'id') : data.id)
+      var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
+      saveProgramField($form.data('id'), $(this).attr('name'), val)
     }
     function setValue(e) {
       var arr = Array.prototype.slice.call(arguments, 1).map(idToOption)
@@ -391,6 +397,8 @@ function classificationPage() {
     if (!x) return null
     return { _id: x.isNew ? null : x.id, name: x.text }
   }
+
+  function select2OptionToInt(x) { return parseInt(x.id) }
 
   function renderClassificationCriteria() {
     enums.criteriaCategories.map(function(category) {

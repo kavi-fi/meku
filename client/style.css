@@ -207,7 +207,7 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .form input:disabled, .form textarea:disabled {background-color: #f4f4f4; }
 
 #program-details .reclassification { display: none; }
-#program-details.reclassification .classifications { display: none; }
+#program-details.reclassification .classification { display: none; }
 #program-details.reclassification .reclassification { display: block; }
 #program-details.reclassification .reclassification label { width: 140px; }
 

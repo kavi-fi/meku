@@ -93,8 +93,8 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-
-  var data = { classifications: [classification.createNew(req.user)], programType: programType }
+  var data = { draftClassifications: {}, programType: programType }
+  data.draftClassifications[req.user._id] = Program.createNewClassification(req.user)
   new Program(data).save(respond(res, next))
 })
 
@@ -102,17 +102,22 @@ app.post('/programs/:id/register', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
 
-    program.classifications[0].registrationDate = new Date()
-    program.classifications[0].status = 'registered'
-    program.classifications[0].author = { _id: req.user._id, name: req.user.name }
+    var newClassification = program.draftClassifications[req.user._id]
+    newClassification.registrationDate = new Date()
+    newClassification.status = 'registered'
+    newClassification.author = { _id: req.user._id, name: req.user.name }
+
+    delete program.draftClassifications[req.user._id]
+    program.classifications.unshift(newClassification)
+    program.markModified('draftClassifications')
 
     verifyTvSeries(program, function(err) {
       if (err) return next(err)
       program.save(function(err) {
         if (err) return next(err)
-        addInvoicerows(function(err, _) {
+        addInvoicerows(newClassification, function(err, _) {
           if (err) return next(err)
-          sendEmail(classification.registrationEmail(program, req.user), function(err) {
+          sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
             if (err) return next(err)
             updateMetadataIndexes(program, function() {
               return res.send(program)
@@ -127,11 +132,10 @@ app.post('/programs/:id/register', function(req, res, next) {
       createParentProgram(program, program.series.name.trim(), callback)
     }
 
-    function addInvoicerows(callback) {
-      var currentClassification = _.first(program.classifications)
+    function addInvoicerows(currentClassification, callback) {
       var seconds = durationToSeconds(currentClassification.duration)
 
-      if (classification.isReclassification(program)) {
+      if (classification.isReclassification(program, currentClassification)) {
         // reclassification fee only when "Oikaisupyyntö" and KAVI is the classifier
         if (currentClassification.reason === 3 && currentClassification.authorOrganization === 1) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
@@ -156,14 +160,15 @@ app.post('/programs/:id/register', function(req, res, next) {
 })
 
 app.post('/programs/:id/reclassification', function(req, res, next) {
-  // create new program.classifications
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
     getRegistrationEmailsFromPreviousClassification(program, function(err, emails) {
       if (err) return next(err)
-      var newClassification = classification.createNew(req.user)
+      var newClassification = Program.createNewClassification(req.user)
       newClassification.registrationEmailAddresses = emails
-      program.classifications = [newClassification].concat(program.classifications)
+      if (!program.draftClassifications) program.draftClassifications = {}
+      program.draftClassifications[req.user._id] = newClassification
+      program.markModified('draftClassifications')
       program.save(respond(res, next))
     })
   })

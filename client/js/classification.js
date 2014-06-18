@@ -42,13 +42,14 @@ function classificationPage() {
 
   $form.on('submit', function(e) {
     e.preventDefault()
-    $.post('/programs/' + $form.data('id') + '/register', function(data) {
+    $.post('/programs/' + $form.data('id') + '/register', function(program) {
       $form.data('id', '').hide().trigger('show')
-      var summary = classification.summary(data, data.classifications[0])
+      var cl = program.classifications[0]
+      var summary = classification.summary(program, cl)
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
-        .append($('<span>', {class: 'name'}).text(data.name))
+        .append($('<span>', {class: 'name'}).text(program.name))
         .append(renderWarningSummary(summary))
-        .append($('<p>', {class: 'registration-date'}).text(classification.status(data.classifications[0])))
+        .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(cl.registrationDate)))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
       $("#search-page").trigger('show').show()
       $(window).scrollTop(0)
@@ -221,8 +222,8 @@ function classificationPage() {
 
   function show(program) {
     $(window).scrollTop(0)
-    var currentClassification = _.first(program.classifications)
-    var isReclassification = classification.isReclassification(program)
+    var currentClassification = draftClassification(program)
+    var isReclassification = classification.isReclassification(program, currentClassification)
     var isExternalReclassification = isReclassification && user.role == 'user'
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
@@ -405,6 +406,7 @@ function classificationPage() {
   }
 
   function saveProgramField(id, field, value) {
+    field = field.replace(/^classifications\.0/, 'draftClassifications.'+user._id)
     $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(program) {
       updateSummary(program)
       preview.update(program)
@@ -412,11 +414,12 @@ function classificationPage() {
   }
 
   function updateSummary(program) {
-    var summary = classification.summary(program, program.classifications[0])
+    var currentClassification = draftClassification(program)
+    var summary = classification.summary(program, currentClassification)
     var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w.category, class:'warning ' + w.category, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = commentToHtml(program.synopsis ? program.synopsis : '-')
     var countries = enums.util.toCountryString(program.country)
-    var comments = commentToHtml(program.classifications[0].publicComments || '')
+    var comments = commentToHtml(currentClassification.publicComments || '')
     $summary
       .find('.name').text(program.name.join(', ') || '-').end()
       .find('.year').text(program.year || '-').end()
@@ -426,7 +429,7 @@ function classificationPage() {
       .find('.actors').text((program.actors).join(', ') || '-').end()
       .find('.agelimit img').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
-      .find('.reason').html(enums.reclassificationReason[program.classifications[0].reason]).end()
+      .find('.reason').html(enums.reclassificationReason[currentClassification.reason]).end()
       .find('.comments').html(comments).end()
   }
 
@@ -465,7 +468,7 @@ function classificationPage() {
     }
 
     function updatePreview(program) {
-      var cl = _.first(program.classifications)
+      var cl = draftClassification(program)
       var buyerEmails = cl.registrationEmailAddresses
         .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
       var manualEmails = cl.registrationEmailAddresses
@@ -475,7 +478,7 @@ function classificationPage() {
       manualEmails.filter(function(email) { return notIn(manualInDom, email) })
         .forEach(addManualEmailCheckbox(true))
 
-      var email = classification.registrationEmail(program, user)
+      var email = classification.registrationEmail(program, cl, user)
 
       $preview.find('.recipients').text(email.recipients.join(', '))
       $preview.find('.subject').text(email.subject)
@@ -507,7 +510,7 @@ function classificationPage() {
     function reset(program) {
       currentBuyerId = null
       $emails.find('ul').empty()
-      program.classifications[0].registrationEmailAddresses.map(function(e) { return e.email })
+      draftClassification(program).registrationEmailAddresses.map(function(e) { return e.email })
         .forEach(addBuyerEmailCheckbox(true))
       updatePreview(program)
     }
@@ -528,5 +531,9 @@ function classificationPage() {
     var addManualEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.manual'))
 
     return { update: updatePreview, reset: reset }
+  }
+
+  function draftClassification(program) {
+    return program.draftClassifications[user._id]
   }
 }

@@ -282,7 +282,7 @@ function classificationPage() {
       .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
 
     $form.find('.author-and-reason').toggleClass('hide', isExternalReclassification)
-      .find('input').select2('enable', !isExternalReclassification || isReclassification)
+      .find('input').select2('enable', isReclassification && hasRole('kavi'))
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
     $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGameType(program))

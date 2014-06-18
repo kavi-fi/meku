@@ -9,7 +9,6 @@ function programBox() {
     var episode = utils.seasonEpisodeCode(p)
     var selectedIcon = '<i class="icon-play"></i> '
 
-    var selectedClassification = p.classifications[0]
     var classifications = p.classifications.map(function(c, index) {
       var registrationDate = utils.asDate(c.registrationDate) || 'Tuntematon rekisteröintiaika'
       var $classification = $('<span>', { class: 'classification' })
@@ -39,6 +38,7 @@ function programBox() {
       .find('.synopsis').labeledText(p.synopsis).end()
       .find('.classifications').html(classifications).end()
 
+    var selectedClassification = p.classifications[0]
     if (selectedClassification) {
       renderClassification($e, p, selectedClassification)
     }

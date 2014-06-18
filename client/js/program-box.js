@@ -1,5 +1,6 @@
 function programBox() {
   var $detailTemplate = $('#templates > .program-box').clone()
+  var $draftTemplate = $('<div>').html('Luokittelusta on käyttäjän <b></b> <span></span> tallentama luonnos.')
 
   return { render: render }
 
@@ -17,6 +18,10 @@ function programBox() {
         $classification.addClass('selected').prepend(selectedIcon)
       }
       return $classification
+    })
+
+    var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
+      return $draftTemplate.clone().find('b').text(draft.author.name).end().find('span').text(utils.asDate(draft.creationDate)).end()
     })
 
     var $e = $detailTemplate.clone()
@@ -37,6 +42,7 @@ function programBox() {
       .find('.actors').labeledText(p.actors.join(', ')).end()
       .find('.synopsis').labeledText(p.synopsis).end()
       .find('.classifications').html(classifications).end()
+      .find('.drafts').html(drafts).end()
 
     var selectedClassification = p.classifications[0]
     if (selectedClassification) {

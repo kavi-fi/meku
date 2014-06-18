@@ -84,6 +84,7 @@ enums.util.isOtherTv = function(p) { return p.programType == 4 }
 enums.util.isMovieType = function(p) { return p.programType == 1 || p.programType == 5 || p.programType == 6 }
 enums.util.isGameType = function(p) { return p.programType == 7 }
 enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 7 }
+enums.util.isTvSeriesName = function(p) { return p.programType == 2 }
 
 enums.movieGenre = [
   'Fiktio',

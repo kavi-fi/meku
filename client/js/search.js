@@ -55,7 +55,10 @@ function internalSearchPage() {
   })
 
   function toggleDetailButtons($detail, p) {
-    if (p.draftClassifications && p.draftClassifications[user._id]) {
+    if (enums.util.isTvSeriesName(p)) {
+      $detail.find('button.continue-classification').hide()
+      $detail.find('button.reclassify').hide()
+    } else if (p.draftClassifications && p.draftClassifications[user._id]) {
       $detail.find('button.continue-classification').show()
       $detail.find('button.reclassify').hide()
     } else {

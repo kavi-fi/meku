@@ -156,18 +156,18 @@ function classificationPage() {
 
   selectAutocomplete({
     $el: $form.find('input[name="classifications.0.buyer"]'),
-    path: function (term) { return '/accounts/user/search?q=' + encodeURIComponent(term) + '&roles=Subscriber' },
+    path: function (term) { return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Subscriber' },
     toOption: idNamePairToSelect2Option,
     fromOption: select2OptionToIdNamePair,
-    termMinLength: hasRole('kavi') ? 1 : 0
+    termMinLength: 0
   })
 
   selectAutocomplete({
     $el: $form.find('input[name="classifications.0.billing"]'),
-    path: function (term) { return '/accounts/user/search?q=' + encodeURIComponent(term) + '&roles=Subscriber,Classifier' },
+    path: function (term) { return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Subscriber,Classifier' },
     toOption: idNamePairToSelect2Option,
     fromOption: select2OptionToIdNamePair,
-    termMinLength: hasRole('kavi') ? 1 : 0
+    termMinLength: 0
   })
 
   selectAutocomplete({

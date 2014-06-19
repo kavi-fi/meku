@@ -8,16 +8,10 @@ function programBox() {
     var names = { n: p.name.join(', '), fi: p.nameFi.join(', '), sv: p.nameSv.join(', '), other: p.nameOther.join(', ')}
     var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
-    var selectedIcon = '<i class="icon-play"></i> '
 
     var classifications = p.classifications.map(function(c, index) {
       var registrationDate = utils.asDate(c.registrationDate) || 'Tuntematon rekisteröintiaika'
-      var $classification = $('<span>', { class: 'classification' })
-        .data(c).text(registrationDate)
-      if (index === 0) {
-        $classification.addClass('selected').prepend(selectedIcon)
-      }
-      return $classification
+      return $('<span>').addClass('classification').toggleClass('selected', index == 0).data(c).text(registrationDate).prepend($('<i>').addClass('icon-play'))
     })
 
     var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
@@ -51,8 +45,6 @@ function programBox() {
 
     $e.on('click', '.classification', function() {
       $(this).addClass('selected').siblings('.selected').removeClass('selected')
-      $(this).parent().find('i').remove()
-      $(this).prepend(selectedIcon)
       renderClassification($e, p, $(this).data())
     })
 

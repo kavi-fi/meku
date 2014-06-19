@@ -194,7 +194,10 @@ h5 { font-size: 14px; color: #444444; line-height: 19px; }
 .program-box .sequenceId { position: absolute; bottom: 5px; right: 5px; color: #d8d8d8; }
 .program-box .classification { color: #49f; cursor: pointer; text-decoration: underline; }
 .program-box .classification.selected { color: #0b8; text-decoration: none; cursor: default; }
-.program-box .classification.selected .icon-play { font-size: 10px; }
+.program-box .classification .icon-play { font-size: 10px; margin-right: 5px; visibility: hidden; }
+.program-box .classification.selected .icon-play { visibility: visible; }
+.program-box .classification { line-height: 20px; }
+
 .program-box .drafts div { margin: 3px 0; padding: 7px 11px; display: inline-block; background-color: #00BB88; color: #fff; border-radius: 7px; }
 
 #classification-page input[type=text],

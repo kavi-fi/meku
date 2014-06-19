@@ -251,7 +251,7 @@ function searchPage(baseUrl) {
       .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p)
         ? '<i class="icon-warning-sign"></i>'
         : enums.programType[p.programType].fi))
-      .append($('<span>', { class: 'summary' }).append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
+      .append($('<span>').append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
 
     function name(p) {
       return _.compact([p.name[0], utils.seasonEpisodeCode(p)]).join(' ')

@@ -313,7 +313,7 @@ function classificationPage() {
       placeholder: 'Valitse...',
       multiple: opts.multiple || false,
       initSelection: initSelection,
-      fromOption: function(x) { return x.id },
+      fromOption: function(x) { return x.id }
     }, opts)
 
     opts.$el.select2(opts).on('change', onChange).on('setVal', setValue)

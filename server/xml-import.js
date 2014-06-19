@@ -32,7 +32,7 @@ var format = flatMap(requiredAttr('TYPE', 'type'), function(p) {
 var validateProgram = map(compose([
   and(requiredAttr('TYPE', 'type'), function(xml) {
     var type = xml.$.TYPE
-    if (_.has(enums.legacyProgramTypes, type)) return ok({ programType: enums.legacyProgramTypes[type] })
+    if (type != '05' && _.has(enums.legacyProgramTypes, type)) return ok({ programType: enums.legacyProgramTypes[type] })
     else return error("Virheellinen attribuutti: TYPE")
   }),
   required('ASIAKKAANTUNNISTE', 'externalId'),

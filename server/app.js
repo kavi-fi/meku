@@ -139,7 +139,7 @@ app.post('/programs/:id/register', function(req, res, next) {
       if (classification.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification) && enums.authorOrganizationIsKavi(currentClassification)) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
-        } else if (enums.authorOrganizationIsExternal(currentClassification)) {
+        } else if (!utils.hasRole(req.user, 'kavi')) {
           InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(callback)
         } else {
           callback()

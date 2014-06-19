@@ -174,7 +174,6 @@ enums.authorOrganization = {
   3: 'KHO'
 }
 
-enums.authorOrganizationIsExternal = function(c) { return !c.authorOrganization }
 enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }
 
 enums.invoiceRowType = {

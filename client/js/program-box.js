@@ -64,9 +64,10 @@ function programBox() {
       .find('.billing').labeledText(c.billing && c.billing.name || '').end()
       .find('.format').labeledText(txtIfNotCurrent(enums.util.isGameType(p) && p.gameFormat || c.format)).end()
       .find('.duration').labeledText(txtIfNotCurrent(c.duration)).end()
+      .find('.criteria').html(renderClassificationCriteria(c)).end()
       .find('.comments').labeledText(c.comments).end()
       .find('.publicComments').labeledText(c.publicComments).end()
-      .find('.criteria').html(renderClassificationCriteria(c)).end()
+      .find('.commentHeader').toggle(!!(c.comments || c.publicComments)).end()
 
     function txtIfNotCurrent(txt) { return (p.classifications[0]._id == c._id) ? '' : txt }
   }

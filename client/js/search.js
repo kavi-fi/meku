@@ -88,10 +88,6 @@ function internalSearchPage() {
     $('#classification-page').trigger('show', programId).show()
   }
 
-  function isTvEpisode(value) {
-    return value == 3
-  }
-
   function showCategorizationForm(id) {
     var $categorySelectForm = $page.find('.categorization-form input[name=category-select]')
     var $categorySaveButton = $page.find('.categorization-form .save-category')
@@ -102,23 +98,52 @@ function internalSearchPage() {
     $categorySelectForm.change(function() {
       var value = $categorySelectForm.select2('val')
 
-      $categorySaveButton.prop('disabled', isTvEpisode(value))
-
-      if (isTvEpisode(value)) {
-        $('.categorization-form-tv-episode').show()
-        } else {
+      if (enums.util.isTvEpisode({ programType: value })) {
+        $categorySaveButton.prop('disabled', true)
+        showTvEpisodeCategorizationForm(id)
+      } else {
         $('.categorization-form-tv-episode').hide()
       }
     })
 
     $categorySaveButton.click(function() {
-      var programType = $categorySelectForm.select2('val')
-      $.post('/programs/' + id + '/categorization', JSON.stringify({programType: programType}))
+      var $seriesSelectData = $('.categorization-form input[name=series]').select2('data')
+      var categoryData = {
+        programType: $categorySelectForm.select2('val'),
+        series: $seriesSelectData ? {
+          'id': $seriesSelectData.id,
+          'name': $seriesSelectData.text
+        } : {},
+        episode: $('.categorization-form input[name=episode]').val(),
+        season: $('.categorization-form input[name=season]').val()
+      }
+      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData))
         .done(function(program) {
           toggleDetailButtons($('.program-box'), program)
           $('.categorization-form').hide()
           $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
         })
+    })
+  }
+
+  function showTvEpisodeCategorizationForm(id) {
+    $('.categorization-form-tv-episode').show()
+
+    var $categorySaveButton = $page.find('.categorization-form .save-category')
+    var $episode = $('.categorization-form-tv-episode input[name=episode]');
+    var $series = $page.find('.categorization-form-tv-episode input[name=series]')
+
+    select2Autocomplete({
+      $el: $series,
+      path: '/series/search/',
+      toOption: idNamePairToSelect2Option,
+      fromOption: select2OptionToIdNamePair,
+      allowAdding: true
+    })
+
+    $('.categorization-form').change(function() {
+      var isSeriesAndEpisodeSet = !(!!$series.val() && !!$episode.val())
+      $categorySaveButton.prop('disabled', isSeriesAndEpisodeSet)
     })
   }
 }

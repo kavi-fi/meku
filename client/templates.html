@@ -17,10 +17,11 @@
     </div>
     <div class="categorization-form-tv-episode">
       <label>Sarjan isäntäohjelman nimi</label>
-      <label>Tuotantokausi</label>
-      <input name="season" type="text" />
-      <label>Jakso *</label>
-      <input name="episode" type="text" />
+      <input name="series" class="required" type="hidden" />
+      <div class="tv-episode-field season-episode-fields">
+        <label>Kausi</label><input name="season" type="number" min="0" />
+        <label>Jakso</label><input name="episode" type="number" min="0" class="required" />
+      </div>
     </div>
   </div>
   <div>

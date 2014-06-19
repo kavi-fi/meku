@@ -198,6 +198,14 @@ app.post('/programs/:id/categorization', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
     program.programType = parseInt(req.body.programType)
+    if (req.body.series && req.body.episode) {
+      program.series = {
+        _id: req.body.series.id,
+        name: req.body.series.name
+      }
+      program.episode = req.body.episode
+      program.season = req.body.season
+    }
     program.save(respond(res, next))
   })
 })

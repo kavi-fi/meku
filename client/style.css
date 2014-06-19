@@ -138,8 +138,8 @@ h3 { font-size: 20px; color: #00BB88; line-height: 24px; }
 h4 { font-size: 16px; color: #444444; line-height: 24px; }
 h5 { font-size: 14px; color: #444444; line-height: 19px; }
 
-.content h2 { margin: 0 0 40px 0; padding: 0 0 40px 0; border-bottom: 4px solid #DDDDDD; }
-.content h3 { margin: 0 0 20px 0; padding: 0 0 15px 0; }
+h2.main { margin: 0 0 40px 0; padding: 0 0 40px 0; border-bottom: 4px solid #DDDDDD; }
+h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDDDDD; }
 
 .left { float: left; width: 50%; }
 .right { float: right; width: 50%; }
@@ -423,10 +423,7 @@ textarea.invalid:disabled,
   background-size: 40px 40px;
 }
 
-#criteria .category .heading h3 {
-  margin: 24px 0;
-}
-
+#criteria .category .heading h3 { margin: 24px 0; }
 #criteria .category.violence .heading h3 { color: #AA0050; }
 #criteria .category.fear .heading h3 { color: #44AAFF;}
 #criteria .category.sex .heading h3 { color: #FF77AA;}
@@ -452,8 +449,6 @@ textarea.invalid:disabled,
   border-top: 5px solid #33BB33;
   background-image: url('images/drugs.png');
 }
-
-#criteria .category .heading h3 {}
 
 #criteria .category .criteria {
   background-color: #fff;
@@ -543,7 +538,6 @@ textarea.invalid:disabled,
 #summary .right {width: 460px; padding: 0 0 0 10px;}
 #summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
 #summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
-#summary h3 { border-bottom: 5px solid #DDDDDD; }
 
 #summary .header { border-bottom: 1px solid #D3D3D3; }
 #summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
@@ -569,7 +563,6 @@ textarea.invalid:disabled,
 #email .emails label { text-align: left; width: 200px;}
 #email .emails input[name=registration-email] { width: 93%; }
 
-#email h3 { border-bottom: 5px solid #DDDDDD; }
 #email .left { width: 300px; }
 #email .right { width: 620px; }
 

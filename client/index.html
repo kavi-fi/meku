@@ -70,8 +70,8 @@
   <form id="program-details" data-id="">
     <div class="row">
       <div class="program-info form content">
-        <h2 class="classification">Uusi kuvaohjelma - <span class="programTypeName"></span></h2>
-        <h2 class="reclassification">Kuvaohjelman tiedot - <span class="programTypeName"></span></h2>
+        <h2 class="main classification">Uusi kuvaohjelma - <span class="programTypeName"></span></h2>
+        <h2 class="main reclassification">Kuvaohjelman tiedot - <span class="programTypeName"></span></h2>
 
         <div class="left">
           <div class="tv-episode-field"><label>TV-sarjan nimi</label><input name="series" class="required" type="hidden" /></div>
@@ -104,8 +104,8 @@
 
     <div id="classification" class="row">
       <div class="form content">
-        <h2 class="classification">Luokittelu</h2>
-        <h2 class="reclassification">Uudelleenluokittelu</h2>
+        <h2 class="main classification">Luokittelu</h2>
+        <h2 class="main reclassification">Uudelleenluokittelu</h2>
 
         <div class="summary">
           <span class="name"></span>
@@ -145,7 +145,7 @@
         <div class="header">
           <span class="safe-container">
             <input name="classifications.0.safe" type="checkbox" />Ei sisällä lapsille haitallista materiaalia</span>
-          <h2>Luokittelun kriteerit</h2>
+          <h2 class="main">Luokittelun kriteerit</h2>
         </div>
         <div class="category-container">
           <div class="category violence">
@@ -171,19 +171,19 @@
 
         <div class="comments left">
           <div class="private-comments">
-            <h3>KAVIN sisäiset kommentit</h3>
+            <h3 class="main">KAVIN sisäiset kommentit</h3>
             <textarea placeholder="KAVIN sisäiset kommentit" name="classifications.0.comments"></textarea>
             <p>KAVI:n sisäiset kommentit näkyvät vain KAVIN työntekijöille.</p>
           </div>
 
           <div class="public-comments reclassification">
-            <h3>Julkiset kommentit</h3>
+            <h3 class="main">Julkiset kommentit</h3>
             <textarea placeholder="Perusteet uudelleenluokittelulle" name="classifications.0.publicComments" class="required"></textarea>
           </div>
         </div>
 
         <div class="right summary">
-          <h3>Ikärajat.fi-näkymä</h3>
+          <h3 class="main">Ikärajat.fi-näkymä</h3>
           <div class="box">
 
             <div class="header">
@@ -209,9 +209,9 @@
 
     <div id="email" class="row">
       <div class="content">
-        <h2>Luokittelupäätös</h2>
+        <h2 class="main">Luokittelupäätös</h2>
         <div class="emails left required-pseudo">
-          <h3>Lähetä luokittelupäätös</h3>
+          <h3 class="main">Lähetä luokittelupäätös</h3>
 
           <ul class="buyer"></ul>
           <ul class="manual"></ul>
@@ -223,7 +223,7 @@
 
         </div>
         <div class="preview right">
-          <h3>Luokittelupäätöksen esikatselu</h3>
+          <h3 class="main">Luokittelupäätöksen esikatselu</h3>
           <div class="email-preview box">
             <dl>
               <dt>Vastaanottajat</dt><dd class="recipients"></dd>

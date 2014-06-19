@@ -117,6 +117,7 @@ function internalSearchPage() {
         .done(function(program) {
           toggleDetailButtons($('.program-box'), program)
           $('.categorization-form').hide()
+          $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
         })
     })
   }
@@ -244,11 +245,11 @@ function searchPage(baseUrl) {
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
     return $('<div>', { class:'result', 'data-id': p._id })
       .data('program', p)
-      .append($('<span>').text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
-      .append($('<span>').text(countryAndYear(p)))
-      .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
-      .append($('<span>').text(enums.programType[p.programType].fi))
-      .append($('<span>').append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
+      .append($('<span>', { class: 'name' }).text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
+      .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
+      .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
+      .append($('<span>', { class: 'program-type' }).text(enums.programType[p.programType].fi))
+      .append($('<span>', { class: 'summary' }).append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
 
     function name(p) {
       return _.compact([p.name[0], utils.seasonEpisodeCode(p)]).join(' ')

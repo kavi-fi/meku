@@ -83,7 +83,7 @@ function classificationPage() {
   })
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
-    if (enums.isRemediationRequest($(this).val())) {
+    if (enums.isOikaisupyynto($(this).val())) {
       $buyer.add($billing).select2('enable', true).removeClass('invalid')
     } else {
       $buyer.add($billing).select2('enable', false).select2('val', '', true)
@@ -279,7 +279,7 @@ function classificationPage() {
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
-    $buyer.add($billing).select2('enable', (!isReclassification || enums.isRemediationRequest(currentClassification.reason)) || isExternalReclassification)
+    $buyer.add($billing).select2('enable', (!isReclassification || enums.isOikaisupyynto(currentClassification.reason)) || isExternalReclassification)
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
       .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)

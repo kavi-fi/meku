@@ -137,7 +137,7 @@ app.post('/programs/:id/register', function(req, res, next) {
       var seconds = durationToSeconds(currentClassification.duration)
 
       if (classification.isReclassification(program, currentClassification)) {
-        if (enums.isOikaisupyynto(currentClassification) && enums.authorOrganizationIsKavi(currentClassification)) {
+        if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
         } else if (!utils.hasRole(req.user, 'kavi')) {
           InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(callback)

@@ -176,6 +176,8 @@ enums.authorOrganization = {
 
 enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }
 
+enums.isRemediationRequest = function(val) { return val == 3 }
+
 enums.invoiceRowType = {
   registration: 'Kuvaohjelman rekisteröinti',
   classification: 'KAVIn luokittelu',

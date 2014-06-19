@@ -20,7 +20,7 @@ function internalSearchPage() {
   var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
   var $newClassificationButton = $page.find('.new-classification button')
 
-  $newClassificationType.select2({
+  var programTypesSelect2 = {
     data: [
       {id: 1, text: 'Elokuva'},
       {id: 3, text: 'TV-sarjan jakso'},
@@ -29,7 +29,9 @@ function internalSearchPage() {
       {id: 6, text: 'Trailer'},
       {id: 7, text: 'Peli'}
     ]
-  }).select2('val', 1)
+  }
+
+  $newClassificationType.select2(programTypesSelect2).select2('val', 1)
 
   $page.on('showDetails', '.program-box', function(e, program) {
     toggleDetailButtons($(this), program)
@@ -55,7 +57,7 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.categorize', function(e) {
-    showCategorizationForm()
+    showCategorizationForm($(this).parents('.program-box').data('id'))
   })
 
 
@@ -67,14 +69,17 @@ function internalSearchPage() {
     } else if (enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
+      $detail.find('button.categorize').hide()
     } else if (p.draftClassifications && p.draftClassifications[user._id]) {
       $detail.find('button.continue-classification').show()
       $detail.find('button.reclassify').hide()
+      $detail.find('button.categorize').hide()
     } else {
       var head = p.classifications[0]
       var canReclassify = (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered'))
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(!!canReclassify)
+      $detail.find('button.categorize').hide()
     }
   }
 
@@ -83,8 +88,37 @@ function internalSearchPage() {
     $('#classification-page').trigger('show', programId).show()
   }
 
-  function showCategorizationForm() {
+  function isTvEpisode(value) {
+    return value == 3
+  }
+
+  function showCategorizationForm(id) {
+    var $categorySelectForm = $page.find('.categorization-form input[name=category-select]')
+    var $categorySaveButton = $page.find('.categorization-form .save-category')
+
+    $categorySelectForm.select2(programTypesSelect2).select2('val', 1)
+
     $('.categorization-form').show()
+    $categorySelectForm.change(function() {
+      var value = $categorySelectForm.select2('val')
+
+      $categorySaveButton.prop('disabled', isTvEpisode(value))
+
+      if (isTvEpisode(value)) {
+        $('.categorization-form-tv-episode').show()
+        } else {
+        $('.categorization-form-tv-episode').hide()
+      }
+    })
+
+    $categorySaveButton.click(function() {
+      var programType = $categorySelectForm.select2('val')
+      $.post('/programs/' + id + '/categorization', JSON.stringify({programType: programType}))
+        .done(function(program) {
+          toggleDetailButtons($('.program-box'), program)
+          $('.categorization-form').hide()
+        })
+    })
   }
 }
 

@@ -194,6 +194,14 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
 
 })
 
+app.post('/programs/:id/categorization', function(req, res, next) {
+  Program.findById(req.params.id, function(err, program) {
+    if (err) next(err)
+    program.programType = parseInt(req.body.programType)
+    program.save(respond(res, next))
+  })
+})
+
 app.post('/programs/:id', function(req, res, next) {
   Program.findByIdAndUpdate(req.params.id, req.body, null, function(err, program) {
     if (err) return next(err)

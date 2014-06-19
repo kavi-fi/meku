@@ -38,9 +38,11 @@ function programBox() {
       .find('.classifications').html(classifications).end()
       .find('.drafts').html(drafts).end()
 
-    var selectedClassification = p.classifications[0]
-    if (selectedClassification) {
-      renderClassification($e, p, selectedClassification)
+    if (p.classifications[0]) {
+      var c = p.classifications[0]
+      renderClassification($e, p, c)
+      $e.find('.current-format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
+        .find('.current-duration').labeledText(c.duration).end()
     }
 
     $e.on('click', '.classification', function() {
@@ -60,12 +62,13 @@ function programBox() {
       .find('.authorOrganization').labeledText(enums.authorOrganization[c.authorOrganization]).end()
       .find('.buyer').labeledText(c.buyer && c.buyer.name || '').end()
       .find('.billing').labeledText(c.billing && c.billing.name || '').end()
-      .find('.format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
-      .find('.duration').labeledText(c.duration).end()
+      .find('.format').labeledText(txtIfNotCurrent(enums.util.isGameType(p) && p.gameFormat || c.format)).end()
+      .find('.duration').labeledText(txtIfNotCurrent(c.duration)).end()
       .find('.comments').labeledText(c.comments).end()
       .find('.publicComments').labeledText(c.publicComments).end()
       .find('.criteria').html(renderClassificationCriteria(c)).end()
 
+    function txtIfNotCurrent(txt) { return (p.classifications[0]._id == c._id) ? '' : txt }
   }
 
   function renderClassificationCriteria(c) {

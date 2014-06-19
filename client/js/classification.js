@@ -83,11 +83,7 @@ function classificationPage() {
   })
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
-    if (enums.isOikaisupyynto($(this).val())) {
-      $buyer.add($billing).select2('enable', true).removeClass('invalid')
-    } else {
-      $buyer.add($billing).select2('enable', false).select2('val', '', true)
-    }
+    $buyer.add($billing).select2('enable', enums.isOikaisupyynto($(this).val())).trigger('validate')
   })
 
   selectEnumAutocomplete({

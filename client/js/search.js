@@ -248,7 +248,9 @@ function searchPage(baseUrl) {
       .append($('<span>', { class: 'name' }).text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
       .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
-      .append($('<span>', { class: 'program-type' }).text(enums.programType[p.programType].fi))
+      .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p)
+        ? '<i class="icon-warning-sign"></i>'
+        : enums.programType[p.programType].fi))
       .append($('<span>', { class: 'summary' }).append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
 
     function name(p) {

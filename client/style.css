@@ -7,6 +7,9 @@ body {
 }
 
 .hide { display: none !important; }
+
+.clearfix:after { content:''; display:table; clear:both; }
+
 #login-overlay, #error-overlay { z-index: 2; }
 #login, #error-dialog { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
 #login > div, #error-dialog > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }

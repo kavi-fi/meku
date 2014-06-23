@@ -89,61 +89,66 @@ function internalSearchPage() {
   }
 
   function showCategorizationForm(id) {
-    var $categorySelectForm = $page.find('.categorization-form input[name=category-select]')
+    var $categorizationForm = $page.find('.categorization-form')
+    var $categorySelection = $page.find('.categorization-form input[name=category-select]')
     var $categorySaveButton = $page.find('.categorization-form .save-category')
 
-    $categorySelectForm.select2(programTypesSelect2).select2('val', 1)
-
-    $('.categorization-form').show()
-    $categorySelectForm.change(function() {
-      var value = $categorySelectForm.select2('val')
-
-      if (enums.util.isTvEpisode({ programType: value })) {
-        $categorySaveButton.prop('disabled', true)
-        showTvEpisodeCategorizationForm(id)
-      } else {
-        $('.categorization-form-tv-episode').hide()
-      }
-    })
-
-    $categorySaveButton.click(function() {
-      var $seriesSelectData = $('.categorization-form input[name=series]').select2('data')
-      var categoryData = {
-        programType: $categorySelectForm.select2('val'),
-        series: $seriesSelectData ? {
-          'id': $seriesSelectData.id,
-          'name': $seriesSelectData.text
-        } : {},
-        episode: $('.categorization-form input[name=episode]').val(),
-        season: $('.categorization-form input[name=season]').val()
-      }
-      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData))
-        .done(function(program) {
-          toggleDetailButtons($('.program-box'), program)
-          $('.categorization-form').hide()
-          $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
-        })
-    })
-  }
-
-  function showTvEpisodeCategorizationForm(id) {
-    $('.categorization-form-tv-episode').show()
-
-    var $categorySaveButton = $page.find('.categorization-form .save-category')
+    var $tvEpisodeForm = $('.categorization-form-tv-episode')
     var $episode = $('.categorization-form-tv-episode input[name=episode]');
-    var $series = $page.find('.categorization-form-tv-episode input[name=series]')
+    var $season = $('.categorization-form-tv-episode input[name=season]')
+    var $series = $('.categorization-form-tv-episode input[name=series]')
 
     select2Autocomplete({
       $el: $series,
       path: '/series/search/',
       toOption: idNamePairToSelect2Option,
       fromOption: select2OptionToIdNamePair,
-      allowAdding: true
+      allowAdding: false
     })
 
-    $('.categorization-form').change(function() {
-      var isSeriesAndEpisodeSet = !(!!$series.val() && !!$episode.val())
-      $categorySaveButton.prop('disabled', isSeriesAndEpisodeSet)
+    $categorySelection.select2(programTypesSelect2).select2('val', 1)
+
+    var isTvEpisode = function() {
+      return enums.util.isTvEpisode({ programType: $categorySelection.select2('val') })
+    }
+
+    $categorizationForm.show()
+
+    $categorizationForm.on('input change', function() {
+      if (isTvEpisode()) {
+        var isSeriesAndEpisodeSet = !(!!$series.val() && !!$episode.val())
+        $categorySaveButton.prop('disabled', isSeriesAndEpisodeSet)
+      }
+    })
+
+    $categorySelection.change(function() {
+      if (isTvEpisode()) {
+        $tvEpisodeForm.show()
+      } else {
+        $categorySaveButton.prop('disabled', false)
+        $tvEpisodeForm.hide()
+      }
+    })
+
+    $categorySaveButton.click(function() {
+      var categoryData = { programType: $categorySelection.select2('val') }
+
+      if (isTvEpisode()) {
+        var $seriesSelectData = $series.select2('data')
+        categoryData.series = {
+          'id': $seriesSelectData.id,
+          'name': $seriesSelectData.text
+        }
+        categoryData.episode = $episode.val()
+        categoryData.season = $season.val()
+      }
+
+      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData))
+        .done(function(program) {
+          toggleDetailButtons($('.program-box'), program)
+          $categorizationForm.hide()
+          $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
+        })
     })
   }
 }

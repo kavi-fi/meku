@@ -204,7 +204,7 @@ app.post('/programs/:id/categorization', function(req, res, next) {
         name: req.body.series.name
       }
       program.episode = req.body.episode
-      program.season = req.body.season
+      program.season = _.isEmpty(req.body.season) ? null : req.body.season
     }
     program.save(respond(res, next))
   })

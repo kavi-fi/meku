@@ -264,6 +264,7 @@ function select2Autocomplete(opts, onChangeFn) {
 }
 
 function idNamePairToSelect2Option(x) {
+  if (!x) return null
   return {id: x._id === null ? x.name : x._id, text: x.name}
 }
 

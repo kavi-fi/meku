@@ -59,6 +59,11 @@ conn.connect(function(err) {
   })
 })
 
+function readFixtureData() {
+  var env = process.env.NODE_ENV || 'development'
+  return require('./data.' + env)
+}
+
 function run(job, callback) {
   console.log('\n> '+job)
   tasks[job](function(err) {
@@ -269,7 +274,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoAccounts, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, demoApiUsers], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, demoAccounts, linkUserAccounts, linkSecurityGroupAccounts], callback)
 
   function accountBase(callback) {
     var seq = 1
@@ -325,44 +330,27 @@ function accounts(callback) {
       .pipe(consumer(pushUserToAccount, callback))
   }
 
-  function demoAccounts(callback) {
-    var accounts = [
-      {name: "DEMO tilaaja 1", roles: ['Subscriber'], emailAddresses: [], users: [], yTunnus: 'DEMO1' },
-      {name: "DEMO tilaaja 2", roles: ['Subscriber'], emailAddresses: [], users: [], yTunnus: 'DEMO2' },
-      {name: "DEMO tilaaja 3", roles: ['Subscriber', 'Classifier'], emailAddresses: [], users: [], yTunnus: 'DEMO3' },
-    ]
-    async.each(accounts, function(a, callback) {
-      new schema.Account(a).save(callback)
-    }, callback)
-  }
-
   function demoUsers(callback) {
-    async.forEach(['root', 'kavi', 'user'], function(u, callback) {
-      new schema.User({ username:u, password:u, role:u, name:u, emails:[u+'@fake-meku.fi'] }).save(function(err, saved) {
-        if (err) return callback(err)
-        var data = {_id: saved._id, name: saved.username}
-        async.eachSeries(['DEMO1', 'DEMO2', 'DEMO3'], function(y, callback) {
-          schema.Account.update({yTunnus: y}, { $addToSet: { users: data } }, callback)
-        }, callback)
-      })
+    var users = readFixtureData().users
+    async.forEach(users, function(u, callback) {
+      new schema.User(u).save(callback)
     }, callback)
   }
 
-  function demoApiUsers(callback) {
-    var users = {
-      'yle': {name: 'Yle testi', passwd: 'hattivatti', emekuId: 'cd5ad00f-3632-3f57-cc9e-4e770b9eeef9', apiToken: '53a16689b1611bc18c6af98e'},
-      'nelonen': {name: 'Nelonen testi', passwd: 'digimon', emekuId: '1db92ef2-ab3d-950d-e053-4e82f88d1df0', apiToken: '53a16689b1611bc18c6af98f'},
-      'mtv': {name: 'MTV testi', passwd: 'pokemon', emekuId: 'ae57bb17-a9f2-1f09-a928-4e97f008b792', apiToken: '53a16689b1611bc18c6af990'}
-    }
-    async.forEach(_.pairs(users), function(u, next) {
-      var username = u[0], data = u[1]
-      var user = {username:username, password:data.passwd, role:'user', name:data.name, active: true, emails:[username+'@fake-meku.fi']}
-      new schema.User(user).save(function(err, saved) {
+  function demoAccounts(callback) {
+    var accounts = readFixtureData().accounts
+    async.each(accounts, function(a, callback) {
+      async.map(a.users, function(username, callback) {
+        schema.User.findOne({ username: username }, null, function(err, user) {
+          if (err) return callback(err)
+          return callback(null, {_id: user._id, name: user.username})
+        })
+      }, function(err, users) {
         if (err) return callback(err)
-        var newUser = {_id: saved._id, name: saved.username}
-        schema.Account.update({emekuId: data.emekuId}, { $addToSet: { users: newUser }, apiToken: data.apiToken }, next)
+        a.users = users
+        new schema.Account(a).save(callback)
       })
-    }, callback) 
+    }, callback)
   }
 
   function idToEmailMapper(row, result) {

@@ -112,22 +112,30 @@ function internalSearchPage() {
       return enums.util.isTvEpisode({ programType: $categorySelection.select2('val') })
     }
 
-    $categorizationForm.show()
+    $categorizationForm.on('select2-blur', function(e) { $(e.target).addClass('touched') })
 
-    $categorizationForm.on('input change', function() {
-      if (isTvEpisode()) {
-        var isSeriesAndEpisodeSet = !(!!$series.val() && !!$episode.val())
-        $categorySaveButton.prop('disabled', isSeriesAndEpisodeSet)
-      }
+    $categorizationForm.show()
+    validateTextChange($categorizationForm.find('.required'), isNotEmpty)
+
+    $categorizationForm.on('validation', function() {
+      var required = $categorizationForm.find('.required.invalid')
+        .not('input:disabled, textarea:disabled')
+        .not('.select2-container')
+        // Filter hidden elements, but select the offscreen input that has the value from select2 input
+        .filter(function() {
+          if ($(this).is('.select2-offscreen')) { return true }
+          return $(this).is(':visible')
+        })
+      $categorySaveButton.prop('disabled', required.length > 0)
     })
 
     $categorySelection.change(function() {
       if (isTvEpisode()) {
         $tvEpisodeForm.show()
       } else {
-        $categorySaveButton.prop('disabled', false)
         $tvEpisodeForm.hide()
       }
+      $tvEpisodeForm.find('input').trigger('validate')
     })
 
     $categorySaveButton.click(function() {

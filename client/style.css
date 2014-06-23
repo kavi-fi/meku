@@ -341,6 +341,7 @@ textarea.required,
 }
 
 input[type=text].invalid,
+input[type=number].invalid,
 textarea.invalid,
 .select2-container.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
@@ -352,7 +353,7 @@ textarea.invalid,
 }
 
 input[type=text].invalid.touched,
-input[type=number]:invalid, input[type=number]:invalid.touched,
+input[type=number].invalid.touched,
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {
@@ -360,7 +361,7 @@ textarea.invalid.touched,
 }
 
 input[type=text].invalid:disabled,
-input[type=number]:invalid:disabled,
+input[type=number].invalid:disabled,
 textarea.invalid:disabled,
 .select2-container-disabled.invalid .select2-choices,
 .select2-container-disabled.invalid .select2-choice {

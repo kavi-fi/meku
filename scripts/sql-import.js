@@ -269,7 +269,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoAccounts, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, generateApiTokens], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoAccounts, demoUsers, linkUserAccounts, linkSecurityGroupAccounts, demoApiUsers], callback)
 
   function accountBase(callback) {
     var seq = 1
@@ -348,10 +348,21 @@ function accounts(callback) {
     }, callback)
   }
 
-  function generateApiTokens(callback) {
-    // yle, nelonenmedia, mtv
-    var ids = ['cd5ad00f-3632-3f57-cc9e-4e770b9eeef9', '1db92ef2-ab3d-950d-e053-4e82f88d1df0', 'ae57bb17-a9f2-1f09-a928-4e97f008b792']
-    async.forEach(ids, setApiToken, callback)
+  function demoApiUsers(callback) {
+    var users = {
+      'yle': {name: 'Yle testi', passwd: 'hattivatti', emekuId: 'cd5ad00f-3632-3f57-cc9e-4e770b9eeef9', apiToken: '53a16689b1611bc18c6af98e'},
+      'nelonen': {name: 'Nelonen testi', passwd: 'digimon', emekuId: '1db92ef2-ab3d-950d-e053-4e82f88d1df0', apiToken: '53a16689b1611bc18c6af98f'},
+      'mtv': {name: 'MTV testi', passwd: 'pokemon', emekuId: 'ae57bb17-a9f2-1f09-a928-4e97f008b792', apiToken: '53a16689b1611bc18c6af990'}
+    }
+    async.forEach(_.pairs(users), function(u, next) {
+      var username = u[0], data = u[1]
+      var user = {username:username, password:data.passwd, role:'user', name:data.name, active: true, emails:[username+'@fake-meku.fi']}
+      new schema.User(user).save(function(err, saved) {
+        if (err) return callback(err)
+        var newUser = {_id: saved._id, name: saved.username}
+        schema.Account.update({emekuId: data.emekuId}, { $addToSet: { users: newUser }, apiToken: data.apiToken }, next)
+      })
+    }, callback) 
   }
 
   function idToEmailMapper(row, result) {

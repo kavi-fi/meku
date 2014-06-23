@@ -205,6 +205,9 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .program-box .drafts div { margin: 3px 0; padding: 7px 11px; display: inline-block; background-color: #00BB88; color: #fff; border-radius: 7px; }
 .program-box .categorization-form { display: none; }
 .program-box .categorization-form-tv-episode { display: none; }
+.program-box .categorization-form button.save-category { float: right; }
+.program-box .season-episode-fields > div { width: 149px; display: inline-block; }
+.program-box .season-episode-fields input { width: 100%; box-sizing: border-box; }
 
 #classification-page input[type=text],
 #classification-page input[type=number],

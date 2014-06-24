@@ -121,10 +121,13 @@ function internalSearchPage() {
       var required = $categorizationForm.find('.required.invalid')
         .not('input:disabled, textarea:disabled')
         .not('.select2-container')
-        // Filter hidden elements, but select the offscreen input that has the value from select2 input
         .filter(function() {
-          if ($(this).is('.select2-offscreen')) { return true }
-          return $(this).is(':visible')
+          var $this = $(this)
+          // Filter hidden elements, but select the hidden offscreen input if its select2 container is visible
+          if ($this.is('.select2-offscreen')) {
+            return $($this.select2('container')).is(':visible')
+          }
+          return $this.is(':visible')
         })
       $categorySaveButton.prop('disabled', required.length > 0)
     })

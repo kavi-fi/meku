@@ -133,11 +133,7 @@ function internalSearchPage() {
     })
 
     $categorySelection.change(function() {
-      if (isTvEpisode()) {
-        $tvEpisodeForm.show()
-      } else {
-        $tvEpisodeForm.hide()
-      }
+      $tvEpisodeForm.toggle(isTvEpisode())
       $tvEpisodeForm.find('input').trigger('validate')
     })
 

@@ -93,10 +93,10 @@ function internalSearchPage() {
     var $categorySelection = $page.find('.categorization-form input[name=category-select]')
     var $categorySaveButton = $page.find('.categorization-form .save-category')
 
-    var $tvEpisodeForm = $('.categorization-form-tv-episode')
-    var $episode = $('.categorization-form-tv-episode input[name=episode]');
-    var $season = $('.categorization-form-tv-episode input[name=season]')
-    var $series = $('.categorization-form-tv-episode input[name=series]')
+    var $tvEpisodeForm = $categorizationForm.find('.categorization-form-tv-episode')
+    var $episode = $tvEpisodeForm.find('input[name=episode]')
+    var $season = $tvEpisodeForm.find('input[name=season]')
+    var $series = $tvEpisodeForm.find('input[name=series]')
 
     select2Autocomplete({
       $el: $series,

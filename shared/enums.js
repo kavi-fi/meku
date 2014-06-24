@@ -217,7 +217,7 @@ enums.countries = {
   'EC': 'Ecuador',
   'EE': 'Viro',
   'EG': 'Egypti',
-  'ES': 'ES',
+  'ES': 'Espanja',
   'ET': 'Etiopia',
   'EU': 'Euroopan unioni',
   'FI': 'Suomi',

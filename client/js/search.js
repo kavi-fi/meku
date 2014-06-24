@@ -146,7 +146,6 @@ function internalSearchPage() {
 
       if (isTvEpisode()) {
         var series = select2OptionToIdNamePair($series.select2('data'))
-        console.log(series)
         categoryData.series = series
         categoryData.episode = $episode.val()
         categoryData.season = $season.val()

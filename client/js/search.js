@@ -58,6 +58,7 @@ function internalSearchPage() {
 
   $results.on('click', 'button.categorize', function(e) {
     showCategorizationForm($(this).parents('.program-box').data('id'))
+    $(this).hide()
   })
 
 

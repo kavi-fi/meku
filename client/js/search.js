@@ -62,10 +62,10 @@ function internalSearchPage() {
 
 
   function toggleDetailButtons($detail, p) {
-    if (enums.util.isUnknown(p) && hasRole('kavi')) {
+    if (enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').show()
+      $detail.find('button.categorize').toggle(hasRole('kavi'))
     } else if (enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
@@ -76,7 +76,7 @@ function internalSearchPage() {
       $detail.find('button.categorize').hide()
     } else {
       var head = p.classifications[0]
-      var canReclassify = (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered'))
+      var canReclassify = (!head || !enums.isKHO(head.authorOrganization)) && (hasRole('kavi') || !head || (head.status != 'registered'))
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(!!canReclassify)
       $detail.find('button.categorize').hide()

@@ -175,6 +175,10 @@ enums.authorOrganization = {
   3: 'KHO'
 }
 
+enums.isKHO = function(number) {
+  return number == 3
+}
+
 enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }
 
 enums.invoiceRowType = {

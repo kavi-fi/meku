@@ -138,7 +138,7 @@ h3 { font-size: 20px; color: #00BB88; line-height: 24px; }
 h4 { font-size: 16px; color: #444444; line-height: 24px; }
 h5 { font-size: 14px; color: #444444; line-height: 19px; }
 
-h2.main { margin: 0 0 40px 0; padding: 0 0 40px 0; border-bottom: 4px solid #DDDDDD; }
+h2.main { margin: 0 0 40px 0; padding: 0 0 40px 0; border-bottom: 5px solid #DDDDDD; font-size: 26px; }
 h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDDDDD; }
 
 .left { float: left; width: 50%; }
@@ -174,22 +174,22 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 #search-page .result > span:nth-child(1) { min-width: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 #search-page .result > span:nth-child(2) { flex: 0 0 auto; padding: 0 14px; margin-right: auto; }
 #search-page .result > span:nth-child(3) { flex: 0 0 auto; text-align: right; padding-right: 20px; }
-#search-page .result > span:nth-child(4) { flex: 0 0 auto; font-size: 11px; width: 80px; }
+#search-page .result > span:nth-child(4) { flex: 0 0 auto; font-size: 14px; width: 100px; }
 #search-page .result > span:nth-child(5) { flex: 0 0 auto; text-align: right; width: 140px; }
 #search-page .result .agelimit, #search-page .result .warning { vertical-align: middle; margin-right: 3px; width: 25px; height: 25px; background-size: 25px; }
 #search-page .result.selected { border-bottom: none; }
 #search-page .highlight { color: #00BB88; }
 
-.program-box { display: none; background: #fff; padding: 20px 40px 50px 40px; font-size: 13px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; }
+.program-box { display: none; background: #fff; padding: 20px 40px 50px 40px; font-size: 14px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; line-height: 19px; }
 .program-box .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
 .program-box .warning-summary { vertical-align: middle; margin-right: 14px; }
 .program-box .agelimit, .program-box .warning { margin-right: 8px; }
 .program-box .classifications { display: inline-block; font-size: 14px; white-space: nowrap; }
 .program-box .classifications span { display: block; }
 .program-box .classifications a { color: #4499FF; }
-.program-box h2 { color: #000; font-weight: normal; margin: 0; padding: 0 15px 0 0; }
+.program-box h2 { color: #444; margin: 0; padding: 0 15px 0 0; font-size: 20px; line-height: 26px; }
 .program-box h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
-.program-box label { display: block; padding: 18px 0 5px 0; text-align: left; width: auto; }
+.program-box label { display: block; padding: 19px 0 0 0; text-align: left; width: auto; }
 .program-box .criteria label { text-transform: capitalize; }
 .program-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 .program-box .buttons { float: right; }
@@ -200,7 +200,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .program-box .classification.selected { color: #0b8; text-decoration: none; cursor: default; }
 .program-box .classification .icon-play { font-size: 10px; margin-right: 5px; visibility: hidden; }
 .program-box .classification.selected .icon-play { visibility: visible; }
-.program-box .classification { line-height: 20px; }
+.program-box .classification { line-height: 19px; }
 
 .program-box .drafts div { margin: 3px 0; padding: 7px 11px; display: inline-block; background-color: #00BB88; color: #fff; border-radius: 7px; }
 .program-box .categorization-form { display: none; }

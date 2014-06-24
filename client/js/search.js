@@ -116,7 +116,7 @@ function internalSearchPage() {
     $categorizationForm.on('select2-blur', function(e) { $(e.target).addClass('touched') })
 
     $categorizationForm.show()
-    validateTextChange($categorizationForm.find('.required'), isNotEmpty)
+    validateTextChange($categorizationForm.find('input.required'), isNotEmpty)
 
     $categorizationForm.on('validation', function() {
       var required = $categorizationForm.find('.required.invalid')

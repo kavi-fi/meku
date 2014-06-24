@@ -118,9 +118,8 @@ function internalSearchPage() {
     $categorizationForm.show()
     validateTextChange($categorizationForm.find('input.required'), isNotEmpty)
 
-    $categorizationForm.on('validation', function() {
-      var required = $categorizationForm.find('.required.invalid')
-        .not('input:disabled, textarea:disabled')
+    $categorizationForm.on('validation input', function(e) {
+      var required = $categorizationForm.find('.required.invalid, input:invalid')
         .not('.select2-container')
         .filter(function() {
           var $this = $(this)

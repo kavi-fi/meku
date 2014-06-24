@@ -59,11 +59,6 @@ conn.connect(function(err) {
   })
 })
 
-function readFixtureData() {
-  var env = process.env.NODE_ENV || 'development'
-  return require('./data.' + env)
-}
-
 function run(job, callback) {
   console.log('\n> '+job)
   tasks[job](function(err) {
@@ -328,29 +323,6 @@ function accounts(callback) {
     conn.query('select a.id as accountId, u.id as userId from users u join securitygroups_users sgu on (u.id = sgu.user_id) join securitygroups sg on (sg.id = sgu.securitygroup_id) join securitygroups_records sgr on (sg.id = sgr.securitygroup_id and sgr.module = "Accounts") join accounts a on (sgr.record_id = a.id) where sg.id != "8d4ad931-1055-a4f5-96da-4e3664911855" and u.deleted != "1" and sgu.deleted != "1" and sg.deleted != "1" and sgr.deleted != "1" and a.deleted != "1"')
       .stream()
       .pipe(consumer(pushUserToAccount, callback))
-  }
-
-  function demoUsers(callback) {
-    var users = readFixtureData().users
-    async.forEach(users, function(u, callback) {
-      new schema.User(u).save(callback)
-    }, callback)
-  }
-
-  function demoAccounts(callback) {
-    var accounts = readFixtureData().accounts
-    async.each(accounts, function(a, callback) {
-      async.map(a.users, function(username, callback) {
-        schema.User.findOne({ username: username }, null, function(err, user) {
-          if (err) return callback(err)
-          return callback(null, {_id: user._id, name: user.username})
-        })
-      }, function(err, users) {
-        if (err) return callback(err)
-        a.users = users
-        new schema.Account(a).save(callback)
-      })
-    }, callback)
   }
 
   function idToEmailMapper(row, result) {

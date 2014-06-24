@@ -156,6 +156,8 @@ function internalSearchPage() {
           toggleDetailButtons($('.program-box'), program)
           $categorizationForm.hide()
           $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
+          $results.find('.result[data-id=' + program._id + ']').data('program', program)
+          $results.trigger('categorized', program)
         })
     })
   }
@@ -197,6 +199,11 @@ function searchPage(baseUrl) {
     queryChanged($input.val().trim())
     updateLocationHash()
     load()
+  })
+
+  $results.on('categorized', function(e, p) {
+    closeDetail()
+    openDetail($('.result[data-id=' + p._id + ']'), false)
   })
 
   $results.on('click', '.result', function() {

@@ -190,9 +190,9 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
 
 app.post('/programs/:id/categorization', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
-    if (err) next(err)
+    if (err) return next(err)
     program.programType = parseInt(req.body.programType)
-    if (req.body.series && req.body.episode) {
+    if (enums.util.isTvEpisode(program)) {
       program.series = {
         _id: req.body.series.id,
         name: req.body.series.name
@@ -202,7 +202,7 @@ app.post('/programs/:id/categorization', function(req, res, next) {
     }
 
     verifyTvSeries(program, function(err) {
-      if (err) { return next(err) }
+      if (err) return next(err)
       program.save(respond(res, next))
     })
   })

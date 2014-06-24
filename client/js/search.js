@@ -103,7 +103,7 @@ function internalSearchPage() {
       path: '/series/search/',
       toOption: idNamePairToSelect2Option,
       fromOption: select2OptionToIdNamePair,
-      allowAdding: false
+      allowAdding: true
     })
 
     $categorySelection.select2(programTypesSelect2).select2('val', 1)
@@ -145,11 +145,9 @@ function internalSearchPage() {
       var categoryData = { programType: $categorySelection.select2('val') }
 
       if (isTvEpisode()) {
-        var $seriesSelectData = $series.select2('data')
-        categoryData.series = {
-          'id': $seriesSelectData.id,
-          'name': $seriesSelectData.text
-        }
+        var series = select2OptionToIdNamePair($series.select2('data'))
+        console.log(series)
+        categoryData.series = series
         categoryData.episode = $episode.val()
         categoryData.season = $season.val()
       }

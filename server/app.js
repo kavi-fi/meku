@@ -127,12 +127,6 @@ app.post('/programs/:id/register', function(req, res, next) {
       })
     })
 
-    function verifyTvSeries(program, callback) {
-      if (!enums.util.isTvEpisode(program)) return callback()
-      else if (program.series._id == null) createParentProgram(program, program.series.name.trim(), callback)
-      else return callback()
-    }
-
     function addInvoicerows(currentClassification, callback) {
       var seconds = durationToSeconds(currentClassification.duration)
 
@@ -206,7 +200,11 @@ app.post('/programs/:id/categorization', function(req, res, next) {
       program.episode = req.body.episode
       program.season = _.isEmpty(req.body.season) ? null : req.body.season
     }
-    program.save(respond(res, next))
+
+    verifyTvSeries(program, function(err) {
+      if (err) { return next(err) }
+      program.save(respond(res, next))
+    })
   })
 })
 
@@ -519,4 +517,10 @@ function respond(res, next) {
     if (err) return next(err)
     res.send(data)
   }
+}
+
+function verifyTvSeries(program, callback) {
+  if (enums.util.isTvEpisode(program) && program.series._id == null) {
+    createParentProgram(program, program.series.name.trim(), callback)
+  } else return callback()
 }

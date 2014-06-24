@@ -177,6 +177,12 @@ function classificationPage() {
     allowAdding: true
   })
 
+  function selectAutocomplete(opts) {
+    select2Autocomplete(opts, function(name, val) {
+      saveProgramField($form.data('id'), name, val)
+    })
+  }
+
   warningDragOrder($('#summary .summary'))
   warningDragOrder($('#classification .summary'))
 
@@ -336,66 +342,6 @@ function classificationPage() {
       $(this).select2('data', data).trigger('validate')
     }
   }
-
-  function selectAutocomplete(opts) {
-    var defaults = {
-      toOption: function(x) { return {id: x, text: x} },
-      fromOption: function(x) { return x.id },
-      multiple: false,
-      allowAdding: false,
-      termMinLength: 1
-    }
-    opts = _.merge(defaults, opts)
-
-    var $select = opts.$el
-
-    function createSearchChoice(term, data) {
-      if (_.indexOf(data, term) === -1) {
-        return {id: term, text: term, isNew: true }
-      }
-    }
-
-    $select.select2({
-      query: function(query) {
-        var len = $.trim(query.term).length
-        if (len < opts.termMinLength) {
-          return query.callback({results: []})
-        }
-        var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + query.term
-        return $.get(path).done(function(data) {
-          return query.callback({results: data.map(opts.toOption)})
-        })
-      },
-      initSelection: function(element, callback) {
-        var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)
-        return callback(val)
-      },
-      multiple: opts.multiple,
-      placeholder: 'Valitse...',
-      createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
-    })
-
-    $select.on('change', function() {
-      var data = $(this).select2('data')
-      var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
-      saveProgramField($form.data('id'), $(this).attr('name'), val)
-    }).on('setVal', function() {
-      var arr = Array.prototype.slice.call(arguments, 1).map(opts.toOption)
-      var data = opts.multiple ? arr : (arr[0] && arr[0] || '')
-      $(this).select2('data', data).trigger('validate')
-    })
-  }
-
-  function idNamePairToSelect2Option(x) {
-    return {id: x._id === null ? x.name : x._id, text: x.name}
-  }
-
-  function select2OptionToIdNamePair(x) {
-    if (!x) return null
-    return { _id: x.isNew ? null : x.id, name: x.text }
-  }
-
-  function select2OptionToInt(x) { return parseInt(x.id) }
 
   function renderClassificationCriteria() {
     enums.criteriaCategories.map(function(category) {

@@ -85,6 +85,7 @@ enums.util.isMovieType = function(p) { return p.programType == 1 || p.programTyp
 enums.util.isGameType = function(p) { return p.programType == 7 }
 enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 7 }
 enums.util.isTvSeriesName = function(p) { return p.programType == 2 }
+enums.util.isUnknown = function(p) { return p.programType === 0 }
 
 enums.movieGenre = [
   'Fiktio',
@@ -172,6 +173,10 @@ enums.authorOrganization = {
   1: 'KAVIn virkailija',
   2: 'Kuvalautakunta',
   3: 'KHO'
+}
+
+enums.isKHO = function(number) {
+  return number == 3
 }
 
 enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }

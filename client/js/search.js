@@ -13,14 +13,14 @@ function publicSearchPage() {
 }
 
 function internalSearchPage() {
-  searchPage('/programs/search/')
+  var searchPageApi = searchPage('/programs/search/')
 
   var $page = $('#search-page')
   var $results = $page.find('.results')
   var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
   var $newClassificationButton = $page.find('.new-classification button')
 
-  $newClassificationType.select2({
+  var programTypesSelect2 = {
     data: [
       {id: 1, text: 'Elokuva'},
       {id: 3, text: 'TV-sarjan jakso'},
@@ -29,7 +29,9 @@ function internalSearchPage() {
       {id: 6, text: 'Trailer'},
       {id: 7, text: 'Peli'}
     ]
-  }).select2('val', 1)
+  }
+
+  $newClassificationType.select2(programTypesSelect2).select2('val', 1)
 
   $page.on('showDetails', '.program-box', function(e, program) {
     toggleDetailButtons($(this), program)
@@ -54,24 +56,106 @@ function internalSearchPage() {
     showClassificationPage(id)
   })
 
+  $results.on('click', 'button.categorize', function(e) {
+    showCategorizationForm($(this).parents('.program-box').data('id'))
+    $(this).hide()
+  })
+
+
   function toggleDetailButtons($detail, p) {
-    if (enums.util.isTvSeriesName(p)) {
+    if (enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
+      $detail.find('button.categorize').toggle(hasRole('kavi'))
+    } else if (enums.util.isTvSeriesName(p)) {
+      $detail.find('button.continue-classification').hide()
+      $detail.find('button.reclassify').hide()
+      $detail.find('button.categorize').hide()
     } else if (p.draftClassifications && p.draftClassifications[user._id]) {
       $detail.find('button.continue-classification').show()
       $detail.find('button.reclassify').hide()
+      $detail.find('button.categorize').hide()
     } else {
       var head = p.classifications[0]
-      var canReclassify = (!head || head.authorOrganization !== 3) && (hasRole('kavi') || !head || (head.status != 'registered'))
+      var canReclassify = (!head || !enums.isKHO(head.authorOrganization)) && (hasRole('kavi') || !head || (head.status != 'registered'))
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(!!canReclassify)
+      $detail.find('button.categorize').hide()
     }
   }
 
   function showClassificationPage(programId) {
     $('body').children('.page').hide()
     $('#classification-page').trigger('show', programId).show()
+  }
+
+  function showCategorizationForm(id) {
+    var $categorizationForm = $page.find('.categorization-form')
+    var $categorySelection = $page.find('.categorization-form input[name=category-select]')
+    var $categorySaveButton = $page.find('.categorization-form .save-category')
+
+    var $tvEpisodeForm = $categorizationForm.find('.categorization-form-tv-episode')
+    var $episode = $tvEpisodeForm.find('input[name=episode]')
+    var $season = $tvEpisodeForm.find('input[name=season]')
+    var $series = $tvEpisodeForm.find('input[name=series]')
+
+    select2Autocomplete({
+      $el: $series,
+      path: '/series/search/',
+      toOption: idNamePairToSelect2Option,
+      fromOption: select2OptionToIdNamePair,
+      allowAdding: true
+    })
+
+    $categorySelection.select2(programTypesSelect2).select2('val', 1)
+
+    var isTvEpisode = function() {
+      return enums.util.isTvEpisode({ programType: $categorySelection.select2('val') })
+    }
+
+    $categorizationForm.on('select2-blur', function(e) { $(e.target).addClass('touched') })
+
+    $categorizationForm.show()
+    validateTextChange($categorizationForm.find('input.required'), isNotEmpty)
+
+    $categorizationForm.on('validation input', function(e) {
+      var required = $categorizationForm.find('.required.invalid, input:invalid')
+        .not('.select2-container')
+        .filter(function() {
+          var $this = $(this)
+          // Filter hidden elements, but select the hidden offscreen input if its select2 container is visible
+          if ($this.is('.select2-offscreen')) {
+            return $($this.select2('container')).is(':visible')
+          }
+          return $this.is(':visible')
+        })
+      $categorySaveButton.prop('disabled', required.length > 0)
+    })
+
+    $categorySelection.change(function() {
+      $tvEpisodeForm.toggle(isTvEpisode())
+      $tvEpisodeForm.find('input').trigger('validate')
+    })
+
+    $categorySaveButton.click(function() {
+      var categoryData = { programType: $categorySelection.select2('val') }
+
+      if (isTvEpisode()) {
+        var series = select2OptionToIdNamePair($series.select2('data'))
+        categoryData.series = series
+        categoryData.episode = $episode.val()
+        categoryData.season = $season.val()
+      }
+
+      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData))
+        .done(function(program) {
+          toggleDetailButtons($('.program-box'), program)
+          $categorizationForm.hide()
+          $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
+          var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
+          searchPageApi.reloadDetail($row)
+        })
+    })
   }
 }
 
@@ -123,6 +207,8 @@ function searchPage(baseUrl) {
     }
   })
 
+  return { reloadDetail: reloadDetail }
+
   function queryChanged(q) {
     state = { q:q, page: 0 }
     $noResults.add($noMoreResults).hide()
@@ -173,6 +259,11 @@ function searchPage(baseUrl) {
     })
   }
 
+  function reloadDetail($row) {
+    closeDetail()
+    openDetail($row, false)
+  }
+
   function openDetail($row, animate) {
     var p = $row.data('program')
     updateLocationHash(p._id)
@@ -197,10 +288,12 @@ function searchPage(baseUrl) {
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
     return $('<div>', { class:'result', 'data-id': p._id })
       .data('program', p)
-      .append($('<span>').text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
-      .append($('<span>').text(countryAndYear(p)))
-      .append($('<span>').text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
-      .append($('<span>').text(enums.programType[p.programType].fi))
+      .append($('<span>', { class: 'name' }).text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
+      .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
+      .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
+      .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p)
+        ? '<i class="icon-warning-sign"></i>'
+        : enums.programType[p.programType].fi))
       .append($('<span>').append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
 
     function name(p) {

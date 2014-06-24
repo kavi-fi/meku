@@ -194,7 +194,7 @@ app.post('/programs/:id/categorization', function(req, res, next) {
     program.programType = parseInt(req.body.programType)
     if (enums.util.isTvEpisode(program)) {
       program.series = {
-        _id: req.body.series.id,
+        _id: req.body.series._id,
         name: req.body.series.name
       }
       program.episode = req.body.episode

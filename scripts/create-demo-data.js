@@ -20,7 +20,7 @@ function readFixtureData() {
 
 function demoUsers(callback) {
   async.forEach(fixtureData.users, function(u, callback) {
-    schema.User.update({username: u.username}, u, {upsert: true}, callback)
+    new schema.User(u).save(callback)
   }, callback)
 }
 

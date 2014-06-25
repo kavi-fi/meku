@@ -112,6 +112,7 @@ function loginPage() {
       .done(function() {
         showFeedback('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.')
         $username.val('')
+        $forgotPasswordButton.prop('disabled', 'disabled')
       })
       .fail(function() {
         showFeedback('Käyttäjätunnusta ei ole olemassa.')

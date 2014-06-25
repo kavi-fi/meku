@@ -16,6 +16,7 @@ var classification = require('../shared/classification')
 var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var builder = require('xmlbuilder')
+var bcrypt = require('bcrypt')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -55,6 +56,53 @@ app.post('/login', function(req, res, next) {
 app.post('/logout', function(req, res, next) {
   res.clearCookie('user')
   res.send({})
+})
+
+app.post('/forgot-password', function(req, res, next) {
+  var username = req.body.username
+
+  if (!username) return res.send(403)
+
+  User.findOne({ username: username }, function(err, user) {
+    if (err) return next(err)
+    if (!user) return res.send(403)
+
+    if (!user.emails) {
+      console.log(user.username + ' has no email address')
+      return res.send(500)
+    }
+
+    // todo: delete resetHash after it is used once (or after some time)
+    if (user.resetHash) {
+      sendSaltLinkViaEmail(user.resetHash)
+    } else {
+      bcrypt.genSalt(1, function (err, s) {
+        if (err) return next(err)
+        var salt = new Buffer(s, 'base64').toString('hex')
+        user.resetHash = salt
+
+        user.save(function (err) {
+          if (err) return next(err)
+          sendSaltLinkViaEmail(user.resetHash)
+        })
+      })
+    }
+
+    function sendSaltLinkViaEmail(salt) {
+      var hostUrl = process.env.HOST_URL ? process.env.HOST_URL : 'http://meku.herokuapp.com'
+      var url = hostUrl + '/reset-password/' + salt
+      var emailData = {
+        recipients: user.emails,
+        subject: 'Ohjeet salasanan vaihtamista varten',
+        body: 'Tämän linkin avulla voit vaihtaa salasanasi: <a href="' + url + '">' + url + '</a>'
+      }
+
+      sendEmail(emailData, function(err) {
+        if (err) return next(err)
+        res.send({})
+      })
+    }
+  })
 })
 
 app.get('/public/search/:q?', function(req, res, next) {
@@ -437,7 +485,7 @@ function authenticate(req, res, next) {
   var whitelist = [
     'GET:/index.html', 'GET:/public.html', 'GET:/templates.html', 'GET:/public/search/',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
-    'POST:/login', 'POST:/logout', 'POST:/xml'
+    'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password'
   ]
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()

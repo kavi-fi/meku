@@ -240,6 +240,10 @@ app.get('/accounts/:id', function(req, res, next) {
   Account.findById(req.params.id, respond(res, next))
 })
 
+app.get('/users', function(req, res, next) {
+  User.find(respond(res, next))
+})
+
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 app.get('/productionCompanies/search/:query', queryNameIndex('ProductionCompany'))

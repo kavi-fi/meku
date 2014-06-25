@@ -148,6 +148,12 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 .page { display: none; }
 
+.result {
+  border-bottom: 2px solid #e8e8e8; line-height: 47px;
+  font-size: 14px; color: #444444; cursor: pointer;
+  display: -webkit-flex; display: flex; -webkit-align-items: baseline; align-items: baseline;
+}
+
 #search-page .row { border-bottom: none; padding-bottom: 0; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; height: 220px; }
 #search-page .left { width: 600px; }
@@ -166,11 +172,6 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 #search-page button.search { margin-left: 15px; }
 #search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
-#search-page .result {
-  border-bottom: 2px solid #e8e8e8; line-height: 47px;
-  font-size: 14px; color: #444444; cursor: pointer;
-  display: -webkit-flex; display: flex; -webkit-align-items: baseline; align-items: baseline;
-}
 #search-page .result > span:nth-child(1) { min-width: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 #search-page .result > span:nth-child(2) { flex-shrink: 800; padding: 0 14px; margin-right: auto; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 #search-page .result > span:nth-child(3) { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
@@ -611,6 +612,10 @@ textarea.invalid:disabled,
 #billing-page button { display: none; }
 #billing-page .program-box-container { padding: 0 0 10px 0; }
 #billing-page .deselected td + td { opacity: 0.4; }
+
+#user-management-page { width: 940px; margin: 0 auto; padding: 70px 0; }
+#user-management-page .result span { width: 33%; }
+#user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

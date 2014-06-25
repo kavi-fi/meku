@@ -31,6 +31,7 @@ $.fn.labeledText = function(txt) {
 }
 
 function renderWarningSummary(summary) {
+  if (!summary) return undefined
   return $('#templates > .warning-summary').clone()
     .find('.agelimit').attr('src', ageLimitIcon(summary)).end()
     .find('.warnings').html(warningIcons(summary)).end()

@@ -284,17 +284,14 @@ function searchPage(baseUrl) {
   }
 
   function render(p, query) {
-    var c = p.classifications[0]
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
     return $('<div>', { class:'result', 'data-id': p._id })
       .data('program', p)
       .append($('<span>', { class: 'name' }).text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
       .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
-      .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(c)))
-      .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p)
-        ? '<i class="icon-warning-sign"></i>'
-        : enums.programType[p.programType].fi))
-      .append($('<span>').append(c && renderWarningSummary(classification.summary(p, c)) || ' - '))
+      .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
+      .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="icon-warning-sign"></i>' : enums.programType[p.programType].fi))
+      .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
 
     function name(p) {
       return _.compact([p.name[0], utils.seasonEpisodeCode(p)]).join(' ')
@@ -305,7 +302,8 @@ function searchPage(baseUrl) {
       return s == '' ? s : '('+s+')'
     }
 
-    function duration(c) {
+    function duration(p) {
+      var c = p.classifications[0]
       if (!c || !c.duration) return ''
       var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
       if (!match) return c.duration

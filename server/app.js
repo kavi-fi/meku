@@ -154,7 +154,6 @@ app.post('/programs/:id/register', function(req, res, next) {
         })
       }
     }
-
   })
 })
 
@@ -188,7 +187,6 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
       callback(null, [])
     }
   }
-
 })
 
 app.post('/programs/:id/categorization', function(req, res, next) {

@@ -6,7 +6,13 @@ if (typeof module !== 'undefined' && module.exports) {
 
 (function(exports) {
 
+exports.fullSummary = function(program) {
+  var c = enums.util.isTvSeriesName(program) ? tvSeriesClassification(program) : program.classifications[0]
+  return summary(program, c)
+}
+
 var summary = exports.summary = function(program, classification) {
+  if (!classification) return undefined
   if (classification.safe) return { age:'S', warnings:[] }
   var maxAgeLimit = ageLimit(classification)
   var warnings = _(classification.criteria)
@@ -23,6 +29,13 @@ var summary = exports.summary = function(program, classification) {
   return { age: maxAgeLimit, warnings: warnings }
 }
 
+var tvSeriesClassification = function(program) {
+  return {
+    criteria: program.tvSeriesCriteria,
+    legacyAgeLimit: program.tvSeriesCriteria.length == 0 ? program.tvSeriesLegacyAgeLimit : undefined,
+    warningOrder:[]
+  }
+}
 var classificationText = function(classification) {
   if (classification.age === 'S') {
     return 'Kuvaohjelma on sallittu.'

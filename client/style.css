@@ -13,7 +13,7 @@ body {
 #login-overlay, #error-overlay { z-index: 2; }
 #login, #error-dialog { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
 #login > div, #error-dialog > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
-#login label { display: block; text-align: left; }
+#login label { text-align: left; }
 #login input { width: 330px; font-weight: normal; margin: 10px 0; }
 #login input.invalid { background-color: #fff; }
 #login button { margin-top: 10px; }
@@ -153,7 +153,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 #search-page .left { width: 600px; }
 #search-page .new-classification { width: 340px; }
 #search-page .new-classification label { width: 200px; }
-#search-page .search-label { display: block; text-align: left; padding: 0 0 20px 0; }
+#search-page .search-label { display: block; padding: 0 0 20px 0; }
 
 #search-page .new-classification label { display: block; text-align: left; padding: 0 0 20px 0; }
 #search-page .new-classification button { margin-left: 15px; }
@@ -189,7 +189,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .program-box .classifications a { color: #4499FF; }
 .program-box h2 { color: #444; margin: 0; padding: 0 15px 0 0; font-size: 20px; line-height: 36px; }
 .program-box h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
-.program-box label { display: block; padding: 19px 0 0 0; text-align: left; width: auto; }
+.program-box label { display: block; padding: 19px 0 0 0; width: auto; }
 .program-box .criteria label { text-transform: capitalize; }
 .program-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 .program-box .buttons { float: right; }
@@ -302,13 +302,9 @@ label, input {
 }
 
 label {
-  width: 140px;
-  text-align: right;
-  padding: 0 20px 0 0;
   font-weight: bold;
   font-size: 14px;
   color: #444444;
-  line-height: 19px;
 }
 
 .select2-container { width: 302px; }
@@ -375,7 +371,7 @@ textarea.invalid:disabled,
 #program-details { display: none; }
 
 #program-details textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
-#program-details label { width: 145px; }
+#program-details label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
 #program-details label[for=synopsis] { vertical-align: top; padding-top: 9px; }
 
 #program-details input.duration { margin-bottom: 3px }

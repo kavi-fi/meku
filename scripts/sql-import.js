@@ -269,7 +269,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, demoUsers, demoAccounts, linkUserAccounts, linkSecurityGroupAccounts], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, linkUserAccounts, linkSecurityGroupAccounts], callback)
 
   function accountBase(callback) {
     var seq = 1

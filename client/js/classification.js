@@ -44,12 +44,10 @@ function classificationPage() {
     e.preventDefault()
     $.post('/programs/' + $form.data('id') + '/register', function(program) {
       $form.data('id', '').hide().trigger('show')
-      var cl = program.classifications[0]
-      var summary = classification.summary(program, cl)
       showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
         .append($('<span>', {class: 'name'}).text(program.name))
-        .append(renderWarningSummary(summary))
-        .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(cl.registrationDate)))
+        .append(renderWarningSummary(classification.fullSummary(program)))
+        .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(program.classifications[0].registrationDate)))
         .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
       $("#search-page").trigger('show').show()
       $(window).scrollTop(0)

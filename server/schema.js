@@ -51,7 +51,9 @@ var ProgramSchema = new Schema({
   draftClassifications: {}, // { userId:classification, userId:classification2 }
   programType: Number, // enums.programType
   gameFormat: String,
-  season: String, episode: String, series: { _id: ObjectId, name: String }
+  season: String, episode: String, series: { _id: ObjectId, name: String },
+  tvSeriesCriteria: [Number],
+  tvSeriesLegacyAgeLimit: String
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))

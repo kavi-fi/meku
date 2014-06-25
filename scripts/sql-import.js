@@ -424,19 +424,33 @@ function markUnclassifiedProgramsDeleted(callback) {
 }
 
 function linkTvSeries(callback) {
-  var tick = progressMonitor()
-  conn.query('select program.id as programId, program.season, program.episode, parent.id as parentId from meku_audiovisualprograms program join meku_audiovisualprograms parent on (program.parent_id = parent.id) where program.deleted != "1" and parent.deleted != "1" and program.program_type = "03" and parent.program_type = "05"')
-    .stream()
-    .pipe(consumer(onRow, callback))
+  async.applyEachSeries([linkEpisodesToSeries, calculateParentClassifications], callback)
 
-  function onRow(row, callback) {
-    tick()
-    schema.Program.findOne({ emekuId: row.parentId }, { name:1 }, function(err, parent) {
-      var update = { season: trimPeriod(row.season), episode: trimPeriod(row.episode), series: { _id: parent._id, name: parent.name[0] } }
-      schema.Program.update({ emekuId: row.programId }, update, callback)
+  function linkEpisodesToSeries(callback) {
+    var tick = progressMonitor()
+    conn.query('select program.id as programId, program.season, program.episode, parent.id as parentId from meku_audiovisualprograms program join meku_audiovisualprograms parent on (program.parent_id = parent.id) where program.deleted != "1" and parent.deleted != "1" and program.program_type = "03" and parent.program_type = "05"')
+      .stream()
+      .pipe(consumer(onRow, callback))
+
+    function onRow(row, callback) {
+      tick()
+      schema.Program.findOne({ emekuId: row.parentId }, { name:1 }, function(err, parent) {
+        var update = { season: trimPeriod(row.season), episode: trimPeriod(row.episode), series: { _id: parent._id, name: parent.name[0] } }
+        schema.Program.update({ emekuId: row.programId }, update, callback)
+      })
+    }
+    function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
+  }
+
+  function calculateParentClassifications(callback) {
+    var tick = progressMonitor(10)
+    schema.Program.find({ programType: 2 }, { _id:1 }).lean().exec(function(err, series) {
+      async.eachLimit(_.pluck(series, '_id'), 10, function(id, callback) {
+        tick('*')
+        schema.Program.updateTvSeriesClassification(id, callback)
+      }, callback)
     })
   }
-  function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
 }
 
 function linkCustomersIds(callback) {

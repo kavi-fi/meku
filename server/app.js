@@ -531,18 +531,7 @@ function respond(res, next) {
 
 function verifyTvSeriesClassification(program, callback) {
   if (!enums.util.isTvEpisode(program)) return callback()
-  updateTvSeriesClassification(program.series._id, callback)
-}
-
-function updateTvSeriesClassification(seriesId, callback) {
-  var fields = { classifications: { $slice: 1 } }
-  Program.find({ 'series._id': seriesId, 'classifications.0': { $exists: true } }, fields).lean().exec(function(err, programs) {
-    if (err) return callback(err)
-    var classifications = programs.map(function(p) { return p.classifications[0] })
-    var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
-    var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max(function(s) { return parseInt(s) || 0 }).value()
-    Program.update({ _id: seriesId }, { tvSeriesCriteria: criteria, tvSeriesLegacyAgeLimit: legacyAgeLimit || 'S' }, callback)
-  })
+  Program.updateTvSeriesClassification(program.series._id, callback)
 }
 
 function verifyTvSeries(program, callback) {

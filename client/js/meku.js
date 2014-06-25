@@ -64,6 +64,7 @@ function setup() {
   classificationPage()
   buyerPage()
   billingPage()
+  userManagementPage()
   navigation.start()
 }
 
@@ -120,6 +121,7 @@ function navi() {
   var $navi = $('#header .navi')
 
   $navi.find('a[data-href="#billing-page"]').parent().toggle(hasRole('kavi'))
+  $navi.find('a[data-href="#user-management-page"]').parent().toggle(hasRole('kavi'))
 
   $navi.find('a').on('click', function(e) {
     e.preventDefault()

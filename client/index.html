@@ -23,6 +23,7 @@
   <script src="js/search.js"></script>
   <script src="js/classification.js"></script>
   <script src="js/billing.js"></script>
+  <script src="js/user-management.js"></script>
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
@@ -56,8 +57,8 @@
       <ul class="navi">
         <li><a href="#haku" data-href="#search-page">Haku</a></li>
         <li><a href="#luokittelu" data-href="#classification-page">Luokittelu</a></li>
-        <li><a href="#tilaajat" data-href="#buyer-page">Tilaajat</a></li>
         <li><a href="#laskutus" data-href="#billing-page">Laskutus</a></li>
+        <li><a href="#kayttajat" data-href="#user-management-page">Käyttäjät</a></li>
       </ul>
     </div>
   </div>
@@ -237,8 +238,6 @@
   </form>
   </div>
 
-  <div id="buyer-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
-
   <div id="billing-page" class="page">
     <div class="row">
       <div class="content">
@@ -252,6 +251,8 @@
       </div>
     </div>
   </div>
+
+  <div id="user-management-page"></div>
 
   <div id="templates"></div>
   <div id="overlay"></div>

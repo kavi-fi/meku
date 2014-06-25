@@ -42,17 +42,6 @@ var isReclassification = exports.isReclassification = function(program, classifi
   return _.any(program.classifications, function(c) { return String(classification._id) != String(c._id) })
 }
 
-exports.mostValid = function(classifications) {
-  if (!classifications || classifications.length == 0) return undefined
-  if (classifications.length == 1) return classifications[0]
-  var head = classifications[0]
-  if (head.status == 'in_process') {
-    return classifications[1]
-  } else {
-    return head
-  }
-}
-
 var ageLimit = exports.ageLimit = function(classification) {
   if (!classification) return '-'
   if (classification.safe) return 'S'

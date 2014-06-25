@@ -284,7 +284,7 @@ function searchPage(baseUrl) {
   }
 
   function render(p, query) {
-    var c = classification.mostValid(p.classifications)
+    var c = p.classifications[0]
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
     return $('<div>', { class:'result', 'data-id': p._id })
       .data('program', p)

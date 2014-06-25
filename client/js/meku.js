@@ -80,7 +80,8 @@ function loginPage() {
   var $username = $form.find('input[name="username"]').on('input', checkInput)
   var $password = $form.find('input[name="password"]').on('input', checkInput)
   var $feedback = $form.find('.feedback')
-  var $button = $form.find('button')
+  var $loginButton = $form.find('button.login')
+  var $forgotPasswordButton = $form.find('button.forgot-password')
   var $info = $('#header .user-info').toggle(!!user)
   $info.find('.name').text(user ? user.name : '')
 
@@ -90,19 +91,32 @@ function loginPage() {
 
   $form.on('validate', function() {
     var invalid = $username.hasClass('invalid') || $password.hasClass('invalid')
-    $button.prop('disabled', invalid? 'disabled' : '')
+    $loginButton.prop('disabled', invalid? 'disabled' : '')
+    $forgotPasswordButton.prop('disabled', $username.hasClass('invalid') ? 'disabled' : '')
     $feedback.slideUp()
   })
 
-  $button.click(function() {
+  $loginButton.click(function() {
     $.post('/login', JSON.stringify({ username: $username.val(), password: $password.val() }))
       .done(function() { location.reload() })
       .fail(function(jqXHR) {
         if (jqXHR.status == 403) {
           $password.val('').trigger('input').focus()
-          $feedback.slideDown()
+          showFeedback('Väärä käyttäjätunnus tai salasana.')
         }
       })
+  })
+
+  $forgotPasswordButton.click(function() {
+    $.post('/forgot-password', JSON.stringify({ username: $username.val() }))
+      .done(function() {
+        showFeedback('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.')
+        $username.val('')
+      })
+      .fail(function() {
+        showFeedback('Käyttäjätunnusta ei ole olemassa.')
+      })
+    $password.val('')
   })
 
   return { show: show }
@@ -111,8 +125,14 @@ function loginPage() {
     $form.add($overlay).show()
     $username.focus()
   }
+
   function checkInput() {
     $(this).toggleClass('invalid', $(this).val() === '').trigger('validate')
+  }
+
+  function showFeedback(text) {
+    $feedback.html(text)
+    $feedback.slideDown()
   }
 }
 

@@ -161,7 +161,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 #search-page .new-classification input { width: auto; }
 #search-page .query { width: 350px; }
 #search-page .filters { font-size: 14px; color: #444444; }
-#search-page .filters label { width: auto; font-weight: normal; }
+#search-page .filters label { padding-right: 12px; font-weight: normal; }
 #search-page .filters input { margin-right: 10px; }
 #search-page button.search { margin-left: 15px; }
 #search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }

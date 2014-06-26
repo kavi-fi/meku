@@ -36,7 +36,6 @@ var tasks = {
   markUnclassifiedProgramsDeleted: markUnclassifiedProgramsDeleted,
   linkCustomersIds: linkCustomersIds,
   linkTvSeries: linkTvSeries
-
 }
 
 if (process.argv.length < 3) {
@@ -424,7 +423,7 @@ function markUnclassifiedProgramsDeleted(callback) {
 }
 
 function linkTvSeries(callback) {
-  async.applyEachSeries([linkEpisodesToSeries, calculateParentClassifications], callback)
+  async.applyEachSeries([linkEpisodesToSeries, calculateParentClassifications, deleteLegacyTvSeriesClassifications], callback)
 
   function linkEpisodesToSeries(callback) {
     var tick = progressMonitor()
@@ -451,6 +450,11 @@ function linkTvSeries(callback) {
       }, callback)
     })
   }
+
+  function deleteLegacyTvSeriesClassifications(callback) {
+    schema.Program.update({ programType: 2 }, { classifications:[] }, { multi: true }, callback)
+  }
+
 }
 
 function linkCustomersIds(callback) {

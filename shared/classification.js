@@ -32,10 +32,11 @@ var summary = exports.summary = function(program, classification) {
 var tvSeriesClassification = function(program) {
   return {
     criteria: program.tvSeriesCriteria,
-    legacyAgeLimit: program.tvSeriesCriteria.length == 0 ? program.tvSeriesLegacyAgeLimit : undefined,
+    legacyAgeLimit: program.tvSeriesLegacyAgeLimit,
     warningOrder:[]
   }
 }
+
 var classificationText = function(summary) {
   if (summary.age == 0) {
     return 'Kuvaohjelma on sallittu.'
@@ -44,6 +45,11 @@ var classificationText = function(summary) {
          + ' vuotta ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
          + criteriaText(summary.warnings) + '.'
   }
+}
+
+var criteriaAgeLimit = function(classification) {
+  if (classification.criteria.length == 0) return 0
+  return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
 }
 
 var criteriaText = exports.criteriaText = function(warnings) {
@@ -60,9 +66,9 @@ var ageAsText = function(age) { return age && age.toString() || 'S' }
 var ageLimit = exports.ageLimit = function(classification) {
   if (!classification) return undefined
   if (classification.safe) return 0
-  if (classification.criteria.length == 0 && classification.legacyAgeLimit) return classification.legacyAgeLimit
-  if (classification.criteria.length == 0) return 0
-  return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
+  var criteria = criteriaAgeLimit(classification)
+  var legacy = classification.legacyAgeLimit || 0
+  return Math.max(criteria, legacy)
 }
 
 exports.registrationEmail = function(program, classification, user) {

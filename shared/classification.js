@@ -13,7 +13,7 @@ exports.fullSummary = function(program) {
 
 var summary = exports.summary = function(program, classification) {
   if (!classification) return undefined
-  if (classification.safe) return { age:'S', warnings:[] }
+  if (classification.safe) return { age:0, warnings:[] }
   var maxAgeLimit = ageLimit(classification)
   var warnings = _(classification.criteria)
     .map(function(id) { return enums.classificationCriteria[id - 1] })
@@ -36,13 +36,13 @@ var tvSeriesClassification = function(program) {
     warningOrder:[]
   }
 }
-var classificationText = function(classification) {
-  if (classification.age === 'S') {
+var classificationText = function(summary) {
+  if (summary.age == 0) {
     return 'Kuvaohjelma on sallittu.'
   } else {
-    return 'Kuvaohjelman ikäraja on ' + classification.age
-         + ' vuotta ja ' + (classification.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
-         + criteriaText(classification.warnings) + '.'
+    return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age)
+         + ' vuotta ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+         + criteriaText(summary.warnings) + '.'
   }
 }
 
@@ -55,20 +55,14 @@ var isReclassification = exports.isReclassification = function(program, classifi
   return _.any(program.classifications, function(c) { return String(classification._id) != String(c._id) })
 }
 
-var ageLimit = exports.ageLimit = function(classification) {
-  if (!classification) return '-'
-  if (classification.safe) return 'S'
-  if (classification.criteria.length == 0 && classification.legacyAgeLimit) return classification.legacyAgeLimit
-  return _(classification.criteria)
-    .map(function(id) { return enums.classificationCriteria[id - 1] })
-    .pluck('age')
-    .reduce(maxAge) || 'S'
+var ageAsText = function(age) { return age && age.toString() || 'S' }
 
-  function maxAge(prev, curr) {
-    if (curr == 'S') return prev
-    if (prev == 'S') return curr
-    return parseInt(curr) > prev ? curr : prev
-  }
+var ageLimit = exports.ageLimit = function(classification) {
+  if (!classification) return undefined
+  if (classification.safe) return 0
+  if (classification.criteria.length == 0 && classification.legacyAgeLimit) return classification.legacyAgeLimit
+  if (classification.criteria.length == 0) return 0
+  return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
 }
 
 exports.registrationEmail = function(program, classification, user) {
@@ -104,7 +98,7 @@ exports.registrationEmail = function(program, classification, user) {
     name: program.name.join(', '),
     year: program.year || '',
     classification: classificationText(classificationSummary),
-    classificationShort: classificationSummary.age + ' ' + criteriaText(classificationSummary.warnings),
+    classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
     link: (user.role == 'kavi') ? linkKavi : linkOther,
     publicComments: classification.publicComments,
     authorEmail: user.email,

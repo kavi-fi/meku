@@ -520,7 +520,7 @@ textarea.invalid:disabled,
 #criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
 #criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
 #criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
-#criteria .category .criteria.agelimit-S { background-image: url('images/agelimit-s.png'); }
+#criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
 
 #criteria .category-container .category.sex, #criteria .category-container .category.drugs {
   margin-right: 0;

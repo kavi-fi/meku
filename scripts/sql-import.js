@@ -169,7 +169,7 @@ function classifications(callback) {
         if (row.format) classification.format = mapFormat(row.format)
         if (row.runtime) classification.duration = row.runtime
         if (row.age_level) {
-          classification.legacyAgeLimit = row.age_level
+          classification.legacyAgeLimit = row.age_level == 'S' ? 0 : parseInt(row.age_level)
         }
         if (row.descriptors) classification.warningOrder = optionListToArray(row.descriptors)
         classification.provider_id = row.provider_id

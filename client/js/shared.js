@@ -38,7 +38,7 @@ function renderWarningSummary(summary) {
 }
 
 function ageLimitIcon(summary) {
-  return 'images/agelimit-'+summary.age.toString().toLowerCase()+'.png'
+  return 'images/agelimit-'+summary.age+'.png'
 }
 
 function warningIcons(summary) {

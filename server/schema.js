@@ -19,7 +19,7 @@ var classification = {
   criteria: [Number],
   criteriaComments: {},
   warningOrder: [String],
-  legacyAgeLimit: String,
+  legacyAgeLimit: Number,
   creationDate: Date,
   registrationDate: Date,
   registrationEmailAddresses: [{email: String, manual: Boolean}],
@@ -54,7 +54,7 @@ var ProgramSchema = new Schema({
   season: String, episode: String,
   series: { _id: { type: ObjectId, index:true }, name: String },
   tvSeriesCriteria: [Number],
-  tvSeriesLegacyAgeLimit: String
+  tvSeriesLegacyAgeLimit: Number
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))
@@ -74,8 +74,8 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
     if (err) return callback(err)
     var classifications = programs.map(function(p) { return p.classifications[0] })
     var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
-    var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max(function(s) { return s && parseInt(s) || 0 }).value()
-    if (!legacyAgeLimit || legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
+    var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
+    if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
     Program.update({ _id: seriesId }, { tvSeriesCriteria: criteria, tvSeriesLegacyAgeLimit: legacyAgeLimit }, callback)
   })
 }

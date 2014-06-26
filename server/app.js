@@ -41,17 +41,21 @@ app.post('/login', function(req, res, next) {
     user.checkPassword(password, function(err, ok) {
       if (err) return next(err)
       if (!ok) return res.send(403)
-      res.cookie('user', {
-        _id: user._id.toString(),
-        username: user.username,
-        name: user.name,
-        role: user.role,
-        email: _.first(user.emails)
-      }, { signed: true })
+      setLoginCookie(res, user)
       res.send({})
     })
   })
 })
+
+function setLoginCookie(res, user) {
+  res.cookie('user', {
+    _id: user._id.toString(),
+    username: user.username,
+    name: user.name,
+    role: user.role,
+    email: _.first(user.emails)
+  }, { signed: true })
+}
 
 app.post('/logout', function(req, res, next) {
   res.clearCookie('user')
@@ -90,7 +94,7 @@ app.post('/forgot-password', function(req, res, next) {
 
     function sendSaltLinkViaEmail(salt) {
       var hostUrl = process.env.HOST_URL ? process.env.HOST_URL : 'http://meku.herokuapp.com'
-      var url = hostUrl + '/reset-password/' + salt
+      var url = hostUrl + '/reset-password.html#/' + salt
       var emailData = {
         recipients: user.emails,
         subject: 'Ohjeet salasanan vaihtamista varten',
@@ -103,6 +107,33 @@ app.post('/forgot-password', function(req, res, next) {
       })
     }
   })
+})
+
+app.get('/check-reset-hash/:hash', function(req, res, next) {
+  User.findOne({ resetHash: req.params.hash }, function(err, user) {
+    if (err) return next(err)
+    if (!user) return res.send(403)
+    res.send({})
+  })
+})
+
+app.post('/reset-password', function(req, res, next) {
+  var resetHash = req.body.resetHash
+  if (resetHash) {
+    User.findOne({ resetHash: resetHash }, function (err, user) {
+      if (err) return next(err)
+      if (!user) return res.send(403)
+      user.password = req.body.password
+      user.resetHash = null
+      user.save(function (err, user) {
+        if (err) return next(err)
+        setLoginCookie(res, user)
+        res.send({})
+      })
+    })
+  } else {
+    return res.send(403)
+  }
 })
 
 app.get('/public/search/:q?', function(req, res, next) {
@@ -485,7 +516,8 @@ function authenticate(req, res, next) {
   var whitelist = [
     'GET:/index.html', 'GET:/public.html', 'GET:/templates.html', 'GET:/public/search/',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
-    'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password'
+    'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
+    'POST:/reset-password', 'GET:/check-reset-hash'
   ]
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()

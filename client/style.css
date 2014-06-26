@@ -20,6 +20,11 @@ body {
 #login .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
 #error-dialog a { color: #00BB88; }
 
+#reset-password-page { margin: 0 auto; width: 700px; }
+#reset-password-page .reset-password-form div > * { display: block; margin: 0 auto; }
+#reset-password-page .feedback { display: none; margin-top: 10px; text-align: center; }
+#reset-password-page label { width: 150px; }
+
 #criteria .category, [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;

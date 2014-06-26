@@ -8,11 +8,11 @@ function resetPasswordPage() {
   var $feedback = $page.find('.feedback')
   var $button = $form.find('button')
 
-  var resetHash = parseLocationHash().length === 2 ? parseLocationHash()[1] : undefined
+  var resetHash = location.hash.substring(1)
 
   $form.on('validate', function () {
     var invalid = !($password.hasClass('invalid') && $password.val() === $passwordConfirmation.val())
-    $button.prop('disabled', invalid ? 'disabled' : '')
+    $button.prop('disabled', invalid)
     $feedback.slideUp()
   })
 
@@ -22,7 +22,7 @@ function resetPasswordPage() {
         window.location = '/'
       })
       .fail(function() {
-        showFeedback('Virhe salasanan vaihtamisessa.')
+        $feedback.html('Virhe salasanan vaihtamisessa.').slideDown()
       })
   })
 
@@ -33,29 +33,40 @@ function resetPasswordPage() {
     if (resetHash) {
       $.get('/check-reset-hash/' + resetHash, function(data) {
         if (data.newUser) {
-          showActivationInstructions(data)
+          showActivationInstructions(data.name)
+        } else {
+          showResetInstructions(data.name)
         }
       })
         .fail(function() {
           $form.hide()
-          showFeedback('Virheellinen tunniste.')
+          $feedback.html('Virheellinen tunniste.').slideDown()
         })
+    } else {
+      $form.hide()
     }
   }
 
-  function showActivationInstructions(data) {
-    var html = '<h1>Käyttäjätunnuksen aktivointi</h1>'
-             + '<span>'
-             + 'Tervetuloa aktivoimaan käyttäjätunnuksesi ' + data.name + ', aseta uusi salasanasi '
-             + 'allaolevan lomakkeen avulla.'
-             + '</span>'
+  function updateInstructions(header, text) {
+    var $instructions = $page.find('.instructions')
 
-    $page.find('.instructions').html(html).show()
+    $instructions.find('h1').text(header)
+    $instructions.find('span').text(text)
+    $instructions.show()
   }
 
-  function showFeedback(text) {
-    $feedback.html(text)
-    $feedback.slideDown()
+  function showResetInstructions(name) {
+    var text = 'Tervetuloa vaihtamaan salasanasi ' + name + ', aseta uusi salasanasi '
+             + 'allaolevan lomakkeen avulla.'
+
+    updateInstructions('Salasanan vaihtaminen', text)
+  }
+
+  function showActivationInstructions(name) {
+    var text = 'Tervetuloa aktivoimaan käyttäjätunnuksesi ' + name + ', aseta salasanasi '
+             + 'allaolevan lomakkeen avulla.'
+
+    updateInstructions('Käyttäjätunnuksen aktivointi', text)
   }
 
   function checkInput() {

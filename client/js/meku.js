@@ -91,8 +91,8 @@ function loginPage() {
 
   $form.on('validate', function() {
     var invalid = $username.hasClass('invalid') || $password.hasClass('invalid')
-    $loginButton.prop('disabled', invalid? 'disabled' : '')
-    $forgotPasswordButton.prop('disabled', $username.hasClass('invalid') ? 'disabled' : '')
+    $loginButton.prop('disabled', invalid)
+    $forgotPasswordButton.prop('disabled', $username.hasClass('invalid'))
     $feedback.slideUp()
   })
 
@@ -102,7 +102,7 @@ function loginPage() {
       .fail(function(jqXHR) {
         if (jqXHR.status == 403) {
           $password.val('').trigger('input').focus()
-          showFeedback('Väärä käyttäjätunnus tai salasana.')
+          $feedback.html('Väärä käyttäjätunnus tai salasana.').slideDown()
         }
       })
   })
@@ -110,14 +110,14 @@ function loginPage() {
   $forgotPasswordButton.click(function() {
     $.post('/forgot-password', JSON.stringify({ username: $username.val() }))
       .done(function() {
-        showFeedback('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.')
+        $feedback.html('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.').slideDown()
         $username.val('')
-        $forgotPasswordButton.prop('disabled', 'disabled')
+        $forgotPasswordButton.prop('disabled', true)
       })
       .fail(function() {
-        showFeedback('Käyttäjätunnusta ei ole olemassa.')
+        $feedback.html('Käyttäjätunnusta ei ole olemassa.').slideDown()
       })
-    $password.val('')
+    $password.val('').trigger('input').focus()
   })
 
   return { show: show }
@@ -129,11 +129,6 @@ function loginPage() {
 
   function checkInput() {
     $(this).toggleClass('invalid', $(this).val() === '').trigger('validate')
-  }
-
-  function showFeedback(text) {
-    $feedback.html(text)
-    $feedback.slideDown()
   }
 }
 

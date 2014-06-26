@@ -81,9 +81,7 @@ app.post('/forgot-password', function(req, res, next) {
     } else {
       bcrypt.genSalt(1, function (err, s) {
         if (err) return next(err)
-        var salt = new Buffer(s, 'base64').toString('hex')
-        user.resetHash = salt
-
+        user.resetHash = new Buffer(s, 'base64').toString('hex')
         user.save(function (err) {
           if (err) return next(err)
           sendSaltLinkViaEmail(user.resetHash)
@@ -92,8 +90,8 @@ app.post('/forgot-password', function(req, res, next) {
     }
 
     function sendSaltLinkViaEmail(salt) {
-      var hostUrl = process.env.HOST_URL ? process.env.HOST_URL : 'http://meku.herokuapp.com'
-      var url = hostUrl + '/reset-password.html#/' + salt
+      var hostUrl = isDev() ? 'http://localhost:3000' : 'http://meku.herokuapp.com'
+      var url = hostUrl + '/reset-password.html#' + salt
       var emailData = {
         recipients: user.emails,
         subject: 'Ohjeet salasanan vaihtamista varten',
@@ -112,7 +110,7 @@ app.get('/check-reset-hash/:hash', function(req, res, next) {
   User.findOne({ resetHash: req.params.hash, active: { $ne: false } }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
-    if (user.password) return res.send({})
+    if (user.password) return res.send({ name: user.name })
     res.send({ newUser: true, name: user.name })
   })
 })
@@ -127,9 +125,7 @@ app.post('/reset-password', function(req, res, next) {
       user.resetHash = null
       user.save(function (err, user) {
         if (err) return next(err)
-        if (user.active) {
-          setLoginCookie(res, user)
-        }
+        setLoginCookie(res, user)
         res.send({})
       })
     })

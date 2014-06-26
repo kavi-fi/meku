@@ -23,6 +23,8 @@ body {
 #reset-password-page { margin: 0 auto; width: 700px; }
 #reset-password-page .reset-password-form div > * { display: block; margin: 0 auto; }
 #reset-password-page .feedback { display: none; margin-top: 10px; text-align: center; }
+#reset-password-page .instructions { display: none; margin-top: 10px; }
+#reset-password-page .instructions h1 { text-align: center; }
 #reset-password-page label { width: 150px; }
 
 #criteria .category, [draggable] {

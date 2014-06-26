@@ -31,11 +31,26 @@ function resetPasswordPage() {
   function show() {
     $page.show()
     if (resetHash) {
-      $.get('/check-reset-hash/' + resetHash).fail(function() {
-        $form.hide()
-        showFeedback('Virheellinen tunniste.')
+      $.get('/check-reset-hash/' + resetHash, function(data) {
+        if (data.newUser) {
+          showActivationInstructions(data)
+        }
       })
+        .fail(function() {
+          $form.hide()
+          showFeedback('Virheellinen tunniste.')
+        })
     }
+  }
+
+  function showActivationInstructions(data) {
+    var html = '<h1>Käyttäjätunnuksen aktivointi</h1>'
+             + '<span>'
+             + 'Tervetuloa aktivoimaan käyttäjätunnuksesi ' + data.name + ', aseta uusi salasanasi '
+             + 'allaolevan lomakkeen avulla.'
+             + '</span>'
+
+    $page.find('.instructions').html(html).show()
   }
 
   function showFeedback(text) {

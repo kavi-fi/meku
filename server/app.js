@@ -67,7 +67,7 @@ app.post('/forgot-password', function(req, res, next) {
 
   if (!username) return res.send(403)
 
-  User.findOne({ username: username }, function(err, user) {
+  User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
 
@@ -76,7 +76,6 @@ app.post('/forgot-password', function(req, res, next) {
       return res.send(500)
     }
 
-    // todo: delete resetHash after it is used once (or after some time)
     if (user.resetHash) {
       sendSaltLinkViaEmail(user.resetHash)
     } else {
@@ -110,24 +109,27 @@ app.post('/forgot-password', function(req, res, next) {
 })
 
 app.get('/check-reset-hash/:hash', function(req, res, next) {
-  User.findOne({ resetHash: req.params.hash }, function(err, user) {
+  User.findOne({ resetHash: req.params.hash, active: { $ne: false } }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
-    res.send({})
+    if (user.password) return res.send({})
+    res.send({ newUser: true, name: user.name })
   })
 })
 
 app.post('/reset-password', function(req, res, next) {
   var resetHash = req.body.resetHash
   if (resetHash) {
-    User.findOne({ resetHash: resetHash }, function (err, user) {
+    User.findOne({ resetHash: resetHash, active: { $ne: false } }, function (err, user) {
       if (err) return next(err)
       if (!user) return res.send(403)
       user.password = req.body.password
       user.resetHash = null
       user.save(function (err, user) {
         if (err) return next(err)
-        setLoginCookie(res, user)
+        if (user.active) {
+          setLoginCookie(res, user)
+        }
         res.send({})
       })
     })

@@ -244,6 +244,13 @@ app.get('/users', function(req, res, next) {
   User.find(respond(res, next))
 })
 
+app.post('/users/:id', function(req, res, next) {
+  User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
+    if (err) return next(err)
+    res.send(user)
+  })
+})
+
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 app.get('/productionCompanies/search/:query', queryNameIndex('ProductionCompany'))

@@ -64,6 +64,9 @@ ol { list-style-type: none; margin: 0; }
 
 textarea { resize: vertical; }
 
+.detail-box { display: none; background: #fff; padding: 20px 40px 50px 40px; font-size: 14px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; line-height: 19px; }
+.detail-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
+
 .warning-summary { display: inline-block; }
 .warning-summary img { width: 40px; height: 40px;}
 .warning-summary .warnings .warning.sex { background-image: url('images/sex.png'); }
@@ -181,7 +184,6 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 #search-page .result.selected { border-bottom: none; }
 #search-page .highlight { color: #00BB88; }
 
-.program-box { display: none; background: #fff; padding: 20px 40px 50px 40px; font-size: 14px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; line-height: 19px; }
 .program-box .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
 .program-box .warning-summary { vertical-align: middle; margin-right: 14px; }
 .program-box .agelimit, .program-box .warning { margin-right: 8px; }
@@ -192,7 +194,6 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .program-box h3 { font-weight: 100; border-bottom: 1px solid #d8d8d8; padding-bottom: 10px; margin-bottom: 8px; }
 .program-box label { display: block; padding: 19px 0 0 0; width: auto; }
 .program-box .criteria label { text-transform: capitalize; }
-.program-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 .program-box .buttons { float: right; }
 .program-box .buttons button, .program-box .buttons a { display: none }
 .program-box .buttons button.categorize { display: none; }
@@ -230,6 +231,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 input[type=text],
 input[type=number],
 input[type=password],
+input[type=email],
 textarea,
 .select2-container-multi .select2-choices,
 .select2-container .select2-choice {
@@ -245,6 +247,7 @@ textarea,
 input[type=text]:focus,
 input[type=number]:focus,
 input[type=password]:focus,
+input[type=email]:focus,
 textarea:focus,
 .select2-container-active .select2-choices,
 .select2-container-active .select2-choice {
@@ -253,7 +256,7 @@ textarea:focus,
   box-shadow: 0 0 5px 0 rgba(67,169,255,0.50), 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-input[type=text], input[type=number], input[type=password], textarea, .select2-container-multi .select2-choices .select2-search-field input {
+input[type=text], input[type=number], input[type=password], input[type=email], textarea, .select2-container-multi .select2-choices .select2-search-field input {
   padding: 8px 10px !important;
 }
 
@@ -616,6 +619,10 @@ textarea.invalid:disabled,
 #user-management-page { width: 940px; margin: 0 auto; padding: 70px 0; }
 #user-management-page .result span { width: 33%; }
 #user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
+#user-management-page .user-details label { box-sizing: border-box; width: 100%; }
+#user-management-page .user-details input { margin-top: 4px; box-sizing: border-box; width: 100%; }
+#user-management-page .user-details input[type=checkbox] { width: 16px; }
+#user-management-page .user-details button[name=save] { float: right; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

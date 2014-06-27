@@ -149,15 +149,15 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .page { display: none; }
 
 #search-page .row { border-bottom: none; padding-bottom: 0; }
-#search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; height: 220px; }
+#search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }
+
 #search-page .left { width: 600px; }
-#search-page .new-classification { width: 340px; }
-#search-page .new-classification label { width: 200px; }
 #search-page .search-label { display: block; padding: 0 0 20px 0; }
 
-#search-page .new-classification label { display: block; text-align: left; padding: 0 0 20px 0; }
+#search-page .new-classification { float: right; }
+#search-page .new-classification label { display: block; padding: 0 0 20px 0; }
 #search-page .new-classification button { margin-left: 15px; }
-#search-page .new-classification .select2-container { width: 250px; margin-bottom: 0; }
+#search-page .new-classification .select2-container { width: 222px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
 #search-page .query { width: 350px; }
 #search-page .filters { font-size: 14px; color: #444444; }

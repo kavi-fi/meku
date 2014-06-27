@@ -10,22 +10,15 @@
     <h2 class="primary-name"></h2>
   </div>
   <div class="categorization-form">
+    <button class="save-category">Tallenna</button>
     <div class="category-select-container">
       <label>Valitse kuvaohjelman tyyppi</label>
       <input name="category-select" type="hidden" class="required"/>
-      <button class="save-category">Tallenna</button>
     </div>
-    <div class="categorization-form-tv-episode">
-      <label>Sarjan isäntäohjelman nimi</label>
-      <input name="series" class="required" type="hidden" />
-      <div class="tv-episode-field season-episode-fields">
-        <div>
-          <label>Kausi</label><input name="season" type="number" min="0" />
-        </div>
-        <div>
-          <label>Jakso</label><input name="episode" type="number" min="0" class="required" />
-        </div>
-      </div>
+    <div class="categorization-form-tv-episode hide">
+      <div><label>Sarjan isäntäohjelman nimi</label><input name="series" class="required" type="hidden" /></div>
+      <div><label>Kausi</label><input name="season" type="number" min="0" /></div>
+      <div><label>Jakso</label><input name="episode" type="number" min="0" class="required" /></div>
     </div>
   </div>
   <div>

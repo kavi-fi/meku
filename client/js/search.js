@@ -91,8 +91,8 @@ function internalSearchPage() {
 
   function showCategorizationForm(id) {
     var $categorizationForm = $page.find('.categorization-form')
-    var $categorySelection = $page.find('.categorization-form input[name=category-select]')
-    var $categorySaveButton = $page.find('.categorization-form .save-category')
+    var $categorySelection = $categorizationForm.find('input[name=category-select]')
+    var $categorySaveButton = $categorizationForm.find('.save-category')
 
     var $tvEpisodeForm = $categorizationForm.find('.categorization-form-tv-episode')
     var $episode = $tvEpisodeForm.find('input[name=episode]')
@@ -133,8 +133,7 @@ function internalSearchPage() {
     })
 
     $categorySelection.change(function() {
-      $tvEpisodeForm.toggle(isTvEpisode())
-      $tvEpisodeForm.find('input').trigger('validate')
+      $tvEpisodeForm.toggleClass('hide', !isTvEpisode()).find('input').trigger('validate')
     })
 
     $categorySaveButton.click(function() {

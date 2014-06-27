@@ -61,7 +61,6 @@ function internalSearchPage() {
     $(this).hide()
   })
 
-
   function toggleDetailButtons($detail, p) {
     if (enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
@@ -152,7 +151,7 @@ function internalSearchPage() {
           $categorizationForm.hide()
           $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
           var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
-          searchPageApi.reloadDetail($row)
+          searchPageApi.programDataUpdated($row)
         })
     })
   }
@@ -206,7 +205,7 @@ function searchPage(baseUrl) {
     }
   })
 
-  return { reloadDetail: reloadDetail }
+  return { programDataUpdated: programDataUpdated }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -258,9 +257,10 @@ function searchPage(baseUrl) {
     })
   }
 
-  function reloadDetail($row) {
-    closeDetail()
-    openDetail($row, false)
+  function programDataUpdated($row) {
+    var $newRow = render($row.data('program'), state.q)
+    $row.replaceWith($newRow)
+    openDetail($newRow, false)
   }
 
   function openDetail($row, animate) {
@@ -284,16 +284,22 @@ function searchPage(baseUrl) {
 
   function render(p, query) {
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
-    return $('<div>', { class:'result', 'data-id': p._id })
-      .data('program', p)
-      .append($('<span>', { class: 'name' }).text(name(p)).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
-      .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
-      .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
-      .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="icon-warning-sign"></i>' : enums.programType[p.programType].fi))
-      .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
+    return $('<div>', { class:'result', 'data-id': p._id }).data('program', p).append(series(p)).append(row(p))
 
-    function name(p) {
-      return _.compact([p.name[0], utils.seasonEpisodeCode(p)]).join(' ')
+    function series(p) {
+      if (!enums.util.isTvEpisode(p)) return undefined
+      return $('<div>').addClass('series')
+        .text(_.compact([p.series && p.series.name, utils.seasonEpisodeCode(p)]).join(' '))
+        .highlight(queryParts, { beginningsOnly: true, caseSensitive: false })
+    }
+
+    function row(p) {
+      return $('<div>').addClass('items')
+        .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
+        .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
+        .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="icon-warning-sign"></i>' : enums.programType[p.programType].fi))
+        .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
     }
 
     function countryAndYear(p) {

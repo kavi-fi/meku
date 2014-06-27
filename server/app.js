@@ -115,12 +115,15 @@ app.post('/programs/:id/register', function(req, res, next) {
       if (err) return next(err)
       program.save(function(err) {
         if (err) return next(err)
-        addInvoicerows(newClassification, function(err, _) {
+        verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
-          sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
+          addInvoicerows(newClassification, function(err, _) {
             if (err) return next(err)
-            updateMetadataIndexes(program, function() {
-              return res.send(program)
+            sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
+              if (err) return next(err)
+              updateMetadataIndexes(program, function() {
+                return res.send(program)
+              })
             })
           })
         })
@@ -151,7 +154,6 @@ app.post('/programs/:id/register', function(req, res, next) {
         })
       }
     }
-
   })
 })
 
@@ -185,7 +187,6 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
       callback(null, [])
     }
   }
-
 })
 
 app.post('/programs/:id/categorization', function(req, res, next) {
@@ -203,7 +204,13 @@ app.post('/programs/:id/categorization', function(req, res, next) {
 
     verifyTvSeries(program, function(err) {
       if (err) return next(err)
-      program.save(respond(res, next))
+      program.save(function(err, saved) {
+        if (err) return next(err)
+        verifyTvSeriesClassification(program, function(err) {
+          if (err) return next(err)
+          res.send(saved)
+        })
+      })
     })
   })
 })
@@ -343,10 +350,13 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
             if (err) return callback(err)
             p.save(function (err) {
               if (err) return callback(err)
-              var seconds = durationToSeconds(_.first(p.classifications).duration)
-              InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
+              verifyTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
-                updateActorAndDirectorIndexes(p, callback)
+                var seconds = durationToSeconds(_.first(p.classifications).duration)
+                InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
+                  if (err) return callback(err)
+                  updateActorAndDirectorIndexes(p, callback)
+                })
               })
             })
           })
@@ -517,6 +527,11 @@ function respond(res, next) {
     if (err) return next(err)
     res.send(data)
   }
+}
+
+function verifyTvSeriesClassification(program, callback) {
+  if (!enums.util.isTvEpisode(program)) return callback()
+  Program.updateTvSeriesClassification(program.series._id, callback)
 }
 
 function verifyTvSeries(program, callback) {

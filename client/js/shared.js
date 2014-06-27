@@ -31,13 +31,14 @@ $.fn.labeledText = function(txt) {
 }
 
 function renderWarningSummary(summary) {
+  if (!summary) return undefined
   return $('#templates > .warning-summary').clone()
     .find('.agelimit').attr('src', ageLimitIcon(summary)).end()
     .find('.warnings').html(warningIcons(summary)).end()
 }
 
 function ageLimitIcon(summary) {
-  return 'images/agelimit-'+summary.age.toString().toLowerCase()+'.png'
+  return 'images/agelimit-'+summary.age+'.png'
 }
 
 function warningIcons(summary) {

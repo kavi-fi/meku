@@ -140,7 +140,8 @@ var UserSchema = new Schema({
   password: String,
   role: String,
   name: String,
-  active: Boolean
+  active: Boolean,
+  resetHash: String
 })
 
 UserSchema.pre('save', function(next) {

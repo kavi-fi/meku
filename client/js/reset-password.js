@@ -30,18 +30,7 @@ function resetPassword() {
   function show() {
     $form.show()
     if (resetHash) {
-      $.get('/check-reset-hash/' + resetHash, function(data) {
-        if (data.newUser) {
-          var text = 'Tervetuloa aktivoimaan käyttäjätunnuksesi ' + data.name + ', aseta salasanasi '
-                   + 'allaolevan lomakkeen avulla.'
-        } else {
-          var text = 'Tervetuloa vaihtamaan salasanasi ' + data.name + ', aseta uusi salasanasi '
-                   + 'allaolevan lomakkeen avulla.'
-        }
-
-        $form.find('.instructions').text(text).show()
-      })
-        .fail(function() { window.location = '/' })
+      $.get('/check-reset-hash/' + resetHash).fail(function() { window.location = '/' })
     } else {
       window.location = '/'
     }

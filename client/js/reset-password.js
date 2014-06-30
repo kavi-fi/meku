@@ -1,7 +1,6 @@
 function resetPassword() {
   $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json' })
 
-  var $overlay = $('#reset-password-overlay')
   var $form = $('#reset-password').submit(function(e) { e.preventDefault() })
   var $password = $form.find('input[name="password"]').on('input', checkInput)
   var $passwordConfirmation = $form.find('input[name="password-confirmation"]').on('input', checkInput)
@@ -29,7 +28,7 @@ function resetPassword() {
   return { show: show }
 
   function show() {
-    $form.add($overlay).show()
+    $form.show()
     if (resetHash) {
       $.get('/check-reset-hash/' + resetHash, function(data) {
         if (data.newUser) {

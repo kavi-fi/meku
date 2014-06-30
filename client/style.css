@@ -10,7 +10,7 @@ body {
 
 .clearfix:after { content:''; display:table; clear:both; }
 
-#login-overlay, #error-overlay, #reset-password-overlay { z-index: 2; }
+#login-overlay, #error-overlay { z-index: 2; }
 #login, #error-dialog, #reset-password { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
 #login > div, #error-dialog > div, #reset-password > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
 #login label, #reset-password label { text-align: left; }
@@ -20,6 +20,7 @@ body {
 #login .feedback, #reset-password .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
 #error-dialog a { color: #00BB88; }
 
+#reset-password > div { border: 0px; }
 #reset-password .instructions { text-align: left; margin-bottom: 10px; }
 
 #criteria .category, [draggable] {
@@ -88,7 +89,7 @@ textarea { resize: vertical; }
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
   z-index: 1000;
 }
-#overlay, #login-overlay, #error-overlay, #reset-password-overlay { display: none; position: fixed; top:0; bottom:0; left:0; right:0; background: #222; opacity: 0.6; }
+#overlay, #login-overlay, #error-overlay { display: none; position: fixed; top:0; bottom:0; left:0; right:0; background: #222; opacity: 0.6; }
 
 /* layout */
 #header {
@@ -100,6 +101,7 @@ textarea { resize: vertical; }
 }
 
 #header .content { padding: 15px 0 0 0; }
+#header .reset-password-page { text-align: center; }
 
 #header h1 { margin-bottom: 30px; font-size: 22px; display: inline-block; }
 #header ul { list-style: none; padding: 0; margin: 0;}

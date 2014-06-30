@@ -3,6 +3,20 @@ function userManagementPage() {
   var $userList = $page.find('.user-list')
   var $userNameQuery = $page.find('#user-name-query')
 
+  var userRoleLabels = {
+    'kavi': 'kavi',
+    'user': 'Luokittelija',
+    'root': 'Admin'
+  }
+  var userTypes = enums.userRoles.map(function(role, index) {
+    return { id: index, text: userRoleLabels[role] }
+  })
+
+  var $newUserType = $page.find('.new-user input[name="new-user-type"]').select2({
+    data: userTypes,
+    minimumResultsForSearch: -1
+  }).select2('val', 1)
+
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
     $userList.empty()
@@ -25,6 +39,14 @@ function userManagementPage() {
       closeDetails()
       openDetails($this)
     }
+  })
+
+  $page.find('.new-user button').on('click', function() {
+    var $newUserForm = renderNewUserForm($newUserType.val())
+
+    closeDetails()
+    $userList.addClass('selected').prepend($newUserForm)
+    $newUserForm.slideDown()
   })
 
   $userNameQuery.on('input', function() {
@@ -70,6 +92,31 @@ function userManagementPage() {
     updateLocationHash('')
   }
 
+  function getUserData($this) {
+    return {
+      name: $this.find('input[name=name]').val(),
+      emails: [ $this.find('input[name=email]').val() ],
+      username: $this.find('input[name=username]').val(),
+      active: $this.find('input[name=active]').prop('checked')
+    }
+  }
+
+  function renderNewUserForm(role) {
+    var $detailTemplate = $('#templates').find('.user-details').clone()
+    $detailTemplate.submit(function(event) {
+      event.preventDefault()
+      var userData = getUserData($(this))
+      userData.role = enums.userRoles[role]
+      $.post('/users/new', JSON.stringify(userData), function(newUser) {
+        $userList.find('.result.selected').data('user', newUser)
+        closeDetails()
+        // todo: insert feedback here
+      })
+    })
+
+    return $detailTemplate.css('display', 'none')
+  }
+
   function renderUserDetails(user) {
     var $detailTemplate = $('#templates').find('.user-details').clone()
     $detailTemplate.find('input[name=name]').val(user.name).end()
@@ -79,14 +126,7 @@ function userManagementPage() {
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
-      var $this = $(this)
-      var data = {
-        name: $this.find('input[name=name]').val(),
-        emails: [ $this.find('input[name=email]').val() ],
-        username: $this.find('input[name=username]').val(),
-        active: $this.find('input[name=active]').prop('checked')
-
-      }
+      var data = getUserData($(this))
       $.post('/users/' + user._id, JSON.stringify(data), function(updatedUser) {
         $userList.find('.result.selected').data('user', updatedUser)
         closeDetails()

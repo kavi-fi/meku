@@ -244,6 +244,18 @@ app.get('/users', function(req, res, next) {
   User.find(respond(res, next))
 })
 
+function userHasRequiredFields(user) {
+  return (user.username != '' && user.emails[0].length > 0 && user.name != '')
+}
+
+app.post('/users/new', function(req, res, next) {
+  if (userHasRequiredFields(req.body)) {
+    new User(req.body).save(respond(res, next))
+  } else {
+    return res.send(500)
+  }
+})
+
 app.post('/users/:id', function(req, res, next) {
   User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
     if (err) return next(err)

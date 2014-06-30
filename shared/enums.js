@@ -60,6 +60,8 @@ enums.gameFormat = [
   'PS4'
 ]
 
+enums.userRoles = ['root', 'kavi', 'user']
+
 enums.roles = {
   'Provider': 'Tarjoaja',
   'Location_of_providing': 'Tarjoamispaikka',

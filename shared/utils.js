@@ -58,7 +58,7 @@ utils.secondsToDuration = function(seconds) {
 }
 
 utils.hasRole = function (user, role) {
-  var roles = ['root', 'kavi', 'user']
+  var roles = enums.userRoles
   if (!user) return false
   return roles.indexOf(role) >= roles.indexOf(user.role)
 }

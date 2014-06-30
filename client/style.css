@@ -626,6 +626,9 @@ textarea.invalid:disabled,
 #user-management-page .user-details button[name=save] { float: right; }
 #user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
+#user-management-page .new-user button { margin-left: 15px; }
+#user-management-page .select2-container { margin-bottom: 0 }
+
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

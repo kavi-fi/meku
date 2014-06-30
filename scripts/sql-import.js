@@ -319,7 +319,16 @@ function accounts(callback) {
   function linkUserAccounts(callback) {
     conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and a.deleted != "1"')
       .stream()
-      .pipe(consumer(pushUserToAccount, callback))
+      .pipe(consumer(function(row, callback) {
+        pushUserToAccount(row, function(err) {
+          if (err) return err
+          schema.Account.findOne({ emekuId: row.accountId }, { name: 1 }, function (err, account) {
+            if (err || !account) return callback(err || new Error('No such account ' + row.accountId))
+            var data = { _id: account._id, name: account.name }
+            schema.User.update({ emekuId: row.userId }, { $addToSet: { employers: data } }, callback)
+          })
+        })
+      }, callback))
   }
 
   function linkSecurityGroupAccounts(callback) {

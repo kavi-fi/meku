@@ -135,6 +135,7 @@ var Provider = exports.Provider = mongoose.model('providers', {
 
 var UserSchema = new Schema({
   emekuId: String,
+  employers: [{_id: ObjectId, name: String}],
   emails: [String],
   phoneNumbers: [String],
   username: { type: String, index: { unique: true } },

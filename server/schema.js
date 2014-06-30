@@ -137,7 +137,7 @@ var UserSchema = new Schema({
   emekuId: String,
   employers: [{_id: ObjectId, name: String}],
   emails: [String],
-  phoneNumbers: [String],
+  phoneNumber: String,
   username: { type: String, index: { unique: true } },
   password: String,
   role: String,

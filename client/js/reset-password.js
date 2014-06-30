@@ -1,11 +1,11 @@
-function resetPasswordPage() {
+function resetPassword() {
   $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json' })
 
-  var $page = $('#reset-password-page')
-  var $form = $page.find('.reset-password-form').submit(function(e) { e.preventDefault() })
+  var $overlay = $('#reset-password-overlay')
+  var $form = $('#reset-password').submit(function(e) { e.preventDefault() })
   var $password = $form.find('input[name="password"]').on('input', checkInput)
   var $passwordConfirmation = $form.find('input[name="password-confirmation"]').on('input', checkInput)
-  var $feedback = $page.find('.feedback')
+  var $feedback = $form.find('.feedback')
   var $button = $form.find('button')
 
   var resetHash = location.hash.substring(1)
@@ -29,44 +29,23 @@ function resetPasswordPage() {
   return { show: show }
 
   function show() {
-    $page.show()
+    $form.add($overlay).show()
     if (resetHash) {
       $.get('/check-reset-hash/' + resetHash, function(data) {
         if (data.newUser) {
-          showActivationInstructions(data.name)
+          var text = 'Tervetuloa aktivoimaan käyttäjätunnuksesi ' + data.name + ', aseta salasanasi '
+                   + 'allaolevan lomakkeen avulla.'
         } else {
-          showResetInstructions(data.name)
+          var text = 'Tervetuloa vaihtamaan salasanasi ' + data.name + ', aseta uusi salasanasi '
+                   + 'allaolevan lomakkeen avulla.'
         }
+
+        $form.find('.instructions').text(text).show()
       })
-        .fail(function() {
-          $form.hide()
-          $feedback.html('Virheellinen tunniste.').slideDown()
-        })
+        .fail(function() { window.location = '/' })
     } else {
-      $form.hide()
+      window.location = '/'
     }
-  }
-
-  function updateInstructions(header, text) {
-    var $instructions = $page.find('.instructions')
-
-    $instructions.find('h1').text(header)
-    $instructions.find('span').text(text)
-    $instructions.show()
-  }
-
-  function showResetInstructions(name) {
-    var text = 'Tervetuloa vaihtamaan salasanasi ' + name + ', aseta uusi salasanasi '
-             + 'allaolevan lomakkeen avulla.'
-
-    updateInstructions('Salasanan vaihtaminen', text)
-  }
-
-  function showActivationInstructions(name) {
-    var text = 'Tervetuloa aktivoimaan käyttäjätunnuksesi ' + name + ', aseta salasanasi '
-             + 'allaolevan lomakkeen avulla.'
-
-    updateInstructions('Käyttäjätunnuksen aktivointi', text)
   }
 
   function checkInput() {

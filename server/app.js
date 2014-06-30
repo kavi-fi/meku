@@ -90,7 +90,7 @@ app.post('/forgot-password', function(req, res, next) {
     }
 
     function sendSaltLinkViaEmail(salt) {
-      var hostUrl = isDev() ? 'http://localhost:3000' : 'http://meku.herokuapp.com'
+      var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
       var url = hostUrl + '/reset-password.html#' + salt
       var emailData = {
         recipients: user.emails,

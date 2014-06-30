@@ -301,8 +301,13 @@ function accounts(callback) {
   }
 
   function userBase(callback) {
-    var q = 'select id, user_name, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users'
-    function onRow(row) { return { emekuId: row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }
+    var q = 'select id, user_name, phone_home, phone_mobile, phone_work, phone_other, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users'
+    function onRow(row) {
+      var phoneNumbers = _.reduce([row.phone_home, row.phone_mobile, row.phone_work, row.phone_other], function(acc, phone) {
+        return acc.concat(phone ? [phone] : [])
+      }, [])
+      return { emekuId: row.id, username: row.user_name, name: row.name, phoneNumbers: phoneNumbers, active: row.status == 'Active' }
+    }
     batchInserter(q, onRow, 'User', callback)
   }
 

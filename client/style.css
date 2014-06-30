@@ -157,22 +157,23 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
   display: -webkit-flex; display: flex; -webkit-align-items: baseline; align-items: baseline;
 }
 
+.search-label { display: block; padding: 0 0 20px 0; }
+input.query { width: 350px; }
+button.search { margin-left: 15px; }
+
 #search-page .row { border-bottom: none; padding-bottom: 0; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; height: 220px; }
 #search-page .left { width: 600px; }
 #search-page .new-classification { width: 340px; }
 #search-page .new-classification label { width: 200px; }
-#search-page .search-label { display: block; padding: 0 0 20px 0; }
 
 #search-page .new-classification label { display: block; text-align: left; padding: 0 0 20px 0; }
 #search-page .new-classification button { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 250px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
-#search-page .query { width: 350px; }
 #search-page .filters { font-size: 14px; color: #444444; }
 #search-page .filters label { padding-right: 12px; font-weight: normal; }
 #search-page .filters input { margin-right: 10px; }
-#search-page button.search { margin-left: 15px; }
 #search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
 #search-page .result > span:nth-child(1) { min-width: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
@@ -623,6 +624,7 @@ textarea.invalid:disabled,
 #user-management-page .user-details input { margin-top: 4px; box-sizing: border-box; width: 100%; }
 #user-management-page .user-details input[type=checkbox] { width: 16px; }
 #user-management-page .user-details button[name=save] { float: right; }
+#user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

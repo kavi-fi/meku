@@ -1,9 +1,11 @@
 function userManagementPage() {
   var $page = $('#user-management-page')
   var $userList = $page.find('.user-list')
+  var $userNameQuery = $page.find('#user-name-query')
 
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
+    $userList.empty()
     $.get('/users', function(users) {
       renderUsers(users)
       if (userId) {
@@ -23,6 +25,19 @@ function userManagementPage() {
       closeDetails()
       openDetails($this)
     }
+  })
+
+  $userNameQuery.on('input', function() {
+    var searchString = $(this).val().toLowerCase()
+
+    $userList.find('.result').each(function() {
+      var name = $(this).children('.name').text().toLowerCase()
+      if (_.contains(name, searchString)) {
+        $(this).show()
+      } else {
+        $(this).hide()
+      }
+    })
   })
 
   function updateLocationHash(userId) {
@@ -56,7 +71,7 @@ function userManagementPage() {
   }
 
   function renderUserDetails(user) {
-    var $detailTemplate = $('#templates > .user-details').clone()
+    var $detailTemplate = $('#templates').find('.user-details').clone()
     $detailTemplate.find('input[name=name]').val(user.name).end()
       .find('input[name=email]').val(user.emails[0]).end()
       .find('input[name=username]').val(user.username).end()

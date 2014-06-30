@@ -322,11 +322,7 @@ function accounts(callback) {
       .pipe(consumer(function(row, callback) {
         pushUserToAccount(row, function(err) {
           if (err) return err
-          schema.Account.findOne({ emekuId: row.accountId }, { name: 1 }, function (err, account) {
-            if (err || !account) return callback(err || new Error('No such account ' + row.accountId))
-            var data = { _id: account._id, name: account.name }
-            schema.User.update({ emekuId: row.userId }, { $addToSet: { employers: data } }, callback)
-          })
+          pushEmployerToUser(row, callback)
         })
       }, callback))
   }
@@ -352,6 +348,14 @@ function accounts(callback) {
       if (err || !user) return callback(err || new Error('No such user ' + row.userId))
       var data = { _id: user._id, name: user.username }
       schema.Account.update({ emekuId: row.accountId }, { $addToSet: { users: data } }, callback)
+    })
+  }
+
+  function pushEmployerToUser(row, callback) {
+    schema.Account.findOne({ emekuId: row.accountId }, { name: 1 }, function (err, account) {
+      if (err || !account) return callback(err || new Error('No such account ' + row.accountId))
+      var data = { _id: account._id, name: account.name }
+      schema.User.update({ emekuId: row.userId }, { $addToSet: { employers: data } }, callback)
     })
   }
 

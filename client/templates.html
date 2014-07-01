@@ -162,19 +162,18 @@
 <div class="user-details detail-box">
   <form>
     <div class="column">
-      <label>Nimi <input type="text" name="name"></label>
-      <label>Sähköposti <input type="email" name="email"></label>
+      <label>Nimi <input type="text" name="name" required></label>
+      <label>Sähköposti <input type="email" name="email" required></label>
     </div>
 
     <div class="column">
-      <label>Käyttäjätunnus <input type="text" name="username"></label>
-      <label>Puhelinnumero <input type="text" name="phoneNumber"></label>
+      <label>Käyttäjätunnus <input type="text" name="username" required></label>
+      <label>Puhelinnumero <input type="tel" name="phoneNumber"></label>
     </div>
 
     <div class="column">
-      <button name="save">Tallenna</button>
+      <button name="save" type="submit" disabled>Tallenna</button>
       <label class="modify-only"><input type="checkbox" name="active"> Käyttäjätunnus aktiivinen</label>
     </div>
-
   </form>
 </div>

@@ -241,6 +241,7 @@ input[type=text],
 input[type=number],
 input[type=password],
 input[type=email],
+input[type=tel],
 textarea,
 .select2-container-multi .select2-choices,
 .select2-container .select2-choice {
@@ -257,6 +258,7 @@ input[type=text]:focus,
 input[type=number]:focus,
 input[type=password]:focus,
 input[type=email]:focus,
+input[type=tel]:focus,
 textarea:focus,
 .select2-container-active .select2-choices,
 .select2-container-active .select2-choice {
@@ -265,7 +267,13 @@ textarea:focus,
   box-shadow: 0 0 5px 0 rgba(67,169,255,0.50), 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-input[type=text], input[type=number], input[type=password], input[type=email], textarea, .select2-container-multi .select2-choices .select2-search-field input {
+input[type=text],
+input[type=number],
+input[type=password],
+input[type=email],
+input[type=tel],
+textarea,
+.select2-container-multi .select2-choices .select2-search-field input {
   padding: 8px 10px !important;
 }
 
@@ -344,6 +352,7 @@ label {
 input[type=text].required,
 input[type=number].required,
 textarea.required,
+input:required,
 .select2-container.required .select2-choices,
 .select2-container.required .select2-choice {
   border: 1px solid #00BB88;
@@ -353,6 +362,7 @@ input[type=text].invalid,
 input[type=number].invalid,
 input[type=number]:invalid,
 textarea.invalid,
+input:invalid,
 .select2-container.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
   background: #F0FFF0;
@@ -365,6 +375,7 @@ textarea.invalid,
 input[type=text].invalid.touched,
 input[type=number].invalid.touched,
 input[type=number]:invalid,
+input:required:invalid.touched,
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {

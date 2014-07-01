@@ -133,6 +133,15 @@ function userManagementPage() {
         closeDetails()
       })
     })
+
+    $detailTemplate.find('form').on('input', function() {
+      $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
+    })
+
+    $detailTemplate.find('input').on('blur', function() {
+      $(this).addClass('touched')
+    })
+
     return $detailTemplate.css('display', 'none')
   }
 

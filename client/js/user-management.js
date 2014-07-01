@@ -136,6 +136,7 @@ function userManagementPage() {
 
     if (isNewUser) {
       $detailTemplate.find('.modify-only').remove()
+      $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
       $detailTemplate.find('input[name=name]').val(user.name).end()
         .find('input[name=email]').val(user.emails[0]).end()

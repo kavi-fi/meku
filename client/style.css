@@ -61,7 +61,7 @@ button:active, a.button:active {
 
 button:focus, a.button:focus { outline: none; }
 
-button[disabled=disabled], button:disabled, a.button.disabled { color: gray; }
+button[disabled=disabled], button:disabled, a.button.disabled { color: gray; cursor: not-allowed; }
 
 ol { list-style-type: none; margin: 0; }
 
@@ -228,7 +228,7 @@ button.search { margin-left: 15px; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }
-.form input:disabled, .form textarea:disabled {background-color: #f4f4f4; }
+.form input:disabled, .form textarea:disabled { background-color: #f4f4f4; cursor: not-allowed; }
 
 #program-details .reclassification { display: none; }
 #program-details.reclassification .classification { display: none; }

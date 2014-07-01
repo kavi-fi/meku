@@ -16,6 +16,7 @@ var classification = require('../shared/classification')
 var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var builder = require('xmlbuilder')
+var bcrypt = require('bcrypt')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -40,21 +41,97 @@ app.post('/login', function(req, res, next) {
     user.checkPassword(password, function(err, ok) {
       if (err) return next(err)
       if (!ok) return res.send(403)
-      res.cookie('user', {
-        _id: user._id.toString(),
-        username: user.username,
-        name: user.name,
-        role: user.role,
-        email: _.first(user.emails)
-      }, { signed: true })
+      setLoginCookie(res, user)
       res.send({})
     })
   })
 })
 
+function setLoginCookie(res, user) {
+  res.cookie('user', {
+    _id: user._id.toString(),
+    username: user.username,
+    name: user.name,
+    role: user.role,
+    email: _.first(user.emails)
+  }, { signed: true })
+}
+
 app.post('/logout', function(req, res, next) {
   res.clearCookie('user')
   res.send({})
+})
+
+app.post('/forgot-password', function(req, res, next) {
+  var username = req.body.username
+
+  if (!username) return res.send(403)
+
+  User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
+    if (err) return next(err)
+    if (!user) return res.send(403)
+
+    if (!user.emails) {
+      console.log(user.username + ' has no email address')
+      return res.send(500)
+    }
+
+    if (user.resetHash) {
+      sendSaltLinkViaEmail(user.resetHash)
+    } else {
+      bcrypt.genSalt(1, function (err, s) {
+        if (err) return next(err)
+        user.resetHash = new Buffer(s, 'base64').toString('hex')
+        user.save(function (err) {
+          if (err) return next(err)
+          sendSaltLinkViaEmail(user.resetHash)
+        })
+      })
+    }
+
+    function sendSaltLinkViaEmail(salt) {
+      var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
+      var url = hostUrl + '/reset-password.html#' + salt
+      var emailData = {
+        recipients: user.emails,
+        subject: 'Ohjeet salasanan vaihtamista varten',
+        body: 'Tämän linkin avulla voit vaihtaa salasanasi: <a href="' + url + '">' + url + '</a>'
+      }
+
+      sendEmail(emailData, function(err) {
+        if (err) return next(err)
+        res.send({})
+      })
+    }
+  })
+})
+
+app.get('/check-reset-hash/:hash', function(req, res, next) {
+  User.findOne({ resetHash: req.params.hash, active: { $ne: false } }, function(err, user) {
+    if (err) return next(err)
+    if (!user) return res.send(403)
+    if (user.password) return res.send({ name: user.name })
+    res.send({ newUser: true, name: user.name })
+  })
+})
+
+app.post('/reset-password', function(req, res, next) {
+  var resetHash = req.body.resetHash
+  if (resetHash) {
+    User.findOne({ resetHash: resetHash, active: { $ne: false } }, function (err, user) {
+      if (err) return next(err)
+      if (!user) return res.send(403)
+      user.password = req.body.password
+      user.resetHash = null
+      user.save(function (err, user) {
+        if (err) return next(err)
+        setLoginCookie(res, user)
+        res.send({})
+      })
+    })
+  } else {
+    return res.send(403)
+  }
 })
 
 app.get('/public/search/:q?', function(req, res, next) {
@@ -115,12 +192,15 @@ app.post('/programs/:id/register', function(req, res, next) {
       if (err) return next(err)
       program.save(function(err) {
         if (err) return next(err)
-        addInvoicerows(newClassification, function(err, _) {
+        verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
-          sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
+          addInvoicerows(newClassification, function(err, _) {
             if (err) return next(err)
-            updateMetadataIndexes(program, function() {
-              return res.send(program)
+            sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
+              if (err) return next(err)
+              updateMetadataIndexes(program, function() {
+                return res.send(program)
+              })
             })
           })
         })
@@ -151,7 +231,6 @@ app.post('/programs/:id/register', function(req, res, next) {
         })
       }
     }
-
   })
 })
 
@@ -185,7 +264,6 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
       callback(null, [])
     }
   }
-
 })
 
 app.post('/programs/:id/categorization', function(req, res, next) {
@@ -203,7 +281,13 @@ app.post('/programs/:id/categorization', function(req, res, next) {
 
     verifyTvSeries(program, function(err) {
       if (err) return next(err)
-      program.save(respond(res, next))
+      program.save(function(err, saved) {
+        if (err) return next(err)
+        verifyTvSeriesClassification(program, function(err) {
+          if (err) return next(err)
+          res.send(saved)
+        })
+      })
     })
   })
 })
@@ -366,10 +450,13 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
             if (err) return callback(err)
             p.save(function (err) {
               if (err) return callback(err)
-              var seconds = durationToSeconds(_.first(p.classifications).duration)
-              InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
+              verifyTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
-                updateActorAndDirectorIndexes(p, callback)
+                var seconds = durationToSeconds(_.first(p.classifications).duration)
+                InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
+                  if (err) return callback(err)
+                  updateActorAndDirectorIndexes(p, callback)
+                })
               })
             })
           })
@@ -450,7 +537,8 @@ function authenticate(req, res, next) {
   var whitelist = [
     'GET:/index.html', 'GET:/public.html', 'GET:/templates.html', 'GET:/public/search/',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
-    'POST:/login', 'POST:/logout', 'POST:/xml'
+    'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
+    'POST:/reset-password', 'GET:/check-reset-hash'
   ]
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
@@ -540,6 +628,11 @@ function respond(res, next) {
     if (err) return next(err)
     res.send(data)
   }
+}
+
+function verifyTvSeriesClassification(program, callback) {
+  if (!enums.util.isTvEpisode(program)) return callback()
+  Program.updateTvSeriesClassification(program.series._id, callback)
 }
 
 function verifyTvSeries(program, callback) {

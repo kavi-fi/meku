@@ -19,7 +19,7 @@ var classification = {
   criteria: [Number],
   criteriaComments: {},
   warningOrder: [String],
-  legacyAgeLimit: String,
+  legacyAgeLimit: Number,
   creationDate: Date,
   registrationDate: Date,
   registrationEmailAddresses: [{email: String, manual: Boolean}],
@@ -51,7 +51,10 @@ var ProgramSchema = new Schema({
   draftClassifications: {}, // { userId:classification, userId:classification2 }
   programType: Number, // enums.programType
   gameFormat: String,
-  season: String, episode: String, series: { _id: ObjectId, name: String }
+  season: String, episode: String,
+  series: { _id: { type: ObjectId, index:true }, name: String },
+  tvSeriesCriteria: [Number],
+  tvSeriesLegacyAgeLimit: Number
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))
@@ -64,6 +67,17 @@ ProgramSchema.statics.createNewClassification = function(user) {
     author: { _id: user._id, name: user.name },
     warningOrder: [], criteria: [], criteriaComments: {}, registrationEmailAddresses: []
   }
+}
+ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
+  var fields = { classifications: { $slice: 1 } }
+  Program.find({ 'series._id': seriesId, 'classifications.0': { $exists: true } }, fields).lean().exec(function(err, programs) {
+    if (err) return callback(err)
+    var classifications = programs.map(function(p) { return p.classifications[0] })
+    var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
+    var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
+    if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
+    Program.update({ _id: seriesId }, { tvSeriesCriteria: criteria, tvSeriesLegacyAgeLimit: legacyAgeLimit }, callback)
+  })
 }
 
 ProgramSchema.methods.populateAllNames = function(callback) {
@@ -121,12 +135,15 @@ var Provider = exports.Provider = mongoose.model('providers', {
 
 var UserSchema = new Schema({
   emekuId: String,
+  employers: [{_id: ObjectId, name: String}],
   emails: [String],
+  phoneNumber: String,
   username: { type: String, index: { unique: true } },
   password: String,
   role: String,
   name: String,
-  active: Boolean
+  active: Boolean,
+  resetHash: String
 })
 
 UserSchema.pre('save', function(next) {

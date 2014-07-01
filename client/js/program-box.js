@@ -73,7 +73,7 @@ function programBox() {
   }
 
   function renderClassificationCriteria(c) {
-    if (!c.criteria) return ''
+    if (!c.criteria || c.safe) return ''
     return c.criteria.map(function(id) {
       var cr = enums.classificationCriteria[id - 1]
       var category = enums.classificationCategoriesFI[cr.category]

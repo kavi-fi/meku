@@ -3,6 +3,7 @@ function publicSearchPage() {
 
   var $page = $('#search-page')
   $page.find('.new-classification').remove()
+  $page.find('.drafts').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
     var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program._id+']')
@@ -19,6 +20,7 @@ function internalSearchPage() {
   var $results = $page.find('.results')
   var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
   var $newClassificationButton = $page.find('.new-classification button')
+  var $drafts = $page.find('.drafts')
 
   var programTypesSelect2 = {
     data: [
@@ -35,20 +37,30 @@ function internalSearchPage() {
 
   $page.on('show', function(e, q, filters, programId) {
     $.get('/programs/drafts', function(drafts) {
-      $page.find('.drafts .draft').remove()
+      $drafts.find('.draft').remove()
       drafts.forEach(function(draft) {
         var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
         var $remove = $('<div>', {class: 'remove'}).append($('<button>').text('Poista'))
         var $draft = $('<div>', {class: 'result draft'})
           .data('id', draft._id).append($date).append($link).append($remove)
-        $page.find('.drafts > div').append($draft)
+        $drafts.find('> div').append($draft)
       })
+      $drafts.toggleClass('hide', drafts.length === 0)
     })
   })
 
-  $page.find('.drafts').on('click', '.draft', function(e) {
+  $drafts.on('click', '.draft', function() {
     showClassificationPage($(this).data('id'))
+  })
+
+  $drafts.on('click', '.draft button', function(e) {
+    e.stopPropagation()
+    var $draft = $(this).parents('.draft')
+    $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function() {
+      $draft.remove()
+      $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
+    })
   })
 
   $page.on('showDetails', '.program-box', function(e, program) {

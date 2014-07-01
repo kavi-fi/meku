@@ -301,8 +301,11 @@ function accounts(callback) {
   }
 
   function userBase(callback) {
-    var q = 'select id, user_name, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users'
-    function onRow(row) { return { emekuId: row.id, username: row.user_name, name: row.name, active: row.status == 'Active' } }
+    var q = 'select id, user_name, phone_mobile, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users'
+    function onRow(row) {
+      var phone = row.phone_mobile || undefined
+      return { emekuId: row.id, username: row.user_name, name: row.name, phoneNumber: phone, active: row.status == 'Active' }
+    }
     batchInserter(q, onRow, 'User', callback)
   }
 
@@ -314,7 +317,12 @@ function accounts(callback) {
   function linkUserAccounts(callback) {
     conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and a.deleted != "1"')
       .stream()
-      .pipe(consumer(pushUserToAccount, callback))
+      .pipe(consumer(function(row, callback) {
+        pushUserToAccount(row, function(err) {
+          if (err) return err
+          pushEmployerToUser(row, callback)
+        })
+      }, callback))
   }
 
   function linkSecurityGroupAccounts(callback) {
@@ -338,6 +346,14 @@ function accounts(callback) {
       if (err || !user) return callback(err || new Error('No such user ' + row.userId))
       var data = { _id: user._id, name: user.username }
       schema.Account.update({ emekuId: row.accountId }, { $addToSet: { users: data } }, callback)
+    })
+  }
+
+  function pushEmployerToUser(row, callback) {
+    schema.Account.findOne({ emekuId: row.accountId }, { name: 1 }, function (err, account) {
+      if (err || !account) return callback(err || new Error('No such account ' + row.accountId))
+      var data = { _id: account._id, name: account.name }
+      schema.User.update({ emekuId: row.userId }, { $addToSet: { employers: data } }, callback)
     })
   }
 

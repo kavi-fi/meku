@@ -60,7 +60,7 @@ utils.secondsToDuration = function(seconds) {
 utils.hasRole = function (user, role) {
   var roles = enums.userRoles
   if (!user) return false
-  return roles.indexOf(role) >= roles.indexOf(user.role)
+  return roles[role].order >= roles[user.role].order
 }
 
 utils.asDate = function (date) {

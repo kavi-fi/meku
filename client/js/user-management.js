@@ -3,19 +3,13 @@ function userManagementPage() {
   var $userList = $page.find('.user-list')
   var $userNameQuery = $page.find('#user-name-query')
 
-  var userRoleLabels = {
-    'kavi': 'kavi',
-    'user': 'Luokittelija',
-    'root': 'Admin'
-  }
-  var userTypes = enums.userRoles.map(function(role, index) {
-    return { id: index, text: userRoleLabels[role] }
-  })
-
-  var $newUserType = $page.find('.new-user input[name="new-user-type"]').select2({
-    data: userTypes,
+  var $newUserType = $page.find('.new-user input[name="new-user-type"]')
+  $newUserType.select2({
+    data: _.map(enums.userRoles, function(roleValue, roleKey) {
+      return { id: roleKey, text: roleValue.name }
+    }),
     minimumResultsForSearch: -1
-  }).select2('val', 1)
+  }).select2('val', 'user')
 
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
@@ -42,7 +36,7 @@ function userManagementPage() {
   })
 
   $page.find('.new-user button').on('click', function() {
-    var $newUserForm = renderNewUserForm($newUserType.val())
+    var $newUserForm = renderNewUserForm($newUserType.select2('val'))
 
     closeDetails()
     $userList.addClass('selected').prepend($newUserForm)
@@ -74,7 +68,7 @@ function userManagementPage() {
    return $('<div>', { class: 'result', 'data-id': user._id })
      .data('user', user).data('id', user._id)
      .append($('<span>', { class: 'name' }).text(user.name))
-     .append($('<span>', { class: 'role' }).html(user.role || '<i class="icon-warning-sign"></i>'))
+     .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="icon-warning-sign"></i>'))
      .append($('<span>', { class: 'cert-end '}).html('<i class="icon-warning-sign"></i>'))
   }
 
@@ -98,7 +92,7 @@ function userManagementPage() {
     $detailTemplate.submit(function(event) {
       event.preventDefault()
       var userData = getUserData($(this))
-      userData.role = enums.userRoles[role]
+      userData.role = role
       userData.active = true
       $.post('/users/new', JSON.stringify(userData), function(newUser) {
         $userList.find('.result.selected').data('user', newUser)
@@ -106,7 +100,6 @@ function userManagementPage() {
         $userList.prepend($user)
         $user.slideToggle()
         closeDetails()
-        // todo: insert feedback here
       })
     })
 

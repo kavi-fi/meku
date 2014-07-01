@@ -60,7 +60,15 @@ enums.gameFormat = [
   'PS4'
 ]
 
-enums.userRoles = ['root', 'kavi', 'user']
+enums.userRoles = {
+  root: { name: 'Pääkäyttäjä', order: 1 },
+  kavi: { name: 'Kavi', order: 2 },
+  user: { name: 'Luokittelija', order: 3 }
+}
+enums.util.userRoleName = function(role) {
+  var userRole = enums.userRoles[role]
+  return userRole ? userRole.name : undefined
+}
 
 enums.roles = {
   'Provider': 'Tarjoaja',

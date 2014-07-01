@@ -92,12 +92,13 @@ function userManagementPage() {
     updateLocationHash('')
   }
 
-  function getUserData($this) {
+  function getUserData($details) {
     return {
-      name: $this.find('input[name=name]').val(),
-      emails: [ $this.find('input[name=email]').val() ],
-      username: $this.find('input[name=username]').val(),
-      active: $this.find('input[name=active]').prop('checked')
+      name: $details.find('input[name=name]').val(),
+      emails: [ $details.find('input[name=email]').val() ],
+      username: $details.find('input[name=username]').val(),
+      active: $details.find('input[name=active]').prop('checked'),
+      phoneNumber: $details.find('input[name=phoneNumber]').val()
     }
   }
 
@@ -123,6 +124,7 @@ function userManagementPage() {
       .find('input[name=email]').val(user.emails[0]).end()
       .find('input[name=username]').val(user.username).end()
       .find('input[name=active]').prop('checked', user.active).end()
+      .find('input[name=phoneNumber]').val(user.phoneNumber).end()
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()

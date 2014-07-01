@@ -638,7 +638,7 @@ textarea.invalid:disabled,
 
 #user-management-page { width: 940px; margin: 0 auto; padding: 70px 0; }
 #user-management-page .result { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
-#user-management-page .result span:nth-child(1) { flex-grow: 2; }
+#user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; }
 #user-management-page .result span:nth-child(2) { width: 200px; }
 #user-management-page .result span:nth-child(3) { width: 200px; }
 #user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }

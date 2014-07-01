@@ -80,7 +80,7 @@ function userManagementPage() {
 
   function openDetails($row) {
     var user = $row.data('user')
-    var $userDetails = renderUserDetails(user)
+    var $userDetails = renderExistingUserDetails(user)
     $row.addClass('selected').after($userDetails)
     updateLocationHash(user._id)
     $userDetails.slideDown()
@@ -93,9 +93,7 @@ function userManagementPage() {
   }
 
   function renderNewUserForm(role) {
-    var $detailTemplate = $('#templates').find('.user-details').clone()
-
-    $detailTemplate.find('.modify-only').remove()
+    var $detailTemplate = renderUserDetails()
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
@@ -112,16 +110,11 @@ function userManagementPage() {
       })
     })
 
-    return $detailTemplate.css('display', 'none')
+    return $detailTemplate
   }
 
-  function renderUserDetails(user) {
-    var $detailTemplate = $('#templates').find('.user-details').clone()
-    $detailTemplate.find('input[name=name]').val(user.name).end()
-      .find('input[name=email]').val(user.emails[0]).end()
-      .find('input[name=username]').val(user.username).end()
-      .find('input[name=active]').prop('checked', user.active).end()
-      .find('input[name=phoneNumber]').val(user.phoneNumber).end()
+  function renderExistingUserDetails(user) {
+    var $detailTemplate = renderUserDetails(user)
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
@@ -133,6 +126,23 @@ function userManagementPage() {
         closeDetails()
       })
     })
+
+    return $detailTemplate
+  }
+
+  function renderUserDetails(user) {
+    var $detailTemplate = $('#templates').find('.user-details').clone()
+    var isNewUser = user == null
+
+    if (isNewUser) {
+      $detailTemplate.find('.modify-only').remove()
+    } else {
+      $detailTemplate.find('input[name=name]').val(user.name).end()
+        .find('input[name=email]').val(user.emails[0]).end()
+        .find('input[name=username]').val(user.username).end()
+        .find('input[name=active]').prop('checked', user.active).end()
+        .find('input[name=phoneNumber]').val(user.phoneNumber).end()
+    }
 
     $detailTemplate.find('form').on('input', function() {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())

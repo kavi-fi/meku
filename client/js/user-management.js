@@ -100,6 +100,9 @@ function userManagementPage() {
       userData.role = enums.userRoles[role]
       $.post('/users/new', JSON.stringify(userData), function(newUser) {
         $userList.find('.result.selected').data('user', newUser)
+        var $user = renderUser(newUser).css('display', 'none')
+        $userList.prepend($user)
+        $user.slideToggle()
         closeDetails()
         // todo: insert feedback here
       })

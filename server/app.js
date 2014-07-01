@@ -80,22 +80,17 @@ app.post('/forgot-password', function(req, res, next) {
     var text = 'Tämän linkin avulla voit vaihtaa salasanasi: '
 
     if (user.resetHash) {
-      sendSaltLinkViaEmail(user, subject, text, afterSave)
+      sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
     } else {
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
-        sendSaltLinkViaEmail(user, subject, text, afterSave)
+        sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
       })
-    }
-
-    function afterSave(err) {
-      if (err) return next(err)
-      res.send({})
     }
   })
 })
 
-function sendSaltLinkViaEmail(user, subject, text, callback) {
+function sendHashLinkViaEmail(user, subject, text, callback) {
   var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
   var url = hostUrl + '/reset-password.html#' + user.resetHash
   var emailData = {
@@ -350,10 +345,7 @@ app.post('/users/new', function(req, res, next) {
         var subject = 'Käyttäjätunnusten aktivointi'
         var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
 
-        sendSaltLinkViaEmail(user, subject, text, function(err) {
-          if (err) return next(err)
-          return res.send(user)
-        })
+        sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
       })
     })
   } else {
@@ -644,10 +636,10 @@ function toMongoArrayQuery(string) {
   }
 }
 
-function respond(res, next) {
+function respond(res, next, overrideData) {
   return function(err, data) {
     if (err) return next(err)
-    res.send(data)
+    res.send(overrideData || data)
   }
 }
 

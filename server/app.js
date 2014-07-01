@@ -164,7 +164,7 @@ function search(responseFields, req, res, next) {
 }
 
 app.get('/programs/drafts', function(req, res, next) {
-  var term = _.object([['draftClassifications.' + req.user._id, {$exists: true}]])
+  var term = utils.keyValue('draftClassifications.' + req.user._id, {$exists: true})
   Program.find(term).exec(function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {

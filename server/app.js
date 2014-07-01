@@ -76,35 +76,43 @@ app.post('/forgot-password', function(req, res, next) {
       return res.send(500)
     }
 
+    var subject = 'Ohjeet salasanan vaihtamista varten'
+    var text = 'Tämän linkin avulla voit vaihtaa salasanasi: '
+
     if (user.resetHash) {
-      sendSaltLinkViaEmail(user.resetHash)
+      sendSaltLinkViaEmail(user, subject, text, afterSave)
     } else {
-      bcrypt.genSalt(1, function (err, s) {
+      createAndSaveHash(user, function(err) {
         if (err) return next(err)
-        user.resetHash = new Buffer(s, 'base64').toString('hex')
-        user.save(function (err) {
-          if (err) return next(err)
-          sendSaltLinkViaEmail(user.resetHash)
-        })
+        sendSaltLinkViaEmail(user, subject, text, afterSave)
       })
     }
 
-    function sendSaltLinkViaEmail(salt) {
-      var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
-      var url = hostUrl + '/reset-password.html#' + salt
-      var emailData = {
-        recipients: user.emails,
-        subject: 'Ohjeet salasanan vaihtamista varten',
-        body: 'Tämän linkin avulla voit vaihtaa salasanasi: <a href="' + url + '">' + url + '</a>'
-      }
-
-      sendEmail(emailData, function(err) {
-        if (err) return next(err)
-        res.send({})
-      })
+    function afterSave(err) {
+      if (err) return next(err)
+      res.send({})
     }
   })
 })
+
+function sendSaltLinkViaEmail(user, subject, text, callback) {
+  var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
+  var url = hostUrl + '/reset-password.html#' + user.resetHash
+  var emailData = {
+    recipients: user.emails,
+    subject: subject,
+    body: text + '<a href="' + url + '">' + url + '</a>'
+  }
+
+  sendEmail(emailData, callback)
+}
+
+function createAndSaveHash(user, callback) {
+  bcrypt.genSalt(1, function (err, s) {
+    user.resetHash = new Buffer(s, 'base64').toString('hex')
+    user.save(callback)
+  })
+}
 
 app.get('/check-reset-hash/:hash', function(req, res, next) {
   User.findOne({ resetHash: req.params.hash, active: { $ne: false } }, function(err, user) {
@@ -334,7 +342,20 @@ function userHasRequiredFields(user) {
 
 app.post('/users/new', function(req, res, next) {
   if (userHasRequiredFields(req.body)) {
-    new User(req.body).save(respond(res, next))
+    new User(req.body).save(function(err, user) {
+      if (err) return next(err)
+      createAndSaveHash(user, function(err) {
+        if (err) return next(err)
+
+        var subject = 'Käyttäjätunnusten aktivointi'
+        var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
+
+        sendSaltLinkViaEmail(user, subject, text, function(err) {
+          if (err) return next(err)
+          return res.send(user)
+        })
+      })
+    })
   } else {
     return res.send(500)
   }

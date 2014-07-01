@@ -40,10 +40,15 @@ function internalSearchPage() {
         var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
         var $remove = $('<div>', {class: 'remove'}).append($('<button>').text('Poista'))
-        var $draft = $('<p>', {class: 'result draft'}).append($date).append($link).append($remove)
+        var $draft = $('<div>', {class: 'result draft'})
+          .data('id', draft._id).append($date).append($link).append($remove)
         $page.find('.drafts > div').append($draft)
       })
     })
+  })
+
+  $page.find('.drafts').on('click', '.draft', function(e) {
+    showClassificationPage($(this).data('id'))
   })
 
   $page.on('showDetails', '.program-box', function(e, program) {

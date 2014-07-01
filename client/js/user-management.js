@@ -94,10 +94,14 @@ function userManagementPage() {
 
   function renderNewUserForm(role) {
     var $detailTemplate = $('#templates').find('.user-details').clone()
+
+    $detailTemplate.find('.modify-only').remove()
+
     $detailTemplate.submit(function(event) {
       event.preventDefault()
       var userData = getUserData($(this))
       userData.role = enums.userRoles[role]
+      userData.active = true
       $.post('/users/new', JSON.stringify(userData), function(newUser) {
         $userList.find('.result.selected').data('user', newUser)
         var $user = renderUser(newUser).css('display', 'none')
@@ -121,11 +125,11 @@ function userManagementPage() {
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
-      var data = getUserData($(this))
-      $.post('/users/' + user._id, JSON.stringify(data), function(updatedUser) {
+      $.post('/users/' + user._id, JSON.stringify(getUserData($(this))), function(updatedUser) {
         var selected = $userList.find('.result.selected')
         selected.data('user', updatedUser)
         selected.find('span.name').text(updatedUser.name)
+        $userList.find('.result.selected').data('user', updatedUser)
         closeDetails()
       })
     })

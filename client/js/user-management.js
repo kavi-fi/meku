@@ -92,16 +92,6 @@ function userManagementPage() {
     updateLocationHash('')
   }
 
-  function getUserData($details) {
-    return {
-      name: $details.find('input[name=name]').val(),
-      emails: [ $details.find('input[name=email]').val() ],
-      username: $details.find('input[name=username]').val(),
-      active: $details.find('input[name=active]').prop('checked'),
-      phoneNumber: $details.find('input[name=phoneNumber]').val()
-    }
-  }
-
   function renderNewUserForm(role) {
     var $detailTemplate = $('#templates').find('.user-details').clone()
     $detailTemplate.submit(function(event) {
@@ -130,10 +120,22 @@ function userManagementPage() {
       event.preventDefault()
       var data = getUserData($(this))
       $.post('/users/' + user._id, JSON.stringify(data), function(updatedUser) {
-        $userList.find('.result.selected').data('user', updatedUser)
+        var selected = $userList.find('.result.selected')
+        selected.data('user', updatedUser)
+        selected.find('span.name').text(updatedUser.name)
         closeDetails()
       })
     })
     return $detailTemplate.css('display', 'none')
+  }
+
+  function getUserData($details) {
+    return {
+      name: $details.find('input[name=name]').val(),
+      emails: [ $details.find('input[name=email]').val() ],
+      username: $details.find('input[name=username]').val(),
+      active: $details.find('input[name=active]').prop('checked'),
+      phoneNumber: $details.find('input[name=phoneNumber]').val()
+    }
   }
 }

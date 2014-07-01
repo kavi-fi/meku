@@ -158,6 +158,13 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 #search-page .left { width: 600px; }
 #search-page .search-label { display: block; padding: 0 0 20px 0; }
 
+#search-page .drafts h3 { margin-bottom: 10px; }
+#search-page .drafts > div { margin-bottom: 40px; }
+#search-page .drafts .draft {  display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; margin: 0; padding: 8px 0; }
+#search-page .drafts .draft .creationDate { margin-right: 30px; }
+#search-page .drafts .draft .name { width: 695px; font-weight: bold; }
+#search-page .drafts .draft .remove { flex: 0 0 auto; text-align: right; width: 95px; }
+
 #search-page .new-classification { float: right; }
 #search-page .new-classification label { display: block; padding: 0 0 20px 0; }
 #search-page .new-classification button { margin-left: 15px; }

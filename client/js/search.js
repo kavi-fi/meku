@@ -33,6 +33,19 @@ function internalSearchPage() {
 
   $newClassificationType.select2(programTypesSelect2).select2('val', 1)
 
+  $page.on('show', function(e, q, filters, programId) {
+    $.get('/programs/drafts', function(drafts) {
+      $page.find('.drafts .draft').remove()
+      drafts.forEach(function(draft) {
+        var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
+        var $link = $('<span>', {class: 'name'}).text(draft.name)
+        var $remove = $('<div>', {class: 'remove'}).append($('<button>').text('Poista'))
+        var $draft = $('<p>', {class: 'result draft'}).append($date).append($link).append($remove)
+        $page.find('.drafts > div').append($draft)
+      })
+    })
+  })
+
   $page.on('showDetails', '.program-box', function(e, program) {
     toggleDetailButtons($(this), program)
   })

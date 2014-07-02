@@ -171,16 +171,12 @@ function userManagementPage() {
   }
 
   function validateUsername($username, $detailTemplate) {
-    $username.removeClass('checking')
     $username.addClass('touched')
-    $.ajax('/users/search/' + $username.val(), { global: false })
-      .done(function() {
-        $username.get(0).setCustomValidity('Username taken')
-      }).fail(function(jqXHR, textStatus, errorThrown) {
-        $username.get(0).setCustomValidity('')
-      }).always(function() {
-        $username.siblings('i.icon-spinner').hide()
-        $detailTemplate.find('form').trigger('validate')
-      })
+    $.get('/users/exists/' + $username.val(), function(data) {
+      $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
+      $username.siblings('i.icon-spinner').hide()
+      $username.removeClass('checking')
+      $detailTemplate.find('form').trigger('validate')
+    })
   }
 }

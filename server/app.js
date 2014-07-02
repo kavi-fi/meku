@@ -331,11 +331,10 @@ app.get('/users', function(req, res, next) {
   User.find(respond(res, next))
 })
 
-app.get('/users/search/:query', function(req, res, next) {
-  User.findOne({ username: req.params.query }, function(err, user) {
-    if (err) next(err)
-    else if (_.isEmpty(user)) res.send(404, { message: 'User not found' })
-    else res.send(user)
+app.get('/users/exists/:username', function(req, res, next) {
+  User.findOne({ username: req.params.username }, function(err, user) {
+    if (err) return next(err)
+    res.send({ exists: !!user })
   })
 })
 

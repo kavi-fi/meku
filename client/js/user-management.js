@@ -138,12 +138,22 @@ function userManagementPage() {
         .find('input[name=phoneNumber]').val(user.phoneNumber).end()
     }
 
-    $detailTemplate.find('form').on('input', function() {
+    $detailTemplate.find('form').on('input', _.throttle(function() { $(this).trigger('validate') }, 200))
+
+    $detailTemplate.find('form').on('validate', function() {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
     })
 
     $detailTemplate.find('input').on('blur', function() {
       $(this).addClass('touched')
+    })
+
+    var usernameValidator = _.debounce(validateUsername, 500)
+    $detailTemplate.find('input[name=username]').on('input', function() {
+      var $username = $(this)
+      $username.siblings('i.icon-spinner').show()
+      $username.get(0).setCustomValidity('Checking username')
+      usernameValidator($username, $detailTemplate)
     })
 
     return $detailTemplate.css('display', 'none')
@@ -157,5 +167,18 @@ function userManagementPage() {
       active: $details.find('input[name=active]').prop('checked'),
       phoneNumber: $details.find('input[name=phoneNumber]').val()
     }
+  }
+
+  function validateUsername($username, $detailTemplate) {
+    $username.addClass('touched')
+    $.ajax('/users/search/' + $username.val(), { global: false })
+      .done(function() {
+        $username.get(0).setCustomValidity('Username taken')
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        $username.get(0).setCustomValidity('')
+      }).always(function() {
+        $username.siblings('i.icon-spinner').hide()
+        $detailTemplate.find('form').trigger('validate')
+      })
   }
 }

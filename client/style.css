@@ -646,6 +646,7 @@ textarea.invalid:disabled,
 #user-management-page .user-details input { margin-top: 4px; box-sizing: border-box; width: 100%; }
 #user-management-page .user-details input[type=checkbox] { width: 16px; }
 #user-management-page .user-details button[name=save] { float: right; }
+#user-management-page .user-details .icon-spinner { margin-left: -20px; display: none; }
 #user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
 #user-management-page .new-user { width: 340px; }

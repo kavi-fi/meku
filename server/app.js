@@ -331,6 +331,14 @@ app.get('/users', function(req, res, next) {
   User.find(respond(res, next))
 })
 
+app.get('/users/search/:query', function(req, res, next) {
+  User.findOne({ username: req.params.query }, function(err, user) {
+    if (err) next(err)
+    else if (_.isEmpty(user)) res.send(404, { message: 'User not found' })
+    else res.send(user)
+  })
+})
+
 function userHasRequiredFields(user) {
   return (user.username != '' && user.emails[0].length > 0 && user.name != '')
 }

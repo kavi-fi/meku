@@ -57,9 +57,13 @@ function internalSearchPage() {
   $drafts.on('click', '.draft button', function(e) {
     e.stopPropagation()
     var $draft = $(this).parents('.draft')
-    $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function() {
+    $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function(p) {
+      var programId = $draft.data('id')
       $draft.remove()
       $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
+      var $box = $page.find('.result[data-id=' + programId + '] + .program-box')
+      toggleDetailButtons($box, p)
+      $box.find('.drafts div[data-userId=' + user._id + ']').remove()
     })
   })
 

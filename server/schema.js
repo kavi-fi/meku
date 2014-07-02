@@ -143,7 +143,10 @@ var UserSchema = new Schema({
   role: String,
   name: String,
   active: Boolean,
-  resetHash: String
+  resetHash: String,
+  certificateStartDate: Date,
+  certificateEndDate: Date,
+  comment: String
 })
 
 UserSchema.pre('save', function(next) {

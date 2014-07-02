@@ -70,6 +70,10 @@ enums.util.userRoleName = function(role) {
   return userRole ? userRole.name : undefined
 }
 
+enums.util.isClassifier = function(role) {
+  return role === 'user'
+}
+
 enums.roles = {
   'Provider': 'Tarjoaja',
   'Location_of_providing': 'Tarjoamispaikka',

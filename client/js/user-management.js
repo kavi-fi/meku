@@ -2,6 +2,7 @@ function userManagementPage() {
   var $page = $('#user-management-page')
   var $userList = $page.find('.user-list')
   var $userNameQuery = $page.find('#user-name-query')
+  var dateFormat = 'DD.MM.YYYY'
 
   var $newUserType = $page.find('.new-user input[name="new-user-type"]')
   $newUserType.select2({
@@ -87,13 +88,20 @@ function userManagementPage() {
   }
 
   function renderNewUserForm(role) {
-    var $detailTemplate = renderUserDetails()
+    var $detailTemplate = renderUserDetails(null, role)
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
-      var userData = getUserData($(this))
+
+      var $this = $(this)
+      var userData = getUserData($this)
       userData.role = role
       userData.active = true
+
+      if (enums.util.isClassifier(role)) {
+        userData = _.merge(userData, getClassifierData($this))
+      }
+
       $.post('/users/new', JSON.stringify(userData), function(newUser) {
         $userList.find('.result.selected').data('user', newUser)
         var $user = renderUser(newUser).css('display', 'none')
@@ -111,7 +119,15 @@ function userManagementPage() {
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
-      $.post('/users/' + user._id, JSON.stringify(getUserData($(this))), function(updatedUser) {
+
+      var $this = $(this)
+      var userData = getUserData($this)
+
+      if (enums.util.isClassifier(user.role)) {
+        userData = _.merge(userData, getClassifierData($this))
+      }
+
+      $.post('/users/' + user._id, JSON.stringify(userData), function(updatedUser) {
         var selected = $userList.find('.result.selected')
         selected.data('user', updatedUser)
         selected.find('span.name').text(updatedUser.name)
@@ -123,19 +139,38 @@ function userManagementPage() {
     return $detailTemplate
   }
 
-  function renderUserDetails(user) {
+  function renderUserDetails(user, role) {
     var $detailTemplate = $('#templates').find('.user-details').clone()
     var isNewUser = user == null
+    var isClassifier = enums.util.isClassifier(role) || user && enums.util.isClassifier(user.role)
+
+    if (isClassifier) {
+      $detailTemplate.find('.classifier-details').removeClass('hide')
+    }
 
     if (isNewUser) {
+      if (isClassifier) {
+        initSearch2Autocomplete($detailTemplate.find('input[name=subscribers]'), subscribersSearch)
+        initSearch2Autocomplete($detailTemplate.find('input[name=employers]'), employersSearch)
+      }
+
       $detailTemplate.find('.modify-only').remove()
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
-      $detailTemplate.find('input[name=name]').val(user.name).end()
-        .find('input[name=email]').val(user.emails[0]).end()
-        .find('input[name=username]').val(user.username).end()
-        .find('input[name=active]').prop('checked', user.active).end()
-        .find('input[name=phoneNumber]').val(user.phoneNumber).end()
+      if (isClassifier) {
+        var $subscribers = $detailTemplate.find('input[name=subscribers]')
+        var $employers = $detailTemplate.find('input[name=employers]')
+
+        $.get('/accounts/search?user_id=' + user._id + '&roles=Subscriber', function(subscribers) {
+          initSearch2Autocomplete($subscribers, subscribersSearch)
+          $subscribers.trigger('setVal', subscribers).end()
+        })
+
+        initSearch2Autocomplete($employers, employersSearch)
+        $employers.trigger('setVal', user.employers).end()
+      }
+
+      populate($detailTemplate, user)
     }
 
     $detailTemplate.find('form').on('input', _.throttle(function() { $(this).trigger('validate') }, 200))
@@ -154,6 +189,39 @@ function userManagementPage() {
     })
 
     return $detailTemplate.css('display', 'none')
+
+    function subscribersSearch(term) {
+      return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Subscriber'
+    }
+
+    function employersSearch(term) {
+        return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Classifier' // todo: only classifier?
+    }
+
+    function initSearch2Autocomplete($element, path, initSelection) {
+      select2Autocomplete({
+        $el: $element,
+        path: path,
+        toOption: idNamePairToSelect2Option,
+        fromOption: select2OptionToIdNamePair,
+        multiple: true,
+        initSelection: initSelection
+      })
+    }
+
+    function populate($element, user) {
+      var cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(dateFormat) : ''
+      var cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(dateFormat) : ''
+
+      $element.find('input[name=name]').val(user.name).end()
+        .find('input[name=email]').val(user.emails[0]).end()
+        .find('input[name=username]').val(user.username).end()
+        .find('input[name=active]').prop('checked', user.active).end()
+        .find('input[name=phoneNumber]').val(user.phoneNumber).end()
+        .find('input[name=certificateStartDate]').val(cStartDate).end()
+        .find('input[name=certificateEndDate]').val(cEndDate).end()
+        .find('input[name=comment]').val(user.comment).end()
+    }
   }
 
   function getUserData($details) {
@@ -163,6 +231,16 @@ function userManagementPage() {
       username: $details.find('input[name=username]').val(),
       active: $details.find('input[name=active]').prop('checked'),
       phoneNumber: $details.find('input[name=phoneNumber]').val()
+    }
+  }
+
+  function getClassifierData($details) {
+    return {
+      certificateStartDate: $details.find('input[name=certificateStartDate]').val(),
+      certificateEndDate: $details.find('input[name=certificateEndDate]').val(),
+      employers: $details.find('input[name=employers]').select2('data').map(select2OptionToIdNamePair),
+      subscribers: $details.find('input[name=subscribers]').select2('data').map(select2OptionToIdNamePair),
+      comment: $details.find('input[name=comment]').val()
     }
   }
 

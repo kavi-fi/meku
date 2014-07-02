@@ -650,6 +650,9 @@ textarea.invalid:disabled,
 #user-management-page .user-details input[type=checkbox] { width: 16px; }
 #user-management-page .user-details button[name=save] { float: right; }
 #user-management-page .user-details .icon-spinner { margin-left: -20px; }
+#user-management-page .user-details .double-margin { margin-top: 18px; }
+#user-management-page .user-details .select2-choices { width: 264px; }
+#user-management-page .user-details .select2-search-field { height: 35px; }
 #user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
 #user-management-page .new-user { width: 340px; }

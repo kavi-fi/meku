@@ -362,7 +362,7 @@ input[type=text].invalid,
 input[type=number].invalid,
 input[type=number]:invalid,
 textarea.invalid,
-input:invalid,
+input:invalid:not(.checking),
 .select2-container.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
   background: #F0FFF0;
@@ -375,7 +375,7 @@ input:invalid,
 input[type=text].invalid.touched,
 input[type=number].invalid.touched,
 input[type=number]:invalid,
-input:required:invalid.touched,
+input:required:invalid.touched:not(.checking),
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {

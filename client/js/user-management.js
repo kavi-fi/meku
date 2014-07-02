@@ -153,6 +153,7 @@ function userManagementPage() {
       var $username = $(this)
       $username.siblings('i.icon-spinner').show()
       $username.get(0).setCustomValidity('Checking username')
+      $username.addClass('checking')
       usernameValidator($username, $detailTemplate)
     })
 
@@ -170,6 +171,7 @@ function userManagementPage() {
   }
 
   function validateUsername($username, $detailTemplate) {
+    $username.removeClass('checking')
     $username.addClass('touched')
     $.ajax('/users/search/' + $username.val(), { global: false })
       .done(function() {

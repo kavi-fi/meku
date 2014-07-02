@@ -175,7 +175,7 @@ app.get('/programs/drafts', function(req, res, next) {
 })
 
 app.delete('/programs/drafts/:id', function(req, res, next) {
-  var unset = _.object([['draftClassifications.' + req.user._id, ""]])
+  var unset = utils.keyValue('draftClassifications.' + req.user._id, "")
   Program.findByIdAndUpdate(req.params.id, {$unset: unset}, null, respond(res, next))
 })
 

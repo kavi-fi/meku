@@ -148,13 +148,9 @@ function userManagementPage() {
       $(this).addClass('touched')
     })
 
-    var usernameValidator = _.debounce(validateUsername, 500)
     $detailTemplate.find('input[name=username]').on('input', function() {
       var $username = $(this)
-      $username.siblings('i.icon-spinner').show()
-      $username.get(0).setCustomValidity('Checking username')
-      $username.addClass('checking')
-      usernameValidator($username, $detailTemplate)
+      validateUsername($username, $detailTemplate)
     })
 
     return $detailTemplate.css('display', 'none')
@@ -170,13 +166,25 @@ function userManagementPage() {
     }
   }
 
+  var usernameValidator = _.debounce((function() {
+    var getLatestAjax = switchLatestDeferred()
+    return function(username, $username, $detailTemplate) {
+      getLatestAjax($.get('/users/exists/' + username), $username.siblings('i.icon-spinner'))
+        .done(function(data) {
+          $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
+          $username.removeClass('pending')
+          $detailTemplate.find('form').trigger('validate')
+        })
+      }
+  })(), 300)
+
   function validateUsername($username, $detailTemplate) {
+    $username.get(0).setCustomValidity('Checking username')
     $username.addClass('touched')
-    $.get('/users/exists/' + $username.val(), function(data) {
-      $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
-      $username.siblings('i.icon-spinner').hide()
-      $username.removeClass('checking')
-      $detailTemplate.find('form').trigger('validate')
-    })
+    var username = $username.val().trim()
+    if (username) {
+      $username.addClass('pending')
+      usernameValidator(username, $username, $detailTemplate)
+    }
   }
 }

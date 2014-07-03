@@ -79,6 +79,9 @@ textarea { resize: vertical; }
 .warning-summary .warnings { display: inline-block; }
 .warning-summary .warnings .warning { display: inline-block; background: transparent no-repeat; background-size: 40px; width: 40px; height: 40px; }
 
+.icon-spinner { display: none; }
+.icon-spinner.active { display: inherit; }
+
 #dialog {
   display: none;
   width: 860px;
@@ -362,7 +365,7 @@ input[type=text].invalid,
 input[type=number].invalid,
 input[type=number]:invalid,
 textarea.invalid,
-input:invalid:not(.checking),
+input:invalid:not(.pending),
 .select2-container.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
   background: #F0FFF0;
@@ -375,7 +378,7 @@ input:invalid:not(.checking),
 input[type=text].invalid.touched,
 input[type=number].invalid.touched,
 input[type=number]:invalid,
-input:required:invalid.touched:not(.checking),
+input:required:invalid.touched:not(.pending),
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {
@@ -646,7 +649,7 @@ textarea.invalid:disabled,
 #user-management-page .user-details input { margin-top: 4px; box-sizing: border-box; width: 100%; }
 #user-management-page .user-details input[type=checkbox] { width: 16px; }
 #user-management-page .user-details button[name=save] { float: right; }
-#user-management-page .user-details .icon-spinner { margin-left: -20px; display: none; }
+#user-management-page .user-details .icon-spinner { margin-left: -20px; }
 #user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
 #user-management-page .new-user { width: 340px; }

@@ -198,14 +198,13 @@ function userManagementPage() {
         return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Classifier' // todo: only classifier?
     }
 
-    function initSearch2Autocomplete($element, path, initSelection) {
+    function initSearch2Autocomplete($element, path) {
       select2Autocomplete({
         $el: $element,
         path: path,
         toOption: idNamePairToSelect2Option,
         fromOption: select2OptionToIdNamePair,
-        multiple: true,
-        initSelection: initSelection
+        multiple: true
       })
     }
 

@@ -150,7 +150,6 @@ function userManagementPage() {
 
     if (isNewUser) {
       if (isClassifier) {
-        initSearch2Autocomplete($detailTemplate.find('input[name=subscribers]'), subscribersSearch)
         initSearch2Autocomplete($detailTemplate.find('input[name=employers]'), employersSearch)
       }
 
@@ -158,13 +157,7 @@ function userManagementPage() {
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
       if (isClassifier) {
-        var $subscribers = $detailTemplate.find('input[name=subscribers]')
         var $employers = $detailTemplate.find('input[name=employers]')
-
-        $.get('/accounts/search?user_id=' + user._id + '&roles=Subscriber', function(subscribers) {
-          initSearch2Autocomplete($subscribers, subscribersSearch)
-          $subscribers.trigger('setVal', subscribers).end()
-        })
 
         initSearch2Autocomplete($employers, employersSearch)
         $employers.trigger('setVal', user.employers).end()
@@ -189,10 +182,6 @@ function userManagementPage() {
     })
 
     return $detailTemplate.css('display', 'none')
-
-    function subscribersSearch(term) {
-      return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Subscriber'
-    }
 
     function employersSearch(term) {
         return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Classifier' // todo: only classifier?
@@ -219,7 +208,7 @@ function userManagementPage() {
         .find('input[name=phoneNumber]').val(user.phoneNumber).end()
         .find('input[name=certificateStartDate]').val(cStartDate).end()
         .find('input[name=certificateEndDate]').val(cEndDate).end()
-        .find('input[name=comment]').val(user.comment).end()
+        .find('textarea[name=comment]').val(user.comment).end()
     }
   }
 
@@ -238,8 +227,7 @@ function userManagementPage() {
       certificateStartDate: $details.find('input[name=certificateStartDate]').val(),
       certificateEndDate: $details.find('input[name=certificateEndDate]').val(),
       employers: $details.find('input[name=employers]').select2('data').map(select2OptionToIdNamePair),
-      subscribers: $details.find('input[name=subscribers]').select2('data').map(select2OptionToIdNamePair),
-      comment: $details.find('input[name=comment]').val()
+      comment: $details.find('textarea[name=comment]').val()
     }
   }
 

@@ -350,19 +350,10 @@ function userHasRequiredFields(user) {
 }
 
 app.post('/users/new', function(req, res, next) {
+  console.log(req.body)
   if (userHasRequiredFields(req.body)) {
     new User(req.body).save(function(err, user) {
       if (err) return next(err)
-
-      if (req.body.subscribers) {
-        Account.find({_id: {$in: _.pluck(req.body.subscribers, '_id')}}, function(err, accounts) {
-          if (err) return next(err)
-          accounts.forEach(function(account) {
-            account.users.push({_id: user._id, name: user.name})
-            account.save()
-          })
-        })
-      }
 
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
@@ -379,34 +370,9 @@ app.post('/users/new', function(req, res, next) {
 })
 
 app.post('/users/:id', function(req, res, next) {
+  console.log(req.body)
   User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
     if (err) return next(err)
-    if (req.body.subscribers) {
-      var subscribers = req.body.subscribers
-      Account.find({'users._id': user._id}, function(err, existingSubscribers) {
-        if (err) return next(err)
-
-        var oldKeys = existingSubscribers.map(function(s) { return String(s._id) })
-        var newKeys = _.pluck(subscribers, '_id')
-
-        _.map(_.difference(newKeys, oldKeys), function(addedSubscriber) {
-          return _.find(subscribers, function(s) { return s._id === addedSubscriber })
-        }).forEach(function(addedSubscriber) {
-          Account.findOne({_id: addedSubscriber._id}, function(err, account) {
-            if (err) return next(err)
-            account.users.push({_id: user._id, name: user.name})
-            account.save()
-          })
-        })
-
-        _.difference(oldKeys, newKeys).forEach(function(removedSubscriber) {
-          var updateTerm = {$pull: {users: {_id: user._id}}}
-          Account.findOneAndUpdate({_id: removedSubscriber}, updateTerm, function(err) {
-            if (err) return next(err)
-          })
-        })
-      })
-    }
     res.send(user)
   })
 })

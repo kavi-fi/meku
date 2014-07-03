@@ -350,7 +350,6 @@ function userHasRequiredFields(user) {
 }
 
 app.post('/users/new', function(req, res, next) {
-  console.log(req.body)
   if (userHasRequiredFields(req.body)) {
     new User(req.body).save(function(err, user) {
       if (err) return next(err)
@@ -370,7 +369,6 @@ app.post('/users/new', function(req, res, next) {
 })
 
 app.post('/users/:id', function(req, res, next) {
-  console.log(req.body)
   User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
     if (err) return next(err)
     res.send(user)

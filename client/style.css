@@ -171,7 +171,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 #search-page .recent .duration-or-game { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
 #search-page .recent .program-type { flex: 0 0 auto; font-size: 12px; width: 100px; }
-#search-page .recent .classification { flext: 0 0 auto; width: 100px; text-align: right; }
+#search-page .recent .classification { flext: 0 0 auto; width: 140px; text-align: right; }
 
 #search-page .new-classification { float: right; }
 #search-page .new-classification label { display: block; padding: 0 0 20px 0; }

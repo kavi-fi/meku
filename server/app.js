@@ -163,6 +163,22 @@ function search(responseFields, req, res, next) {
   }
 }
 
+app.get('/programs/drafts', function(req, res, next) {
+  var term = utils.keyValue('draftClassifications.' + req.user._id, {$exists: true})
+  Program.find(term).exec(function(err, programs) {
+    if (err) return next(err)
+    res.send(programs.map(function(p) {
+      var draft = p.draftClassifications[req.user._id]
+      return {_id: p._id, name: p.name, creationDate: draft.creationDate}
+    }))
+  })
+})
+
+app.delete('/programs/drafts/:id', function(req, res, next) {
+  var unset = utils.keyValue('draftClassifications.' + req.user._id, "")
+  Program.findByIdAndUpdate(req.params.id, {$unset: unset}, null, respond(res, next))
+})
+
 app.get('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, respond(res, next))
 })

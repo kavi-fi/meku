@@ -20,6 +20,7 @@ function classificationPage() {
     } else {
       location.hash = '#luokittelu'
     }
+    $('.navi li:first a').addClass('active')
     $form.find('.private-comments').toggle(hasRole('kavi'))
   })
 
@@ -52,6 +53,10 @@ function classificationPage() {
       $("#search-page").trigger('show').show()
       $(window).scrollTop(0)
     })
+  })
+
+  $form.on('click', '.back-to-search', function() {
+    $("#search-page").trigger('show').show()
   })
 
   $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })

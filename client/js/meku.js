@@ -135,6 +135,8 @@ function loginPage() {
 function navi() {
   var $navi = $('#header .navi')
 
+  $navi.toggle(hasRole('kavi'))
+
   $navi.find('a[data-href="#billing-page"]').parent().toggle(hasRole('kavi'))
 
   $navi.find('a').on('click', function(e) {

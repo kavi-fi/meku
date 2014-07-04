@@ -100,6 +100,7 @@ textarea { resize: vertical; }
   border-bottom: solid 5px #00AA77;
 }
 
+#header .navi { display: none; }
 #header .content { padding: 15px 0 0 0; }
 #header .reset-password-page { text-align: center; }
 
@@ -235,6 +236,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .select2-container-multi .select2-choices {
   width: 280px;
 }
+#classification-page .back-to-search { display: block; margin-top: -20px; margin-bottom: 20px; color: #00BB88; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }

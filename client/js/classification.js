@@ -55,7 +55,9 @@ function classificationPage() {
     })
   })
 
-  $form.on('click', '.back-to-search', function() {
+  $form.on('click', '.back-to-search', function(e) {
+    e.preventDefault()
+    $form.hide()
     $("#search-page").trigger('show').show()
   })
 

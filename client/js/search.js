@@ -119,6 +119,7 @@ function internalSearchPage() {
   }
 
   function loadRecent() {
+    $recent.hide()
     $recent.find('.result').remove()
     $recent.find('.program-box').remove()
     $.get('/programs/recent', function(recents) {
@@ -129,7 +130,7 @@ function internalSearchPage() {
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
           .append($('<span>', { class: 'program-type' }).html(enums.programType[p.programType].fi))
           .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
-        $recent.append($result)
+        $recent.show().append($result)
       })
     })
   }

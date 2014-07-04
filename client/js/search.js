@@ -4,6 +4,7 @@ function publicSearchPage() {
   var $page = $('#search-page')
   $page.find('.new-classification').remove()
   $page.find('.drafts').remove()
+  $page.find('.recent').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
     var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program._id+']')
@@ -17,10 +18,12 @@ function internalSearchPage() {
   var searchPageApi = searchPage('/programs/search/')
 
   var $page = $('#search-page')
-  var $results = $page.find('.results')
+  var $results = $page.find('.results').add($page.find('.recent'))
   var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
   var $newClassificationButton = $page.find('.new-classification button')
   var $drafts = $page.find('.drafts')
+  var $recent = $page.find('.recent')
+  var detailRenderer = programBox()
 
   var programTypesSelect2 = {
     data: [
@@ -36,18 +39,23 @@ function internalSearchPage() {
   $newClassificationType.select2(programTypesSelect2).select2('val', 1)
 
   $page.on('show', function(e, q, filters, programId) {
-    $.get('/programs/drafts', function(drafts) {
-      $drafts.find('.draft').remove()
-      drafts.forEach(function(draft) {
-        var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
-        var $link = $('<span>', {class: 'name'}).text(draft.name)
-        var $remove = $('<div>', {class: 'remove'}).append($('<button>').text('Poista'))
-        var $draft = $('<div>', {class: 'result draft'})
-          .data('id', draft._id).append($date).append($link).append($remove)
-        $drafts.find('> div').append($draft)
+    loadDrafts()
+    loadRecent()
+  })
+
+  $page.find('.recent').on('click', '.result', function() {
+    var $box = $page.find('.recent').find('.program-box')
+    if ($box.length > 0) {
+      $box.slideUp(function() { $(this).remove() })
+    } else {
+      var $result = $(this)
+      $.get('/programs/' + $(this).data('id')).done(function (p) {
+        var $details = detailRenderer.render(p)
+        $result.after($details)
+        toggleDetailButtons($details, p)
+        $details.slideDown()
       })
-      $drafts.toggleClass('hide', drafts.length === 0)
-    })
+    }
   })
 
   $drafts.on('click', '.draft', function() {
@@ -94,6 +102,37 @@ function internalSearchPage() {
     showCategorizationForm($(this).parents('.program-box').data('id'))
     $(this).hide()
   })
+
+  function loadDrafts() {
+    $drafts.find('.draft').remove()
+    $.get('/programs/drafts', function(drafts) {
+      drafts.forEach(function(draft) {
+        var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
+        var $link = $('<span>', {class: 'name'}).text(draft.name)
+        var $remove = $('<div>', {class: 'remove'}).append($('<button>').text('Poista'))
+        var $draft = $('<div>', {class: 'result draft'})
+          .data('id', draft._id).append($date).append($link).append($remove)
+        $drafts.find('> div').append($draft)
+      })
+      $drafts.toggleClass('hide', drafts.length === 0)
+    })
+  }
+
+  function loadRecent() {
+    $recent.find('.result').remove()
+    $recent.find('.program-box').remove()
+    $.get('/programs/recent', function(recents) {
+      recents.forEach(function(p) {
+        var $result = $('<div>').addClass('result').data('id', p._id)
+          .append($('<span>', { class: 'registrationDate' }).text(utils.asDate(p.classifications[0].registrationDate)))
+          .append($('<span>', { class: 'name' }).text(p.name[0]))
+          .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
+          .append($('<span>', { class: 'program-type' }).html(enums.programType[p.programType].fi))
+          .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
+        $recent.append($result)
+      })
+    })
+  }
 
   function toggleDetailButtons($detail, p) {
     if (enums.util.isUnknown(p)) {
@@ -336,11 +375,13 @@ function searchPage(baseUrl) {
         .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
     }
 
+
+  }
+}
     function countryAndYear(p) {
       var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
       return s == '' ? s : '('+s+')'
     }
-
     function duration(p) {
       var c = p.classifications[0]
       if (!c || !c.duration) return ''
@@ -359,5 +400,3 @@ function searchPage(baseUrl) {
         return x
       }
     }
-  }
-}

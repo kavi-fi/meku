@@ -69,9 +69,7 @@ function internalSearchPage() {
       var programId = $draft.data('id')
       $draft.remove()
       $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
-      var $box = $page.find('.result[data-id=' + programId + '] + .program-box')
-      toggleDetailButtons($box, p)
-      $box.find('.drafts div[data-userId=' + user._id + ']').remove()
+      searchPageApi.programDataUpdated($page.find('.result[data-id=' + programId + ']').data('program', p))
     })
   })
 
@@ -333,8 +331,11 @@ function searchPage(baseUrl) {
 
   function programDataUpdated($row) {
     var $newRow = render($row.data('program'), state.q)
+    $row.next('.program-box').remove()
     $row.replaceWith($newRow)
-    openDetail($newRow, false)
+    if ($row.is('.selected')) {
+      openDetail($newRow, false)
+    }
   }
 
   function openDetail($row, animate) {

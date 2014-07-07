@@ -379,25 +379,27 @@ function searchPage(baseUrl) {
 
   }
 }
-    function countryAndYear(p) {
-      var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
-      return s == '' ? s : '('+s+')'
-    }
-    function duration(p) {
-      var c = p.classifications[0]
-      if (!c || !c.duration) return ''
-      var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
-      if (!match) return c.duration
-      match.shift()
-      return _.chain(match).map(suffixify).compact().join(' ')
 
-      function suffixify(x, ii) {
-        if (!x) return x
-        var int = parseInt(x)
-        if (!int) return ''
-        if (ii == 0) return int + ' h'
-        if (ii == 1) return int + ' min'
-        if (ii == 2) return int + ' s'
-        return x
-      }
-    }
+function countryAndYear(p) {
+  var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
+  return s == '' ? s : '('+s+')'
+}
+
+function duration(p) {
+  var c = p.classifications[0]
+  if (!c || !c.duration) return ''
+  var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
+  if (!match) return c.duration
+  match.shift()
+  return _.chain(match).map(suffixify).compact().join(' ')
+
+  function suffixify(x, ii) {
+    if (!x) return x
+    var int = parseInt(x)
+    if (!int) return ''
+    if (ii == 0) return int + ' h'
+    if (ii == 1) return int + ' min'
+    if (ii == 2) return int + ' s'
+    return x
+  }
+}

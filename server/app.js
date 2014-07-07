@@ -174,6 +174,21 @@ app.get('/programs/drafts', function(req, res, next) {
   })
 })
 
+app.get('/programs/recent', function(req, res, next) {
+  var ObjectId = mongoose.Types.ObjectId
+  Program.aggregate({$match: {"classifications.author._id": ObjectId(req.user._id) }})
+    .unwind("classifications")
+    .project({"registrationDate": "$classifications.registrationDate"})
+    .sort('-registrationDate')
+    .limit(1)
+    .exec(function(err, recents) {
+      if (err) return next(err)
+      async.map(recents, function(p, callback) {
+        return Program.findById(p._id, callback)
+      }, respond(res, next))
+    })
+})
+
 app.delete('/programs/drafts/:id', function(req, res, next) {
   var unset = utils.keyValue('draftClassifications.' + req.user._id, "")
   Program.findByIdAndUpdate(req.params.id, {$unset: unset}, null, respond(res, next))

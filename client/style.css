@@ -224,8 +224,7 @@ button.search { margin-left: 15px; }
 .program-box .categorization-form input[type=number] { width: 80px; display: inline-block; }
 
 #classification-page input[type=text],
-#classification-page input[type=number],
-.select2-container-multi .select2-choices {
+#classification-page input[type=number] {
   width: 280px;
 }
 
@@ -280,16 +279,10 @@ textarea,
   padding: 8px 10px !important;
 }
 
-.select2-container-multi .select2-choices {
-  min-height: 0;
-  width: 300px;
-}
-
 .select2-container-multi .select2-choices .select2-search-choice {
   padding: 6px 8px 6px 18px;
   border: 0;
-  background-color: #eee;
-  background-image: none;
+  background: #eee none;
   color: #666666;
   margin: 4px 0 3px 5px;
   line-height: 14px;
@@ -306,13 +299,8 @@ textarea,
   line-height: 19px;
 }
 
-input, select, .select2-choices  {
+input, select, .select2-container  {
   margin: 0 0 15px 0;
-  vertical-align: middle;
-}
-
-.select2-container {
-  margin-bottom: 10px;
 }
 
 .select2-container .select2-choice {
@@ -344,9 +332,7 @@ label {
 }
 .select2-container.select2-dropdown-open.select2-drop-above .select2-choice,
 .select2-container.select2-dropdown-open.select2-drop-above .select2-choices {
-  border-radius: 3px;
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
+  border-radius: 0 0 3px 3px;
 }
 
 .select2-drop-active.required { border: 1px solid #00BB88; border-top: none; }
@@ -645,20 +631,21 @@ textarea.invalid:disabled,
 #user-management-page .result span:nth-child(2) { width: 200px; }
 #user-management-page .result span:nth-child(3) { width: 200px; }
 #user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
-#user-management-page .user-details label { box-sizing: border-box; width: 100%; }
-#user-management-page .user-details input { margin-top: 4px; box-sizing: border-box; width: 100%; }
+#user-management-page .user-details label { box-sizing: border-box; width: 266px; margin-right: 10px; vertical-align: top; }
+#user-management-page .user-details label.double { width: 547px; box-sizing: border-box; }
+#user-management-page .user-details input:not(.select2-input) { margin-top: 4px; box-sizing: border-box; width: 100%; }
+#user-management-page .user-details .select2-container { margin-top: 4px; width: 100%; box-sizing: border-box; }
 #user-management-page .user-details input[type=checkbox] { width: 16px; }
 #user-management-page .user-details button[name=save] { float: right; }
 #user-management-page .user-details .icon-spinner { margin-left: -20px; }
 #user-management-page .user-details .double-margin { margin-top: 18px; }
-#user-management-page .user-details textarea { width: 525px; height: 100px; }
-#user-management-page .user-details .select2-choices { width: 264px; }
-#user-management-page .user-details .select2-search-field { height: 35px; }
+#user-management-page .user-details textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
 #user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
+#user-management-page .controls .select2-container { width: 222px; box-sizing: border-box; }
+#user-management-page .controls button { vertical-align: top; }
 
 #user-management-page .new-user { width: 340px; }
 #user-management-page .new-user button { margin-left: 15px; }
-#user-management-page .select2-container { margin-bottom: 0; width: 222px; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

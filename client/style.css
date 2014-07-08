@@ -631,7 +631,7 @@ textarea.invalid:disabled,
 #user-management-page .result span:nth-child(2) { width: 200px; }
 #user-management-page .result span:nth-child(3) { width: 200px; }
 #user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
-#user-management-page .user-details label { box-sizing: border-box; width: 266px; margin-right: 10px; vertical-align: top; }
+#user-management-page .user-details label { box-sizing: border-box; width: 266px; margin-right: 10px; }
 #user-management-page .user-details label.double { width: 547px; box-sizing: border-box; }
 #user-management-page .user-details input:not(.select2-input) { margin-top: 4px; box-sizing: border-box; width: 100%; }
 #user-management-page .user-details .select2-container { margin-top: 4px; width: 100%; box-sizing: border-box; }
@@ -640,6 +640,7 @@ textarea.invalid:disabled,
 #user-management-page .user-details .icon-spinner { margin-left: -20px; }
 #user-management-page .user-details .double-margin { margin-top: 18px; }
 #user-management-page .user-details textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
+#user-management-page .user-details input[name=employers] { float: right; margin-right: 30px; }
 #user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 #user-management-page .controls .select2-container { width: 222px; box-sizing: border-box; }
 #user-management-page .controls button { vertical-align: top; }

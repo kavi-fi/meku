@@ -1,4 +1,18 @@
 var user;
+var pikadayDefaults = {
+  defaultDate: new Date(),
+  firstDay: 1,
+  format: 'DD.MM.YYYY',
+  i18n: {
+    previousMonth: 'Edellinen kuukausi',
+    nextMonth: 'Seuraava kuukausi',
+    months: ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
+    weekdays: ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'],
+    weekdaysShort: ['Su', 'Ma', 'Ti', 'Ke', 'To', 'Pe', 'La']
+  },
+  setDefaultDate: true,
+  showWeekNumber: true
+}
 
 $(function() {
   loadTemplates(setup)

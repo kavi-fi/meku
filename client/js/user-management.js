@@ -145,7 +145,15 @@ function userManagementPage() {
     var isClassifier = enums.util.isClassifier(role) || user && enums.util.isClassifier(user.role)
 
     if (isClassifier) {
-      $detailTemplate.find('.classifier-details').removeClass('hide')
+      $detailTemplate.find('form').append($('#templates').find('.classifier-details').clone())
+
+      var $endDate = $detailTemplate.find('input[name=certificateEndDate]')
+        .pikaday(_.defaults({ defaultDate: moment().add('years', 5).toDate() }, pikadayDefaults))
+
+      $detailTemplate.find('input[name=certificateStartDate]')
+        .pikaday(_.defaults({ onSelect: function(date) {
+          $endDate.pikaday('setMoment', moment(date).add('years', 5))
+      }}, pikadayDefaults))
     }
 
     if (isNewUser) {
@@ -166,7 +174,7 @@ function userManagementPage() {
       populate($detailTemplate, user)
     }
 
-    $detailTemplate.find('form').on('input', _.throttle(function() { $(this).trigger('validate') }, 200))
+    $detailTemplate.find('form').on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
 
     $detailTemplate.find('form').on('validate', function() {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
@@ -180,6 +188,8 @@ function userManagementPage() {
       var $username = $(this)
       validateUsername($username, $detailTemplate)
     })
+
+    $detailTemplate.find('input[name=employers]').change(toggleInvalid).each(toggleInvalid)
 
     return $detailTemplate.css('display', 'none')
 
@@ -210,6 +220,10 @@ function userManagementPage() {
         .find('input[name=certificateEndDate]').val(cEndDate).end()
         .find('textarea[name=comment]').val(user.comment).end()
     }
+
+    function toggleInvalid() {
+      $(this).toggleClass('invalid', !this.checkValidity())
+    }
   }
 
   function getUserData($details) {
@@ -224,8 +238,8 @@ function userManagementPage() {
 
   function getClassifierData($details) {
     return {
-      certificateStartDate: $details.find('input[name=certificateStartDate]').val(),
-      certificateEndDate: $details.find('input[name=certificateEndDate]').val(),
+      certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), dateFormat),
+      certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), dateFormat),
       employers: $details.find('input[name=employers]').select2('data').map(select2OptionToIdNamePair),
       comment: $details.find('textarea[name=comment]').val()
     }

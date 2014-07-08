@@ -169,16 +169,22 @@
     </label>
 
     <label>Sähköposti <input type="email" name="email" required></label>
-    <label>Puhelinnumero <input type="tel" name="phoneNumber"></label>
+    <label>Puhelinnumero <input type="tel" name="phoneNumber" required></label>
     <label class="modify-only"><input type="checkbox" name="active"> Käyttäjätunnus aktiivinen</label>
 
-    <div class="classifier-details hide">
-      <label>Sertifikaatin ensimmäinen myöntämispäivä <input type="text" name="certificateStartDate"></label>
 
-      <label class="double-margin">Voimassaolo päättyy <input type="text" name="certificateEndDate"></label>
-
-      <label class="double-margin">Työnantaja <input type="text" name="employers"></label>
-      <label class="double">Kommenttikenttä <textarea name="comment" class="two-column"></textarea></label>
-    </div>
   </form>
+</div>
+
+<div class="classifier-details">
+  <label>Sertifikaatin ensimmäinen myöntämispäivä
+    <input type="text" name="certificateStartDate" class="datepicker" pattern="\d{1,2}\.\d{1,2}\.\d{4}" required>
+  </label>
+
+  <label class="double-margin">Voimassaolo päättyy
+    <input type="text" name="certificateEndDate" class="datepicker" pattern="\d{1,2}\.\d{1,2}\.\d{4}" required>
+  </label>
+
+  <label class="double-margin">Työnantaja <input type="text" name="employers" required class="required invalid"></label>
+  <label class="double">Kommenttikenttä <textarea name="comment" class="two-column"></textarea></label>
 </div>

@@ -70,7 +70,17 @@ function userManagementPage() {
      .data('user', user).data('id', user._id)
      .append($('<span>', { class: 'name' }).text(user.name))
      .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="icon-warning-sign"></i>'))
-     .append($('<span>', { class: 'cert-end '}).html('<i class="icon-warning-sign"></i>'))
+     .append($('<span>', { class: 'cert-end' }).html(renderCertEnd(user.certificateEndDate)))
+  }
+
+  function renderCertEnd(certEndDate) {
+    if (certEndDate) {
+      var certEnd = moment(certEndDate)
+      var expiresSoon = certEnd.isBefore(moment().add(3, 'months'))
+      return $('<span>', { class: expiresSoon ? ' expires-soon' : '' }).text(certEnd.format(dateFormat))
+    } else {
+      return '<i class="icon-warning-sign"></i>'
+    }
   }
 
   function openDetails($row) {
@@ -131,6 +141,7 @@ function userManagementPage() {
         var selected = $userList.find('.result.selected')
         selected.data('user', updatedUser)
         selected.find('span.name').text(updatedUser.name)
+        selected.find('span.cert-end').html(renderCertEnd(updatedUser.certificateEndDate))
         $userList.find('.result.selected').data('user', updatedUser)
         closeDetails()
       })

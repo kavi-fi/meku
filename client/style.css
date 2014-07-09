@@ -633,7 +633,7 @@ textarea.invalid:disabled,
 #user-management-page .user-details .icon-spinner { margin-left: -20px; }
 #user-management-page .user-details .double-margin { margin-top: 18px; }
 #user-management-page .user-details textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
-#user-management-page .user-details input[name=employers] { float: right; margin-right: 30px; }
+#user-management-page .user-details label.employers { float: right; margin-right: 34px; }
 #user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 #user-management-page .controls .select2-container { width: 222px; box-sizing: border-box; }
 #user-management-page .controls button { vertical-align: top; }

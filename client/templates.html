@@ -176,7 +176,7 @@
   </form>
 </div>
 
-<div class="classifier-details">
+<div class="classifier-details clearfix">
   <label>Sertifikaatin ensimmäinen myöntämispäivä
     <input type="text" name="certificateStartDate" class="datepicker" pattern="\d{1,2}\.\d{1,2}\.\d{4}" required>
   </label>
@@ -185,6 +185,8 @@
     <input type="text" name="certificateEndDate" class="datepicker" pattern="\d{1,2}\.\d{1,2}\.\d{4}" required>
   </label>
 
-  <label class="double-margin">Työnantaja <input type="text" name="employers" required class="required invalid"></label>
+  <label class="double-margin employers">Työnantaja
+    <input type="text" name="employers" required class="required invalid">
+  </label>
   <label class="double">Kommenttikenttä <textarea name="comment" class="two-column"></textarea></label>
 </div>

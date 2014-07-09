@@ -38,12 +38,16 @@ app.post('/login', function(req, res, next) {
   User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
-    user.checkPassword(password, function(err, ok) {
-      if (err) return next(err)
-      if (!ok) return res.send(403)
-      setLoginCookie(res, user)
-      res.send({})
-    })
+    if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
+      user.update({ active: false }, respond(res, next, 403))
+    } else {
+      user.checkPassword(password, function(err, ok) {
+        if (err) return next(err)
+        if (!ok) return res.send(403)
+        setLoginCookie(res, user)
+        res.send({})
+      })
+    }
   })
 })
 

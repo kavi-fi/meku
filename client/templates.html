@@ -2,15 +2,15 @@
   <span class="sequenceId"></span>
   <div class="header clearfix">
     <div class="buttons">
-      <button class="reclassify">Luokittele uudelleen</button>
-      <button class="continue-classification">Jatka luokittelua</button>
-      <button class="categorize">Määritä kategoria</button>
+      <button class="button reclassify">Luokittele uudelleen</button>
+      <button class="button continue-classification">Jatka luokittelua</button>
+      <button class="button categorize">Määritä kategoria</button>
       <a href="#" class="button request-reclassification">Pyydä ikärajan tarkistusta</a>
     </div>
     <h2 class="primary-name"></h2>
   </div>
   <div class="categorization-form">
-    <button class="save-category">Tallenna</button>
+    <button class="button save-category">Tallenna</button>
     <div class="category-select-container">
       <label>Valitse kuvaohjelman tyyppi</label>
       <input name="category-select" type="hidden" class="required"/>
@@ -135,11 +135,11 @@
     <div class="content">
       <h2 class="main">Kuvaohjelmahaku</h2>
       <div class="new-classification">
-        <label>Luo uusi kuvaohjelma</label><input name="new-classification-type" type="hidden"/><button>Luo</button>
+        <label>Luo uusi kuvaohjelma</label><input name="new-classification-type" type="hidden"/><button class="button">Luo</button>
       </div>
       <div>
         <label class="search-label">Nimi</label>
-        <input class="query" type="text" /><button class="search">Hae</button>
+        <input class="query" type="text" /><button class="button search">Hae</button>
         <div class="filters">
           <label><input type="checkbox" data-id="a" data-type="1"/>Elokuvat</label>
           <label><input type="checkbox" data-id="b" data-type="2,3,4"/>TV</label>
@@ -161,7 +161,7 @@
 
 <div class="user-details detail-box">
   <form class="form">
-    <button name="save" type="submit" disabled>Tallenna</button>
+    <button name="save" type="submit" disabled class="button">Tallenna</button>
 
     <label>Nimi <input type="text" name="name" required></label>
     <label>Käyttäjätunnus

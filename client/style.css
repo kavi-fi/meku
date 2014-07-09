@@ -34,7 +34,7 @@ body {
 
 #templates { display: none; }
 
-button, a.button {
+.button {
   border-radius: 3px;
   background: -o-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
   background: -moz-linear-gradient(-90deg, #00BB88 0%, #00AA77 100%);
@@ -47,21 +47,13 @@ button, a.button {
 }
 a.button { text-decoration: none; }
 
-button:hover, a.button:hover {
-  border-radius: 3px;
-  background: #00BB88;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20);
-}
+.button:hover { border-radius: 3px; background: #00BB88; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20); }
 
-button:active, a.button:active {
-  border-radius: 3px;
-  background: #009966;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20);
-}
+.button:active { border-radius: 3px; background: #009966; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20); }
 
-button:focus, a.button:focus { outline: none; }
+.button:focus { outline: none; }
 
-button[disabled=disabled], button:disabled, a.button.disabled { color: gray; cursor: not-allowed; }
+.button[disabled], .button.disabled { color: gray; cursor: not-allowed; }
 
 ol { list-style-type: none; margin: 0; }
 

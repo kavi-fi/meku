@@ -76,16 +76,14 @@ function userManagementPage() {
   }
 
   function renderCertEnd(user) {
-    if (enums.util.isClassifier(user.role)) {
-      if (user.certificateEndDate) {
-        var certEnd = moment(user.certificateEndDate)
-        var expiresSoon = certEnd.isBefore(moment().add(3, 'months'))
-        return $('<span>', { class: expiresSoon ? ' expires-soon' : '' }).text(certEnd.format(dateFormat))
-      } else {
-        return '<i class="icon-warning-sign"></i>'
-      }
+    if (!enums.util.isClassifier(user.role)) return ''
+
+    if (user.certificateEndDate) {
+      var certEnd = moment(user.certificateEndDate)
+      return $('<span>').text(certEnd.format(dateFormat))
+        .toggleClass('expires-soon', certEnd.isBefore(moment().add(3, 'months')))
     } else {
-      return ''
+      return '<i class="icon-warning-sign"></i>'
     }
   }
 

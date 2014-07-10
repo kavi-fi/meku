@@ -17,6 +17,7 @@ var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
+var CronJob = require('cron').CronJob
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -558,6 +559,27 @@ var server = app.listen(process.env.PORT || 3000, function() {
   console.log('Listening on port ' + server.address().port)
 })
 
+var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
+  User.find({ $and: [
+    { certificateEndDate: { $lt: new Date() }},
+    { active: { $ne: false }},
+    {'emails.0': { $exists: true }}
+  ]}, function(err, users) {
+    if (err) throw err
+
+    users.forEach(function(user) {
+      user.update({ active: false }, logError)
+
+      sendEmail({
+        recipients: [ user.emails[0] ],
+        subject: 'Luokittelusertifikaattisi on vanhentunut',
+        body: 'Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.'
+      }, logError)
+    })
+  })
+})
+checkExpiredCerts.start()
+
 function nocache(req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
   res.header('Expires', '-1')
@@ -671,4 +693,8 @@ function verifyTvSeries(program, callback) {
   if (enums.util.isTvEpisode(program) && program.series._id == null) {
     createParentProgram(program, program.series.name.trim(), callback)
   } else return callback()
+}
+
+function logError(err) {
+  if (err) console.error(err)
 }

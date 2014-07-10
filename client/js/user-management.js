@@ -73,6 +73,7 @@ function userManagementPage() {
      .append($('<span>', { class: 'name' }).text(user.name))
      .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="icon-warning-sign"></i>'))
      .append($('<span>', { class: 'cert-end' }).html(renderCertEnd(user)))
+     .toggleClass('inactive', user.active === false)
   }
 
   function renderCertEnd(user) {

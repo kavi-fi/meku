@@ -340,7 +340,8 @@ app.get('/accounts/:id', function(req, res, next) {
 })
 
 app.get('/users', function(req, res, next) {
-  User.find(respond(res, next))
+  var roleFilters = req.query.filters
+  User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
 })
 
 app.get('/users/exists/:username', function(req, res, next) {

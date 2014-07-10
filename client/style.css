@@ -62,6 +62,10 @@ textarea { resize: vertical; }
 .detail-box { display: none; background: #fff; padding: 20px 40px 50px 40px; font-size: 14px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; line-height: 19px; }
 .detail-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 
+.filters { font-size: 14px; color: #444444; }
+.filters label { padding-right: 12px; font-weight: normal; }
+.filters input { margin-right: 10px; }
+
 .warning-summary { display: inline-block; }
 .warning-summary img { width: 40px; height: 40px;}
 .warning-summary .warnings .warning.sex { background-image: url('images/sex.png'); }
@@ -168,9 +172,6 @@ button.search { margin-left: 15px; }
 #search-page .new-classification button { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 222px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
-#search-page .filters { font-size: 14px; color: #444444; }
-#search-page .filters label { padding-right: 12px; font-weight: normal; }
-#search-page .filters input { margin-right: 10px; }
 #search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
 #search-page .result .series { padding-top: 10px; color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

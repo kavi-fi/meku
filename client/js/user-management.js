@@ -15,7 +15,7 @@ function userManagementPage() {
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
     $userList.empty()
-    $.get('/users', function(users) {
+    $.get('/users?' + $.param({ filters: currentFilters() }), function(users) {
       renderUsers(users)
       if (userId) {
         var $selected = $userList.find('.result[data-id=' + userId + ']')
@@ -56,6 +56,8 @@ function userManagementPage() {
       }
     })
   })
+
+  $('.filters').change(function() { $page.trigger('show') })
 
   function updateLocationHash(userId) {
     location.hash = '#kayttajat/' + userId
@@ -280,5 +282,9 @@ function userManagementPage() {
       $username.addClass('pending')
       usernameValidator(username, $username, $detailTemplate)
     }
+  }
+
+  function currentFilters() {
+    return $page.find('.filters input').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
   }
 }

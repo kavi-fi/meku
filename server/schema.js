@@ -146,7 +146,8 @@ var UserSchema = new Schema({
   resetHash: String,
   certificateStartDate: Date,
   certificateEndDate: Date,
-  comment: String
+  comment: String,
+  certExpiryReminderSent: Boolean
 })
 
 UserSchema.pre('save', function(next) {

@@ -580,6 +580,29 @@ var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
 })
 checkExpiredCerts.start()
 
+var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
+  User.find({ $and: [
+    { certificateEndDate: { $lt: moment().add(3, 'months').toDate() }},
+    { active: { $ne: false }},
+    {'emails.0': { $exists: true }},
+    { certExpiryReminderSent: { $ne: true }}
+  ]}, function(err, users) {
+    if (err) throw err
+    users.forEach(function(user) {
+      sendEmail({
+        recipients: [ user.emails[0] ],
+        subject: 'Luokittelusertifikaattisi on vanhentumassa',
+        body: 'Luokittelusertifikaattisi on vanhentumassa ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
+          '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.'
+      }, function(err) {
+        if (err) console.error(err)
+        else user.update({ certExpiryReminderSent: true }, logError)
+      })
+    })
+  })
+})
+checkCertsExpiringSoon.start()
+
 function nocache(req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
   res.header('Expires', '-1')

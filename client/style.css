@@ -155,7 +155,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 .page { display: none; }
 
-.result { border-bottom: 2px solid #e8e8e8; line-height: 47px; font-size: 14px; color: #444444; cursor: pointer; }
+.result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; }
 .result.inactive { color: #afafaf; }
 
 .search-label { display: block; padding: 0 0 20px 0; }
@@ -638,7 +638,7 @@ textarea.invalid:disabled,
 
 #user-management-page { width: 940px; margin: 0 auto; padding: 70px 0; }
 #user-management-page .result { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
-#user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; }
+#user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; padding: 10px 0; }
 #user-management-page .result span:nth-child(2) { width: 200px; }
 #user-management-page .result span:nth-child(3) { width: 200px; }
 #user-management-page .result span.cert-end span.expires-soon { background: #ff9999; padding: 3px; border-radius: 5px; margin-left: -3px; }

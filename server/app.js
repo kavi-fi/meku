@@ -375,6 +375,11 @@ app.get('/users', function(req, res, next) {
   User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
 })
 
+app.delete('/users/:id', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+  User.findByIdAndRemove(req.params.id, respond(res, next))
+})
+
 app.get('/users/exists/:username', function(req, res, next) {
   User.findOne({ username: req.params.username }, function(err, user) {
     if (err) return next(err)

@@ -207,6 +207,15 @@ function userManagementPage() {
 
     $detailTemplate.find('input[name=employers]').change(toggleInvalid).each(toggleInvalid)
 
+    $detailTemplate.find('button[name=remove]').click(function() {
+      var $selected = $page.find('.result.selected')
+      var user = $selected.data('user')
+      $.ajax('/users/' + user._id, { type: 'DELETE' }).done(function() {
+        closeDetails()
+        $selected.slideUp(function() { $(this).remove() })
+      })
+    })
+
     return $detailTemplate.css('display', 'none')
 
     function employersSearch(term) {

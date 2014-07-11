@@ -619,10 +619,12 @@ checkExpiredCerts.start()
 
 var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
   User.find({ $and: [
-    { certificateEndDate: { $lt: moment().add(3, 'months').toDate() }},
+    { certificateEndDate: { $lt: moment().add(3, 'months').toDate(), $gt: new Date() }},
     { active: { $ne: false }},
     {'emails.0': { $exists: true }},
-    { certExpiryReminderSent: { $ne: true }}
+    { $or: [
+      { certExpiryReminderSent: { $exists: false }},
+      { certExpiryReminderSent: { $lt: moment().subtract(1, 'months').toDate() }}]}
   ]}, function(err, users) {
     if (err) throw err
     users.forEach(function(user) {
@@ -633,7 +635,7 @@ var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
           '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.'
       }, function(err) {
         if (err) console.error(err)
-        else user.update({ certExpiryReminderSent: true }, logError)
+        else user.update({ certExpiryReminderSent: new Date() }, logError)
       })
     })
   })

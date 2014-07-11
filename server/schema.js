@@ -147,7 +147,7 @@ var UserSchema = new Schema({
   certificateStartDate: Date,
   certificateEndDate: Date,
   comment: String,
-  certExpiryReminderSent: Boolean
+  certExpiryReminderSent: Date
 })
 
 UserSchema.pre('save', function(next) {

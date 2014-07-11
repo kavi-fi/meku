@@ -304,7 +304,10 @@ function accounts(callback) {
     var q = 'select id, user_name, phone_mobile, CONCAT_WS(" ", TRIM(first_name), TRIM(last_name)) as name, status from users'
     function onRow(row) {
       var phone = row.phone_mobile || undefined
-      return { emekuId: row.id, username: row.user_name, name: row.name, phoneNumber: phone, active: row.status == 'Active' }
+      return {
+        emekuId: row.id, username: row.user_name, name: row.name, phoneNumber: phone, active: row.status == 'Active',
+        role: 'user'
+      }
     }
     batchInserter(q, onRow, 'User', callback)
   }

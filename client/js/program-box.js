@@ -15,7 +15,7 @@ function programBox() {
     })
 
     var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
-      return $draftTemplate.clone().find('b').text(draft.author.name).end().find('span').text(utils.asDate(draft.creationDate)).end()
+      return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDate(draft.creationDate)).end()
     })
 
     var $e = $detailTemplate.clone()

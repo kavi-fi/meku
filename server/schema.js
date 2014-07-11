@@ -9,7 +9,7 @@ var bcryptSaltFactor = 12
 
 var classification = {
   emekuId: { type: String, index: true },
-  author: {_id: ObjectId, name: String},
+  author: {_id: {type: ObjectId, index: true}, name: String},
   authorOrganization: Number,
   buyer: {_id: ObjectId, name: String},
   billing: {_id: ObjectId, name: String},

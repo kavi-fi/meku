@@ -143,11 +143,7 @@ function userManagementPage() {
       }
 
       $.post('/users/' + user._id, JSON.stringify(userData), function(updatedUser) {
-        var selected = $userList.find('.result.selected')
-        selected.data('user', updatedUser)
-        selected.find('span.name').text(updatedUser.name)
-        selected.find('span.cert-end').html(renderCertEnd(updatedUser.certificateEndDate))
-        $userList.find('.result.selected').data('user', updatedUser)
+        $userList.find('.result.selected').replaceWith(renderUser(updatedUser))
         closeDetails()
       })
     })

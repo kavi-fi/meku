@@ -61,7 +61,7 @@
       <ul class="navi">
         <li><a href="#haku" data-href="#search-page">Luokittelu</a></li>
         <li class="hide"><a href="#luokittelu" data-href="#classification-page">Luokittelu</a></li>
-        <li><a href="#tilaajat" data-href="#buyer-page">Tilaajat</a></li>
+        <li><a href="#tilaajat" data-href="#account-management-page">Tilaajat</a></li>
         <li><a href="#laskutus" data-href="#billing-page">Laskutus</a></li>
         <li><a href="#kayttajat" data-href="#user-management-page">Käyttäjät</a></li>
       </ul>
@@ -72,9 +72,8 @@
   </div>
 
   <div id="classification-page" class="page">
-  <form id="program-details" data-id="">
-    <div class="row">
-      <div class="program-info form content">
+    <form id="program-details" data-id="">
+      <div class="program-info form content clearfix">
         <a href="#haku" class="back-to-search"><i class="icon-long-arrow-left"></i> Takaisin hakuun</a>
         <h2 class="main classification">Uusi kuvaohjelma - <span class="programTypeName"></span></h2>
         <h2 class="main reclassification">Kuvaohjelman tiedot - <span class="programTypeName"></span></h2>
@@ -106,142 +105,140 @@
           <label for="synopsis">Synopsis</label><textarea id="synopsis" name="synopsis" class="required"></textarea>
         </div>
       </div>
-    </div>
 
-    <div id="classification" class="row">
-      <div class="form content">
-        <h2 class="main classification">Luokittelu</h2>
-        <h2 class="main reclassification">Uudelleenluokittelu</h2>
+      <div id="classification" class="row">
+        <div class="form content">
+          <h2 class="main classification">Luokittelu</h2>
+          <h2 class="main reclassification">Uudelleenluokittelu</h2>
 
-        <div class="summary">
-          <span class="name"></span>
-          <div class="agelimit warning-summary">
-            <img src="images/agelimit-0.png" />
-            <div class="warnings"></div>
-          </div>
-        </div>
-
-        <div class="left">
-          <label>Luokittelijan nimi</label>
-          <span class="author"></span>
-          <div class="reclassification author-and-reason">
-            <label>Luokittelija</label>
-            <input name="classifications.0.authorOrganization" class="required" type="hidden"/>
-
-            <label>Peruste</label>
-            <input name="classifications.0.reason" class="required" type="hidden"/>
-          </div>
-          <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
-          <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="hidden" />
-        </div>
-        <div class="right">
-          <div class="non-game-field">
-            <label>Ohjelman formaatti</label><input name="classifications.0.format" class="required format" type="hidden"/>
-          </div>
-          <div>
-            <label><span class="game-field">Luokittelun kesto</span><span class="non-game-field">Kesto</span></label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
-            <span class="duration-hint">hh:mm:ss</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="criteria" class="row">
-      <div class="content">
-        <div class="header">
-          <span class="safe-container">
-            <input name="classifications.0.safe" type="checkbox" />Ei sisällä lapsille haitallista materiaalia</span>
-          <h2 class="main">Luokittelun kriteerit</h2>
-        </div>
-        <div class="category-container">
-          <div class="category violence">
-            <div class="heading"><h3>Väkivalta</h3></div>
-          </div>
-          <div class="category fear">
-            <div class="heading"><h3>Ahdistus</h3></div>
-          </div>
-          <div class="category sex">
-            <div class="heading"><h3>Seksi</h3></div>
-          </div>
-          <div class="category drugs">
-            <div class="heading"><h3>Päihteet</h3></div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <div id="summary" class="row">
-      <div class="content">
-
-        <div class="comments left">
-          <div class="private-comments">
-            <h3 class="main">KAVIN sisäiset kommentit</h3>
-            <textarea placeholder="KAVIN sisäiset kommentit" name="classifications.0.comments"></textarea>
-            <p>KAVI:n sisäiset kommentit näkyvät vain KAVIN työntekijöille.</p>
-          </div>
-
-          <div class="public-comments reclassification">
-            <h3 class="main">Julkiset kommentit</h3>
-            <textarea placeholder="Perusteet uudelleenluokittelulle" name="classifications.0.publicComments" class="required"></textarea>
-          </div>
-        </div>
-
-        <div class="right summary">
-          <h3 class="main">Ikärajat.fi-näkymä</h3>
-          <div class="box">
-
-            <div class="header">
-              <h4 class="name"></h4>
-              <span class="year"></span>
-            </div>
-
+          <div class="summary">
+            <span class="name"></span>
             <div class="agelimit warning-summary">
               <img src="images/agelimit-0.png" />
               <div class="warnings"></div>
             </div>
-            <dl>
-              <dt>Synopsis</dt><dd class="synopsis"></dd>
-              <dt>Maa</dt><dd class="country"></dd>
-              <dt>Ohjaajat</dt><dd class="directors"></dd>
-              <dt>Näyttelijät</dt><dd class="actors"></dd>
-              <div class="reclassification"><dt>Luokittelun peruste</dt><dd><p class="reason"></p><p class="comments"></p></dd></div>
-            </dl>
+          </div>
+
+          <div class="left">
+            <label>Luokittelijan nimi</label>
+            <span class="author"></span>
+            <div class="reclassification author-and-reason">
+              <label>Luokittelija</label>
+              <input name="classifications.0.authorOrganization" class="required" type="hidden"/>
+
+              <label>Peruste</label>
+              <input name="classifications.0.reason" class="required" type="hidden"/>
+            </div>
+            <label>Luokittelun tilaaja</label><input name="classifications.0.buyer" class="required" type="hidden" />
+            <label>Rekisteröinnistä laskutetaan</label><input name="classifications.0.billing" class="required" type="hidden" />
+          </div>
+          <div class="right">
+            <div class="non-game-field">
+              <label>Ohjelman formaatti</label><input name="classifications.0.format" class="required format" type="hidden"/>
+            </div>
+            <div>
+              <label><span class="game-field">Luokittelun kesto</span><span class="non-game-field">Kesto</span></label><input name="classifications.0.duration" class="required duration" data-type="duration" type="text" />
+              <span class="duration-hint">hh:mm:ss</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div id="email" class="row">
-      <div class="content">
-        <h2 class="main">Luokittelupäätös</h2>
-        <div class="emails left required-pseudo">
-          <h3 class="main">Lähetä luokittelupäätös</h3>
-
-          <ul class="buyer"></ul>
-          <ul class="manual"></ul>
-
-          <div>
-            <label>Lisää sähköpostiosoite: <input type="text" class="email required exclude" name="registration-email"/></label><button class="button add-registration-email">Lisää</button>
+      <div id="criteria" class="row">
+        <div class="content">
+          <div class="header">
+            <span class="safe-container">
+              <input name="classifications.0.safe" type="checkbox" />Ei sisällä lapsille haitallista materiaalia</span>
+            <h2 class="main">Luokittelun kriteerit</h2>
           </div>
-          <button name="register" disabled class="button">Rekisteröi</button>
+          <div class="category-container">
+            <div class="category violence">
+              <div class="heading"><h3>Väkivalta</h3></div>
+            </div>
+            <div class="category fear">
+              <div class="heading"><h3>Ahdistus</h3></div>
+            </div>
+            <div class="category sex">
+              <div class="heading"><h3>Seksi</h3></div>
+            </div>
+            <div class="category drugs">
+              <div class="heading"><h3>Päihteet</h3></div>
+            </div>
 
+          </div>
         </div>
-        <div class="preview right">
-          <h3 class="main">Luokittelupäätöksen esikatselu</h3>
-          <div class="email-preview box">
-            <dl>
-              <dt>Vastaanottajat</dt><dd class="recipients"></dd>
-              <dt>Aihe</dt><dd class="subject"></dd>
-            </dl>
-            <div class="body"></div>
+
+      </div>
+
+      <div id="summary" class="row">
+        <div class="content">
+
+          <div class="comments left">
+            <div class="private-comments">
+              <h3 class="main">KAVIN sisäiset kommentit</h3>
+              <textarea placeholder="KAVIN sisäiset kommentit" name="classifications.0.comments"></textarea>
+              <p>KAVI:n sisäiset kommentit näkyvät vain KAVIN työntekijöille.</p>
+            </div>
+
+            <div class="public-comments reclassification">
+              <h3 class="main">Julkiset kommentit</h3>
+              <textarea placeholder="Perusteet uudelleenluokittelulle" name="classifications.0.publicComments" class="required"></textarea>
+            </div>
+          </div>
+
+          <div class="right summary">
+            <h3 class="main">Ikärajat.fi-näkymä</h3>
+            <div class="box">
+
+              <div class="header">
+                <h4 class="name"></h4>
+                <span class="year"></span>
+              </div>
+
+              <div class="agelimit warning-summary">
+                <img src="images/agelimit-0.png" />
+                <div class="warnings"></div>
+              </div>
+              <dl>
+                <dt>Synopsis</dt><dd class="synopsis"></dd>
+                <dt>Maa</dt><dd class="country"></dd>
+                <dt>Ohjaajat</dt><dd class="directors"></dd>
+                <dt>Näyttelijät</dt><dd class="actors"></dd>
+                <div class="reclassification"><dt>Luokittelun peruste</dt><dd><p class="reason"></p><p class="comments"></p></dd></div>
+              </dl>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-  </form>
+      <div id="email" class="row">
+        <div class="content">
+          <h2 class="main">Luokittelupäätös</h2>
+          <div class="emails left required-pseudo">
+            <h3 class="main">Lähetä luokittelupäätös</h3>
+
+            <ul class="buyer"></ul>
+            <ul class="manual"></ul>
+
+            <div>
+              <label>Lisää sähköpostiosoite: <input type="text" class="email required exclude" name="registration-email"/></label><button class="button add-registration-email">Lisää</button>
+            </div>
+            <button name="register" disabled class="button">Rekisteröi</button>
+
+          </div>
+          <div class="preview right">
+            <h3 class="main">Luokittelupäätöksen esikatselu</h3>
+            <div class="email-preview box">
+              <dl>
+                <dt>Vastaanottajat</dt><dd class="recipients"></dd>
+                <dt>Aihe</dt><dd class="subject"></dd>
+              </dl>
+              <div class="body"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
 
   <div id="billing-page" class="page">
@@ -276,6 +273,14 @@
       </div>
     </div>
     <div class="user-list results"></div>
+  </div>
+
+  <div id="account-management-page" class="page">
+    <h2 class="main">Tilaajienhallinta</h2>
+    <div class="controls">
+
+    </div>
+    <div class="accounts-list results"></div>
   </div>
 
   <div id="templates"></div>

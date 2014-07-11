@@ -137,7 +137,7 @@ textarea { resize: vertical; }
 #header .user-info a { color: #00BB88; padding-left: 8px; }
 
 .row { border-bottom: 1px solid #D3D3D3; width: 100%; float: left; margin: 0; padding: 70px 0 80px 0; }
-.content { width: 940px; margin: 0 auto; padding: 0 10px; }
+.content { width: 940px; margin: 0 auto; }
 
 h1 { font-size: 24px; color: #00BB88; line-height: 30px; }
 h2 { font-size: 24px; color: #00BB88; line-height: 30px; }
@@ -153,7 +153,9 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 .box { border: 1px solid #D3D3D3; border-radius: 2px; padding: 20px; }
 
-.page { display: none; }
+.page { display: none; width: 940px; margin: 70px auto; }
+
+.controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
 .result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; }
 .result.inactive { color: #afafaf; }
@@ -189,7 +191,6 @@ button.search { margin-left: 15px; }
 #search-page .new-classification button { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 222px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
-#search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
 #search-page .result .series { padding-top: 10px; color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #search-page .result .items { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 10px 0; }
@@ -237,7 +238,7 @@ button.search { margin-left: 15px; }
 #classification-page input[type=number] {
   width: 280px;
 }
-#classification-page .back-to-search { display: block; margin-top: -20px; margin-bottom: 20px; color: #00BB88; }
+#classification-page .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }
@@ -636,7 +637,6 @@ textarea.invalid:disabled,
 #billing-page .program-box-container { padding: 0 0 10px 0; }
 #billing-page .deselected td + td { opacity: 0.4; }
 
-#user-management-page { width: 940px; margin: 0 auto; padding: 70px 0; }
 #user-management-page .result { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 #user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; padding: 10px 0; }
 #user-management-page .result span:nth-child(2) { width: 200px; }
@@ -654,7 +654,6 @@ textarea.invalid:disabled,
 #user-management-page .user-details .double-margin { margin-top: 18px; }
 #user-management-page .user-details textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
 #user-management-page .user-details label.employers { float: right; margin-right: 34px; }
-#user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 #user-management-page .controls .select2-container { width: 222px; box-sizing: border-box; }
 #user-management-page .controls button { vertical-align: top; }
 

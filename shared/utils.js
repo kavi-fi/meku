@@ -5,6 +5,8 @@ if (isNodeJs()) {
 
 var utils = {}
 
+utils.dateFormat = 'D.M.YYYY'
+
 utils.keyValue = function(key, value) {
   var data = {}
   data[key] = value

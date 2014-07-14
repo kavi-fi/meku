@@ -2,7 +2,6 @@ function userManagementPage() {
   var $page = $('#user-management-page')
   var $userList = $page.find('.user-list')
   var $userNameQuery = $page.find('#user-name-query')
-  var dateFormat = 'DD.MM.YYYY'
 
   var $newUserType = $page.find('.new-user input[name="new-user-type"]')
   $newUserType.select2({
@@ -81,7 +80,7 @@ function userManagementPage() {
 
     if (user.certificateEndDate) {
       var certEnd = moment(user.certificateEndDate)
-      return $('<span>').text(certEnd.format(dateFormat))
+      return $('<span>').text(certEnd.format(utils.dateFormat))
         .toggleClass('expires-soon', certEnd.isBefore(moment().add(3, 'months')))
     } else {
       return '<i class="icon-warning-sign"></i>'
@@ -224,8 +223,8 @@ function userManagementPage() {
     }
 
     function populate($element, user) {
-      var cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(dateFormat) : ''
-      var cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(dateFormat) : ''
+      var cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(utils.dateFormat) : ''
+      var cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(utils.dateFormat) : ''
 
       $element.find('input[name=name]').val(user.name).end()
         .find('input[name=email]').val(user.emails[0]).end()
@@ -255,8 +254,8 @@ function userManagementPage() {
 
   function getClassifierData($details) {
     return {
-      certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), dateFormat),
-      certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), dateFormat),
+      certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), utils.dateFormat),
+      certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), utils.dateFormat),
       employers: $details.find('input[name=employers]').select2('data').map(select2OptionToIdNamePair),
       comment: $details.find('textarea[name=comment]').val()
     }

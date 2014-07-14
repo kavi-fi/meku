@@ -2,7 +2,7 @@ var user;
 var pikadayDefaults = {
   defaultDate: new Date(),
   firstDay: 1,
-  format: 'DD.MM.YYYY',
+  format: utils.dateFormat,
   i18n: {
     previousMonth: 'Edellinen kuukausi',
     nextMonth: 'Seuraava kuukausi',

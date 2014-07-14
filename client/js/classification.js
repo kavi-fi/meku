@@ -49,7 +49,7 @@ function classificationPage() {
         .append($('<span>', {class: 'name'}).text(program.name))
         .append(renderWarningSummary(classification.fullSummary(program)))
         .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(program.classifications[0].registrationDate)))
-        .append($('<p>', {class: 'buttons'}).html($('<button>', {click: closeDialog}).text('Sulje'))))
+        .append($('<p>', {class: 'buttons'}).html($('<button>', { click: closeDialog, class: 'button' }).text('Sulje'))))
       $("#search-page").trigger('show').show()
       $(window).scrollTop(0)
     })

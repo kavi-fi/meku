@@ -158,7 +158,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; padding: 10px 0; }
 .result.inactive { color: #afafaf; }
 
-.search-label { display: block; padding: 0 0 20px 0; }
+.search-label { display: block; padding: 0 0 20px 0; width: 350px; }
 input.query { width: 350px; margin-top: 1px; }
 button.search { margin-left: 15px; }
 
@@ -253,6 +253,7 @@ input[type=number],
 input[type=password],
 input[type=email],
 input[type=tel],
+input[type=search],
 textarea,
 .select2-container-multi .select2-choices,
 .select2-container .select2-choice {
@@ -270,6 +271,7 @@ input[type=number]:focus,
 input[type=password]:focus,
 input[type=email]:focus,
 input[type=tel]:focus,
+input[type=search]:focus,
 textarea:focus,
 .select2-container-active .select2-choices,
 .select2-container-active .select2-choice {
@@ -283,6 +285,7 @@ input[type=number],
 input[type=password],
 input[type=email],
 input[type=tel],
+input[type=search],
 textarea,
 .select2-container-multi .select2-choices .select2-search-field input {
   padding: 8px 10px !important;
@@ -662,6 +665,7 @@ textarea.invalid:disabled,
 
 #account-management-page .result { display: -webkit-flex; display: flex; }
 #account-management-page .result span { width: 50%; box-sizing: border-box; }
+
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

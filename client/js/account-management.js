@@ -9,6 +9,14 @@ function accountManagementPage() {
     })
   })
 
+  $page.find('#account-name-query').on('input', function() {
+    var searchString = $(this).val().toLowerCase()
+    $accounts.find('.result').each(function() {
+      var name = $(this).children('.name').text().toLowerCase()
+      $(this).toggle(_.contains(name, searchString))
+    })
+  })
+
   function updateLocationHash() {
     location.hash = '#tilaajat/'
   }

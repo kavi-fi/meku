@@ -351,6 +351,11 @@ app.get('/series/search/:query', function(req, res, next) {
   })
 })
 
+app.get('/accounts', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+  Account.find({}, respond(res, next))
+})
+
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }}

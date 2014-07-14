@@ -155,7 +155,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
-.result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; }
+.result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; padding: 10px 0; }
 .result.inactive { color: #afafaf; }
 
 .search-label { display: block; padding: 0 0 20px 0; }
@@ -190,9 +190,8 @@ button.search { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 222px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
-#search-page .result .series { padding-top: 10px; color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#search-page .result .items { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 10px 0; }
-#search-page .result .series ~ .items { padding: 0 0 10px 0; }
+#search-page .result .series { color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#search-page .result .items { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 #search-page .result .items > span:nth-child(1) { min-width: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 #search-page .result .items > span:nth-child(2) { flex-shrink: 800; padding: 0 14px; margin-right: auto; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 #search-page .result .items > span:nth-child(3) { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
@@ -636,7 +635,7 @@ textarea.invalid:disabled,
 #billing-page .deselected td + td { opacity: 0.4; }
 
 #user-management-page .result { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
-#user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; padding: 10px 0; }
+#user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; }
 #user-management-page .result span:nth-child(2) { width: 200px; }
 #user-management-page .result span:nth-child(3) { width: 200px; }
 #user-management-page .result span.cert-end span.expires-soon { background: #ff9999; padding: 3px; border-radius: 5px; margin-left: -3px; }
@@ -661,6 +660,8 @@ textarea.invalid:disabled,
 .remove-user-dialog { width: 300px; margin: 0 auto; }
 .remove-user-dialog .buttons { display: -webkit-flex; display: flex; width: 100%;  -webkit-justify-content: space-around; justify-content: space-around; }
 
+#account-management-page .result { display: -webkit-flex; display: flex; }
+#account-management-page .result span { width: 50%; box-sizing: border-box; }
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

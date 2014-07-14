@@ -1,16 +1,16 @@
-<div class="program-box">
+<div class="program-box detail-box">
   <span class="sequenceId"></span>
   <div class="header clearfix">
     <div class="buttons">
-      <button class="reclassify">Luokittele uudelleen</button>
-      <button class="continue-classification">Jatka luokittelua</button>
-      <button class="categorize">Määritä kategoria</button>
+      <button class="button reclassify">Luokittele uudelleen</button>
+      <button class="button continue-classification">Jatka luokittelua</button>
+      <button class="button categorize">Määritä kategoria</button>
       <a href="#" class="button request-reclassification">Pyydä ikärajan tarkistusta</a>
     </div>
     <h2 class="primary-name"></h2>
   </div>
   <div class="categorization-form">
-    <button class="save-category">Tallenna</button>
+    <button class="button save-category">Tallenna</button>
     <div class="category-select-container">
       <label>Valitse kuvaohjelman tyyppi</label>
       <input name="category-select" type="hidden" class="required"/>
@@ -142,11 +142,11 @@
       </div>
       <h2 class="main">Kuvaohjelmahaku</h2>
       <div class="new-classification">
-        <label>Luo uusi kuvaohjelma</label><input name="new-classification-type" type="hidden"/><button>Luo</button>
+        <label>Luo uusi kuvaohjelma</label><input name="new-classification-type" type="hidden"/><button class="button">Luo</button>
       </div>
       <div>
         <label class="search-label">Nimi</label>
-        <input class="query" type="text" /><button class="search">Hae</button>
+        <input class="query" type="text" /><button class="button search">Hae</button>
         <div class="filters">
           <label><input type="checkbox" data-id="a" data-type="1"/>Elokuvat</label>
           <label><input type="checkbox" data-id="b" data-type="2,3,4"/>TV</label>
@@ -163,5 +163,43 @@
     <div class="loading">Ladataan...</div>
     <div class="no-results">Ei hakutuloksia.</div>
     <div class="no-more-results"><i>FIN</i></div>
+  </div>
+</div>
+
+<div class="user-details detail-box">
+  <form class="form">
+    <button name="save" type="submit" disabled class="button">Tallenna</button>
+    <button name="remove" type="button" class="button modify-only">Poista</button>
+
+    <label>Nimi <input type="text" name="name" required></label>
+    <label>Käyttäjätunnus
+      <input type="text" name="username" required disabled><i class="icon-spinner icon-spin"></i>
+    </label>
+
+    <label>Sähköposti <input type="email" name="email" required></label>
+    <label>Puhelinnumero <input type="tel" name="phoneNumber" required></label>
+    <label class="modify-only"><input type="checkbox" name="active"> Käyttäjätunnus aktiivinen</label>
+  </form>
+</div>
+
+<div class="classifier-details clearfix">
+  <label>Sertifikaatin ensimmäinen myöntämispäivä
+    <input type="text" name="certificateStartDate" class="datepicker" pattern="\d{1,2}\.\d{1,2}\.\d{4}" required>
+  </label>
+
+  <label class="double-margin">Voimassaolo päättyy
+    <input type="text" name="certificateEndDate" class="datepicker" pattern="\d{1,2}\.\d{1,2}\.\d{4}" required>
+  </label>
+
+  <label class="double-margin employers">Työnantaja
+    <input type="text" name="employers" required class="required invalid">
+  </label>
+  <label class="double">Kommenttikenttä <textarea name="comment" class="two-column"></textarea></label>
+</div>
+
+<div class="remove-user-dialog dialog">
+  <p>Haluatko varmasti poistaa käyttäjän <span class="user-name"></span>?</p>
+  <div class="buttons">
+    <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
   </div>
 </div>

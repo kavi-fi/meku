@@ -107,7 +107,7 @@ function internalSearchPage() {
       drafts.forEach(function(draft) {
         var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
-        var $remove = $('<div>', {class: 'remove'}).append($('<button>').text('Poista'))
+        var $remove = $('<div>', {class: 'remove'}).append($('<button>', { class: 'button' }).text('Poista'))
         var $draft = $('<div>', {class: 'result draft'})
           .data('id', draft._id).append($date).append($link).append($remove)
         $drafts.find('> div').append($draft)

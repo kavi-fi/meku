@@ -5,6 +5,8 @@ if (isNodeJs()) {
 
 var utils = {}
 
+utils.dateFormat = 'D.M.YYYY'
+
 utils.keyValue = function(key, value) {
   var data = {}
   data[key] = value
@@ -58,9 +60,9 @@ utils.secondsToDuration = function(seconds) {
 }
 
 utils.hasRole = function (user, role) {
-  var roles = ['root', 'kavi', 'user']
+  var roles = enums.userRoles
   if (!user) return false
-  return roles.indexOf(role) >= roles.indexOf(user.role)
+  return roles[role].order >= roles[user.role].order
 }
 
 utils.asDate = function (date) {

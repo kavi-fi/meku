@@ -5,6 +5,7 @@
   <link href="vendor/select2-3.4.6/select2.css" rel="stylesheet"/>
   <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
   <link href="vendor/jquery-date-range-picker/daterangepicker.css" rel="stylesheet"/>
+  <link href="vendor/pikaday.css" rel="stylesheet">
   <link href="style.css" media="all" rel="stylesheet" />
   <script src="vendor/jquery-2.1.0.min.js"></script>
   <script src="vendor/lodash.min.js"></script>
@@ -14,6 +15,8 @@
   <script src="vendor/jquery.autosize-1.18.9.min.js"></script>
   <script src="vendor/moment-2.6.0.min.js"></script>
   <script src="vendor/jquery-date-range-picker/jquery.daterangepicker.js"></script>
+  <script src="vendor/pikaday.js"></script>
+  <script src="vendor/pikaday.jquery.js"></script>
   <script src="shared/enums.js"></script>
   <script src="shared/classification.js"></script>
   <script src="shared/utils.js"></script>
@@ -23,6 +26,7 @@
   <script src="js/search.js"></script>
   <script src="js/classification.js"></script>
   <script src="js/billing.js"></script>
+  <script src="js/user-management.js"></script>
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
@@ -43,8 +47,8 @@
       <label>Käyttäjätunnus<input type="text" name="username" class="invalid"/></label>
       <label>Salasana<input type="password" name="password" class="invalid" /></label>
       <div class="feedback"></div>
-      <button disabled class="login">Kirjaudu</button>
-      <button disabled class="forgot-password">Unohdin salasanani</button>
+      <button disabled class="button login">Kirjaudu</button>
+      <button disabled class="button forgot-password">Unohdin salasanani</button>
     </div>
   </form>
 
@@ -59,6 +63,7 @@
         <li class="hide"><a href="#luokittelu" data-href="#classification-page">Luokittelu</a></li>
         <li><a href="#tilaajat" data-href="#buyer-page">Tilaajat</a></li>
         <li><a href="#laskutus" data-href="#billing-page">Laskutus</a></li>
+        <li><a href="#kayttajat" data-href="#user-management-page">Käyttäjät</a></li>
       </ul>
     </div>
   </div>
@@ -218,9 +223,9 @@
           <ul class="manual"></ul>
 
           <div>
-            <label>Lisää sähköpostiosoite: <input type="text" class="email required exclude" name="registration-email"/></label><button class="add-registration-email">Lisää</button>
+            <label>Lisää sähköpostiosoite: <input type="text" class="email required exclude" name="registration-email"/></label><button class="button add-registration-email">Lisää</button>
           </div>
-          <button name="register" disabled=disabled>Rekisteröi</button>
+          <button name="register" disabled class="button">Rekisteröi</button>
 
         </div>
         <div class="preview right">
@@ -239,8 +244,6 @@
   </form>
   </div>
 
-  <div id="buyer-page" class="page"><img src="images/in-progress.png" style="display: block; margin: 40px auto;" /></div>
-
   <div id="billing-page" class="page">
     <div class="row">
       <div class="content">
@@ -249,10 +252,30 @@
           <input type="hidden" name="begin" />
           <input type="hidden" name="end" />
           <div class="accounts"></div>
-          <button>Luo Proe-tiedosto</button>
+          <button class="button">Luo Proe-tiedosto</button>
         </form>
       </div>
     </div>
+  </div>
+
+  <div id="user-management-page" class="page">
+    <h2 class="main">Käyttäjähallinta</h2>
+    <div class="controls">
+      <div class="new-user right">
+        <label for="new-user-type" class="search-label">Käyttäjäryhmä</label>
+        <input name="new-user-type" type="hidden" id="new-user-type"><button class="button">Luo</button>
+      </div>
+      <div class="search">
+        <label for="user-name-query" class="search-label">Nimi</label>
+        <input class="query" type="text" id="user-name-query" placeholder="Hae nimellä...">
+      </div>
+      <div class="filters">
+        <label><input type="checkbox" name="root">Pääkäyttäjä</label>
+        <label><input type="checkbox" name="kavi">Kavi</label>
+        <label><input type="checkbox" name="user">Luokittelija</label>
+      </div>
+    </div>
+    <div class="user-list results"></div>
   </div>
 
   <div id="templates"></div>

@@ -17,6 +17,7 @@ var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
+var CronJob = require('cron').CronJob
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -38,12 +39,16 @@ app.post('/login', function(req, res, next) {
   User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
-    user.checkPassword(password, function(err, ok) {
-      if (err) return next(err)
-      if (!ok) return res.send(403)
-      setLoginCookie(res, user)
-      res.send({})
-    })
+    if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
+      user.update({ active: false }, respond(res, next, 403))
+    } else {
+      user.checkPassword(password, function(err, ok) {
+        if (err) return next(err)
+        if (!ok) return res.send(403)
+        setLoginCookie(res, user)
+        res.send({})
+      })
+    }
   })
 })
 
@@ -76,35 +81,38 @@ app.post('/forgot-password', function(req, res, next) {
       return res.send(500)
     }
 
+    var subject = 'Ohjeet salasanan vaihtamista varten'
+    var text = 'Tämän linkin avulla voit vaihtaa salasanasi: '
+
     if (user.resetHash) {
-      sendSaltLinkViaEmail(user.resetHash)
+      sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
     } else {
-      bcrypt.genSalt(1, function (err, s) {
+      createAndSaveHash(user, function(err) {
         if (err) return next(err)
-        user.resetHash = new Buffer(s, 'base64').toString('hex')
-        user.save(function (err) {
-          if (err) return next(err)
-          sendSaltLinkViaEmail(user.resetHash)
-        })
-      })
-    }
-
-    function sendSaltLinkViaEmail(salt) {
-      var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
-      var url = hostUrl + '/reset-password.html#' + salt
-      var emailData = {
-        recipients: user.emails,
-        subject: 'Ohjeet salasanan vaihtamista varten',
-        body: 'Tämän linkin avulla voit vaihtaa salasanasi: <a href="' + url + '">' + url + '</a>'
-      }
-
-      sendEmail(emailData, function(err) {
-        if (err) return next(err)
-        res.send({})
+        sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
       })
     }
   })
 })
+
+function sendHashLinkViaEmail(user, subject, text, callback) {
+  var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
+  var url = hostUrl + '/reset-password.html#' + user.resetHash
+  var emailData = {
+    recipients: user.emails,
+    subject: subject,
+    body: text + '<a href="' + url + '">' + url + '</a>'
+  }
+
+  sendEmail(emailData, callback)
+}
+
+function createAndSaveHash(user, callback) {
+  bcrypt.genSalt(1, function (err, s) {
+    user.resetHash = new Buffer(s, 'base64').toString('hex')
+    user.save(callback)
+  })
+}
 
 app.get('/check-reset-hash/:hash', function(req, res, next) {
   User.findOne({ resetHash: req.params.hash, active: { $ne: false } }, function(err, user) {
@@ -346,13 +354,67 @@ app.get('/series/search/:query', function(req, res, next) {
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }}
-  if (!utils.hasRole(req.user, 'kavi')) q['users._id'] = req.user._id
-  if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + req.query.q, 'i')
+  var userId = req.query.user_id
+
+  if (!userId && !utils.hasRole(req.user, 'kavi')) {
+    q['users._id'] = req.user._id
+  } else if (userId) {
+    q['users._id'] = userId
+  }
+
+  if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
   Account.find(q).sort('name').limit(50).exec(respond(res, next))
 })
 
 app.get('/accounts/:id', function(req, res, next) {
   Account.findById(req.params.id, respond(res, next))
+})
+
+app.get('/users', function(req, res, next) {
+  var roleFilters = req.query.filters
+  User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
+})
+
+app.delete('/users/:id', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+  User.findByIdAndRemove(req.params.id, respond(res, next))
+})
+
+app.get('/users/exists/:username', function(req, res, next) {
+  User.findOne({ username: req.params.username }, function(err, user) {
+    if (err) return next(err)
+    res.send({ exists: !!user })
+  })
+})
+
+function userHasRequiredFields(user) {
+  return (user.username != '' && user.emails[0].length > 0 && user.name != '')
+}
+
+app.post('/users/new', function(req, res, next) {
+  if (userHasRequiredFields(req.body)) {
+    new User(req.body).save(function(err, user) {
+      if (err) return next(err)
+
+      createAndSaveHash(user, function(err) {
+        if (err) return next(err)
+
+        var subject = 'Käyttäjätunnusten aktivointi'
+        var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
+
+        sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
+      })
+    })
+  } else {
+    return res.send(500)
+  }
+})
+
+app.post('/users/:id', function(req, res, next) {
+  User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
+    if (err) return next(err)
+    res.send(user)
+  })
 })
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
@@ -534,6 +596,52 @@ var server = app.listen(process.env.PORT || 3000, function() {
   console.log('Listening on port ' + server.address().port)
 })
 
+var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
+  User.find({ $and: [
+    { certificateEndDate: { $lt: new Date() }},
+    { active: { $ne: false }},
+    {'emails.0': { $exists: true }}
+  ]}, function(err, users) {
+    if (err) throw err
+
+    users.forEach(function(user) {
+      user.update({ active: false }, logError)
+
+      sendEmail({
+        recipients: [ user.emails[0] ],
+        subject: 'Luokittelusertifikaattisi on vanhentunut',
+        body: 'Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.'
+      }, logError)
+    })
+  })
+})
+checkExpiredCerts.start()
+
+var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
+  User.find({ $and: [
+    { certificateEndDate: { $lt: moment().add(3, 'months').toDate(), $gt: new Date() }},
+    { active: { $ne: false }},
+    {'emails.0': { $exists: true }},
+    { $or: [
+      { certExpiryReminderSent: { $exists: false }},
+      { certExpiryReminderSent: { $lt: moment().subtract(1, 'months').toDate() }}]}
+  ]}, function(err, users) {
+    if (err) throw err
+    users.forEach(function(user) {
+      sendEmail({
+        recipients: [ user.emails[0] ],
+        subject: 'Luokittelusertifikaattisi on vanhentumassa',
+        body: 'Luokittelusertifikaattisi on vanhentumassa ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
+          '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.'
+      }, function(err) {
+        if (err) console.error(err)
+        else user.update({ certExpiryReminderSent: new Date() }, logError)
+      })
+    })
+  })
+})
+checkCertsExpiringSoon.start()
+
 function nocache(req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
   res.header('Expires', '-1')
@@ -631,10 +739,10 @@ function toMongoArrayQuery(string) {
   }
 }
 
-function respond(res, next) {
+function respond(res, next, overrideData) {
   return function(err, data) {
     if (err) return next(err)
-    res.send(data)
+    res.send(overrideData || data)
   }
 }
 
@@ -647,4 +755,8 @@ function verifyTvSeries(program, callback) {
   if (enums.util.isTvEpisode(program) && program.series._id == null) {
     createParentProgram(program, program.series.name.trim(), callback)
   } else return callback()
+}
+
+function logError(err) {
+  if (err) console.error(err)
 }

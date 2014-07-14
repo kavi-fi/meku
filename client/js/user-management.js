@@ -166,23 +166,20 @@ function userManagementPage() {
         .pikaday(_.defaults({ onSelect: function(date) {
           $endDate.pikaday('setMoment', moment(date).add('years', 5))
       }}, pikadayDefaults))
+
+      select2Autocomplete({
+        $el: $detailTemplate.find('input[name=employers]'),
+        path: employersSearch,
+        multiple: true,
+        toOption: idNamePairToSelect2Option,
+        fromOption: select2OptionToIdNamePair
+      })
     }
 
     if (isNewUser) {
-      if (isClassifier) {
-        initSearch2Autocomplete($detailTemplate.find('input[name=employers]'), employersSearch)
-      }
-
       $detailTemplate.find('.modify-only').remove()
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
-      if (isClassifier) {
-        var $employers = $detailTemplate.find('input[name=employers]')
-
-        initSearch2Autocomplete($employers, employersSearch)
-        $employers.trigger('setVal', user.employers).end()
-      }
-
       populate($detailTemplate, user)
     }
 
@@ -223,17 +220,7 @@ function userManagementPage() {
     return $detailTemplate.css('display', 'none')
 
     function employersSearch(term) {
-        return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Classifier' // todo: only classifier?
-    }
-
-    function initSearch2Autocomplete($element, path) {
-      select2Autocomplete({
-        $el: $element,
-        path: path,
-        toOption: idNamePairToSelect2Option,
-        fromOption: select2OptionToIdNamePair,
-        multiple: true
-      })
+      return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Classifier' // todo: only classifier?
     }
 
     function populate($element, user) {
@@ -248,6 +235,7 @@ function userManagementPage() {
         .find('input[name=certificateStartDate]').val(cStartDate).end()
         .find('input[name=certificateEndDate]').val(cEndDate).end()
         .find('textarea[name=comment]').val(user.comment).end()
+        .find('input[name=employers]').trigger('setVal', user.employers).end()
     }
 
     function toggleInvalid() {

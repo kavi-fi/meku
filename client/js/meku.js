@@ -153,7 +153,7 @@ function navi() {
   $navi.toggle(hasRole('kavi'))
 
   $navi.find('a[data-href="#billing-page"]').parent().toggle(hasRole('kavi'))
-  $navi.find('a[data-href="#user-management-page"]').parent().toggle(hasRole('kavi'))
+  $navi.find('a[data-href="#user-management-page"]').parent().toggle(hasRole('root'))
 
   $navi.find('a').on('click', function(e) {
     e.preventDefault()

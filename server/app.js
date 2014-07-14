@@ -362,7 +362,7 @@ app.get('/accounts/search', function(req, res, next) {
     q['users._id'] = userId
   }
 
-  if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + req.query.q, 'i')
+  if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
   Account.find(q).sort('name').limit(50).exec(respond(res, next))
 })
 

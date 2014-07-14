@@ -2,7 +2,7 @@ var user;
 var pikadayDefaults = {
   defaultDate: new Date(),
   firstDay: 1,
-  format: 'DD.MM.YYYY',
+  format: utils.dateFormat,
   i18n: {
     previousMonth: 'Edellinen kuukausi',
     nextMonth: 'Seuraava kuukausi',
@@ -153,7 +153,7 @@ function navi() {
   $navi.toggle(hasRole('kavi'))
 
   $navi.find('a[data-href="#billing-page"]').parent().toggle(hasRole('kavi'))
-  $navi.find('a[data-href="#user-management-page"]').parent().toggle(hasRole('kavi'))
+  $navi.find('a[data-href="#user-management-page"]').parent().toggle(hasRole('root'))
 
   $navi.find('a').on('click', function(e) {
     e.preventDefault()
@@ -272,7 +272,7 @@ function select2Autocomplete(opts, onChangeFn) {
       if (len < opts.termMinLength) {
         return query.callback({results: []})
       }
-      var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + query.term
+      var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + encodeURIComponent(query.term)
       return $.get(path).done(function(data) {
         return query.callback({results: data.map(opts.toOption)})
       })

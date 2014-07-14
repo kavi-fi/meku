@@ -2,7 +2,6 @@ function userManagementPage() {
   var $page = $('#user-management-page')
   var $userList = $page.find('.user-list')
   var $userNameQuery = $page.find('#user-name-query')
-  var dateFormat = 'DD.MM.YYYY'
 
   var $newUserType = $page.find('.new-user input[name="new-user-type"]')
   $newUserType.select2({
@@ -81,7 +80,7 @@ function userManagementPage() {
 
     if (user.certificateEndDate) {
       var certEnd = moment(user.certificateEndDate)
-      return $('<span>').text(certEnd.format(dateFormat))
+      return $('<span>').text(certEnd.format(utils.dateFormat))
         .toggleClass('expires-soon', certEnd.isBefore(moment().add(3, 'months')))
     } else {
       return '<i class="icon-warning-sign"></i>'
@@ -166,23 +165,20 @@ function userManagementPage() {
         .pikaday(_.defaults({ onSelect: function(date) {
           $endDate.pikaday('setMoment', moment(date).add('years', 5))
       }}, pikadayDefaults))
+
+      select2Autocomplete({
+        $el: $detailTemplate.find('input[name=employers]'),
+        path: employersSearch,
+        multiple: true,
+        toOption: idNamePairToSelect2Option,
+        fromOption: select2OptionToIdNamePair
+      })
     }
 
     if (isNewUser) {
-      if (isClassifier) {
-        initSearch2Autocomplete($detailTemplate.find('input[name=employers]'), employersSearch)
-      }
-
       $detailTemplate.find('.modify-only').remove()
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
-      if (isClassifier) {
-        var $employers = $detailTemplate.find('input[name=employers]')
-
-        initSearch2Autocomplete($employers, employersSearch)
-        $employers.trigger('setVal', user.employers).end()
-      }
-
       populate($detailTemplate, user)
     }
 
@@ -206,31 +202,29 @@ function userManagementPage() {
     $detailTemplate.find('button[name=remove]').click(function() {
       var $selected = $page.find('.result.selected')
       var user = $selected.data('user')
-      $.ajax('/users/' + user._id, { type: 'DELETE' }).done(function() {
-        closeDetails()
-        $selected.slideUp(function() { $(this).remove() })
-      })
+      showDialog($('#templates').find('.remove-user-dialog').clone()
+        .find('.user-name').text(user.name).end()
+        .find('button[name=remove]').click(removeUser).end()
+        .find('button[name=cancel]').click(closeDialog).end())
+
+      function removeUser() {
+        $.ajax('/users/' + user._id, { type: 'DELETE' }).done(function() {
+          closeDialog()
+          closeDetails()
+          $selected.slideUp(function() { $(this).remove() })
+        })
+      }
     })
 
     return $detailTemplate.css('display', 'none')
 
     function employersSearch(term) {
-        return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Classifier' // todo: only classifier?
-    }
-
-    function initSearch2Autocomplete($element, path) {
-      select2Autocomplete({
-        $el: $element,
-        path: path,
-        toOption: idNamePairToSelect2Option,
-        fromOption: select2OptionToIdNamePair,
-        multiple: true
-      })
+      return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Classifier' // todo: only classifier?
     }
 
     function populate($element, user) {
-      var cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(dateFormat) : ''
-      var cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(dateFormat) : ''
+      var cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(utils.dateFormat) : ''
+      var cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(utils.dateFormat) : ''
 
       $element.find('input[name=name]').val(user.name).end()
         .find('input[name=email]').val(user.emails[0]).end()
@@ -240,6 +234,7 @@ function userManagementPage() {
         .find('input[name=certificateStartDate]').val(cStartDate).end()
         .find('input[name=certificateEndDate]').val(cEndDate).end()
         .find('textarea[name=comment]').val(user.comment).end()
+        .find('input[name=employers]').trigger('setVal', user.employers).end()
     }
 
     function toggleInvalid() {
@@ -259,8 +254,8 @@ function userManagementPage() {
 
   function getClassifierData($details) {
     return {
-      certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), dateFormat),
-      certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), dateFormat),
+      certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), utils.dateFormat),
+      certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), utils.dateFormat),
       employers: $details.find('input[name=employers]').select2('data').map(select2OptionToIdNamePair),
       comment: $details.find('textarea[name=comment]').val()
     }
@@ -269,7 +264,7 @@ function userManagementPage() {
   var usernameValidator = _.debounce((function() {
     var getLatestAjax = switchLatestDeferred()
     return function(username, $username, $detailTemplate) {
-      getLatestAjax($.get('/users/exists/' + username), $username.siblings('i.icon-spinner'))
+      getLatestAjax($.get('/users/exists/' + encodeURIComponent(username)), $username.siblings('i.icon-spinner'))
         .done(function(data) {
           $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
           $username.removeClass('pending')

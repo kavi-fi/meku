@@ -272,7 +272,7 @@ function select2Autocomplete(opts, onChangeFn) {
       if (len < opts.termMinLength) {
         return query.callback({results: []})
       }
-      var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + query.term
+      var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + encodeURIComponent(query.term)
       return $.get(path).done(function(data) {
         return query.callback({results: data.map(opts.toOption)})
       })

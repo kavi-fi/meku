@@ -277,7 +277,7 @@ function userManagementPage() {
   var usernameValidator = _.debounce((function() {
     var getLatestAjax = switchLatestDeferred()
     return function(username, $username, $detailTemplate) {
-      getLatestAjax($.get('/users/exists/' + username), $username.siblings('i.icon-spinner'))
+      getLatestAjax($.get('/users/exists/' + encodeURIComponent(username)), $username.siblings('i.icon-spinner'))
         .done(function(data) {
           $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
           $username.removeClass('pending')

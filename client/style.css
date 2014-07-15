@@ -666,6 +666,7 @@ textarea.invalid:disabled,
 
 #account-management-page .result { display: -webkit-flex; display: flex; }
 #account-management-page .result span { width: 50%; box-sizing: border-box; }
+#account-management-page .account-details .emails { float: right; margin-right: 34px; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

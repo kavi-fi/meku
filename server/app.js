@@ -353,7 +353,8 @@ app.get('/series/search/:query', function(req, res, next) {
 
 app.get('/accounts', function(req, res, next) {
   if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
-  Account.find({}, respond(res, next))
+  var selectedRoles = req.query.roles
+  Account.find(selectedRoles ? { roles: { $all: selectedRoles }} : {}, respond(res, next))
 })
 
 app.get('/accounts/search', function(req, res, next) {

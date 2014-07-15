@@ -4,7 +4,7 @@ function accountManagementPage() {
 
   $page.on('show', function() {
     updateLocationHash()
-    $.get('/accounts', function(accounts) {
+    $.get('/accounts?' + $.param({ roles: currentFilters() }), function(accounts) {
       renderAccounts(accounts)
     })
   })
@@ -16,6 +16,8 @@ function accountManagementPage() {
       $(this).toggle(_.contains(name, searchString))
     })
   })
+
+  $('.filters').change(function() { $page.trigger('show') })
 
   function updateLocationHash() {
     location.hash = '#tilaajat/'
@@ -38,4 +40,9 @@ function accountManagementPage() {
 
     return _.map(roles, function(role) { return enums.roles[role] }).join(', ')
   }
+
+  function currentFilters() {
+    return $page.find('.filters input').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
+  }
+
 }

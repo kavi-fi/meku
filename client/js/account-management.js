@@ -19,6 +19,47 @@ function accountManagementPage() {
 
   $('.filters').change(function() { $page.trigger('show') })
 
+
+  $accounts.on('click', '.result', function() {
+    var $this = $(this)
+    if ($this.hasClass('selected')) {
+      closeDetails()
+    } else {
+      closeDetails()
+      openDetails($this)
+    }
+  })
+
+  function openDetails($row) {
+    var account = $row.data('account')
+    var $accountDetails = renderAccountDetails(account)
+    $row.addClass('selected').after($accountDetails)
+    updateLocationHash(account._id)
+    $accountDetails.slideDown()
+  }
+
+  function closeDetails() {
+    $accounts.find('.result.selected').removeClass('selected')
+    $accounts.find('.account-details').slideUp(function() { $(this).remove() })
+    updateLocationHash('')
+  }
+
+  function renderAccountDetails(account) {
+    var $detailTemplate = $('#templates').find('.account-details').clone()
+
+    $detailTemplate.find('input[name=name]').val(account.name)
+
+    $detailTemplate.submit(function(event) {
+      event.preventDefault()
+
+      // todo: $.post here
+
+      closeDetails()
+    })
+
+    return $detailTemplate
+  }
+
   function updateLocationHash() {
     location.hash = '#tilaajat/'
   }

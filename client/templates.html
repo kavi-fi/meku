@@ -206,6 +206,24 @@
 
 <div class="account-details detail-box">
   <form class="form">
-    <label>Toiminimi <input name="name"></label>
+    <button name="save" type="submit" disabled class="button">Tallenna</button>
+    <button name="remove" type="button" class="button modify-only">Poista</button>
+
+    <label>Toiminimi <input type="text" name="name" required></label>
+    <label>Y-tunnus <input type="text" name="yTunnus" required></label>
+
+    <div class="address">
+      <label>Lähiosoite <input type="text" name="street" required></label>
+      <label>Postinumero <input type="text" name="zip" required></label>
+      <label>Kaupunki <input type="text" name="city" required></label>
+      <label>Maa <input type="text" name="country" required></label>
+    </div>
+
+    <div class="contact">
+      <label>Yhteyshenkilö <input type="text" name="contact-name"></label>
+      <label>Puhelinnumero <input type="text" name="contact-phone" required></label>
+      <label>Sähköpostit <input type="text" name="contact-emails" required></label>
+    </div>
+
   </form>
 </div>

@@ -643,16 +643,6 @@ textarea.invalid:disabled,
 #user-management-page .result span:nth-child(3) { width: 200px; }
 #user-management-page .result span.cert-end span.expires-soon { background: #ff9999; padding: 3px; border-radius: 5px; margin-left: -3px; }
 #user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
-#user-management-page .user-details label { box-sizing: border-box; width: 266px; margin-right: 10px; }
-#user-management-page .user-details label.double { width: 547px; box-sizing: border-box; }
-#user-management-page .user-details input:not(.select2-input) { margin-top: 4px; box-sizing: border-box; width: 100%; }
-#user-management-page .user-details .select2-container { margin-top: 4px; width: 100%; box-sizing: border-box; }
-#user-management-page .user-details input[type=checkbox] { width: 16px; }
-#user-management-page .user-details button { float: right; }
-#user-management-page .user-details button[name=remove] { margin-right: 15px; }
-#user-management-page .user-details .icon-spinner { margin-left: -20px; }
-#user-management-page .user-details .double-margin { margin-top: 18px; }
-#user-management-page .user-details textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
 #user-management-page .user-details label.employers { float: right; margin-right: 34px; }
 #user-management-page .controls .select2-container { width: 222px; box-sizing: border-box; }
 #user-management-page .controls button { vertical-align: top; }
@@ -662,6 +652,17 @@ textarea.invalid:disabled,
 
 .remove-user-dialog { width: 300px; margin: 0 auto; }
 .remove-user-dialog .buttons { display: -webkit-flex; display: flex; width: 100%;  -webkit-justify-content: space-around; justify-content: space-around; }
+
+.detail-box .form label { box-sizing: border-box; width: 266px; margin-right: 10px; }
+.detail-box .form label.double { width: 547px; box-sizing: border-box; }
+.detail-box .form input:not(.select2-input) { margin-top: 4px; box-sizing: border-box; width: 100%; }
+.detail-box .form .select2-container { margin-top: 4px; width: 100%; box-sizing: border-box; }
+.detail-box .form input[type=checkbox] { width: 16px; }
+.detail-box .form button { float: right; }
+.detail-box .form button[name=remove] { margin-right: 15px; }
+.detail-box .form .icon-spinner { margin-left: -20px; }
+.detail-box .form .double-margin { margin-top: 18px; }
+.detail-box .form textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
 
 #account-management-page .result { display: -webkit-flex; display: flex; }
 #account-management-page .result span { width: 50%; box-sizing: border-box; }

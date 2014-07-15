@@ -2,10 +2,16 @@ function accountManagementPage() {
   var $page = $('#account-management-page')
   var $accounts = $page.find('.accounts-list')
 
-  $page.on('show', function() {
-    updateLocationHash()
+  $page.on('show', function(event, accountId) {
+    updateLocationHash(accountId || '')
     $.get('/accounts?' + $.param({ roles: currentFilters() }), function(accounts) {
       renderAccounts(accounts)
+      if (accountId) {
+        var $selected = $accounts.find('.result[data-id=' + accountId + ']')
+        openDetails($selected)
+        var top = $selected.offset().top - 25
+        $('body,html').animate({ scrollTop: top })
+      }
     })
   })
 
@@ -19,13 +25,11 @@ function accountManagementPage() {
 
   $('.filters').change(function() { $page.trigger('show') })
 
-
   $accounts.on('click', '.result', function() {
     var $this = $(this)
-    if ($this.hasClass('selected')) {
-      closeDetails()
-    } else {
-      closeDetails()
+    var wasSelected = $this.hasClass('selected')
+    closeDetails()
+    if (!wasSelected) {
       openDetails($this)
     }
   })
@@ -60,8 +64,8 @@ function accountManagementPage() {
     return $detailTemplate
   }
 
-  function updateLocationHash() {
-    location.hash = '#tilaajat/'
+  function updateLocationHash(accountId) {
+    location.hash = '#tilaajat/' + accountId
   }
 
   function renderAccounts(accounts) {
@@ -70,7 +74,7 @@ function accountManagementPage() {
   }
 
   function renderAccount(account) {
-    return $('<div>', { class: 'result' })
+    return $('<div>', { class: 'result', 'data-id': account._id })
       .data('account', account)
       .append($('<span>', { class: 'name' }).text(account.name))
       .append($('<span>', { class: 'roles' }).html(renderRoles(account.roles)))

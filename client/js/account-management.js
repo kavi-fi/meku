@@ -1,6 +1,7 @@
 function accountManagementPage() {
   var $page = $('#account-management-page')
   var $accounts = $page.find('.accounts-list')
+  var accountDetails = accountDetailsRenderer()
 
   $page.on('show', function(event, accountId) {
     updateLocationHash(accountId || '')
@@ -36,7 +37,7 @@ function accountManagementPage() {
 
   function openDetails($row) {
     var account = $row.data('account')
-    var $accountDetails = renderAccountDetails(account)
+    var $accountDetails = accountDetails.render(account)
     $row.addClass('selected').after($accountDetails)
     updateLocationHash(account._id)
     $accountDetails.slideDown()
@@ -46,22 +47,6 @@ function accountManagementPage() {
     $accounts.find('.result.selected').removeClass('selected')
     $accounts.find('.account-details').slideUp(function() { $(this).remove() })
     updateLocationHash('')
-  }
-
-  function renderAccountDetails(account) {
-    var $detailTemplate = $('#templates').find('.account-details').clone()
-
-    $detailTemplate.find('input[name=name]').val(account.name)
-
-    $detailTemplate.submit(function(event) {
-      event.preventDefault()
-
-      // todo: $.post here
-
-      closeDetails()
-    })
-
-    return $detailTemplate
   }
 
   function updateLocationHash(accountId) {

@@ -8,10 +8,12 @@ function accountDetailsRenderer() {
     $detailTemplate
       .find('input[name=name]').val(account.name).end()
       .find('input[name=yTunnus]').val(account.yTunnus).end()
-      .find('input[name=street]').val(account.billing.street).end()
-      .find('input[name=zip]').val(account.billing.zip).end()
-      .find('input[name=city]').val(account.billing.city).end()
-      .find('input[name=country]').val(account.billing.country).end()
+      .find('input[name=street]').val(account.address.street).end()
+      .find('input[name=zip]').val(account.address.zip).end()
+      .find('input[name=city]').val(account.address.city).end()
+      .find('input[name=country]').val(account.address.country).end()
+      .find('input[name=contactName]').val(account.contactName).end()
+      .find('input[name=phoneNumber]').val(account.phoneNumber).end()
 
     return $detailTemplate
   }

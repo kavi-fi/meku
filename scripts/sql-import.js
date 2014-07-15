@@ -274,16 +274,28 @@ function accounts(callback) {
     var seq = 1
     var q = 'select id, name, customer_type, sic_code,' +
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
-      ' e_invoice, e_invoice_operator' +
+      ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
+      ' ownership, phone_office, phone_alternate' +
       ' from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
     function onRow(row) {
+      var address = { street: trim(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
+      var billingAddress = row.billing_address_street
+        ? { street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)) }
+        : undefined
+      if (_.isEqual(address, billingAddress)) {
+        billingAddress = undefined
+      }
+      var phoneNumber = row.phone_office || row.phone_alternate || undefined
+
       return {
         emekuId: row.id, sequenceId:seq++, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        address: address,
         billing: {
-          street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)),
-          language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text)
+          address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text)
         },
-        eInvoice: { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
+        eInvoice: { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) },
+        contactName: row.ownership,
+        phoneNumber: phoneNumber
       }
     }
     batchInserter(q, onRow, 'Account', callback)

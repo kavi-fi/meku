@@ -75,10 +75,32 @@ function accountManagementPage() {
 
     var $form = $e.find('form')
 
+    $form.find('input').on('blur', function() {
+      $(this).addClass('touched')
+    })
+
     $form.on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
+
     $form.on('validate', function() {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
     })
+
+    $form.find('input[name=emails]').on('change', function(event) {
+      $(this).addClass('touched')
+      var emails = event.val
+      if (!_.isEmpty(emails) && _.all(emails, validateEmail)) {
+        this.setCustomValidity('')
+        $(this).removeClass('invalid')
+      } else {
+        this.setCustomValidity('Invalid email')
+        $(this).addClass('invalid')
+      }
+
+      function validateEmail(email) {
+        return new RegExp('.+@.+\\..+').test(email)
+      }
+    })
+
   }
 
   function closeDetails() {

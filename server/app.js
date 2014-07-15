@@ -351,6 +351,13 @@ app.get('/series/search/:query', function(req, res, next) {
   })
 })
 
+app.post('/accounts/:id', function(req, res, next) {
+  Account.findByIdAndUpdate(req.params.id, req.body, null, function(err, account) {
+    if (err) return next(err)
+    account.save(respond(res, next))
+  })
+})
+
 app.get('/accounts', function(req, res, next) {
   if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
   var selectedRoles = req.query.roles

@@ -14,6 +14,10 @@ function accountDetailsRenderer() {
       .find('input[name=country]').val(account.address.country).end()
       .find('input[name=contactName]').val(account.contactName).end()
       .find('input[name=phoneNumber]').val(account.phoneNumber).end()
+      .find('input[name=emails]').val(account.emailAddresses).select2({
+        tags: account.emailAddresses,
+        multiple: true
+      }).end()
 
     return $detailTemplate
   }

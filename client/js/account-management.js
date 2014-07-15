@@ -38,9 +38,48 @@ function accountManagementPage() {
   function openDetails($row) {
     var account = $row.data('account')
     var $accountDetails = accountDetails.render(account)
+
+    bindEventHandlers($accountDetails, account)
+
     $row.addClass('selected').after($accountDetails)
     updateLocationHash(account._id)
     $accountDetails.slideDown()
+  }
+
+  function bindEventHandlers($e, account) {
+    $e.submit(function(event) {
+      event.preventDefault()
+
+      var accountData = {
+        name: findInput('name').val(),
+        emailAddresses: findInput('emails').select2('data').map(function(select2Pair) { return select2Pair.text }),
+        yTunnus: findInput('yTunnus').val(),
+        address: {
+          street: findInput('street').val(),
+          city: findInput('city').val(),
+          zip: findInput('zip').val(),
+          country: findInput('country').val()
+        },
+        contactName: findInput('contactName').val(),
+        phoneNumber: findInput('phoneNumber').val()
+      }
+
+      $.post('/accounts/' + account._id, JSON.stringify(accountData), function(account) {
+        $accounts.find('.result.selected').replaceWith(renderAccount(account))
+        closeDetails()
+      })
+
+      function findInput(name) {
+        return $e.find('input[name=' + name + ']')
+      }
+    })
+
+    var $form = $e.find('form')
+
+    $form.on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
+    $form.on('validate', function() {
+      $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
+    })
   }
 
   function closeDetails() {

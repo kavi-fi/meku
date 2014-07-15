@@ -60,7 +60,8 @@ function accountManagementPage() {
           country: findInput('country').val()
         },
         contactName: findInput('contactName').val(),
-        phoneNumber: findInput('phoneNumber').val()
+        phoneNumber: findInput('phoneNumber').val(),
+        users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair)
       }
 
       $.post('/accounts/' + account._id, JSON.stringify(accountData), function(account) {
@@ -138,6 +139,25 @@ function accountManagementPage() {
   function renderAccountDetails(account) {
     var $detailTemplate = $('#templates').find('.account-details').clone()
 
+    var $classifiers = $detailTemplate.find('input[name=classifiers]')
+
+    select2Autocomplete({
+      $el: $classifiers,
+      path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
+      multiple: true,
+      toOption: function(x) {
+        if (!x) return null
+        return {
+          id: x._id,
+          text: x.name + (x.username ? ' (' + x.username + ')' : ''),
+          name: x.username ? x.username : x.name
+        }
+      },
+      fromOption: select2OptionToIdUsernamePair
+    })
+
+    $classifiers.trigger('setVal', account.users).end()
+
     $detailTemplate
       .find('input[name=name]').val(account.name).end()
       .find('input[name=yTunnus]').val(account.yTunnus).end()
@@ -155,4 +175,8 @@ function accountManagementPage() {
     return $detailTemplate
   }
 
+  function select2OptionToIdUsernamePair(x) {
+    if (!x) return null
+    return { _id: x.id, name: x.name }
+  }
 }

@@ -352,7 +352,7 @@ app.get('/series/search/:query', function(req, res, next) {
 })
 
 app.post('/accounts/:id', function(req, res, next) {
-  Account.findByIdAndUpdate(req.params.id, req.body, null, function(err, account) {
+  Account.findByIdAndUpdate(req.params.id, req.body, function(err, account) {
     if (err) return next(err)
     account.save(respond(res, next))
   })
@@ -386,6 +386,11 @@ app.get('/accounts/:id', function(req, res, next) {
 app.get('/users', function(req, res, next) {
   var roleFilters = req.query.filters
   User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
+})
+
+app.get('/users/search', function(req, res, next) {
+  var q = { name: new RegExp("^" + utils.escapeRegExp(req.query.q), 'i') }
+  User.find(q).exec(respond(res, next))
 })
 
 app.delete('/users/:id', function(req, res, next) {

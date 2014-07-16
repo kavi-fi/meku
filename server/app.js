@@ -367,12 +367,8 @@ app.get('/accounts', function(req, res, next) {
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }}
-  var userId = req.query.user_id
-
-  if (!userId && !utils.hasRole(req.user, 'kavi')) {
+  if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
-  } else if (userId) {
-    q['users._id'] = userId
   }
 
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')

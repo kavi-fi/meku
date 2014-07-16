@@ -666,7 +666,8 @@ textarea.invalid:disabled,
 
 #subscriber-management-page .result { display: -webkit-flex; display: flex; }
 #subscriber-management-page .result span { width: 50%; box-sizing: border-box; }
-#subscriber-management-page .account-details .emails { float: right; margin-right: 34px; }
+#subscriber-management-page .subscriber-details .emails { float: right; margin-right: 34px; }
+#subscriber-management-page .subscriber-details .emails .select2-choices { overflow: auto; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

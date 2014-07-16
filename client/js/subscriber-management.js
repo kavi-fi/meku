@@ -38,7 +38,7 @@ function subscriberManagementPage() {
     var $newSubscriberForm = renderNewSubscriberForm()
 
     bindEventHandlers($newSubscriberForm, function(subscriberData) {
-      subscriberData.roles = [ 'Classifier' ]
+      subscriberData.roles = [ 'Subscriber' ]
 
       $.post('/accounts/', JSON.stringify(subscriberData), function(subscriber) {
         $subscribers.find('.result.selected').data('subscriber', subscriber)

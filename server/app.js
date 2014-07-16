@@ -364,6 +364,15 @@ app.get('/accounts', function(req, res, next) {
   Account.find(selectedRoles ? { roles: { $all: selectedRoles }} : {}, respond(res, next))
 })
 
+app.get('/subscribers', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+  var selectedRoles = req.query.roles
+  var query = _.isEmpty(selectedRoles)
+    ? { roles: { $in: ['Classifier', 'Subscriber'] }}
+    : { roles: { $all: selectedRoles }}
+  Account.find(query, respond(res, next))
+})
+
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }}

@@ -4,7 +4,7 @@ function accountManagementPage() {
 
   $page.on('show', function(event, accountId) {
     updateLocationHash(accountId || '')
-    $.get('/accounts?' + $.param({ roles: currentFilters() }), function(accounts) {
+    $.get('/subscribers?' + $.param({ roles: currentFilters() }), function(accounts) {
       renderAccounts(accounts)
       if (accountId) {
         var $selected = $accounts.find('.result[data-id=' + accountId + ']')

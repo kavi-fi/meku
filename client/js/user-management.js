@@ -61,7 +61,7 @@ function userManagementPage() {
     closeDetails()
   })
 
-  $('.filters').change(function() { $page.trigger('show') })
+  $page.find('.filters').change(function() { $page.trigger('show') })
 
   function updateLocationHash(userId) {
     location.hash = '#kayttajat/' + userId

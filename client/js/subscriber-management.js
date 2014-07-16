@@ -29,7 +29,7 @@ function subscriberManagementPage() {
     closeDetails()
   })
 
-  $('.filters').change(function() { $page.trigger('show') })
+  $page.find('.filters').change(function() { $page.trigger('show') })
 
   $subscribers.on('click', '.result', function() {
     var $this = $(this)

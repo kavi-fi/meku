@@ -16,6 +16,10 @@ function userManagementPage() {
     $userList.empty()
     $.get('/users?' + $.param({ filters: currentFilters() }), function(users) {
       renderUsers(users)
+
+      // Apply username search
+      $userNameQuery.trigger('input')
+
       if (userId) {
         var $selected = $userList.find('.result[data-id=' + userId + ']')
         openDetails($selected)
@@ -54,6 +58,7 @@ function userManagementPage() {
         $(this).hide()
       }
     })
+    closeDetails()
   })
 
   $('.filters').change(function() { $page.trigger('show') })

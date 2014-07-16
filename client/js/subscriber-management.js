@@ -1,11 +1,16 @@
 function subscriberManagementPage() {
   var $page = $('#subscriber-management-page')
   var $subscribers = $page.find('.subscribers-list')
+  var $subscriberNameQuery = $page.find('#subscriber-name-query')
 
   $page.on('show', function(event, subscriberId) {
     updateLocationHash(subscriberId || '')
     $.get('/subscribers?' + $.param({ roles: currentFilters() }), function(subscribers) {
       renderSubscribers(subscribers)
+
+      // Apply subscriber search
+      $subscriberNameQuery.trigger('input')
+
       if (subscriberId) {
         var $selected = $subscribers.find('.result[data-id=' + subscriberId + ']')
         openDetails($selected)
@@ -15,12 +20,13 @@ function subscriberManagementPage() {
     })
   })
 
-  $page.find('#subscriber-name-query').on('input', function() {
+  $subscriberNameQuery.on('input', function() {
     var searchString = $(this).val().toLowerCase()
     $subscribers.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
       $(this).toggle(_.contains(name, searchString))
     })
+    closeDetails()
   })
 
   $('.filters').change(function() { $page.trigger('show') })

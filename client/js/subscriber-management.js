@@ -139,6 +139,24 @@ function subscriberManagementPage() {
       }
     })
 
+    $form.find('input[name=billing-extra], input[name=billing-extra-type]').on('change click', function() {
+      toggleBillingExtra($form)
+    })
+
+  }
+
+  function toggleBillingExtra($form) {
+    var extraBillingEnabled = $form.find('input[name=billing-extra]').prop('checked')
+    $form.find('.billing-extra-fields input').prop('disabled', !extraBillingEnabled)
+
+    if (extraBillingEnabled) {
+      var type = $form.find('input[name=billing-extra-type]:checked').val()
+      var $addressInputs = $form.find('.billing-extra-fields .billing-address input')
+      var $eInvoiceInputs = $form.find('.billing-extra-fields .eInvoice input')
+
+      $addressInputs.prop('disabled', type === 'eInvoice')
+      $eInvoiceInputs.prop('disabled', type === 'address')
+    }
   }
 
   function closeDetails() {
@@ -175,21 +193,35 @@ function subscriberManagementPage() {
 
   function renderSubscriberDetails(subscriber) {
     var $detailTemplate = renderSubscriberTemplate()
+    var address = subscriber.address || false
+    var billingAddress = subscriber.billing && subscriber.billing.address || false
+    var eInvoice = subscriber.eInvoice || false
+    var extraBillingType = billingAddress ? 'address' : 'eInvoice'
 
     $detailTemplate
       .find('input[name=classifiers]').trigger('setVal', subscriber.users).end()
       .find('input[name=name]').val(subscriber.name).end()
       .find('input[name=yTunnus]').val(subscriber.yTunnus).end()
-      .find('input[name=street]').val(subscriber.address.street).end()
-      .find('input[name=zip]').val(subscriber.address.zip).end()
-      .find('input[name=city]').val(subscriber.address.city).end()
-      .find('input[name=country]').val(subscriber.address.country).end()
+      .find('input[name=street]').val(address.street).end()
+      .find('input[name=zip]').val(address.zip).end()
+      .find('input[name=city]').val(address.city).end()
+      .find('input[name=country]').val(address.country).end()
       .find('input[name=contactName]').val(subscriber.contactName).end()
       .find('input[name=phoneNumber]').val(subscriber.phoneNumber).end()
       .find('input[name=emails]').val(subscriber.emailAddresses).select2({
         tags: subscriber.emailAddresses,
         multiple: true
       }).end()
+      .find('input[name="billing.street"]').val(billingAddress.street).end()
+      .find('input[name="billing.zip"]').val(billingAddress.zip).end()
+      .find('input[name="billing.city"]').val(billingAddress.city).end()
+      .find('input[name="billing.country"]').val(billingAddress.country).end()
+      .find('input[name="eInvoice.address"]').val(eInvoice.address).end()
+      .find('input[name=operator]').val(eInvoice.operator).end()
+      .find('input[name=billing-extra]').prop('checked', eInvoice || billingAddress).end()
+      .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
+
+    toggleBillingExtra($detailTemplate)
 
     return $detailTemplate
   }
@@ -227,6 +259,8 @@ function subscriberManagementPage() {
       tags: [],
       multiple: true
     }).end()
+
+    toggleBillingExtra($detailTemplate)
 
     return $detailTemplate
   }

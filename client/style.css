@@ -311,7 +311,7 @@ textarea,
   line-height: 19px;
 }
 
-input, select, .select2-container  {
+input, select, .select2-container, textarea {
   margin: 0 0 15px 0;
 }
 
@@ -657,7 +657,7 @@ textarea.invalid:disabled,
 .detail-box .form label.double { width: 547px; box-sizing: border-box; }
 .detail-box .form input:not(.select2-input) { margin-top: 4px; box-sizing: border-box; width: 100%; }
 .detail-box .form .select2-container { margin-top: 4px; width: 100%; box-sizing: border-box; }
-.detail-box .form input[type=checkbox] { width: 16px; }
+.detail-box .form input[type=checkbox], .detail-box .form input[type=radio] { width: 16px; }
 .detail-box .form button { float: right; }
 .detail-box .form button[name=remove] { margin-right: 15px; }
 .detail-box .form .icon-spinner { margin-left: -20px; }
@@ -669,6 +669,8 @@ textarea.invalid:disabled,
 #subscriber-management-page .subscriber-details .emails { float: right; margin-right: 34px; }
 #subscriber-management-page .subscriber-details .emails .select2-choices { overflow: auto; }
 #subscriber-management-page .subscriber-details .roles label { width: auto; }
+#subscriber-management-page label.full { width: 100%; }
+#subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

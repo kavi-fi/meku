@@ -34,18 +34,43 @@ function subscriberManagementPage() {
     }
   })
 
+  $page.find('.new-subscriber button').on('click', function() {
+    var $newSubscriberForm = renderNewSubscriberForm()
+
+    bindEventHandlers($newSubscriberForm, function(subscriberData) {
+      subscriberData.roles = [ 'Classifier' ]
+
+      $.post('/accounts/', JSON.stringify(subscriberData), function(subscriber) {
+        $subscribers.find('.result.selected').data('subscriber', subscriber)
+        var $subscriber = renderSubscriber(subscriber).css('display', 'none')
+        $subscribers.prepend($subscriber)
+        $subscriber.slideToggle()
+        closeDetails()
+      })
+    })
+
+    closeDetails()
+    $subscribers.addClass('selected').prepend($newSubscriberForm)
+    $newSubscriberForm.slideDown()
+  })
+
   function openDetails($row) {
     var subscriber = $row.data('subscriber')
     var $subscriberDetails = renderSubscriberDetails(subscriber)
 
-    bindEventHandlers($subscriberDetails, subscriber)
+    bindEventHandlers($subscriberDetails, function(subscriberData) {
+      $.post('/accounts/' + subscriber._id, JSON.stringify(subscriberData), function(subscriber) {
+        $subscribers.find('.result.selected').replaceWith(renderSubscriber(subscriber))
+        closeDetails()
+      })
+    })
 
     $row.addClass('selected').after($subscriberDetails)
     updateLocationHash(subscriber._id)
     $subscriberDetails.slideDown()
   }
 
-  function bindEventHandlers($e, subscriber) {
+  function bindEventHandlers($e, submitCallback) {
     $e.submit(function(event) {
       event.preventDefault()
 
@@ -64,10 +89,7 @@ function subscriberManagementPage() {
         users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair)
       }
 
-      $.post('/accounts/' + subscriber._id, JSON.stringify(subscriberData), function(subscriber) {
-        $subscribers.find('.result.selected').replaceWith(renderSubscriber(subscriber))
-        closeDetails()
-      })
+      submitCallback(subscriberData)
 
       function findInput(name) {
         return $e.find('input[name=' + name + ']')
@@ -137,28 +159,10 @@ function subscriberManagementPage() {
   }
 
   function renderSubscriberDetails(subscriber) {
-    var $detailTemplate = $('#templates').find('.subscriber-details').clone()
-
-    var $classifiers = $detailTemplate.find('input[name=classifiers]')
-
-    select2Autocomplete({
-      $el: $classifiers,
-      path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
-      multiple: true,
-      toOption: function(x) {
-        if (!x) return null
-        return {
-          id: x._id,
-          text: x.name + (x.username ? ' (' + x.username + ')' : ''),
-          name: x.username ? x.username : x.name
-        }
-      },
-      fromOption: select2OptionToIdUsernamePair
-    })
-
-    $classifiers.trigger('setVal', subscriber.users).end()
+    var $detailTemplate = renderSubscriberTemplate()
 
     $detailTemplate
+      .find('input[name=classifiers]').trigger('setVal', subscriber.users).end()
       .find('input[name=name]').val(subscriber.name).end()
       .find('input[name=yTunnus]').val(subscriber.yTunnus).end()
       .find('input[name=street]').val(subscriber.address.street).end()
@@ -178,5 +182,37 @@ function subscriberManagementPage() {
   function select2OptionToIdUsernamePair(x) {
     if (!x) return null
     return { _id: x.id, name: x.name }
+  }
+
+  function renderSubscriberTemplate() {
+    var $detailTemplate = $('#templates').find('.subscriber-details').clone()
+
+    select2Autocomplete({
+      $el: $detailTemplate.find('input[name=classifiers]'),
+      path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
+      multiple: true,
+      toOption: function(x) {
+        if (!x) return null
+        return {
+          id: x._id,
+          text: x.name + (x.username ? ' (' + x.username + ')' : ''),
+          name: x.username ? x.username : x.name
+        }
+      },
+      fromOption: select2OptionToIdUsernamePair
+    })
+
+    return $detailTemplate
+  }
+
+  function renderNewSubscriberForm() {
+    var $detailTemplate = renderSubscriberTemplate()
+
+    $detailTemplate.find('input[name=emails]').select2({
+      tags: [],
+      multiple: true
+    }).end()
+
+    return $detailTemplate
   }
 }

@@ -40,7 +40,7 @@ function subscriberManagementPage() {
     }
   })
 
-  $page.find('.new-subscriber button').on('click', function() {
+  $page.find('button[name=new-subscriber]').on('click', function() {
     var $newSubscriberForm = renderNewSubscriberForm()
 
     bindEventHandlers($newSubscriberForm, function(subscriberData) {

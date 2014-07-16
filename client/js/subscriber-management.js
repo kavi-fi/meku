@@ -105,15 +105,32 @@ function subscriberManagementPage() {
           zip: findInput('zip').val(),
           country: findInput('country').val()
         },
+        billing: {},
         contactName: findInput('contactName').val(),
         phoneNumber: findInput('phoneNumber').val(),
         users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair)
+      }
+      if ($e.find('input[name=billing-extra]').prop('checked')) {
+        var extraBillingType = $e.find('input[name=billing-extra-type]:checked').val()
+        if (extraBillingType === 'address') {
+          subscriberData.billing.address = {
+            street: findInput('billing.street').val(),
+            city: findInput('billing.city').val(),
+            zip: findInput('billing.zip').val(),
+            country: findInput('billing.country').val()
+          }
+        } else if (extraBillingType === 'eInvoice') {
+          subscriberData.eInvoice = {
+            address: findInput('eInvoice.address').val(),
+            operator: findInput('operator').val()
+          }
+        }
       }
 
       submitCallback(subscriberData)
 
       function findInput(name) {
-        return $e.find('input[name=' + name + ']')
+        return $e.find('input[name="' + name + '"]')
       }
     })
 
@@ -202,7 +219,7 @@ function subscriberManagementPage() {
     var address = subscriber.address || false
     var billingAddress = subscriber.billing && subscriber.billing.address || false
     var eInvoice = subscriber.eInvoice || false
-    var extraBillingType = billingAddress ? 'address' : 'eInvoice'
+    var extraBillingType = eInvoice ? 'eInvoice' : 'address'
 
     $detailTemplate
       .find('input[name=classifiers]').trigger('setVal', subscriber.users).end()

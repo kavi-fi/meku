@@ -670,7 +670,7 @@ textarea.invalid:disabled,
 #subscriber-management-page .subscriber-details .emails .select2-choices { overflow: auto; }
 #subscriber-management-page .subscriber-details .roles label { width: auto; }
 #subscriber-management-page label.full { width: 100%; }
-#subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; }
+#subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

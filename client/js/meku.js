@@ -79,7 +79,7 @@ function setup() {
   buyerPage()
   billingPage()
   userManagementPage()
-  accountManagementPage()
+  subscriberManagementPage()
   navigation.start()
 }
 

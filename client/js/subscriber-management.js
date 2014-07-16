@@ -1,13 +1,13 @@
-function accountManagementPage() {
-  var $page = $('#account-management-page')
-  var $accounts = $page.find('.accounts-list')
+function subscriberManagementPage() {
+  var $page = $('#subscriber-management-page')
+  var $subscribers = $page.find('.subscribers-list')
 
-  $page.on('show', function(event, accountId) {
-    updateLocationHash(accountId || '')
-    $.get('/subscribers?' + $.param({ roles: currentFilters() }), function(accounts) {
-      renderAccounts(accounts)
-      if (accountId) {
-        var $selected = $accounts.find('.result[data-id=' + accountId + ']')
+  $page.on('show', function(event, subscriberId) {
+    updateLocationHash(subscriberId || '')
+    $.get('/subscribers?' + $.param({ roles: currentFilters() }), function(subscribers) {
+      renderSubscribers(subscribers)
+      if (subscriberId) {
+        var $selected = $subscribers.find('.result[data-id=' + subscriberId + ']')
         openDetails($selected)
         var top = $selected.offset().top - 25
         $('body,html').animate({ scrollTop: top })
@@ -15,9 +15,9 @@ function accountManagementPage() {
     })
   })
 
-  $page.find('#account-name-query').on('input', function() {
+  $page.find('#subscriber-name-query').on('input', function() {
     var searchString = $(this).val().toLowerCase()
-    $accounts.find('.result').each(function() {
+    $subscribers.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
       $(this).toggle(_.contains(name, searchString))
     })
@@ -25,7 +25,7 @@ function accountManagementPage() {
 
   $('.filters').change(function() { $page.trigger('show') })
 
-  $accounts.on('click', '.result', function() {
+  $subscribers.on('click', '.result', function() {
     var $this = $(this)
     var wasSelected = $this.hasClass('selected')
     closeDetails()
@@ -35,21 +35,21 @@ function accountManagementPage() {
   })
 
   function openDetails($row) {
-    var account = $row.data('account')
-    var $accountDetails = renderAccountDetails(account)
+    var subscriber = $row.data('subscriber')
+    var $subscriberDetails = renderSubscriberDetails(subscriber)
 
-    bindEventHandlers($accountDetails, account)
+    bindEventHandlers($subscriberDetails, subscriber)
 
-    $row.addClass('selected').after($accountDetails)
-    updateLocationHash(account._id)
-    $accountDetails.slideDown()
+    $row.addClass('selected').after($subscriberDetails)
+    updateLocationHash(subscriber._id)
+    $subscriberDetails.slideDown()
   }
 
-  function bindEventHandlers($e, account) {
+  function bindEventHandlers($e, subscriber) {
     $e.submit(function(event) {
       event.preventDefault()
 
-      var accountData = {
+      var subscriberData = {
         name: findInput('name').val(),
         emailAddresses: findInput('emails').select2('data').map(function(select2Pair) { return select2Pair.text }),
         yTunnus: findInput('yTunnus').val(),
@@ -64,8 +64,8 @@ function accountManagementPage() {
         users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair)
       }
 
-      $.post('/accounts/' + account._id, JSON.stringify(accountData), function(account) {
-        $accounts.find('.result.selected').replaceWith(renderAccount(account))
+      $.post('/accounts/' + subscriber._id, JSON.stringify(subscriberData), function(subscriber) {
+        $subscribers.find('.result.selected').replaceWith(renderSubscriber(subscriber))
         closeDetails()
       })
 
@@ -105,25 +105,25 @@ function accountManagementPage() {
   }
 
   function closeDetails() {
-    $accounts.find('.result.selected').removeClass('selected')
-    $accounts.find('.account-details').slideUp(function() { $(this).remove() })
+    $subscribers.find('.result.selected').removeClass('selected')
+    $subscribers.find('.subscriber-details').slideUp(function() { $(this).remove() })
     updateLocationHash('')
   }
 
-  function updateLocationHash(accountId) {
-    location.hash = '#tilaajat/' + accountId
+  function updateLocationHash(subscriberId) {
+    location.hash = '#tilaajat/' + subscriberId
   }
 
-  function renderAccounts(accounts) {
-    $accounts.empty()
-    _(accounts).sortBy('name').map(renderAccount).forEach(function(acc) { $accounts.append(acc) })
+  function renderSubscribers(subscribers) {
+    $subscribers.empty()
+    _(subscribers).sortBy('name').map(renderSubscriber).forEach(function(acc) { $subscribers.append(acc) })
   }
 
-  function renderAccount(account) {
-    return $('<div>', { class: 'result', 'data-id': account._id })
-      .data('account', account)
-      .append($('<span>', { class: 'name' }).text(account.name))
-      .append($('<span>', { class: 'roles' }).html(renderRoles(account.roles)))
+  function renderSubscriber(subscriber) {
+    return $('<div>', { class: 'result', 'data-id': subscriber._id })
+      .data('subscriber', subscriber)
+      .append($('<span>', { class: 'name' }).text(subscriber.name))
+      .append($('<span>', { class: 'roles' }).html(renderRoles(subscriber.roles)))
   }
 
   function renderRoles(roles) {
@@ -136,8 +136,8 @@ function accountManagementPage() {
     return $page.find('.filters input').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
   }
 
-  function renderAccountDetails(account) {
-    var $detailTemplate = $('#templates').find('.account-details').clone()
+  function renderSubscriberDetails(subscriber) {
+    var $detailTemplate = $('#templates').find('.subscriber-details').clone()
 
     var $classifiers = $detailTemplate.find('input[name=classifiers]')
 
@@ -156,19 +156,19 @@ function accountManagementPage() {
       fromOption: select2OptionToIdUsernamePair
     })
 
-    $classifiers.trigger('setVal', account.users).end()
+    $classifiers.trigger('setVal', subscriber.users).end()
 
     $detailTemplate
-      .find('input[name=name]').val(account.name).end()
-      .find('input[name=yTunnus]').val(account.yTunnus).end()
-      .find('input[name=street]').val(account.address.street).end()
-      .find('input[name=zip]').val(account.address.zip).end()
-      .find('input[name=city]').val(account.address.city).end()
-      .find('input[name=country]').val(account.address.country).end()
-      .find('input[name=contactName]').val(account.contactName).end()
-      .find('input[name=phoneNumber]').val(account.phoneNumber).end()
-      .find('input[name=emails]').val(account.emailAddresses).select2({
-        tags: account.emailAddresses,
+      .find('input[name=name]').val(subscriber.name).end()
+      .find('input[name=yTunnus]').val(subscriber.yTunnus).end()
+      .find('input[name=street]').val(subscriber.address.street).end()
+      .find('input[name=zip]').val(subscriber.address.zip).end()
+      .find('input[name=city]').val(subscriber.address.city).end()
+      .find('input[name=country]').val(subscriber.address.country).end()
+      .find('input[name=contactName]').val(subscriber.contactName).end()
+      .find('input[name=phoneNumber]').val(subscriber.phoneNumber).end()
+      .find('input[name=emails]').val(subscriber.emailAddresses).select2({
+        tags: subscriber.emailAddresses,
         multiple: true
       }).end()
 

@@ -38,7 +38,8 @@ function subscriberManagementPage() {
     var $newSubscriberForm = renderNewSubscriberForm()
 
     bindEventHandlers($newSubscriberForm, function(subscriberData) {
-      subscriberData.roles = [ 'Subscriber' ]
+      subscriberData.roles = $newSubscriberForm.find('input[name=roles]')
+        .filter(':checked').map(function() { return $(this).val() }).toArray()
 
       $.post('/accounts/', JSON.stringify(subscriberData), function(subscriber) {
         $subscribers.find('.result.selected').data('subscriber', subscriber)
@@ -49,6 +50,18 @@ function subscriberManagementPage() {
       })
     })
 
+    $newSubscriberForm.find('input[name=roles]').on('change', function() {
+      var $roles = $newSubscriberForm.find('input[name=roles]')
+      if ($newSubscriberForm.find('input[name=roles]:checked').length >= 1) {
+        $roles.get().forEach(function(e) { e.setCustomValidity('') })
+      } else {
+        $roles.get().forEach(function(e) { e.setCustomValidity('You must choose at least one role') })
+      }
+    })
+
+    // This triggers validation for roles checkboxes, which are by default invalid
+    $newSubscriberForm.find('input[name=roles]').trigger('change')
+
     closeDetails()
     $subscribers.addClass('selected').prepend($newSubscriberForm)
     $newSubscriberForm.slideDown()
@@ -57,6 +70,8 @@ function subscriberManagementPage() {
   function openDetails($row) {
     var subscriber = $row.data('subscriber')
     var $subscriberDetails = renderSubscriberDetails(subscriber)
+
+    $subscriberDetails.find('.new-only').remove()
 
     bindEventHandlers($subscriberDetails, function(subscriberData) {
       $.post('/accounts/' + subscriber._id, JSON.stringify(subscriberData), function(subscriber) {

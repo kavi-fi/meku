@@ -128,7 +128,11 @@ function subscriberManagementPage() {
           zip: findInput('zip').val(),
           country: findInput('country').val()
         },
-        billing: {},
+        billing: {
+          invoiceText: $e.find('textarea[name=invoiceText]').val(),
+          language: findInput('billingLanguage').val()
+        },
+        eInvoice: {},
         contactName: findInput('contactName').val(),
         phoneNumber: findInput('phoneNumber').val(),
         users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair)
@@ -240,7 +244,8 @@ function subscriberManagementPage() {
   function renderSubscriberDetails(subscriber) {
     var $detailTemplate = renderSubscriberTemplate()
     var address = subscriber.address || false
-    var billingAddress = subscriber.billing && subscriber.billing.address || false
+    var billing = subscriber.billing || {}
+    var billingAddress = billing.address || false
     var eInvoice = subscriber.eInvoice || false
     var extraBillingType = eInvoice ? 'eInvoice' : 'address'
 
@@ -266,6 +271,8 @@ function subscriberManagementPage() {
       .find('input[name=operator]').val(eInvoice.operator).end()
       .find('input[name=billing-extra]').prop('checked', eInvoice || billingAddress).end()
       .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
+      .find('textarea[name=invoiceText]').val(billing.invoiceText).end()
+      .find('input[name=billingLanguage]').val(billing.language).end()
 
     toggleBillingExtra($detailTemplate)
 

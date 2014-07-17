@@ -470,6 +470,12 @@ enums.legacyProgramTypes = {
   '12': 0       // 'Muu kuvaohjelma' -> unknown
 }
 
+enums.billingLanguages = {
+  'FI': 'Suomi',
+  'SV': 'Ruotsi',
+  'EN': 'Englanti'
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = enums
 }

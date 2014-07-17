@@ -272,7 +272,9 @@ function subscriberManagementPage() {
       .find('input[name=billing-extra]').prop('checked', eInvoice || billingAddress).end()
       .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
       .find('textarea[name=invoiceText]').val(billing.invoiceText).end()
-      .find('input[name=billingLanguage]').val(billing.language).end()
+      .find('input[name=billingLanguage]').val(billing.language).select2({
+        data: getSelect2EnumDataFromKeyValMap(enums.billingLanguages)
+      }).end()
 
     toggleBillingExtra($detailTemplate)
 
@@ -302,7 +304,15 @@ function subscriberManagementPage() {
       fromOption: select2OptionToIdUsernamePair
     })
 
+    $detailTemplate.find('input[name=billingLanguage]').select2({
+      data: getSelect2EnumDataFromKeyValMap(enums.billingLanguages)
+    })
+
     return $detailTemplate
+  }
+
+  function getSelect2EnumDataFromKeyValMap(keyValMap) {
+    return Object.keys(keyValMap).map(function(key) { return { id: key, text: keyValMap[key] } })
   }
 
   function renderNewSubscriberForm() {

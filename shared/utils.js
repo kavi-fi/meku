@@ -70,6 +70,14 @@ utils.asDate = function (date) {
   return date ? moment(date).format(df) : ''
 }
 
+utils.getProperty = function(obj, prop) {
+  var path = prop.split('.')
+  // Retrieve nested properties like object.billing.address
+  return _.reduce(path, function(res, pathElement) {
+    return _.has(res, pathElement) ? res[pathElement] : undefined
+  }, obj)
+}
+
 if (isNodeJs()) module.exports = utils
 
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

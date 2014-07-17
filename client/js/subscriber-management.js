@@ -41,7 +41,7 @@ function subscriberManagementPage() {
   })
 
   $page.find('button[name=new-subscriber]').on('click', function() {
-    var $newSubscriberForm = renderNewSubscriberForm()
+    var $newSubscriberForm = renderSubscriberDetails({})
 
     $newSubscriberForm.find('.modify-only').remove()
 
@@ -80,10 +80,7 @@ function subscriberManagementPage() {
     var $subscriberDetails = renderSubscriberDetails(subscriber)
 
     $subscriberDetails.find('.new-only').remove()
-
-    if (!utils.hasRole(user, 'root')) {
-      $subscriberDetails.find('button[name=remove]').remove()
-    }
+    $subscriberDetails.find('button[name=remove]').toggle(utils.hasRole(user, 'root'))
 
     bindEventHandlers($subscriberDetails, function(subscriberData) {
       $.post('/accounts/' + subscriber._id, JSON.stringify(subscriberData), function(subscriber) {
@@ -92,30 +89,15 @@ function subscriberManagementPage() {
       })
     })
 
-    $subscriberDetails.find('button[name=remove]').click(function() {
-      var $selected = $page.find('.result.selected')
-      var subscriber = $selected.data('subscriber')
-      showDialog($('#templates').find('.remove-subscriber-dialog').clone()
-        .find('.subscriber-name').text(subscriber.name).end()
-        .find('button[name=remove]').click(removeSubscriber).end()
-        .find('button[name=cancel]').click(closeDialog).end())
-
-      function removeSubscriber() {
-        $.ajax('/accounts/' + subscriber._id, { type: 'DELETE' }).done(function() {
-          closeDialog()
-          closeDetails()
-          $selected.slideUp(function() { $(this).remove() })
-        })
-      }
-    })
-
     $row.addClass('selected').after($subscriberDetails)
     updateLocationHash(subscriber._id)
     $subscriberDetails.slideDown()
   }
 
-  function bindEventHandlers($e, submitCallback) {
-    $e.submit(function(event) {
+  function bindEventHandlers($subscriberDetails, submitCallback) {
+    var $form = $subscriberDetails.find('form')
+
+    $form.submit(function(event) {
       event.preventDefault()
 
       var subscriberData = {
@@ -129,16 +111,16 @@ function subscriberManagementPage() {
           country: findInput('country').val()
         },
         billing: {
-          invoiceText: $e.find('textarea[name=invoiceText]').val(),
+          invoiceText: $form.find('textarea[name=invoiceText]').val(),
           language: findInput('billingLanguage').val()
         },
         eInvoice: {},
         contactName: findInput('contactName').val(),
         phoneNumber: findInput('phoneNumber').val(),
-        users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair)
+        users: findInput('classifiers').select2('data').map(select2OptionToIdNamePair)
       }
-      if ($e.find('input[name=billing-extra]').prop('checked')) {
-        var extraBillingType = $e.find('input[name=billing-extra-type]:checked').val()
+      if ($form.find('input[name=billing-extra]').prop('checked')) {
+        var extraBillingType = $form.find('input[name=billing-extra-type]:checked').val()
         if (extraBillingType === 'address') {
           subscriberData.billing.address = {
             street: findInput('billing.street').val(),
@@ -157,15 +139,11 @@ function subscriberManagementPage() {
       submitCallback(subscriberData)
 
       function findInput(name) {
-        return $e.find('input[name="' + name + '"]')
+        return $subscriberDetails.find('input[name="' + name + '"]')
       }
     })
 
-    var $form = $e.find('form')
-
-    $form.find('input').on('blur', function() {
-      $(this).addClass('touched')
-    })
+    $form.find('input').on('blur', function() { $(this).addClass('touched') })
 
     $form.on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
 
@@ -189,24 +167,22 @@ function subscriberManagementPage() {
       }
     })
 
-    $form.find('input[name=billing-extra], input[name=billing-extra-type]').on('change click', function() {
-      toggleBillingExtra($form)
+    $subscriberDetails.find('button[name=remove]').click(function() {
+      var $selected = $page.find('.result.selected')
+      var subscriber = $selected.data('subscriber')
+      showDialog($('#templates').find('.remove-subscriber-dialog').clone()
+        .find('.subscriber-name').text(subscriber.name).end()
+        .find('button[name=remove]').click(removeSubscriber).end()
+        .find('button[name=cancel]').click(closeDialog).end())
+
+      function removeSubscriber() {
+        $.ajax('/accounts/' + subscriber._id, { type: 'DELETE' }).done(function() {
+          closeDialog()
+          closeDetails()
+          $selected.slideUp(function() { $(this).remove() })
+        })
+      }
     })
-
-  }
-
-  function toggleBillingExtra($form) {
-    var extraBillingEnabled = $form.find('input[name=billing-extra]').prop('checked')
-    $form.find('.billing-extra-fields input').prop('disabled', !extraBillingEnabled)
-
-    if (extraBillingEnabled) {
-      var type = $form.find('input[name=billing-extra-type]:checked').val()
-      var $addressInputs = $form.find('.billing-extra-fields .billing-address input')
-      var $eInvoiceInputs = $form.find('.billing-extra-fields .eInvoice input')
-
-      $addressInputs.prop('disabled', type === 'eInvoice')
-      $eInvoiceInputs.prop('disabled', type === 'address')
-    }
   }
 
   function closeDetails() {
@@ -229,12 +205,11 @@ function subscriberManagementPage() {
       .data('subscriber', subscriber)
       .append($('<span>', { class: 'name' }).text(subscriber.name))
       .append($('<span>', { class: 'roles' }).html(renderRoles(subscriber.roles)))
-  }
 
-  function renderRoles(roles) {
-    if (_.isEmpty(roles)) return '<i class="icon-warning-sign"></i>'
-
-    return _.map(roles, function(role) { return enums.roles[role] }).join(', ')
+    function renderRoles(roles) {
+      if (_.isEmpty(roles)) return '<i class="icon-warning-sign"></i>'
+      return _.map(roles, function(role) { return enums.roles[role] }).join(', ')
+    }
   }
 
   function currentFilters() {
@@ -242,92 +217,71 @@ function subscriberManagementPage() {
   }
 
   function renderSubscriberDetails(subscriber) {
-    var $detailTemplate = renderSubscriberTemplate()
+    var $subscriberDetails = $('#templates').find('.subscriber-details').clone()
     var address = subscriber.address || false
     var billing = subscriber.billing || {}
     var billingAddress = billing.address || false
     var eInvoice = subscriber.eInvoice || false
     var extraBillingType = eInvoice ? 'eInvoice' : 'address'
 
-    $detailTemplate
+    $subscriberDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, subscriber))
+
+    $subscriberDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
+
+    select2Autocomplete({
+      $el: $subscriberDetails.find('input[name=classifiers]'),
+      path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
+      multiple: true,
+      toOption: accountToSelect2Option,
+      fromOption: select2OptionToIdNamePair
+    })
+
+    $subscriberDetails
       .find('input[name=classifiers]').trigger('setVal', subscriber.users).end()
-      .find('input[name=name]').val(subscriber.name).end()
-      .find('input[name=yTunnus]').val(subscriber.yTunnus).end()
-      .find('input[name=street]').val(address.street).end()
-      .find('input[name=zip]').val(address.zip).end()
-      .find('input[name=city]').val(address.city).end()
-      .find('input[name=country]').select2('val', address.country).end()
-      .find('input[name=contactName]').val(subscriber.contactName).end()
-      .find('input[name=phoneNumber]').val(subscriber.phoneNumber).end()
-      .find('input[name=emails]').select2('val', subscriber.emailAddresses).end()
-      .find('input[name="billing.street"]').val(billingAddress.street).end()
-      .find('input[name="billing.zip"]').val(billingAddress.zip).end()
-      .find('input[name="billing.city"]').val(billingAddress.city).end()
-      .find('input[name="billing.country"]').select2('val', billingAddress.country).end()
-      .find('input[name="eInvoice.address"]').val(eInvoice.address).end()
-      .find('input[name=operator]').val(eInvoice.operator).end()
+      .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
+      .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
+      .find('input[name="billing.address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=billing-extra]').prop('checked', eInvoice || billingAddress).end()
       .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
-      .find('textarea[name=invoiceText]').val(billing.invoiceText).end()
-      .find('input[name=billingLanguage]').select2('val', billing.language).end()
+      .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
 
-    toggleBillingExtra($detailTemplate)
+    toggleBillingExtra($subscriberDetails)
 
-    return $detailTemplate
+    return $subscriberDetails
+
+    function setInputValWithProperty(object) {
+      var name = $(this).attr('name')
+      var property = utils.getProperty(object, name)
+      if (property !== undefined) $(this).val(property)
+    }
+
+    function accountToSelect2Option(account) {
+      if (!account) return null
+      return {
+        id: account._id,
+        text: account.name + (account.username ? ' (' + account.username + ')' : ''),
+        name: account.username ? account.username : account.name
+      }
+    }
+
+    function toggleBillingExtra() {
+      var extraBillingEnabled = $subscriberDetails.find('input[name=billing-extra]').prop('checked')
+      $subscriberDetails.find('.billing-extra-fields input').prop('disabled', !extraBillingEnabled)
+
+      if (extraBillingEnabled) {
+        var type = $subscriberDetails.find('input[name=billing-extra-type]:checked').val()
+        var $addressInputs = $subscriberDetails.find('.billing-extra-fields .billing-address input')
+        var $eInvoiceInputs = $subscriberDetails.find('.billing-extra-fields .eInvoice input')
+
+        $addressInputs.prop('disabled', type === 'eInvoice')
+        $eInvoiceInputs.prop('disabled', type === 'address')
+      }
+    }
   }
 
-  function select2OptionToIdUsernamePair(x) {
+  function select2OptionToIdNamePair(x) {
     if (!x) return null
     return { _id: x.id, name: x.name }
   }
 
-  function renderSubscriberTemplate() {
-    var $detailTemplate = $('#templates').find('.subscriber-details').clone()
-
-    select2Autocomplete({
-      $el: $detailTemplate.find('input[name=classifiers]'),
-      path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
-      multiple: true,
-      toOption: function(x) {
-        if (!x) return null
-        return {
-          id: x._id,
-          text: x.name + (x.username ? ' (' + x.username + ')' : ''),
-          name: x.username ? x.username : x.name
-        }
-      },
-      fromOption: select2OptionToIdUsernamePair
-    })
-
-    $detailTemplate.find('input[name=emails]').select2({
-      tags: [],
-      multiple: true
-    }).end()
-
-    $detailTemplate.find('input[name=billingLanguage]').select2({
-      data: select2DataFromEnumObject(enums.billingLanguages)
-    })
-
-    $detailTemplate.find('input[name=country]').select2({
-      data: select2DataFromEnumObject(enums.countries)
-    })
-
-    $detailTemplate.find('input[name="billing.country"]').select2({
-      data: select2DataFromEnumObject(enums.countries)
-    })
-
-    return $detailTemplate
-  }
-
-  function select2DataFromEnumObject(object) {
-    return _.map(object, function(value, key) { return { id: key, text: value }})
-  }
-
-  function renderNewSubscriberForm() {
-    var $detailTemplate = renderSubscriberTemplate()
-
-    toggleBillingExtra($detailTemplate)
-
-    return $detailTemplate
-  }
 }

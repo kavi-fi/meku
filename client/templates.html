@@ -219,17 +219,17 @@
     <label>Y-tunnus <input type="text" name="yTunnus" required></label>
 
     <div class="address">
-      <label>Lähiosoite <input type="text" name="street" required></label>
-      <label>Postinumero <input type="text" name="zip" required></label>
-      <label>Kaupunki <input type="text" name="city" required></label>
-      <label>Maa <input type="text" name="country" required></label>
+      <label>Lähiosoite <input type="text" name="address.street" required></label>
+      <label>Postinumero <input type="text" name="address.zip" required></label>
+      <label>Kaupunki <input type="text" name="address.city" required></label>
+      <label>Maa <input type="text" name="address.country" required></label>
     </div>
 
     <label>Yhteyshenkilö <input type="text" name="contactName"></label>
 
     <label>Puhelinnumero <input type="text" name="phoneNumber" required></label>
 
-    <label class="emails">Sähköpostit <input type="text" name="emails" required multiple class="required"></label>
+    <label class="emails">Sähköpostit <input type="text" name="emailAddresses" required multiple class="required"></label>
 
     <div class="billing-extra">
       <label class="full"><input type="checkbox" name="billing-extra"> Laskutus eri osoitteeseen tai verkkolaskulla</label>
@@ -237,22 +237,22 @@
       <div class="billing-extra-fields">
         <label class="full"><input type="radio" name="billing-extra-type" value="address" checked> Eri laskutusosoite</label>
         <div class="billing-address">
-          <label>Lähiosoite <input type="text" name="billing.street" required></label>
-          <label>Postinumero <input type="text" name="billing.zip" required></label>
-          <label>Kaupunki <input type="text" name="billing.city" required></label>
-          <label>Maa <input type="text" name="billing.country" required></label>
+          <label>Lähiosoite <input type="text" name="billing.address.street" required></label>
+          <label>Postinumero <input type="text" name="billing.address.zip" required></label>
+          <label>Kaupunki <input type="text" name="billing.address.city" required></label>
+          <label>Maa <input type="text" name="billing.address.country" required></label>
         </div>
 
         <label class="full"><input type="radio" name="billing-extra-type" value="eInvoice"> Verkkolasku</label>
         <div class="eInvoice">
           <label>Osoite <input type="text" name="eInvoice.address" required></label>
-          <label>Välittäjätunnus <input type="text" name="operator" required></label>
+          <label>Välittäjätunnus <input type="text" name="eInvoice.operator" required></label>
         </div>
       </div>
     </div>
 
-    <label class="top">Laskutuskieli <input type="text" name="billingLanguage"></label>
-    <label class="double">Laskulle haluttava teksti <textarea name="invoiceText"></textarea></label>
+    <label class="top">Laskutuskieli <input type="text" name="billing.language"></label>
+    <label class="double">Laskulle haluttava teksti <textarea name="billing.invoiceText"></textarea></label>
 
     <label class="full">Luokittelijat <input type="text" name="classifiers"></label>
   </form>

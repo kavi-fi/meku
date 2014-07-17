@@ -43,6 +43,8 @@ function subscriberManagementPage() {
   $page.find('button[name=new-subscriber]').on('click', function() {
     var $newSubscriberForm = renderNewSubscriberForm()
 
+    $newSubscriberForm.find('.modify-only').remove()
+
     bindEventHandlers($newSubscriberForm, function(subscriberData) {
       subscriberData.roles = $newSubscriberForm.find('input[name=roles]')
         .filter(':checked').map(function() { return $(this).val() }).toArray()
@@ -79,11 +81,32 @@ function subscriberManagementPage() {
 
     $subscriberDetails.find('.new-only').remove()
 
+    if (!utils.hasRole(user, 'root')) {
+      $subscriberDetails.find('button[name=remove]').remove()
+    }
+
     bindEventHandlers($subscriberDetails, function(subscriberData) {
       $.post('/accounts/' + subscriber._id, JSON.stringify(subscriberData), function(subscriber) {
         $subscribers.find('.result.selected').replaceWith(renderSubscriber(subscriber))
         closeDetails()
       })
+    })
+
+    $subscriberDetails.find('button[name=remove]').click(function() {
+      var $selected = $page.find('.result.selected')
+      var subscriber = $selected.data('subscriber')
+      showDialog($('#templates').find('.remove-subscriber-dialog').clone()
+        .find('.subscriber-name').text(subscriber.name).end()
+        .find('button[name=remove]').click(removeSubscriber).end()
+        .find('button[name=cancel]').click(closeDialog).end())
+
+      function removeSubscriber() {
+        $.ajax('/accounts/' + subscriber._id, { type: 'DELETE' }).done(function() {
+          closeDialog()
+          closeDetails()
+          $selected.slideUp(function() { $(this).remove() })
+        })
+      }
     })
 
     $row.addClass('selected').after($subscriberDetails)

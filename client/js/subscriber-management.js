@@ -256,14 +256,14 @@ function subscriberManagementPage() {
       .find('input[name=street]').val(address.street).end()
       .find('input[name=zip]').val(address.zip).end()
       .find('input[name=city]').val(address.city).end()
-      .find('input[name=country]').val(address.country).end()
+      .find('input[name=country]').select2('val', address.country).end()
       .find('input[name=contactName]').val(subscriber.contactName).end()
       .find('input[name=phoneNumber]').val(subscriber.phoneNumber).end()
       .find('input[name=emails]').select2('val', subscriber.emailAddresses).end()
       .find('input[name="billing.street"]').val(billingAddress.street).end()
       .find('input[name="billing.zip"]').val(billingAddress.zip).end()
       .find('input[name="billing.city"]').val(billingAddress.city).end()
-      .find('input[name="billing.country"]').val(billingAddress.country).end()
+      .find('input[name="billing.country"]').select2('val', billingAddress.country).end()
       .find('input[name="eInvoice.address"]').val(eInvoice.address).end()
       .find('input[name=operator]').val(eInvoice.operator).end()
       .find('input[name=billing-extra]').prop('checked', eInvoice || billingAddress).end()
@@ -306,6 +306,14 @@ function subscriberManagementPage() {
 
     $detailTemplate.find('input[name=billingLanguage]').select2({
       data: select2DataFromEnumObject(enums.billingLanguages)
+    })
+
+    $detailTemplate.find('input[name=country]').select2({
+      data: select2DataFromEnumObject(enums.countries)
+    })
+
+    $detailTemplate.find('input[name="billing.country"]').select2({
+      data: select2DataFromEnumObject(enums.countries)
     })
 
     return $detailTemplate

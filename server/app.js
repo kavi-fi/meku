@@ -352,6 +352,7 @@ app.get('/series/search/:query', function(req, res, next) {
 })
 
 app.post('/accounts/:id', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
   Account.findByIdAndUpdate(req.params.id, req.body, function(err, account) {
     if (err) return next(err)
     account.save(respond(res, next))
@@ -359,6 +360,7 @@ app.post('/accounts/:id', function(req, res, next) {
 })
 
 app.post('/accounts', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
   new Account(req.body).save(respond(res, next))
 })
 

@@ -259,10 +259,7 @@ function subscriberManagementPage() {
       .find('input[name=country]').val(address.country).end()
       .find('input[name=contactName]').val(subscriber.contactName).end()
       .find('input[name=phoneNumber]').val(subscriber.phoneNumber).end()
-      .find('input[name=emails]').val(subscriber.emailAddresses).select2({
-        tags: subscriber.emailAddresses,
-        multiple: true
-      }).end()
+      .find('input[name=emails]').select2('val', subscriber.emailAddresses).end()
       .find('input[name="billing.street"]').val(billingAddress.street).end()
       .find('input[name="billing.zip"]').val(billingAddress.zip).end()
       .find('input[name="billing.city"]').val(billingAddress.city).end()
@@ -272,9 +269,7 @@ function subscriberManagementPage() {
       .find('input[name=billing-extra]').prop('checked', eInvoice || billingAddress).end()
       .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
       .find('textarea[name=invoiceText]').val(billing.invoiceText).end()
-      .find('input[name=billingLanguage]').val(billing.language).select2({
-        data: getSelect2EnumDataFromKeyValMap(enums.billingLanguages)
-      }).end()
+      .find('input[name=billingLanguage]').select2('val', billing.language).end()
 
     toggleBillingExtra($detailTemplate)
 
@@ -304,24 +299,24 @@ function subscriberManagementPage() {
       fromOption: select2OptionToIdUsernamePair
     })
 
+    $detailTemplate.find('input[name=emails]').select2({
+      tags: [],
+      multiple: true
+    }).end()
+
     $detailTemplate.find('input[name=billingLanguage]').select2({
-      data: getSelect2EnumDataFromKeyValMap(enums.billingLanguages)
+      data: select2DataFromEnumObject(enums.billingLanguages)
     })
 
     return $detailTemplate
   }
 
-  function getSelect2EnumDataFromKeyValMap(keyValMap) {
-    return Object.keys(keyValMap).map(function(key) { return { id: key, text: keyValMap[key] } })
+  function select2DataFromEnumObject(object) {
+    return _.map(object, function(value, key) { return { id: key, text: value }})
   }
 
   function renderNewSubscriberForm() {
     var $detailTemplate = renderSubscriberTemplate()
-
-    $detailTemplate.find('input[name=emails]').select2({
-      tags: [],
-      multiple: true
-    }).end()
 
     toggleBillingExtra($detailTemplate)
 

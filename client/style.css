@@ -651,8 +651,8 @@ textarea.invalid:disabled,
 #user-management-page .new-user { width: 340px; }
 #user-management-page .new-user button { margin-left: 15px; }
 
-.remove-user-dialog { width: 300px; margin: 0 auto; }
-.remove-user-dialog .buttons { display: -webkit-flex; display: flex; width: 100%;  -webkit-justify-content: space-around; justify-content: space-around; }
+.remove-dialog { width: 300px; margin: 0 auto; }
+.remove-dialog .buttons { display: -webkit-flex; display: flex; width: 100%;  -webkit-justify-content: space-around; justify-content: space-around; }
 
 .detail-box .form label { box-sizing: border-box; width: 266px; margin-right: 10px; }
 .detail-box .form label.double { width: 547px; box-sizing: border-box; }

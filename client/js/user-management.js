@@ -193,7 +193,7 @@ function userManagementPage() {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
     })
 
-    $detailTemplate.find('input').on('blur', function() {
+    $detailTemplate.find('input').on('blur select2-blur', function() {
       $(this).addClass('touched')
     })
 

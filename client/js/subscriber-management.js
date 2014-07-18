@@ -143,7 +143,11 @@ function subscriberManagementPage() {
       }
     })
 
-    $form.find('input').on('blur', function() { $(this).addClass('touched') })
+    $form.find('input').on('blur select2-blur', function() { $(this).addClass('touched') })
+
+    $form.find('input.select2-offscreen').on('change validate', function() {
+      $(this).toggleClass('invalid', !this.checkValidity())
+    })
 
     $form.on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
 
@@ -151,16 +155,14 @@ function subscriberManagementPage() {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
     })
 
-    $form.find('input[name=emails]').on('change', function(event) {
-      $(this).addClass('touched')
+    $form.find('input[name=emailAddresses]').on('change', function(event) {
       var emails = event.val
       if (!_.isEmpty(emails) && _.all(emails, validateEmail)) {
         this.setCustomValidity('')
-        $(this).removeClass('invalid')
       } else {
         this.setCustomValidity('Invalid email')
-        $(this).addClass('invalid')
       }
+      $(this).trigger('validate')
 
       function validateEmail(email) {
         return new RegExp('.+@.+\\..+').test(email)

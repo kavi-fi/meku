@@ -102,9 +102,7 @@ function subscriberManagementPage() {
 
       var subscriberData = {
         name: findInput('name').val(),
-        emailAddresses: findInput('emailAddresses').select2('data').map(function(select2Pair) {
-          return select2Pair.text
-        }),
+        emailAddresses: _.pluck(findInput('emailAddresses').select2('data'), 'text'),
         yTunnus: findInput('yTunnus').val(),
         address: {
           street: findInput('address.street').val(),

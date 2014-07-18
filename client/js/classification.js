@@ -6,13 +6,19 @@ function classificationPage() {
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
   var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
+  var editMode
 
   renderClassificationCriteria()
 
   var $throttledAutoSaveFields = $form.find('input[type=text], input[type=number], textarea').not('[name="registration-email"]')
 
-  $root.on('show', function(e, programId) {
-    if (programId) {
+  $root.on('show', function(e, programId, edit) {
+   editMode = false
+    if (edit) {
+      location.hash = '#luokittelu/'+programId+'/edit'
+      editMode = true
+      $.get('/programs/' + programId).done(show)
+    } else if (programId) {
       location.hash = '#luokittelu/'+programId
       $.get('/programs/' + programId).done(show)
     } else if ($form.data('id')) {
@@ -362,11 +368,15 @@ function classificationPage() {
   }
 
   function saveProgramField(id, field, value) {
-    field = field.replace(/^classifications\.0/, 'draftClassifications.'+user._id)
-    $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(program) {
-      updateSummary(program)
-      preview.update(program)
-    })
+    if (editMode) {
+      // todo: save fields somewhere to be saved until save-button is clicked
+    } else {
+      field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
+      $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {
+        updateSummary(program)
+        preview.update(program)
+      })
+    }
   }
 
   function updateSummary(program) {
@@ -485,6 +495,7 @@ function classificationPage() {
   }
 
   function draftClassification(program) {
+    if (editMode) return program.classifications[0]
     return program.draftClassifications[user._id]
   }
 }

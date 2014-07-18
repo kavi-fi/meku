@@ -101,6 +101,10 @@ function internalSearchPage() {
     $(this).hide()
   })
 
+  $results.on('click', 'button.edit', function() {
+    showClassificationEditPage($(this).parents('.program-box').data('id'))
+  })
+
   function loadDrafts() {
     $drafts.find('.draft').remove()
     $.get('/programs/drafts', function(drafts) {
@@ -153,11 +157,18 @@ function internalSearchPage() {
       $detail.find('button.reclassify').toggle(!!canReclassify)
       $detail.find('button.categorize').hide()
     }
+
+    $detail.find('button.edit').toggle(hasRole('root'))
   }
 
   function showClassificationPage(programId) {
     $('body').children('.page').hide()
     $('#classification-page').trigger('show', programId).show()
+  }
+
+  function showClassificationEditPage(programId) {
+    $('body').children('.page').hide()
+    $('#classification-page').trigger('show', [programId, 'edit']).show()
   }
 
   function showCategorizationForm(id) {

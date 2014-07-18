@@ -220,11 +220,8 @@ function subscriberManagementPage() {
 
   function renderSubscriberDetails(subscriber) {
     var $subscriberDetails = $('#templates').find('.subscriber-details').clone()
-    subscriber = subscriber || {}
-    var address = subscriber.address || {}
-    var billing = subscriber.billing || {}
-    var billingAddress = billing.address || {}
-    var eInvoice = subscriber.eInvoice || {}
+    var eInvoice = utils.getProperty(subscriber, 'eInvoice')
+    var billingAddress = utils.getProperty(subscriber, 'billing.address')
     var extraBillingType = _.isEmpty(billingAddress) ? 'eInvoice' : 'address'
 
     $subscriberDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, subscriber))

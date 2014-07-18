@@ -150,6 +150,8 @@ function subscriberManagementPage() {
       $(this).toggleClass('invalid', !this.checkValidity())
     })
 
+    $form.find('input.select2-offscreen').trigger('validate')
+
     $form.on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
 
     $form.on('validate', function() {

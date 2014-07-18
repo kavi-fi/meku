@@ -102,17 +102,19 @@ function subscriberManagementPage() {
 
       var subscriberData = {
         name: findInput('name').val(),
-        emailAddresses: findInput('emails').select2('data').map(function(select2Pair) { return select2Pair.text }),
+        emailAddresses: findInput('emailAddresses').select2('data').map(function(select2Pair) {
+          return select2Pair.text
+        }),
         yTunnus: findInput('yTunnus').val(),
         address: {
-          street: findInput('street').val(),
-          city: findInput('city').val(),
-          zip: findInput('zip').val(),
-          country: findInput('country').val()
+          street: findInput('address.street').val(),
+          city: findInput('address.city').val(),
+          zip: findInput('address.zip').val(),
+          country: findInput('address.country').val()
         },
         billing: {
-          invoiceText: $form.find('textarea[name=invoiceText]').val(),
-          language: findInput('billingLanguage').val()
+          invoiceText: $form.find('textarea[name="billing.invoiceText"]').val(),
+          language: findInput('billing.language').val()
         },
         eInvoice: {},
         contactName: findInput('contactName').val(),
@@ -123,15 +125,15 @@ function subscriberManagementPage() {
         var extraBillingType = $form.find('input[name=billing-extra-type]:checked').val()
         if (extraBillingType === 'address') {
           subscriberData.billing.address = {
-            street: findInput('billing.street').val(),
-            city: findInput('billing.city').val(),
-            zip: findInput('billing.zip').val(),
-            country: findInput('billing.country').val()
+            street: findInput('billing.address.street').val(),
+            city: findInput('billing.address.city').val(),
+            zip: findInput('billing.address.zip').val(),
+            country: findInput('billing.address.country').val()
           }
         } else if (extraBillingType === 'eInvoice') {
           subscriberData.eInvoice = {
             address: findInput('eInvoice.address').val(),
-            operator: findInput('operator').val()
+            operator: findInput('eInvoice.operator').val()
           }
         }
       }

@@ -237,7 +237,7 @@ function subscriberManagementPage() {
     })
 
     $subscriberDetails
-      .find('input[name=classifiers]').trigger('setVal', subscriber.users).end()
+      .find('input[name=classifiers]').trigger('setVal', utils.getProperty(subscriber, 'users')).end()
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
       .find('input[name="billing.address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()

@@ -16,6 +16,10 @@ function userManagementPage() {
     $userList.empty()
     $.get('/users?' + $.param({ filters: currentFilters() }), function(users) {
       renderUsers(users)
+
+      // Apply username search
+      $userNameQuery.trigger('input')
+
       if (userId) {
         var $selected = $userList.find('.result[data-id=' + userId + ']')
         openDetails($selected)
@@ -54,9 +58,10 @@ function userManagementPage() {
         $(this).hide()
       }
     })
+    closeDetails()
   })
 
-  $('.filters').change(function() { $page.trigger('show') })
+  $page.find('.filters').change(function() { $page.trigger('show') })
 
   function updateLocationHash(userId) {
     location.hash = '#kayttajat/' + userId
@@ -188,7 +193,7 @@ function userManagementPage() {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
     })
 
-    $detailTemplate.find('input').on('blur', function() {
+    $detailTemplate.find('input').on('blur select2-blur', function() {
       $(this).addClass('touched')
     })
 

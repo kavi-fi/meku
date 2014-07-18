@@ -79,7 +79,7 @@ enums.roles = {
   'Location_of_providing': 'Tarjoamispaikka',
   'Subscriber': 'Tilaaja',
   'Classifier': 'Luokittelija',
-  'Distributor': 'Levittaja',
+  'Distributor': 'Levittäjä',
   'Other': 'Muu'
 }
 
@@ -468,6 +468,12 @@ enums.legacyProgramTypes = {
   '10': 0,      // 'Yhteistuotanto' -> unknown
   // '11': 0,   // 'PEGI hyväksytty peli' -> pegi-game (disabled)
   '12': 0       // 'Muu kuvaohjelma' -> unknown
+}
+
+enums.billingLanguages = {
+  'FI': 'Suomi',
+  'SV': 'Ruotsi',
+  'EN': 'Englanti'
 }
 
 if (typeof module !== 'undefined' && module.exports) {

@@ -351,15 +351,44 @@ app.get('/series/search/:query', function(req, res, next) {
   })
 })
 
+app.put('/accounts/:id', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+  Account.findByIdAndUpdate(req.params.id, req.body, function(err, account) {
+    if (err) return next(err)
+    account.save(respond(res, next))
+  })
+})
+
+app.post('/accounts', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+  new Account(req.body).save(respond(res, next))
+})
+
+app.delete('/accounts/:id', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+  Account.findByIdAndRemove(req.params.id, respond(res, next))
+})
+
+app.get('/accounts', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+  var selectedRoles = req.query.roles
+  Account.find(selectedRoles ? { roles: { $all: selectedRoles }} : {}, respond(res, next))
+})
+
+app.get('/subscribers', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+  var selectedRoles = req.query.roles
+  var query = _.isEmpty(selectedRoles)
+    ? { roles: { $in: ['Classifier', 'Subscriber'] }}
+    : { roles: { $all: selectedRoles }}
+  Account.find(query, respond(res, next))
+})
+
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }}
-  var userId = req.query.user_id
-
-  if (!userId && !utils.hasRole(req.user, 'kavi')) {
+  if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
-  } else if (userId) {
-    q['users._id'] = userId
   }
 
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
@@ -373,6 +402,11 @@ app.get('/accounts/:id', function(req, res, next) {
 app.get('/users', function(req, res, next) {
   var roleFilters = req.query.filters
   User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
+})
+
+app.get('/users/search', function(req, res, next) {
+  var q = { name: new RegExp("^" + utils.escapeRegExp(req.query.q), 'i') }
+  User.find(q).exec(respond(res, next))
 })
 
 app.delete('/users/:id', function(req, res, next) {

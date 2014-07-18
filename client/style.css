@@ -135,7 +135,7 @@ textarea { resize: vertical; }
 #header .user-info a { color: #00BB88; padding-left: 8px; }
 
 .row { border-bottom: 1px solid #D3D3D3; width: 100%; float: left; margin: 0; padding: 70px 0 80px 0; }
-.content { width: 940px; margin: 0 auto; padding: 0 10px; }
+.content { width: 940px; margin: 0 auto; }
 
 h1 { font-size: 24px; color: #00BB88; line-height: 30px; }
 h2 { font-size: 24px; color: #00BB88; line-height: 30px; }
@@ -151,14 +151,17 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 .box { border: 1px solid #D3D3D3; border-radius: 2px; padding: 20px; }
 
-.page { display: none; }
+.page { display: none; width: 940px; margin: 70px auto; }
 
-.result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; }
+.controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
+
+.result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; padding: 10px 0; }
 .result.inactive { color: #afafaf; }
 
-.search-label { display: block; padding: 0 0 20px 0; }
+.search-label { display: block; padding: 0 0 20px 0; width: 350px; }
 input.query { width: 350px; margin-top: 1px; }
 button.search { margin-left: 15px; }
+label.top { vertical-align: top; }
 
 #search-page .row { border-bottom: none; padding-bottom: 0; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }
@@ -187,11 +190,9 @@ button.search { margin-left: 15px; }
 #search-page .new-classification button { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 222px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
-#search-page .results { width: 940px; margin: 0 auto; padding: 0 10px; }
 #search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
-#search-page .result .series { padding-top: 10px; color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#search-page .result .items { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 10px 0; }
-#search-page .result .series ~ .items { padding: 0 0 10px 0; }
+#search-page .result .series { color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#search-page .result .items { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 #search-page .result .items > span:nth-child(1) { min-width: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 #search-page .result .items > span:nth-child(2) { flex-shrink: 800; padding: 0 14px; margin-right: auto; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 #search-page .result .items > span:nth-child(3) { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
@@ -235,7 +236,7 @@ button.search { margin-left: 15px; }
 #classification-page input[type=number] {
   width: 280px;
 }
-#classification-page .back-to-search { display: block; margin-top: -20px; margin-bottom: 20px; color: #00BB88; }
+#classification-page .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }
@@ -253,6 +254,7 @@ input[type=number],
 input[type=password],
 input[type=email],
 input[type=tel],
+input[type=search],
 textarea,
 .select2-container-multi .select2-choices,
 .select2-container .select2-choice {
@@ -270,6 +272,7 @@ input[type=number]:focus,
 input[type=password]:focus,
 input[type=email]:focus,
 input[type=tel]:focus,
+input[type=search]:focus,
 textarea:focus,
 .select2-container-active .select2-choices,
 .select2-container-active .select2-choice {
@@ -283,6 +286,7 @@ input[type=number],
 input[type=password],
 input[type=email],
 input[type=tel],
+input[type=search],
 textarea,
 .select2-container-multi .select2-choices .select2-search-field input {
   padding: 8px 10px !important;
@@ -308,7 +312,7 @@ textarea,
   line-height: 19px;
 }
 
-input, select, .select2-container  {
+input, select, .select2-container, textarea {
   margin: 0 0 15px 0;
 }
 
@@ -634,33 +638,41 @@ textarea.invalid:disabled,
 #billing-page .program-box-container { padding: 0 0 10px 0; }
 #billing-page .deselected td + td { opacity: 0.4; }
 
-#user-management-page { width: 940px; margin: 0 auto; padding: 70px 0; }
 #user-management-page .result { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
-#user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; padding: 10px 0; }
+#user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; }
 #user-management-page .result span:nth-child(2) { width: 200px; }
 #user-management-page .result span:nth-child(3) { width: 200px; }
 #user-management-page .result span.cert-end span.expires-soon { background: #ff9999; padding: 3px; border-radius: 5px; margin-left: -3px; }
 #user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
-#user-management-page .user-details label { box-sizing: border-box; width: 266px; margin-right: 10px; }
-#user-management-page .user-details label.double { width: 547px; box-sizing: border-box; }
-#user-management-page .user-details input:not(.select2-input) { margin-top: 4px; box-sizing: border-box; width: 100%; }
-#user-management-page .user-details .select2-container { margin-top: 4px; width: 100%; box-sizing: border-box; }
-#user-management-page .user-details input[type=checkbox] { width: 16px; }
-#user-management-page .user-details button { float: right; }
-#user-management-page .user-details button[name=remove] { margin-right: 15px; }
-#user-management-page .user-details .icon-spinner { margin-left: -20px; }
-#user-management-page .user-details .double-margin { margin-top: 18px; }
-#user-management-page .user-details textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
 #user-management-page .user-details label.employers { float: right; margin-right: 34px; }
-#user-management-page .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 #user-management-page .controls .select2-container { width: 222px; box-sizing: border-box; }
 #user-management-page .controls button { vertical-align: top; }
 
 #user-management-page .new-user { width: 340px; }
 #user-management-page .new-user button { margin-left: 15px; }
 
-.remove-user-dialog { width: 300px; margin: 0 auto; }
-.remove-user-dialog .buttons { display: -webkit-flex; display: flex; width: 100%;  -webkit-justify-content: space-around; justify-content: space-around; }
+.remove-dialog { width: 300px; margin: 0 auto; }
+.remove-dialog .buttons { display: -webkit-flex; display: flex; width: 100%;  -webkit-justify-content: space-around; justify-content: space-around; }
+
+.detail-box .form label { box-sizing: border-box; width: 266px; margin-right: 10px; }
+.detail-box .form label.double { width: 547px; box-sizing: border-box; }
+.detail-box .form input:not(.select2-input) { margin-top: 4px; box-sizing: border-box; width: 100%; }
+.detail-box .form .select2-container { margin-top: 4px; width: 100%; box-sizing: border-box; }
+.detail-box .form input[type=checkbox], .detail-box .form input[type=radio] { width: 16px; }
+.detail-box .form button { float: right; }
+.detail-box .form button[name=remove] { margin-right: 15px; }
+.detail-box .form .icon-spinner { margin-left: -20px; }
+.detail-box .form .double-margin { margin-top: 18px; }
+.detail-box .form textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
+
+#subscriber-management-page .result { display: -webkit-flex; display: flex; }
+#subscriber-management-page .result span { width: 50%; box-sizing: border-box; }
+#subscriber-management-page .subscriber-details .emails { float: right; margin-right: 34px; }
+#subscriber-management-page .subscriber-details .emails .select2-choices { overflow: auto; }
+#subscriber-management-page .subscriber-details .roles label { width: auto; }
+#subscriber-management-page label.full { width: 830px; }
+#subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
+#subscriber-management-page button[name=new-subscriber] { float: right; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

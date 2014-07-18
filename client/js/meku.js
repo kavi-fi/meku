@@ -79,6 +79,7 @@ function setup() {
   buyerPage()
   billingPage()
   userManagementPage()
+  subscriberManagementPage()
   navigation.start()
 }
 
@@ -308,3 +309,7 @@ function select2OptionToIdNamePair(x) {
 }
 
 function select2OptionToInt(x) { return parseInt(x.id) }
+
+function select2DataFromEnumObject(object) {
+  return _.map(object, function(value, key) { return { id: key, text: value }})
+}

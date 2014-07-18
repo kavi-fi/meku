@@ -112,6 +112,7 @@ Program.publicFields = {
   'classifications.authorOrganization': 0, 'classifications.reason': 0,
   'classifications.comments':0, 'classifications.criteriaComments':0
 }
+var address = { street: String, city: String, zip: String, country: String }
 
 var AccountSchema = new Schema({
   emekuId: String,
@@ -119,11 +120,14 @@ var AccountSchema = new Schema({
   name: {type: String, index: true},
   roles: [String],
   yTunnus: String,
-  billing: { street: String, city: String, zip: String, country: String, language: String, invoiceText: String }, // lang in [FI,SV,EN]
+  address: address,
+  billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
   eInvoice: { address:String, operator:String },
   emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],
-  apiToken: String
+  apiToken: String,
+  contactName: String,
+  phoneNumber: String
 })
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))

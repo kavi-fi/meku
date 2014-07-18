@@ -83,9 +83,10 @@ function subscriberManagementPage() {
     $subscriberDetails.find('button[name=remove]').toggle(utils.hasRole(user, 'root'))
 
     bindEventHandlers($subscriberDetails, function(subscriberData) {
-      $.post('/accounts/' + subscriber._id, JSON.stringify(subscriberData), function(subscriber) {
-        $subscribers.find('.result.selected').replaceWith(renderSubscriber(subscriber))
-        closeDetails()
+      $.ajax('/accounts/' + subscriber._id, { type: 'PUT', data: JSON.stringify(subscriberData) })
+        .done(function(subscriber) {
+          $subscribers.find('.result.selected').replaceWith(renderSubscriber(subscriber))
+          closeDetails()
       })
     })
 

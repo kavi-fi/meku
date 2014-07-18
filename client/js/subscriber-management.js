@@ -41,7 +41,7 @@ function subscriberManagementPage() {
   })
 
   $page.find('button[name=new-subscriber]').on('click', function() {
-    var $newSubscriberForm = renderSubscriberDetails({})
+    var $newSubscriberForm = renderSubscriberDetails()
 
     $newSubscriberForm.find('.modify-only').remove()
 
@@ -220,11 +220,12 @@ function subscriberManagementPage() {
 
   function renderSubscriberDetails(subscriber) {
     var $subscriberDetails = $('#templates').find('.subscriber-details').clone()
-    var address = subscriber.address || false
+    subscriber = subscriber || {}
+    var address = subscriber.address || {}
     var billing = subscriber.billing || {}
-    var billingAddress = billing.address || false
-    var eInvoice = subscriber.eInvoice || false
-    var extraBillingType = eInvoice ? 'eInvoice' : 'address'
+    var billingAddress = billing.address || {}
+    var eInvoice = subscriber.eInvoice || {}
+    var extraBillingType = _.isEmpty(billingAddress) ? 'eInvoice' : 'address'
 
     $subscriberDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, subscriber))
 
@@ -243,7 +244,7 @@ function subscriberManagementPage() {
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
       .find('input[name="billing.address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
-      .find('input[name=billing-extra]').prop('checked', eInvoice || billingAddress).end()
+      .find('input[name=billing-extra]').prop('checked', !(_.isEmpty(billingAddress) && _.isEmpty(eInvoice))).end()
       .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
 

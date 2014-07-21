@@ -341,6 +341,11 @@ app.post('/programs/:id', function(req, res, next) {
   })
 })
 
+app.delete('/programs/:id', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+  Program.findByIdAndRemove(req.params.id, respond(res, next))
+})
+
 app.get('/series/search/:query', function(req, res, next) {
   var q = { programType: 2 }
   var parts = toMongoArrayQuery(req.params.query)

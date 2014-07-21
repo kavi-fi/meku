@@ -105,6 +105,24 @@ function internalSearchPage() {
     showClassificationEditPage($(this).parents('.program-box').data('id'))
   })
 
+  $results.on('click', 'button.remove', function() {
+    var $selected = $('.result.selected')
+    var program = $selected.data('program')
+    console.log(program)
+    showDialog($('#templates').find('.remove-program-dialog').clone()
+      .find('.program-name').text(program.name).end()
+      .find('button[name=remove]').click(removeProgram).end()
+      .find('button[name=cancel]').click(closeDialog).end())
+
+    function removeProgram() {
+      $.ajax('/programs/' + program._id, { type: 'DELETE' }).done(function() {
+        closeDialog()
+        searchPageApi.closeDetail()
+        $selected.slideUp(function() { $(this).remove() })
+      })
+    }
+  })
+
   function loadDrafts() {
     $drafts.find('.draft').remove()
     $.get('/programs/drafts', function(drafts) {
@@ -159,6 +177,7 @@ function internalSearchPage() {
     }
 
     $detail.find('button.edit').toggle(hasRole('root'))
+    $detail.find('button.remove').toggle(hasRole('root'))
   }
 
   function showClassificationPage(programId) {
@@ -288,7 +307,7 @@ function searchPage(baseUrl) {
     }
   })
 
-  return { programDataUpdated: programDataUpdated }
+  return { programDataUpdated: programDataUpdated, closeDetail: closeDetail }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }

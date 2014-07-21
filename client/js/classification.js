@@ -260,13 +260,15 @@ function classificationPage() {
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
+    var programTypeName = enums.programType[program.programType].fi
+
     $form.data('id', program._id).show()
-      .find('.programTypeName').text(enums.programType[program.programType].fi).end()
+      .find('.programTypeName').text(programTypeName).end()
       .toggleClass('type-movie', enums.util.isMovieType(program))
       .toggleClass('type-tv-episode', enums.util.isTvEpisode(program))
       .toggleClass('type-tv-other', enums.util.isOtherTv(program))
       .toggleClass('type-game', enums.util.isGameType(program))
-      .toggleClass('classification', !isReclassification)
+      .toggleClass('classification', !isReclassification && !editMode)
       .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()
       .find('.invalid').removeClass('invalid').end()
@@ -340,14 +342,22 @@ function classificationPage() {
       }
     })
 
-    // Email functionality is disabled when using admin's editing tool
-    $form.find('.emails :button, .emails :input').prop('disabled', editMode)
-
     $throttledAutoSaveFields.trigger('reset')
     $form.find('.required').trigger('validate')
     updateSummary(program)
     preview.reset(program)
     $form.find('textarea').trigger('autosize.resize')
+
+    // Email functionality is disabled when using admin's editing tool
+    $form.find('.emails :button, .emails :input').prop('disabled', editMode)
+      .toggleClass('required', !editMode)
+      .toggleClass('invalid', !editMode)
+
+    var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
+    var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
+
+    $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
+    $form.find('#classification h2.main').text(classificationTitle)
   }
 
   function selectEnumAutocomplete(opts) {

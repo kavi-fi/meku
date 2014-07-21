@@ -237,6 +237,7 @@ label.top { vertical-align: top; }
   width: 280px;
 }
 #classification-page .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
+#classification-page .program-info button[name=save] { float: right; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }

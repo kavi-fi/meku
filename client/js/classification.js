@@ -7,6 +7,7 @@ function classificationPage() {
   var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
   var editMode
+  var modifiedFields
 
   renderClassificationCriteria()
 
@@ -16,7 +17,10 @@ function classificationPage() {
    editMode = false
     if (edit) {
       location.hash = '#luokittelu/'+programId+'/edit'
+
       editMode = true
+      modifiedFields = {}
+
       $.get('/programs/' + programId).done(show)
     } else if (programId) {
       location.hash = '#luokittelu/'+programId
@@ -95,6 +99,18 @@ function classificationPage() {
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
     $buyer.add($billing).select2('enable', enums.isOikaisupyynto($(this).val())).trigger('validate')
+  })
+
+  $form.find('button[name=save]').on('click', function(e) {
+    e.preventDefault()
+
+    console.log('Saving: ')
+    console.log(modifiedFields)
+
+    $.post('/programs/' + $form.data('id'), JSON.stringify(modifiedFields)).done(function(program) {
+      updateSummary(program)
+      preview.update(program)
+    })
   })
 
   selectEnumAutocomplete({
@@ -292,6 +308,8 @@ function classificationPage() {
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
+      .find('button[name=save]').toggle(editMode)
+
     $buyer.add($billing).select2('enable', (!isReclassification || enums.isOikaisupyynto(currentClassification.reason)) || isExternalReclassification)
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
@@ -369,7 +387,7 @@ function classificationPage() {
 
   function saveProgramField(id, field, value) {
     if (editMode) {
-      // todo: save fields somewhere to be saved until save-button is clicked
+      modifiedFields[field] = value
     } else {
       field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
       $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {
@@ -495,7 +513,11 @@ function classificationPage() {
   }
 
   function draftClassification(program) {
-    if (editMode) return program.classifications[0]
+    if (editMode) return program.classifications[0] || {
+      criteria: [],
+      warningOrder: [],
+      registrationEmailAddresses: []
+    }
     return program.draftClassifications[user._id]
   }
 }

@@ -255,7 +255,7 @@ function classificationPage() {
   function show(program) {
     $(window).scrollTop(0)
     var currentClassification = draftClassification(program)
-    var isReclassification = classification.isReclassification(program, currentClassification)
+    var isReclassification = !editMode && classification.isReclassification(program, currentClassification)
     var isExternalReclassification = isReclassification && user.role == 'user'
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''

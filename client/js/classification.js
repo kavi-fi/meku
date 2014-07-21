@@ -335,6 +335,9 @@ function classificationPage() {
       }
     })
 
+    // Email functionality is disabled when using admin's editing tool
+    $form.find('.emails :button, .emails :input').prop('disabled', editMode)
+
     $throttledAutoSaveFields.trigger('reset')
     $form.find('.required').trigger('validate')
     updateSummary(program)
@@ -468,7 +471,8 @@ function classificationPage() {
       $preview.find('.subject').text(email.subject)
       $preview.find('.body').html(email.body)
 
-      if (shouldUpdateBuyer(cl)) {
+      // todo: figure out why this fails with tv-episode & editMode
+      if (shouldUpdateBuyer(cl) && !editMode) {
         currentBuyerId = cl.buyer._id
         $.get('/accounts/' + currentBuyerId).done(function(data) {
           // remove all email addresses linked to the selected buyer

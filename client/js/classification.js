@@ -310,7 +310,12 @@ function classificationPage() {
 
       .find('button[name=save]').toggle(editMode)
 
+    if (editMode && _.isEmpty(program.classifications)) {
+      $form.find('#classification, #criteria').remove()
+    }
+
     $buyer.add($billing).select2('enable', (!isReclassification || enums.isOikaisupyynto(currentClassification.reason)) || isExternalReclassification)
+    $billing.prop('disabled', editMode)
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
       .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)

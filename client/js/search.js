@@ -108,7 +108,6 @@ function internalSearchPage() {
   $results.on('click', 'button.remove', function() {
     var $selected = $('.result.selected')
     var program = $selected.data('program')
-    console.log(program)
     showDialog($('#templates').find('.remove-program-dialog').clone()
       .find('.program-name').text(program.name).end()
       .find('button[name=remove]').click(removeProgram).end()

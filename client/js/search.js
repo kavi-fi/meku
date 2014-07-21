@@ -330,6 +330,7 @@ function searchPage(baseUrl) {
   }
 
   function programDataUpdated($row) {
+    if (_.isEmpty($row)) return
     var $newRow = render($row.data('program'), state.q)
     $row.next('.program-box').remove()
     $row.replaceWith($newRow)

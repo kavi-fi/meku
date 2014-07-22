@@ -263,7 +263,7 @@ function classificationPage() {
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
-    var programTypeName = enums.programType[program.programType].fi
+    var programTypeName = enums.util.programTypeName(program.programType)
 
     $form.data('id', program._id).show()
       .find('.programTypeName').text(programTypeName).end()

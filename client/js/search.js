@@ -147,7 +147,7 @@ function internalSearchPage() {
           .append($('<span>', { class: 'registrationDate' }).text(utils.asDate(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
-          .append($('<span>', { class: 'program-type' }).html(enums.programType[p.programType].fi))
+          .append($('<span>', { class: 'program-type' }).html(enums.util.programTypeName(p.programType)))
           .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
         $recent.show().append($result)
       })
@@ -250,7 +250,7 @@ function internalSearchPage() {
         .done(function(program) {
           toggleDetailButtons($('.program-box'), program)
           $categorizationForm.hide()
-          $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
+          $results.find('.selected .program-type').text(enums.util.programTypeName(program.programType))
           var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
           searchPageApi.programDataUpdated($row)
         })
@@ -403,7 +403,7 @@ function searchPage(baseUrl) {
         .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
         .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
-        .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="icon-warning-sign"></i>' : enums.programType[p.programType].fi))
+        .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="icon-warning-sign"></i>' : enums.util.programTypeName(p.programType)))
         .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
     }
 

@@ -93,6 +93,11 @@ enums.programType = {
   6: { type: 'trailer', fi: 'Traileri' },
   7: { type: 'game', fi: 'Peli' }
 }
+
+enums.util.programTypeName = function(programType) {
+  return enums[programType].fi
+}
+
 enums.util.isTvEpisode = function(p) { return p.programType == 3 }
 enums.util.isOtherTv = function(p) { return p.programType == 4 }
 enums.util.isMovieType = function(p) { return p.programType == 1 || p.programType == 5 || p.programType == 6 }

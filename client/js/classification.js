@@ -109,7 +109,8 @@ function classificationPage() {
     $.post('/programs/' + $form.data('id'), JSON.stringify(modifiedFields)).done(function(program) {
       updateSummary(program)
       preview.update(program)
-
+      showDialog($('#templates').find('.modify-success-dialog').clone()
+        .find('button.ok').click(closeDialog).end())
       modifiedFields = {}
       $saveButton.prop('disabled', true)
     })

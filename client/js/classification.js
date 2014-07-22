@@ -101,15 +101,17 @@ function classificationPage() {
     $buyer.add($billing).select2('enable', enums.isOikaisupyynto($(this).val())).trigger('validate')
   })
 
-  $form.find('button[name=save]').on('click', function(e) {
-    e.preventDefault()
+  var $saveButton = $form.find('button[name=save]')
 
-    console.log('Saving: ')
-    console.log(modifiedFields)
+  $saveButton.on('click', function(e) {
+    e.preventDefault()
 
     $.post('/programs/' + $form.data('id'), JSON.stringify(modifiedFields)).done(function(program) {
       updateSummary(program)
       preview.update(program)
+
+      modifiedFields = {}
+      $saveButton.prop('disabled', true)
     })
   })
 
@@ -310,7 +312,7 @@ function classificationPage() {
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
-      .find('button[name=save]').toggle(editMode)
+    $saveButton.toggle(editMode).prop('disabled', true)
 
     if (editMode && _.isEmpty(program.classifications)) {
       $form.find('#classification, #criteria').remove()
@@ -358,6 +360,7 @@ function classificationPage() {
 
     $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
     $form.find('#classification h2.main').text(classificationTitle)
+    $form.find('input[name], textarea[name]').toggleClass('touched', editMode)
   }
 
   function selectEnumAutocomplete(opts) {
@@ -406,6 +409,8 @@ function classificationPage() {
   function saveProgramField(id, field, value) {
     if (editMode) {
       modifiedFields[field] = value
+
+      $saveButton.prop('disabled', false)
     } else {
       field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
       $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {

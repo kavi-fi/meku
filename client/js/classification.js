@@ -501,8 +501,7 @@ function classificationPage() {
       $preview.find('.subject').text(email.subject)
       $preview.find('.body').html(email.body)
 
-      // todo: figure out why this fails with tv-episode & editMode
-      if (shouldUpdateBuyer(cl) && !editMode) {
+      if (shouldUpdateBuyer(cl)) {
         currentBuyerId = cl.buyer._id
         $.get('/accounts/' + currentBuyerId).done(function(data) {
           // remove all email addresses linked to the selected buyer

@@ -490,7 +490,14 @@ function classificationPage() {
 
       var email = classification.registrationEmail(program, cl, user)
 
-      $preview.find('.recipients').text(email.recipients.join(', '))
+      if (editMode) {
+        $.get('/programs/'+program._id+'/registrationEmails', function(emails) {
+          $preview.find('.recipients').text(_.pluck(emails, 'email').join(', '))
+        })
+      } else {
+        $preview.find('.recipients').text(email.recipients.join(', '))
+      }
+
       $preview.find('.subject').text(email.subject)
       $preview.find('.body').html(email.body)
 

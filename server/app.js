@@ -286,23 +286,13 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
       program.save(respond(res, next))
     })
   })
+})
 
-  function getRegistrationEmailsFromPreviousClassification(program, callback) {
-    var ids = _.uniq(_.reduce(program.classifications, function(acc, c) {
-      return acc.concat(c.buyer && c.buyer._id ? [c.buyer._id] : []).concat(c.billing && c.billing._id ? [c.billing._id] : [])
-    }, []))
-
-    if (ids.length > 0) {
-      Account.find({_id: {$in: ids}}).select('emailAddresses').exec(function(err, accounts) {
-        if (err) return callback(err)
-        var emails = _(accounts).map(function(a) { return a.emailAddresses }).flatten()
-          .map(function(e) { return {email: e, manual: false}}).value()
-        callback(null, emails)
-      })
-    } else {
-      callback(null, [])
-    }
-  }
+app.get('/programs/:id/registrationEmails', function(req, res, next) {
+  Program.findById(req.params.id, function(err, program) {
+    if (err) next(err)
+    getRegistrationEmailsFromPreviousClassification(program, respond(res, next))
+  })
 })
 
 app.post('/programs/:id/categorization', function(req, res, next) {
@@ -798,4 +788,21 @@ function verifyTvSeries(program, callback) {
 
 function logError(err) {
   if (err) console.error(err)
+}
+
+function getRegistrationEmailsFromPreviousClassification(program, callback) {
+  var ids = _.uniq(_.reduce(program.classifications, function(acc, c) {
+    return acc.concat(c.buyer && c.buyer._id ? [c.buyer._id] : []).concat(c.billing && c.billing._id ? [c.billing._id] : [])
+  }, []))
+
+  if (ids.length > 0) {
+    Account.find({_id: {$in: ids}}).select('emailAddresses').exec(function(err, accounts) {
+      if (err) return callback(err)
+      var emails = _(accounts).map(function(a) { return a.emailAddresses }).flatten()
+        .map(function(e) { return {email: e, manual: false}}).value()
+      callback(null, emails)
+    })
+  } else {
+    callback(null, [])
+  }
 }

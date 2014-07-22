@@ -352,9 +352,11 @@ function classificationPage() {
     $form.find('textarea').trigger('autosize.resize')
 
     // Email functionality is disabled when using admin's editing tool
-    $form.find('.emails :button, .emails :input').prop('disabled', editMode)
-      .toggleClass('required', !editMode)
-      .toggleClass('invalid', !editMode)
+    if (editMode) {
+      $form.find('.emails :button, .emails :input').prop('disabled', true)
+        .toggleClass('required', false)
+        .toggleClass('invalid', false)
+    }
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'

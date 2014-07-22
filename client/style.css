@@ -371,10 +371,6 @@ input:invalid:not(.pending),
   background: #F0FFF0;
 }
 
-.select2-container.select2-container-disabled.invalid .select2-choice {
-  background-color: #f4f4f4;
-}
-
 input[type=text].invalid.touched,
 input[type=number].invalid.touched,
 input[type=number]:invalid,
@@ -383,6 +379,10 @@ textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {
   background: #fff0f0;
+}
+
+.select2-container.select2-container-disabled.invalid .select2-choice {
+  background-color: #f4f4f4;
 }
 
 input[type=text].invalid:disabled,

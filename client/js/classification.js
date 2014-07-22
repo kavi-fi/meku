@@ -14,7 +14,7 @@ function classificationPage() {
   var $throttledAutoSaveFields = $form.find('input[type=text], input[type=number], textarea').not('[name="registration-email"]')
 
   $root.on('show', function(e, programId, edit) {
-   editMode = false
+    editMode = false
     if (edit) {
       location.hash = '#luokittelu/'+programId+'/edit'
 
@@ -315,10 +315,6 @@ function classificationPage() {
 
     $saveButton.toggle(editMode).prop('disabled', true)
 
-    if (editMode && _.isEmpty(program.classifications)) {
-      $form.find('#classification, #criteria').remove()
-    }
-
     $buyer.add($billing).select2('enable', (!isReclassification || enums.isOikaisupyynto(currentClassification.reason)) || isExternalReclassification)
     $billing.prop('disabled', editMode)
 
@@ -352,14 +348,13 @@ function classificationPage() {
     $form.find('textarea').trigger('autosize.resize')
 
     // Email functionality is disabled when using admin's editing tool
-    if (editMode) {
-      $form.find('#email .emails').remove()
-      $form.find('#email .preview').removeClass('right')
-    }
+    $form.find('#email .emails').toggle(!editMode)
+    $form.find('#email .preview').toggleClass('right', !editMode)
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
 
+    $form.find('#classification, #criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
     $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
     $form.find('#classification h2.main').text(classificationTitle)
     $form.find('input[name], textarea[name]').toggleClass('touched', editMode)

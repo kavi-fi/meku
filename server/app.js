@@ -289,6 +289,7 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
 })
 
 app.get('/programs/:id/registrationEmails', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) return res.send(403)
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
     getRegistrationEmailsFromPreviousClassification(program, respond(res, next))

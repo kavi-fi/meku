@@ -95,7 +95,7 @@ enums.programType = {
 }
 
 enums.util.programTypeName = function(programType) {
-  return enums[programType].fi
+  return utils.getProperty(enums.programType, programType + '.fi')
 }
 
 enums.util.isTvEpisode = function(p) { return p.programType == 3 }

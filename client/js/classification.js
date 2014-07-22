@@ -353,9 +353,8 @@ function classificationPage() {
 
     // Email functionality is disabled when using admin's editing tool
     if (editMode) {
-      $form.find('.emails :button, .emails :input').prop('disabled', true)
-        .toggleClass('required', false)
-        .toggleClass('invalid', false)
+      $form.find('#email .emails').remove()
+      $form.find('#email .preview').removeClass('right')
     }
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'

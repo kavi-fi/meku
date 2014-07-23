@@ -319,7 +319,7 @@ function classificationPage() {
     $billing.prop('disabled', editMode)
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
-      .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
+      .find('textarea').prop('disabled', (isExternalReclassification || !isReclassification) && !editMode)
 
     $form.find('.author-and-reason').toggleClass('hide', isExternalReclassification)
       .find('input').select2('enable', isReclassification && hasRole('kavi'))
@@ -358,6 +358,11 @@ function classificationPage() {
     $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
     $form.find('#classification h2.main').text(classificationTitle)
     $form.find('input[name], textarea[name]').toggleClass('touched', editMode)
+    $form.find('.public-comments').toggle(editModeAndReclassification())
+
+    function editModeAndReclassification() {
+      return (editMode && classification.isReclassification(program, currentClassification))
+    }
   }
 
   function selectEnumAutocomplete(opts) {

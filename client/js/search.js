@@ -101,6 +101,27 @@ function internalSearchPage() {
     $(this).hide()
   })
 
+  $results.on('click', 'button.edit', function() {
+    showClassificationEditPage($(this).parents('.program-box').data('id'))
+  })
+
+  $results.on('click', 'button.remove', function() {
+    var $selected = $('.result.selected')
+    var program = $selected.data('program')
+    showDialog($('#templates').find('.remove-program-dialog').clone()
+      .find('.program-name').text(program.name).end()
+      .find('button[name=remove]').click(removeProgram).end()
+      .find('button[name=cancel]').click(closeDialog).end())
+
+    function removeProgram() {
+      $.ajax('/programs/' + program._id, { type: 'DELETE' }).done(function() {
+        closeDialog()
+        searchPageApi.closeDetail()
+        $selected.slideUp(function() { $(this).remove() })
+      })
+    }
+  })
+
   function loadDrafts() {
     $drafts.find('.draft').remove()
     $.get('/programs/drafts', function(drafts) {
@@ -126,7 +147,7 @@ function internalSearchPage() {
           .append($('<span>', { class: 'registrationDate' }).text(utils.asDate(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
-          .append($('<span>', { class: 'program-type' }).html(enums.programType[p.programType].fi))
+          .append($('<span>', { class: 'program-type' }).html(enums.util.programTypeName(p.programType)))
           .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
         $recent.show().append($result)
       })
@@ -153,11 +174,19 @@ function internalSearchPage() {
       $detail.find('button.reclassify').toggle(!!canReclassify)
       $detail.find('button.categorize').hide()
     }
+
+    $detail.find('button.edit').toggle(hasRole('root'))
+    $detail.find('button.remove').toggle(hasRole('root'))
   }
 
   function showClassificationPage(programId) {
     $('body').children('.page').hide()
     $('#classification-page').trigger('show', programId).show()
+  }
+
+  function showClassificationEditPage(programId) {
+    $('body').children('.page').hide()
+    $('#classification-page').trigger('show', [programId, 'edit']).show()
   }
 
   function showCategorizationForm(id) {
@@ -221,7 +250,7 @@ function internalSearchPage() {
         .done(function(program) {
           toggleDetailButtons($('.program-box'), program)
           $categorizationForm.hide()
-          $results.find('.selected .program-type').text(enums.programType[program.programType].fi)
+          $results.find('.selected .program-type').text(enums.util.programTypeName(program.programType))
           var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
           searchPageApi.programDataUpdated($row)
         })
@@ -277,7 +306,7 @@ function searchPage(baseUrl) {
     }
   })
 
-  return { programDataUpdated: programDataUpdated }
+  return { programDataUpdated: programDataUpdated, closeDetail: closeDetail }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -374,7 +403,7 @@ function searchPage(baseUrl) {
         .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
         .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
-        .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="icon-warning-sign"></i>' : enums.programType[p.programType].fi))
+        .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="icon-warning-sign"></i>' : enums.util.programTypeName(p.programType)))
         .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
     }
 

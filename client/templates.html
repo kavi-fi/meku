@@ -2,6 +2,8 @@
   <span class="sequenceId"></span>
   <div class="header clearfix">
     <div class="buttons">
+      <button class="button remove">Poista</button>
+      <button class="button hidden edit">Muuta tietoja</button>
       <button class="button reclassify">Luokittele uudelleen</button>
       <button class="button continue-classification">Jatka luokittelua</button>
       <button class="button categorize">Määritä kategoria</button>
@@ -197,7 +199,7 @@
   <label class="double">Kommenttikenttä <textarea name="comment" class="two-column"></textarea></label>
 </div>
 
-<div class="remove-user-dialog dialog">
+<div class="remove-user-dialog remove-dialog dialog">
   <p>Haluatko varmasti poistaa käyttäjän <span class="user-name"></span>?</p>
   <div class="buttons">
     <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
@@ -262,5 +264,19 @@
   <p>Haluatko varmasti poistaa tilaajan <span class="subscriber-name"></span>?</p>
   <div class="buttons">
     <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
+  </div>
+</div>
+
+<div class="remove-program-dialog remove-dialog dialog">
+  <p>Haluatko varmasti poistaa kuvaohjelman <span class="program-name"></span>?</p>
+  <div class="buttons">
+    <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
+  </div>
+</div>
+
+<div class="modify-success-dialog dialog">
+  <p>Muutokset tallennettu onnistuneesti.</p>
+  <div class="buttons">
+    <button class="ok button">Ok</button>
   </div>
 </div>

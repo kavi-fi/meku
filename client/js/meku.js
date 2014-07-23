@@ -87,7 +87,7 @@ function errorDialog() {
   var $overlay = $('#error-overlay')
   var $dialog = $('#error-dialog')
   $dialog.find('a').click(function(e) { e.preventDefault(); location.reload() })
-  return { show: function() { $dialog.add($overlay).show() } }
+  return { show: function() { $dialog.add($overlay).show() }}
 }
 
 function loginPage() {

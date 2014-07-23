@@ -6,13 +6,23 @@ function classificationPage() {
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
   var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
+  var editMode
+  var modifiedFields
 
   renderClassificationCriteria()
 
   var $throttledAutoSaveFields = $form.find('input[type=text], input[type=number], textarea').not('[name="registration-email"]')
 
-  $root.on('show', function(e, programId) {
-    if (programId) {
+  $root.on('show', function(e, programId, edit) {
+    editMode = false
+    if (edit) {
+      location.hash = '#luokittelu/'+programId+'/edit'
+
+      editMode = true
+      modifiedFields = {}
+
+      $.get('/programs/' + programId).done(show)
+    } else if (programId) {
       location.hash = '#luokittelu/'+programId
       $.get('/programs/' + programId).done(show)
     } else if ($form.data('id')) {
@@ -89,6 +99,21 @@ function classificationPage() {
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
     $buyer.add($billing).select2('enable', enums.isOikaisupyynto($(this).val())).trigger('validate')
+  })
+
+  var $saveButton = $form.find('button[name=save]')
+
+  $saveButton.on('click', function(e) {
+    e.preventDefault()
+
+    $.post('/programs/' + $form.data('id'), JSON.stringify(modifiedFields)).done(function(program) {
+      updateSummary(program)
+      preview.update(program)
+      showDialog($('#templates').find('.modify-success-dialog').clone()
+        .find('button.ok').click(closeDialog).end())
+      modifiedFields = {}
+      $saveButton.prop('disabled', true)
+    })
   })
 
   selectEnumAutocomplete({
@@ -233,18 +258,20 @@ function classificationPage() {
   function show(program) {
     $(window).scrollTop(0)
     var currentClassification = draftClassification(program)
-    var isReclassification = classification.isReclassification(program, currentClassification)
+    var isReclassification = !editMode && classification.isReclassification(program, currentClassification)
     var isExternalReclassification = isReclassification && user.role == 'user'
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
+    var programTypeName = enums.util.programTypeName(program.programType)
+
     $form.data('id', program._id).show()
-      .find('.programTypeName').text(enums.programType[program.programType].fi).end()
+      .find('.programTypeName').text(programTypeName).end()
       .toggleClass('type-movie', enums.util.isMovieType(program))
       .toggleClass('type-tv-episode', enums.util.isTvEpisode(program))
       .toggleClass('type-tv-other', enums.util.isOtherTv(program))
       .toggleClass('type-game', enums.util.isGameType(program))
-      .toggleClass('classification', !isReclassification)
+      .toggleClass('classification', !isReclassification && !editMode)
       .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()
       .find('.invalid').removeClass('invalid').end()
@@ -286,10 +313,13 @@ function classificationPage() {
       .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
+    $saveButton.toggle(editMode).prop('disabled', true)
+
     $buyer.add($billing).select2('enable', (!isReclassification || enums.isOikaisupyynto(currentClassification.reason)) || isExternalReclassification)
+    $billing.prop('disabled', editMode)
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
-      .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
+      .find('textarea').prop('disabled', (isExternalReclassification || !isReclassification) && !editMode)
 
     $form.find('.author-and-reason').toggleClass('hide', isExternalReclassification)
       .find('input').select2('enable', isReclassification && hasRole('kavi'))
@@ -316,6 +346,23 @@ function classificationPage() {
     updateSummary(program)
     preview.reset(program)
     $form.find('textarea').trigger('autosize.resize')
+
+    // Email functionality is disabled when using admin's editing tool
+    $form.find('#email .emails').toggle(!editMode)
+    $form.find('#email .preview').toggleClass('right', !editMode)
+
+    var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
+    var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
+
+    $form.find('#classification, #criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
+    $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
+    $form.find('#classification h2.main').text(classificationTitle)
+    $form.find('input[name], textarea[name]').toggleClass('touched', editMode)
+    $form.find('.public-comments').toggle(editModeAndReclassification())
+
+    function editModeAndReclassification() {
+      return (editMode && classification.isReclassification(program, currentClassification))
+    }
   }
 
   function selectEnumAutocomplete(opts) {
@@ -362,11 +409,17 @@ function classificationPage() {
   }
 
   function saveProgramField(id, field, value) {
-    field = field.replace(/^classifications\.0/, 'draftClassifications.'+user._id)
-    $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(program) {
-      updateSummary(program)
-      preview.update(program)
-    })
+    if (editMode) {
+      modifiedFields[field] = value
+
+      $saveButton.prop('disabled', false)
+    } else {
+      field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
+      $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {
+        updateSummary(program)
+        preview.update(program)
+      })
+    }
   }
 
   function updateSummary(program) {
@@ -436,7 +489,14 @@ function classificationPage() {
 
       var email = classification.registrationEmail(program, cl, user)
 
-      $preview.find('.recipients').text(email.recipients.join(', '))
+      if (editMode) {
+        $.get('/programs/'+program._id+'/registrationEmails', function(emails) {
+          $preview.find('.recipients').text(_.pluck(emails, 'email').join(', '))
+        })
+      } else {
+        $preview.find('.recipients').text(email.recipients.join(', '))
+      }
+
       $preview.find('.subject').text(email.subject)
       $preview.find('.body').html(email.body)
 
@@ -485,6 +545,11 @@ function classificationPage() {
   }
 
   function draftClassification(program) {
+    if (editMode) return program.classifications[0] || {
+      criteria: [],
+      warningOrder: [],
+      registrationEmailAddresses: []
+    }
     return program.draftClassifications[user._id]
   }
 }

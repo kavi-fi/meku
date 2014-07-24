@@ -9,6 +9,7 @@ var Program = schema.Program
 var User = schema.User
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
+var LoginLog = schema.LoginLog
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
@@ -45,14 +46,16 @@ app.post('/login', function(req, res, next) {
       user.checkPassword(password, function(err, ok) {
         if (err) return next(err)
         if (!ok) return res.send(403)
-        setLoginCookie(res, user)
+        setLoginCookie(res, user, req)
         res.send({})
       })
     }
   })
 })
 
-function setLoginCookie(res, user) {
+function setLoginCookie(res, user, req) {
+  logUserLogin(req, user)
+
   res.cookie('user', {
     _id: user._id.toString(),
     username: user.username,
@@ -60,6 +63,15 @@ function setLoginCookie(res, user) {
     role: user.role,
     email: _.first(user.emails)
   }, { signed: true })
+}
+
+function logUserLogin(req, user) {
+  new LoginLog({
+    user: {_id: user._id, username: user.username},
+    userAgent: req.headers['user-agent'],
+    ip: req.connection.remoteAddress,
+    date: new Date()
+  }).save()
 }
 
 app.post('/logout', function(req, res, next) {
@@ -133,7 +145,7 @@ app.post('/reset-password', function(req, res, next) {
       user.resetHash = null
       user.save(function (err, user) {
         if (err) return next(err)
-        setLoginCookie(res, user)
+        setLoginCookie(res, user, req)
         res.send({})
       })
     })

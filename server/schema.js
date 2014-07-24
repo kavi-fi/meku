@@ -204,6 +204,13 @@ var XmlDoc = exports.XmlDoc = mongoose.model('xmldocs', new Schema({
   account: {_id: ObjectId, name: String}
 }))
 
+var LoginLog = exports.LoginLog = mongoose.model('loginlog', new Schema({
+  user: {_id: ObjectId, username: String},
+  date: Date,
+  ip: String,
+  userAgent: String
+}))
+
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
 var DirectorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
 var ActorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
@@ -236,7 +243,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence]
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, LoginLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

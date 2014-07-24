@@ -184,7 +184,7 @@ app.get('/programs/drafts', function(req, res, next) {
 
 app.get('/programs/recent', function(req, res, next) {
   var ObjectId = mongoose.Types.ObjectId
-  Program.aggregate({$match: {"classifications.author._id": ObjectId(req.user._id) }})
+  Program.aggregate({$match: { "classifications.author._id": ObjectId(req.user._id), deleted: { $ne: true } }})
     .unwind("classifications")
     .project({"registrationDate": "$classifications.registrationDate"})
     .sort('-registrationDate')

@@ -472,10 +472,14 @@ app.post('/proe', express.urlencoded(), function(req, res, next) {
       function accountName(tuple) { return tuple.account.name }
 
       var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
-      var result = proe(dates, data)
-      res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
-      res.setHeader('Content-Type', 'text/plain')
-      res.send(result)
+      try {
+        var result = proe(dates, data)
+        res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
+        res.setHeader('Content-Type', 'text/plain')
+        res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
   })
 })
@@ -603,6 +607,13 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       callback()
     }
   }
+})
+
+// Error handler
+app.use(function(err, req, res, next) {
+  console.error(err.stack || err)
+  res.status(err.status || 500)
+  res.send({ message: err.message || err })
 })
 
 function createParentProgram(program, parentName, callback) {

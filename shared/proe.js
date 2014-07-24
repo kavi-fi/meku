@@ -1,6 +1,7 @@
 if (isNodeJs()) {
   var _ = require('lodash')
   var moment = require('moment')
+  var utils = require('./utils')
 }
 
 // dateRange: { begin: moment, end: moment }, accountRows: [{ account:Account, rows:[InvoiceRow] }]
@@ -20,10 +21,14 @@ function createProe(dateRange, accountRows) {
   }).flatten().compact().join('\n')
 
   function accountHeaderRow(id, account) {
+    var address = utils.getProperty(account, 'billing.address') || account.address
+    if (_.isEmpty(address)) {
+      throw new Error('Tilaajalla ' + account.name + ' ei ole osoitetta.')
+    }
     return header(id, 'L') + ws(2) + pad(account.name, 50)
       + ws(50) // asiakkaan nimi20
-      + pad(account.billing.street, 30)
-      + pad(concat(account.billing.zip, account.billing.city), 30)
+      + pad(address.street, 30)
+      + pad(concat(address.zip, address.city), 30)
       + ws(105) // puhelin/fax/yhteysHenkilö/pankki/pankkiTili
       + ws(1) // asiakastyyppi, default = 0
       + languageCode(account.billingLanguage)
@@ -34,9 +39,9 @@ function createProe(dateRange, accountRows) {
       + ws(10) //Kumppani
       + 'EUR'
       + ws(5) // Laskulaji/Laskutusyksikkö
-      + pad(account.billing.invoiceText, 30) //Laskun selite/
+      + pad(address.invoiceText, 30) //Laskun selite/
       + ws(111) //Turvakielto/Työnantaja1/Työnantaja2/Osoite2
-      + pad(account.billing.country, 30)
+      + pad(address.country, 30)
       + pad(account.yTunnus, 11)
       + ws(39)
   }

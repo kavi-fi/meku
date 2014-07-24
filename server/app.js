@@ -46,14 +46,14 @@ app.post('/login', function(req, res, next) {
       user.checkPassword(password, function(err, ok) {
         if (err) return next(err)
         if (!ok) return res.send(403)
-        setLoginCookie(res, user, req)
+        logUserIn(req, res, user)
         res.send({})
       })
     }
   })
 })
 
-function setLoginCookie(res, user, req) {
+function logUserIn(req, res, user) {
   logUserLogin(req, user)
 
   res.cookie('user', {
@@ -145,7 +145,7 @@ app.post('/reset-password', function(req, res, next) {
       user.resetHash = null
       user.save(function (err, user) {
         if (err) return next(err)
-        setLoginCookie(res, user, req)
+        logUserIn(req, res, user)
         res.send({})
       })
     })

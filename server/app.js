@@ -10,6 +10,7 @@ var User = schema.User
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var LoginLog = schema.LoginLog
+var ChangeLog = schema.ChangeLog
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
@@ -441,6 +442,8 @@ app.post('/users/new', function(req, res, next) {
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
 
+        logCreateOperation(req.user, user, 'User')
+
         var subject = 'Käyttäjätunnusten aktivointi'
         var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
 
@@ -451,6 +454,16 @@ app.post('/users/new', function(req, res, next) {
     return res.send(500)
   }
 })
+
+function logCreateOperation(user, object, collection) {
+  new ChangeLog({
+    user: { _id: user._id, username: user.username },
+    date: new Date(),
+    operation: 'create',
+    targetCollection: collection,
+    documentId: object._id,
+  }).save(logError)
+}
 
 app.post('/users/:id', function(req, res, next) {
   User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {

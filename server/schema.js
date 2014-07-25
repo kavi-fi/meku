@@ -211,6 +211,16 @@ var LoginLog = exports.LoginLog = mongoose.model('loginlog', new Schema({
   userAgent: String
 }))
 
+var ChangeLog = exports.ChangeLog = mongoose.model('changelog', new Schema({
+  user: {_id: ObjectId, username: String},
+  date: Date,
+  operation: String,
+  targetCollection: String,
+  documentId: ObjectId,
+  updates: {},
+  deleted: {}
+}))
+
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
 var DirectorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
 var ActorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
@@ -243,7 +253,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, LoginLog]
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, LoginLog, ChangeLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

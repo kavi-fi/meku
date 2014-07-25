@@ -466,11 +466,31 @@ function logCreateOperation(user, object, collection) {
 }
 
 app.post('/users/:id', function(req, res, next) {
-  User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
+  User.findById(req.params.id, function(err, preUpdateUser) {
     if (err) return next(err)
-    res.send(user)
+
+    User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
+      if (err) return next(err)
+
+      logUpdateOperation(req.user, preUpdateUser, 'User')
+
+      res.send(user)
+    })
   })
 })
+
+function logUpdateOperation(user, preUpdateObject, collection) {
+  new ChangeLog({
+    user: { _id: user._id, username: user.username },
+    date: new Date(),
+    operation: 'update',
+    targetCollection: collection,
+    documentId: preUpdateObject._id,
+    updates: { // todo: _.isEqual does not work well with ObjectIds, so diffing seems complex
+      old: preUpdateObject
+    }
+  }).save(logError)
+}
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))

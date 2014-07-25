@@ -71,7 +71,7 @@ function logUserLogin(req, user) {
     userAgent: req.headers['user-agent'],
     ip: req.connection.remoteAddress,
     date: new Date()
-  }).save()
+  }).save(logError)
 }
 
 app.post('/logout', function(req, res, next) {

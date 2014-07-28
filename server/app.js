@@ -472,23 +472,23 @@ app.post('/users/:id', function(req, res, next) {
     User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
       if (err) return next(err)
 
-      logUpdateOperation(req.user, preUpdateUser, 'User')
+      logUpdateOperation(req.user, preUpdateUser, user, 'User')
 
       res.send(user)
     })
   })
 })
 
-function logUpdateOperation(user, preUpdateObject, collection) {
+function logUpdateOperation(user, preUpdateObject, newObject, collection) {
   new ChangeLog({
     user: { _id: user._id, username: user.username },
     date: new Date(),
     operation: 'update',
     targetCollection: collection,
     documentId: preUpdateObject._id,
-    updates: { // todo: _.isEqual does not work well with ObjectIds, so diffing seems complex
-      old: preUpdateObject
-    }
+    updates: _.omit(_.merge(preUpdateObject.toObject(), newObject.toObject(), function(x,y) {
+      return _.isEqual(x,y) ? { notChanged: true } : { new: y, old: x }
+    }), function(value) { return _.isEqual(value, { notChanged: true }) })
   }).save(logError)
 }
 

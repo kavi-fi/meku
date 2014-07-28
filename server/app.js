@@ -420,8 +420,28 @@ app.get('/users/search', function(req, res, next) {
 
 app.delete('/users/:id', function(req, res, next) {
   if (!utils.hasRole(req.user, 'root')) return res.send(403)
-  User.findByIdAndRemove(req.params.id, respond(res, next))
+  User.findById(req.params.id, function(err, user) {
+    if (err) return next(err)
+
+    user.remove(function(err) {
+      if (err) return next(err)
+
+      logDeleteOperation(req.user, user, 'User')
+
+      res.send({})
+    })
+  })
 })
+
+function logDeleteOperation(user, object, collection) {
+  new ChangeLog({
+    user: { _id: user._id, username: user.username },
+    date: new Date(),
+    operation: 'delete',
+    targetCollection: collection,
+    deleted: object
+  }).save(logError)
+}
 
 app.get('/users/exists/:username', function(req, res, next) {
   User.findOne({ username: req.params.username }, function(err, user) {

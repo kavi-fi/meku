@@ -98,7 +98,9 @@ function classificationPage() {
   })
 
   $form.find('input[name="classifications.0.reason"]').on('change', function(e) {
-    $buyer.add($billing).select2('enable', enums.isOikaisupyynto($(this).val())).trigger('validate')
+    if (!editMode) {
+      $buyer.add($billing).select2('enable', enums.isOikaisupyynto($(this).val())).trigger('validate')
+    }
   })
 
   var $saveButton = $form.find('button[name=save]')
@@ -258,7 +260,7 @@ function classificationPage() {
   function show(program) {
     $(window).scrollTop(0)
     var currentClassification = draftClassification(program)
-    var isReclassification = !editMode && classification.isReclassification(program, currentClassification)
+    var isReclassification = classification.isReclassification(program, currentClassification)
     var isExternalReclassification = isReclassification && user.role == 'user'
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
@@ -271,7 +273,7 @@ function classificationPage() {
       .toggleClass('type-tv-episode', enums.util.isTvEpisode(program))
       .toggleClass('type-tv-other', enums.util.isOtherTv(program))
       .toggleClass('type-game', enums.util.isGameType(program))
-      .toggleClass('classification', !isReclassification && !editMode)
+      .toggleClass('classification', !isReclassification)
       .toggleClass('reclassification', isReclassification)
       .find('.touched').removeClass('touched').end()
       .find('.invalid').removeClass('invalid').end()
@@ -310,7 +312,7 @@ function classificationPage() {
       .find('.criteria').removeClass('selected').removeClass('has-comment').end()
       .find('.criteria textarea').val('').end()
 
-      .find('.program-info input, .program-info textarea').prop('disabled', isReclassification).end()
+      .find('.program-info input, .program-info textarea').prop('disabled', isReclassification && !editMode).end()
       .find('.reclassification .required').prop('disabled', !isReclassification).end()
 
     $saveButton.toggle(editMode).prop('disabled', true)
@@ -319,7 +321,7 @@ function classificationPage() {
     $billing.prop('disabled', editMode)
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
-      .find('textarea').prop('disabled', (isExternalReclassification || !isReclassification) && !editMode)
+      .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
 
     $form.find('.author-and-reason').toggleClass('hide', isExternalReclassification)
       .find('input')
@@ -327,8 +329,13 @@ function classificationPage() {
       .select2('enable', isReclassification && hasRole('kavi'))
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
-    $form.find('input[name=directors]').prop('disabled', isReclassification || enums.util.isGameType(program))
-    $form.find('input[name=gameFormat]').prop('disabled', isReclassification || !enums.util.isGameType(program))
+
+    if (enums.util.isGameType(program)) {
+      $form.find('input[name=directors]').prop('disabled', true)
+    } else {
+      $form.find('input[name=gameFormat]').prop('disabled', isReclassification)
+    }
+
     $form.find('input[name="classifications.0.format"]').prop('disabled', enums.util.isGameType(program))
     var enableDuration = !enums.util.isGameType(program) || hasRole('kavi')
     $form.find('input[name="classifications.0.duration"]').prop('disabled', !enableDuration).parent().toggle(enableDuration)
@@ -360,11 +367,6 @@ function classificationPage() {
     $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
     $form.find('#classification h2.main').text(classificationTitle)
     $form.find('input[name], textarea[name]').toggleClass('touched', editMode)
-    $form.find('.public-comments').toggle(editModeAndReclassification())
-
-    function editModeAndReclassification() {
-      return (editMode && classification.isReclassification(program, currentClassification))
-    }
   }
 
   function selectEnumAutocomplete(opts) {

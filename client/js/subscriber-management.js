@@ -270,6 +270,7 @@ function subscriberManagementPage() {
 
     function populateClassifiers() {
       var names = _.pluck(subscriber.users, 'name').join(',')
+      if (names.length === 0) return
       $.get('/users/names/' + names, function(data) {
         $subscriberDetails.find('input[name=classifiers]').trigger('setVal', data).end()
       })

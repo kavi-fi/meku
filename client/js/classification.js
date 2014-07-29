@@ -317,8 +317,7 @@ function classificationPage() {
 
     $saveButton.toggle(editMode).prop('disabled', true)
 
-    $buyer.add($billing).select2('enable', (!isReclassification || enums.isOikaisupyynto(currentClassification.reason)) || isExternalReclassification)
-    $billing.prop('disabled', editMode)
+    $buyer.add($billing).select2('enable', !editMode && (!isReclassification || enums.isOikaisupyynto(currentClassification.reason)) || isExternalReclassification)
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
       .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)

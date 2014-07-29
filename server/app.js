@@ -432,6 +432,11 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
   }
 })
 
+app.get('/users/names/:names', function(req, res, next) {
+  if (!utils.hasRole(req.user, 'kavi')) return res.send([])
+  User.find({username: {$in: req.params.names.split(',')}}, 'name username', respond(res, next))
+})
+
 app.post('/users/:id', requireRole('root'), function(req, res, next) {
   User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
     if (err) return next(err)

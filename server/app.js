@@ -370,7 +370,13 @@ app.put('/accounts/:id', function(req, res, next) {
 
 app.post('/accounts', function(req, res, next) {
   if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
-  new Account(req.body).save(respond(res, next))
+  new Account(req.body).save(function(err, account) {
+    if (err) return next(err)
+
+    logCreateOperation(req.user, account, 'Account')
+
+    res.send(account)
+  })
 })
 
 app.delete('/accounts/:id', function(req, res, next) {

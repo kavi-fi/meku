@@ -235,7 +235,7 @@ function subscriberManagementPage() {
       $el: $subscriberDetails.find('input[name=classifiers]'),
       path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
       multiple: true,
-      toOption: accountToSelect2Option,
+      toOption: userToSelect2Option,
       fromOption: select2OptionToIdNamePair
     })
 
@@ -259,12 +259,12 @@ function subscriberManagementPage() {
       if (property !== undefined) $(this).val(property)
     }
 
-    function accountToSelect2Option(account) {
-      if (!account) return null
+    function userToSelect2Option(user) {
+      if (!user) return null
       return {
-        id: account._id,
-        text: account.name + (account.username ? ' (' + account.username + ')' : ''),
-        name: account.username ? account.username : account.name
+        id: user._id,
+        text: user.name + (user.username ? ' (' + user.username + ')' : ''),
+        name: user.username ? user.username : user.name
       }
     }
 

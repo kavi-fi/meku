@@ -499,17 +499,25 @@ app.post('/users/:id', function(req, res, next) {
   })
 })
 
-function logUpdateOperation(user, preUpdateObject, newObject, collection) {
+function logUpdateOperation(user, preUpdateObject, newObject, collection, updates) {
   new ChangeLog({
     user: { _id: user._id, username: user.username },
     date: new Date(),
     operation: 'update',
     targetCollection: collection,
     documentId: preUpdateObject._id,
-    updates: _.omit(_.merge(preUpdateObject.toObject(), newObject.toObject(), function(x,y) {
+    updates: updates || difference(preUpdateObject, newObject)
+  }).save(logError)
+
+  function difference(preUpdateObject, newObject) {
+    return _.omit(_.merge(preUpdateObject.toObject(), newObject.toObject(), function(x,y) {
       return _.isEqual(x,y) ? { notChanged: true } : { new: y, old: x }
     }), function(value) { return _.isEqual(value, { notChanged: true }) })
-  }).save(logError)
+  }
+}
+
+function logCustomUpdateOperation(user, object, collection, updates) {
+  logUpdateOperation(user, object, undefined, collection, updates)
 }
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
@@ -711,7 +719,16 @@ var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
     if (err) throw err
 
     users.forEach(function(user) {
-      user.update({ active: false }, logError)
+      user.update({ active: false }, function(err) {
+        if (err) return logError(err)
+
+        logCustomUpdateOperation({ _id: null, username: 'cron' }, user, 'User', {
+          active: {
+            old: user.active,
+            new: false
+          }
+        })
+      })
 
       sendEmail({
         recipients: [ user.emails[0] ],

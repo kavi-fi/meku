@@ -312,23 +312,14 @@ app.get('/programs/:id/registrationEmails', function(req, res, next) {
 app.post('/programs/:id/categorization', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
-    program.programType = parseInt(req.body.programType)
-    if (enums.util.isTvEpisode(program)) {
-      program.series = {
-        _id: req.body.series._id,
-        name: req.body.series.name
-      }
-      program.episode = req.body.episode
-      program.season = _.isEmpty(req.body.season) ? null : req.body.season
-    }
-
-    verifyTvSeries(program, function(err) {
+    var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
+    updateAndLogChanges(program, updates, req.user, function(err, program) {
       if (err) return next(err)
-      program.save(function(err, saved) {
+      verifyTvSeries(program, function(err) {
         if (err) return next(err)
         verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
-          res.send(saved)
+          res.send(program)
         })
       })
     })
@@ -336,11 +327,13 @@ app.post('/programs/:id/categorization', function(req, res, next) {
 })
 
 app.post('/programs/:id', function(req, res, next) {
-  Program.findByIdAndUpdate(req.params.id, req.body, null, function(err, program) {
+  Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
-    program.populateAllNames(function(err) {
-      if (err) return next(err)
-      program.save(respond(res, next))
+    updateAndLogChanges(program, req.body, req.user, function(err, program) {
+      program.populateAllNames(function(err) {
+        if (err) return next(err)
+        program.save(respond(res, next))
+      })
     })
   })
 })
@@ -487,7 +480,7 @@ function logCreateOperation(user, object, collection) {
     date: new Date(),
     operation: 'create',
     targetCollection: collection,
-    documentId: object._id,
+    documentId: object._id
   }).save(logError)
 }
 
@@ -522,8 +515,8 @@ function logUpdateOperation(user, preUpdateObject, newObject, collection, update
   }
 }
 
-function logCustomUpdateOperation(user, object, collection, updates) {
-  logUpdateOperation(user, object, undefined, collection, updates)
+function logCustomUpdateOperation(user, document, updates) {
+  logUpdateOperation(user, document, undefined, document.constructor.modelName, updates)
 }
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
@@ -905,4 +898,23 @@ function getRegistrationEmailsFromPreviousClassification(program, callback) {
   } else {
     callback(null, [])
   }
+}
+
+function updateAndLogChanges(document, updates, user, callback) {
+  var oldObject = document.toObject()
+  updates = utils.flattenObject(updates)
+  _.forEach(updates, function(value, key) {
+    document.set(key, value)
+  })
+  document.save(function(err, updatedDocument) {
+    if (err) return callback(err)
+    var newObject = updatedDocument.toObject()
+    var changes = _(updates).keys().map(function(path) {
+      return [
+        path.replace(/\./g, ','),
+        { new: utils.getProperty(newObject, path), old: utils.getProperty(oldObject, path) }]
+    }).zipObject().valueOf()
+    logCustomUpdateOperation(user, updatedDocument, changes)
+    callback(undefined, updatedDocument)
+  })
 }

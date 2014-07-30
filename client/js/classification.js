@@ -1,38 +1,40 @@
 function classificationPage() {
   var $root = $('#classification-page')
-  var $form = $('#program-details')
+
+  $root.on('show', function (e, programId, edit) {
+    if (edit) {
+      location.hash = '#luokittelu/' + programId + '/edit'
+      $.get('/programs/' + programId).done(classificationForm(edit ? true : false).show)
+    } else if (programId) {
+      location.hash = '#luokittelu/' + programId
+      $.get('/programs/' + programId).done(classificationForm().show)
+    } else {
+      location.hash = '#luokittelu'
+    }
+
+    $('.navi li:first a').addClass('active')
+  })
+}
+
+function classificationForm(editMode) {
+  var $page = $('#classification-page').html($('#templates .program-details').clone())
+  var $form = $page.find('.program-details-form')
   var $summary = $('.summary')
   var $submit = $form.find('button[name=register]')
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
   var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
-  var editMode
   var modifiedFields
+
+  if (editMode) {
+    modifiedFields = {}
+  } else {
+    editMode = false
+  }
 
   renderClassificationCriteria()
 
   var $throttledAutoSaveFields = $form.find('input[type=text], input[type=number], textarea').not('[name="registration-email"]')
-
-  $root.on('show', function(e, programId, edit) {
-    editMode = false
-    if (edit) {
-      location.hash = '#luokittelu/'+programId+'/edit'
-
-      editMode = true
-      modifiedFields = {}
-
-      $.get('/programs/' + programId).done(show)
-    } else if (programId) {
-      location.hash = '#luokittelu/'+programId
-      $.get('/programs/' + programId).done(show)
-    } else if ($form.data('id')) {
-      location.hash = '#luokittelu/'+$form.data('id')
-    } else {
-      location.hash = '#luokittelu'
-    }
-    $('.navi li:first a').addClass('active')
-    $form.find('.private-comments').toggle(hasRole('kavi'))
-  })
 
   $form.find('textarea').autosize()
 
@@ -209,14 +211,16 @@ function classificationPage() {
     allowAdding: true
   })
 
+  warningDragOrder($form.find('#summary .summary'))
+  warningDragOrder($form.find('#classification .summary'))
+
   function selectAutocomplete(opts) {
     select2Autocomplete(opts, function(name, val) {
       saveProgramField($form.data('id'), name, val)
     })
   }
 
-  warningDragOrder($('#summary .summary'))
-  warningDragOrder($('#classification .summary'))
+  return { show: show }
 
   function warningDragOrder($el) {
     $el.on('dragstart', '.warnings .warning', function(e) {
@@ -321,6 +325,8 @@ function classificationPage() {
 
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
       .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
+
+    $form.find('.private-comments').toggle(hasRole('kavi'))
 
     $form.find('.author-and-reason').toggleClass('hide', isExternalReclassification)
       .find('input')
@@ -450,8 +456,8 @@ function classificationPage() {
   }
 
   function registrationPreview() {
-    var $emails = $('#email .emails')
-    var $preview = $('#email .email-preview')
+    var $emails = $form.find('#email .emails')
+    var $preview = $form.find('#email .email-preview')
     var currentBuyerId = null
 
     $emails.find('ul').on('change', 'input', function(e) {

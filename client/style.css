@@ -244,12 +244,12 @@ label.top { vertical-align: top; }
 .form textarea { width: 280px; height: 130px; }
 .form input:disabled, .form textarea:disabled { background-color: #f4f4f4; cursor: not-allowed; }
 
-#program-details .reclassification { display: none; }
-#program-details.reclassification .classification { display: none; }
-#program-details.reclassification .reclassification { display: block; }
-#program-details.reclassification .reclassification label { width: 140px; }
+.program-details-form .reclassification { display: none; }
+.program-details-form.reclassification .classification { display: none; }
+.program-details-form.reclassification .reclassification { display: block; }
+.program-details-form.reclassification .reclassification label { width: 140px; }
 
-#program-details span.author { display: inline-block; height: 30px; width: 300px; }
+.program-details-form span.author { display: inline-block; height: 30px; width: 300px; }
 
 input[type=text],
 input[type=number],
@@ -396,32 +396,32 @@ textarea.invalid:disabled,
 
 #classification-page .new-program { margin-top: 10px }
 
-#program-details { display: none; }
+.program-details-form { display: none; }
 
-#program-details textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
-#program-details label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
-#program-details label[for=synopsis] { vertical-align: top; padding-top: 9px; }
+.program-details-form textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
+.program-details-form label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
+.program-details-form label[for=synopsis] { vertical-align: top; padding-top: 9px; }
 
-#program-details input.duration { margin-bottom: 3px }
-#program-details .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
+.program-details-form input.duration { margin-bottom: 3px }
+.program-details-form .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
 
-#program-details .tv-field { display: none; }
-#program-details.type-tv-other .tv-field { display: block; }
+.program-details-form .tv-field { display: none; }
+.program-details-form.type-tv-other .tv-field { display: block; }
 
-#program-details .tv-episode-field { display: none; }
-#program-details.type-tv-episode .tv-episode-field { display: block; }
-#program-details.type-tv-episode .tv-field { display: block; }
-#program-details.type-tv-episode .non-tv-episode-field { display: none; }
+.program-details-form .tv-episode-field { display: none; }
+.program-details-form.type-tv-episode .tv-episode-field { display: block; }
+.program-details-form.type-tv-episode .tv-field { display: block; }
+.program-details-form.type-tv-episode .non-tv-episode-field { display: none; }
 
-#program-details .movie-field { display: none; }
-#program-details.type-movie .movie-field { display: block; }
+.program-details-form .movie-field { display: none; }
+.program-details-form.type-movie .movie-field { display: block; }
 
-#program-details .game-field { display: none; }
-#program-details.type-game .game-field { display: block; }
-#program-details.type-game .non-game-field { display: none; }
+.program-details-form .game-field { display: none; }
+.program-details-form.type-game .game-field { display: block; }
+.program-details-form.type-game .non-game-field { display: none; }
 
-#program-details .season-episode-fields input + label { width: 50px; }
-#program-details .season-episode-fields input { width: 92px; }
+.program-details-form .season-episode-fields input + label { width: 50px; }
+.program-details-form .season-episode-fields input { width: 92px; }
 
 #classification h2 { margin: 0 0 10px 0; }
 #classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }

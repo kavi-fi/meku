@@ -329,7 +329,7 @@ function classificationForm(editMode) {
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
 
-    $form.find('input[name=directors]').prop('disabled', enums.util.isGameType(program) || isReclassification)
+    $form.find('input[name=directors]').prop('disabled', enums.util.isGameType(program) || isReclassification && !editMode)
     $form.find('input[name=gameFormat]').prop('disabled', !enums.util.isGameType(program))
 
     $form.find('input[name="classifications.0.format"]').prop('disabled', enums.util.isGameType(program))

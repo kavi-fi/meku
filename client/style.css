@@ -593,23 +593,23 @@ textarea.invalid:disabled,
 /*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 .summary .warnings .drop-target.active { width: 50px; }
 
-.id-email .emails label { text-align: left; width: 200px;}
-.id-email .emails input[name=registration-email] { width: 93%; }
+.classification-email .emails label { text-align: left; width: 200px;}
+.classification-email .emails input[name=registration-email] { width: 93%; }
 
-.id-email .left { width: 300px; }
-.id-email .right { width: 620px; }
+.classification-email .left { width: 300px; }
+.classification-email .right { width: 620px; }
 
-.id-email dl, .id-email .email-preview .body { line-height: 17px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
-.id-email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
-.id-email .email-preview pre { white-space: pre-line; }
-.id-email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
-.id-email dl dd { padding: 0 0 10px 0; min-height: 18px; }
-.id-email dl dt { font-weight: bold;}
+.classification-email dl, .classification-email .email-preview .body { line-height: 17px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.classification-email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
+.classification-email .email-preview pre { white-space: pre-line; }
+.classification-email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
+.classification-email dl dd { padding: 0 0 10px 0; min-height: 18px; }
+.classification-email dl dt { font-weight: bold;}
 
-.id-email .emails ul { list-style: none; padding: 0; margin: 0 0; }
-.id-email .emails ul input { margin-right: 10px; }
-.id-email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
-.id-email .emails input.email.invalid.touched { background-color: #F0FFF0; }
+.classification-email .emails ul { list-style: none; padding: 0; margin: 0 0; }
+.classification-email .emails ul input { margin-right: 10px; }
+.classification-email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
+.classification-email .emails input.email.invalid.touched { background-color: #F0FFF0; }
 
 #billing-page .datepicker {
   cursor: pointer;

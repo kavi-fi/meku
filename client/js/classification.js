@@ -4,10 +4,10 @@ function classificationPage() {
   $root.on('show', function (e, programId, edit) {
     if (edit) {
       location.hash = '#luokittelu/' + programId + '/edit'
-      $.get('/programs/' + programId).done(classificationForm(edit ? true : false).show)
+      $.get('/programs/' + programId).done(classificationForm(true).show)
     } else if (programId) {
       location.hash = '#luokittelu/' + programId
-      $.get('/programs/' + programId).done(classificationForm().show)
+      $.get('/programs/' + programId).done(classificationForm(false).show)
     } else {
       location.hash = '#luokittelu'
     }
@@ -24,13 +24,7 @@ function classificationForm(editMode) {
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
   var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
-  var modifiedFields
-
-  if (editMode) {
-    modifiedFields = {}
-  } else {
-    editMode = false
-  }
+  var modifiedFields = {}
 
   renderClassificationCriteria()
 
@@ -51,7 +45,7 @@ function classificationForm(editMode) {
   validateTextChange($form.find('.duration'), utils.isValidDuration)
   validateTextChange($form.find('.email'), isEmail)
   validateTextChange($form.find('input[name=year]'), utils.isValidYear)
-  requiredCheckboxGroup($form.find('.id-email .emails'))
+  requiredCheckboxGroup($form.find('.classification-email .emails'))
 
   $form.on('submit', function(e) {
     e.preventDefault()
@@ -359,8 +353,8 @@ function classificationForm(editMode) {
     $form.find('textarea').trigger('autosize.resize')
 
     // Email functionality is disabled when using admin's editing tool
-    $form.find('.id-email .emails').toggle(!editMode)
-    $form.find('.id-email .preview').toggleClass('right', !editMode)
+    $form.find('.classification-email .emails').toggle(!editMode)
+    $form.find('.classification-email .preview').toggleClass('right', !editMode)
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
@@ -410,7 +404,7 @@ function classificationForm(editMode) {
           .append($('<p>').text(c.description))
           .append($('<textarea>', { name:'classifications.0.criteriaComments.' + c.id, placeholder:'Kommentit...' }))
       })
-      $('.category-container .' + category).append($criteria)
+      $form.find('.category-container .' + category).append($criteria)
     })
   }
 
@@ -453,8 +447,8 @@ function classificationForm(editMode) {
   }
 
   function registrationPreview() {
-    var $emails = $form.find('.id-email .emails')
-    var $preview = $form.find('.id-email .email-preview')
+    var $emails = $form.find('.classification-email .emails')
+    var $preview = $form.find('.classification-email .email-preview')
     var currentBuyerId = null
 
     $emails.find('ul').on('change', 'input', function(e) {

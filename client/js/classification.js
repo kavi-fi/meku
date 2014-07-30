@@ -335,11 +335,8 @@ function classificationForm(editMode) {
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
 
-    if (enums.util.isGameType(program)) {
-      $form.find('input[name=directors]').prop('disabled', true)
-    } else {
-      $form.find('input[name=gameFormat]').prop('disabled', isReclassification)
-    }
+    $form.find('input[name=directors]').prop('disabled', enums.util.isGameType(program) || isReclassification)
+    $form.find('input[name=gameFormat]').prop('disabled', !enums.util.isGameType(program))
 
     $form.find('input[name="classifications.0.format"]').prop('disabled', enums.util.isGameType(program))
     var enableDuration = !enums.util.isGameType(program) || hasRole('kavi')

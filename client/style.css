@@ -22,12 +22,10 @@ body {
 #login .feedback, #reset-password .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
 #error-dialog a { color: #00BB88; }
 
-#registration-confirmation { width: 860px; }
-
 #reset-password > div { border: 0; }
 #reset-password .instructions { text-align: left; margin-bottom: 10px; }
 
-.id-criteria .category, [draggable] {
+.classification-criteria .category, [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -423,29 +421,30 @@ textarea.invalid:disabled,
 .program-details-form .season-episode-fields input + label { width: 50px; }
 .program-details-form .season-episode-fields input { width: 92px; }
 
-.id-classification h2 { margin: 0 0 10px 0; }
-.id-classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
-.id-classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
-.id-classification .summary .agelimit { padding: 0; display: inline-block;}
+.classification-details h2 { margin: 0 0 10px 0; }
+.classification-details .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
+.classification-details .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
+.classification-details .summary .agelimit { padding: 0; display: inline-block;}
 
-.id-registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
-.id-registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
-.id-registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
-.id-registration-confirmation .warning-summary { float: left; }
-.id-registration-confirmation .warning-summary img, .id-registration-confirmation .warning-summary .warning {
+.registration-confirmation { width: 860px; }
+.registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
+.registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
+.registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
+.registration-confirmation .warning-summary { float: left; }
+.registration-confirmation .warning-summary img, .registration-confirmation .warning-summary .warning {
   margin-right: 10px;
 }
 
-.id-criteria .header { position: relative; }
-.id-criteria .safe-container { position: absolute; left: 320px; top: 9px; }
-.id-criteria .safe-container input { margin: 0 5px 0 0; }
-.id-criteria .category {
+.classification-criteria .header { position: relative; }
+.classification-criteria .safe-container { position: absolute; left: 320px; top: 9px; }
+.classification-criteria .safe-container input { margin: 0 5px 0 0; }
+.classification-criteria .category {
   width: 300px;
   float: left;
   margin-right: 15px;
 }
 
-.id-criteria .category .heading {
+.classification-criteria .category .heading {
   outline: 1px solid #D3D3D3;
   background-color: #fff;
   padding: 0 0 0 70px;;
@@ -456,34 +455,34 @@ textarea.invalid:disabled,
   background-size: 40px 40px;
 }
 
-.id-criteria .category .heading h3 { margin: 24px 0; }
-.id-criteria .category.violence .heading h3 { color: #AA0050; }
-.id-criteria .category.fear .heading h3 { color: #44AAFF;}
-.id-criteria .category.sex .heading h3 { color: #FF77AA;}
-.id-criteria .category.drugs .heading h3 { color: #33BB33;}
+.classification-criteria .category .heading h3 { margin: 24px 0; }
+.classification-criteria .category.violence .heading h3 { color: #AA0050; }
+.classification-criteria .category.fear .heading h3 { color: #44AAFF;}
+.classification-criteria .category.sex .heading h3 { color: #FF77AA;}
+.classification-criteria .category.drugs .heading h3 { color: #33BB33;}
 
-.id-criteria .category.violence .heading {
+.classification-criteria .category.violence .heading {
   border-top: 5px solid #AA0050;
   background-image: url('images/violence.png');
 }
 
-.id-criteria .category.fear .heading {
+.classification-criteria .category.fear .heading {
   border-top: 5px solid #44AAFF;
   background-image: url('images/fear.png');
 }
 
-.id-criteria .category.sex .heading {
+.classification-criteria .category.sex .heading {
   border-top: 5px solid #FF77AA;
   background-image: url('images/sex.png');
 }
 
-.id-criteria .category.drugs .heading {
+.classification-criteria .category.drugs .heading {
   margin-top: 15px;
   border-top: 5px solid #33BB33;
   background-image: url('images/drugs.png');
 }
 
-.id-criteria .category .criteria {
+.classification-criteria .category .criteria {
   background-color: #fff;
   padding: 15px 20px 15px 70px;
   margin-top: 15px;
@@ -491,29 +490,29 @@ textarea.invalid:disabled,
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-.id-criteria .category .criteria:hover {
+.classification-criteria .category .criteria:hover {
   cursor: pointer;
   border: 1px solid #44AAFF;
   box-shadow: 0 0 5px 0 rgba(67,169,255,0.50), 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-.id-criteria .category .criteria.selected {
+.classification-criteria .category .criteria.selected {
   color: #ffffff;
   background: #777777;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20);
   border: 1px solid #777777;
 }
 
-.id-criteria .category .criteria h5 {
+.classification-criteria .category .criteria h5 {
   margin: 0 0 10px 0;
 }
 
-.id-criteria .category .criteria h5 span {
+.classification-criteria .category .criteria h5 span {
   color: #777;
   font-weight: normal;
 }
 
-.id-criteria .category .criteria p {
+.classification-criteria .category .criteria p {
   padding: 0;
   margin: 0 0 20px 0;
   font-size: 12px;
@@ -522,68 +521,68 @@ textarea.invalid:disabled,
   line-height: 17px;
 }
 
-.id-criteria .category .criteria.selected p,
-.id-criteria .category .criteria.selected h5,
-.id-criteria .category .criteria.selected h5 span {
+.classification-criteria .category .criteria.selected p,
+.classification-criteria .category .criteria.selected h5,
+.classification-criteria .category .criteria.selected h5 span {
   color: #fff;
 }
 
-.id-criteria .category .criteria textarea {
+.classification-criteria .category .criteria textarea {
   display: none;
   border: 1px solid #666666;
   border-radius: 0;
 }
-.id-criteria .category .criteria.has-comment textarea,
-.id-criteria .category .criteria.selected textarea {
+.classification-criteria .category .criteria.has-comment textarea,
+.classification-criteria .category .criteria.selected textarea {
   display: block;
 }
 
-.id-criteria .category .criteria.agelimit {
+.classification-criteria .category .criteria.agelimit {
   background-position: 15px 15px;
   background-repeat: no-repeat;
   background-size: 40px 40px;
 }
 
-.id-criteria .category .criteria.agelimit-18 { background-image: url('images/agelimit-18.png'); }
-.id-criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
-.id-criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
-.id-criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
-.id-criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
+.classification-criteria .category .criteria.agelimit-18 { background-image: url('images/agelimit-18.png'); }
+.classification-criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
+.classification-criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
+.classification-criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
+.classification-criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
 
-.id-criteria .category-container .category.sex, .id-criteria .category-container .category.drugs {
+.classification-criteria .category-container .category.sex, .classification-criteria .category-container .category.drugs {
   margin-right: 0;
 }
 
 
-.id-criteria .categories { float:left; margin-right: 30px; }
-.id-criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
+.classification-criteria .categories { float:left; margin-right: 30px; }
+.classification-criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
 
-.id-criteria .category-criteria { margin-left: 150px; min-height: 700px; }
-.id-criteria .category-criteria ol { display: none;}
-.id-criteria .category-criteria ol:first-of-type { display: block; }
-.id-criteria .category-criteria li { margin-bottom: 10px; }
-.id-criteria .category-criteria small { margin-left: 65px; display: block; }
-.id-criteria .category-criteria textarea { float: right; }
+.classification-criteria .category-criteria { margin-left: 150px; min-height: 700px; }
+.classification-criteria .category-criteria ol { display: none;}
+.classification-criteria .category-criteria ol:first-of-type { display: block; }
+.classification-criteria .category-criteria li { margin-bottom: 10px; }
+.classification-criteria .category-criteria small { margin-left: 65px; display: block; }
+.classification-criteria .category-criteria textarea { float: right; }
 
-.id-summary .comments textarea { width: 438px; }
-.id-summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
-.id-summary .left {width: 460px; padding: 0 10px 0 0;}
-.id-summary .right {width: 460px; padding: 0 0 0 10px;}
-.id-summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
-.id-summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
+.classification-summary .comments textarea { width: 438px; }
+.classification-summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
+.classification-summary .left {width: 460px; padding: 0 10px 0 0;}
+.classification-summary .right {width: 460px; padding: 0 0 0 10px;}
+.classification-summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
+.classification-summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
 
-.id-summary .header { border-bottom: 1px solid #D3D3D3; }
-.id-summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
-.id-summary .header .year { font-size: 16px; font-weight: normal; float: right;}
-.id-summary p { margin: 0 0 20px 0;}
+.classification-summary .header { border-bottom: 1px solid #D3D3D3; }
+.classification-summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
+.classification-summary .header .year { font-size: 16px; font-weight: normal; float: right;}
+.classification-summary p { margin: 0 0 20px 0;}
 
-.id-summary dl { margin: 15px 0 0 0; }
+.classification-summary dl { margin: 15px 0 0 0; }
 
-.id-summary p,
-.id-summary dl dt,
-.id-summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
-.id-summary dl dt { font-weight: bold;}
-.id-summary dd .reason { font-weight: bold; }
+.classification-summary p,
+.classification-summary dl dt,
+.classification-summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
+.classification-summary dl dt { font-weight: bold;}
+.classification-summary dd .reason { font-weight: bold; }
 
 .summary .agelimit  { padding: 15px 0 0 0;}
 .summary .warnings .warning { cursor: move; transition: width 0.3s; }

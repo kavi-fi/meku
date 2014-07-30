@@ -51,7 +51,7 @@ function classificationForm(editMode) {
     e.preventDefault()
     $.post('/programs/' + $form.data('id') + '/register', function(program) {
       $form.data('id', '').hide().trigger('show')
-      showDialog($('<div>', {class: 'id-registration-confirmation dialog'})
+      showDialog($('<div>', {class: 'registration-confirmation dialog'})
         .append($('<span>', {class: 'name'}).text(program.name))
         .append(renderWarningSummary(classification.fullSummary(program)))
         .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(program.classifications[0].registrationDate)))
@@ -205,8 +205,8 @@ function classificationForm(editMode) {
     allowAdding: true
   })
 
-  warningDragOrder($form.find('.id-summary .summary'))
-  warningDragOrder($form.find('.id-classification .summary'))
+  warningDragOrder($form.find('.classification-summary .summary'))
+  warningDragOrder($form.find('.classification-details .summary'))
 
   function selectAutocomplete(opts) {
     select2Autocomplete(opts, function(name, val) {
@@ -359,9 +359,9 @@ function classificationForm(editMode) {
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
 
-    $form.find('.id-classification, .id-criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
+    $form.find('.classification-details, .classification-criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
     $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
-    $form.find('.id-classification h2.main').text(classificationTitle)
+    $form.find('.classification-details h2.main').text(classificationTitle)
     $form.find('input[name], textarea[name]').toggleClass('touched', editMode)
   }
 

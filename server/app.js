@@ -288,15 +288,14 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
   })
 })
 
-app.get('/programs/:id/registrationEmails', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+app.get('/programs/:id/registrationEmails', requireRole('root'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
     getRegistrationEmailsFromPreviousClassification(program, respond(res, next))
   })
 })
 
-app.post('/programs/:id/categorization', function(req, res, next) {
+app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
     program.programType = parseInt(req.body.programType)
@@ -332,8 +331,7 @@ app.post('/programs/:id', function(req, res, next) {
   })
 })
 
-app.delete('/programs/:id', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
   Program.findByIdAndUpdate(req.params.id, { deleted: true }, respond(res, next))
 })
 
@@ -347,32 +345,27 @@ app.get('/series/search/:query', function(req, res, next) {
   })
 })
 
-app.put('/accounts/:id', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
   Account.findByIdAndUpdate(req.params.id, req.body, function(err, account) {
     if (err) return next(err)
     account.save(respond(res, next))
   })
 })
 
-app.post('/accounts', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+app.post('/accounts', requireRole('kavi'), function(req, res, next) {
   new Account(req.body).save(respond(res, next))
 })
 
-app.delete('/accounts/:id', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+app.delete('/accounts/:id', requireRole('root'), function(req, res, next) {
   Account.findByIdAndRemove(req.params.id, respond(res, next))
 })
 
-app.get('/accounts', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+app.get('/accounts', requireRole('kavi'), function(req, res, next) {
   var selectedRoles = req.query.roles
   Account.find(selectedRoles ? { roles: { $all: selectedRoles }} : {}, respond(res, next))
 })
 
-app.get('/subscribers', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
+app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
   var selectedRoles = req.query.roles
   var query = _.isEmpty(selectedRoles)
     ? { roles: { $in: ['Classifier', 'Subscriber'] }}
@@ -395,22 +388,21 @@ app.get('/accounts/:id', function(req, res, next) {
   Account.findById(req.params.id, respond(res, next))
 })
 
-app.get('/users', function(req, res, next) {
+app.get('/users', requireRole('root'), function(req, res, next) {
   var roleFilters = req.query.filters
   User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
 })
 
-app.get('/users/search', function(req, res, next) {
+app.get('/users/search', requireRole('kavi'), function(req, res, next) {
   var q = { name: new RegExp("^" + utils.escapeRegExp(req.query.q), 'i') }
   User.find(q).exec(respond(res, next))
 })
 
-app.delete('/users/:id', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'root')) return res.send(403)
+app.delete('/users/:id', requireRole('root'), function(req, res, next) {
   User.findByIdAndRemove(req.params.id, respond(res, next))
 })
 
-app.get('/users/exists/:username', function(req, res, next) {
+app.get('/users/exists/:username', requireRole('root'), function(req, res, next) {
   User.findOne({ username: req.params.username }, function(err, user) {
     if (err) return next(err)
     res.send({ exists: !!user })
@@ -421,7 +413,7 @@ function userHasRequiredFields(user) {
   return (user.username != '' && user.emails[0].length > 0 && user.name != '')
 }
 
-app.post('/users/new', function(req, res, next) {
+app.post('/users/new', requireRole('root'), function(req, res, next) {
   if (userHasRequiredFields(req.body)) {
     new User(req.body).save(function(err, user) {
       if (err) return next(err)
@@ -445,7 +437,7 @@ app.get('/users/names/:names', function(req, res, next) {
   User.find({username: {$in: req.params.names.split(',')}}, 'name username', respond(res, next))
 })
 
-app.post('/users/:id', function(req, res, next) {
+app.post('/users/:id', requireRole('root'), function(req, res, next) {
   User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
     if (err) return next(err)
     res.send(user)
@@ -456,14 +448,14 @@ app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
 app.get('/productionCompanies/search/:query', queryNameIndex('ProductionCompany'))
 
-app.get('/invoicerows/:begin/:end', function(req, res, next) {
+app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next) {
   var format = "DD.MM.YYYY"
   var begin = moment(req.params.begin, format)
   var end = moment(req.params.end, format).add('days', 1)
   InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').exec(respond(res, next))
 })
 
-app.post('/proe', express.urlencoded(), function(req, res, next) {
+app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {
   var dates = { begin: req.body.begin, end: req.body.end }
   var invoiceIds = req.body.invoiceId
   if (!Array.isArray(invoiceIds)) invoiceIds = [invoiceIds]
@@ -724,6 +716,13 @@ function authenticateXmlApi(req, res, next) {
       res.send(403)
     }
   })
+}
+
+function requireRole(role) {
+  return function(req, res, next) {
+    if (!utils.hasRole(req.user, role)) return res.send(403)
+    else return next()
+  }
 }
 
 function sendEmail(data, callback) {

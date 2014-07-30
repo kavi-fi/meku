@@ -350,7 +350,10 @@ app.post('/programs/autosave/:id', function(req, res, next) {
 
 app.delete('/programs/:id', function(req, res, next) {
   if (!utils.hasRole(req.user, 'root')) return res.send(403)
-  Program.findByIdAndUpdate(req.params.id, { deleted: true }, respond(res, next))
+  Program.findById(req.params.id, function(err, program) {
+    if (err) return next(err)
+    softDeleteAndLog(program, req.user, respond(res, next))
+  })
 })
 
 app.get('/series/search/:query', function(req, res, next) {
@@ -442,13 +445,13 @@ app.delete('/users/:id', function(req, res, next) {
   })
 })
 
-function logDeleteOperation(user, object, collection) {
+function logDeleteOperation(user, document) {
   new ChangeLog({
     user: { _id: user._id, username: user.username },
     date: new Date(),
     operation: 'delete',
-    targetCollection: collection,
-    deleted: object
+    targetCollection: document.constructor.modelName,
+    documentId: document._id
   }).save(logError)
 }
 
@@ -926,5 +929,14 @@ function updateAndLogChanges(document, updates, user, callback) {
     }).zipObject().valueOf()
     logCustomUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
+  })
+}
+
+function softDeleteAndLog(document, user, callback) {
+  document.deleted = true
+  document.save(function (err, document) {
+    if (err) return callback(err)
+    logDeleteOperation(user, document)
+    callback(undefined, document)
   })
 }

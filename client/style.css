@@ -27,7 +27,7 @@ body {
 #reset-password > div { border: 0; }
 #reset-password .instructions { text-align: left; margin-bottom: 10px; }
 
-#criteria .category, [draggable] {
+.id-criteria .category, [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -233,12 +233,12 @@ label.top { vertical-align: top; }
 .program-box .categorization-form .categorization-form-tv-episode > div { margin-left: 5px; display: inline-block; vertical-align: top; }
 .program-box .categorization-form input[type=number] { width: 80px; display: inline-block; }
 
-#classification-page input[type=text],
-#classification-page input[type=number] {
+.program-details-form input[type=text],
+.program-details-form input[type=number] {
   width: 280px;
 }
-#classification-page .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
-#classification-page .program-info button[name=save] { float: right; }
+.program-details-form .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
+.program-details-form .program-info button[name=save] { float: right; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }
@@ -394,13 +394,13 @@ textarea.invalid:disabled,
   background: #fff0f0;
 }
 
-#classification-page .new-program { margin-top: 10px }
+.program-details-form .new-program { margin-top: 10px }
 
 .program-details-form { display: none; }
 
 .program-details-form textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
 .program-details-form label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
-.program-details-form label[for=synopsis] { vertical-align: top; padding-top: 9px; }
+.program-details-form .id-synopsis-label { vertical-align: top; padding-top: 9px; }
 
 .program-details-form input.duration { margin-bottom: 3px }
 .program-details-form .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
@@ -423,29 +423,29 @@ textarea.invalid:disabled,
 .program-details-form .season-episode-fields input + label { width: 50px; }
 .program-details-form .season-episode-fields input { width: 92px; }
 
-#classification h2 { margin: 0 0 10px 0; }
-#classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
-#classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
-#classification .summary .agelimit { padding: 0; display: inline-block;}
+.id-classification h2 { margin: 0 0 10px 0; }
+.id-classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
+.id-classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
+.id-classification .summary .agelimit { padding: 0; display: inline-block;}
 
-#registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
-#registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
-#registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
-#registration-confirmation .warning-summary { float: left; }
-#registration-confirmation .warning-summary img, #registration-confirmation .warning-summary .warning {
+.id-registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
+.id-registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
+.id-registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
+.id-registration-confirmation .warning-summary { float: left; }
+.id-registration-confirmation .warning-summary img, .id-registration-confirmation .warning-summary .warning {
   margin-right: 10px;
 }
 
-#criteria .header { position: relative; }
-#criteria .safe-container { position: absolute; left: 320px; top: 9px; }
-#criteria .safe-container input { margin: 0 5px 0 0; }
-#criteria .category {
+.id-criteria .header { position: relative; }
+.id-criteria .safe-container { position: absolute; left: 320px; top: 9px; }
+.id-criteria .safe-container input { margin: 0 5px 0 0; }
+.id-criteria .category {
   width: 300px;
   float: left;
   margin-right: 15px;
 }
 
-#criteria .category .heading {
+.id-criteria .category .heading {
   outline: 1px solid #D3D3D3;
   background-color: #fff;
   padding: 0 0 0 70px;;
@@ -456,34 +456,34 @@ textarea.invalid:disabled,
   background-size: 40px 40px;
 }
 
-#criteria .category .heading h3 { margin: 24px 0; }
-#criteria .category.violence .heading h3 { color: #AA0050; }
-#criteria .category.fear .heading h3 { color: #44AAFF;}
-#criteria .category.sex .heading h3 { color: #FF77AA;}
-#criteria .category.drugs .heading h3 { color: #33BB33;}
+.id-criteria .category .heading h3 { margin: 24px 0; }
+.id-criteria .category.violence .heading h3 { color: #AA0050; }
+.id-criteria .category.fear .heading h3 { color: #44AAFF;}
+.id-criteria .category.sex .heading h3 { color: #FF77AA;}
+.id-criteria .category.drugs .heading h3 { color: #33BB33;}
 
-#criteria .category.violence .heading {
+.id-criteria .category.violence .heading {
   border-top: 5px solid #AA0050;
   background-image: url('images/violence.png');
 }
 
-#criteria .category.fear .heading {
+.id-criteria .category.fear .heading {
   border-top: 5px solid #44AAFF;
   background-image: url('images/fear.png');
 }
 
-#criteria .category.sex .heading {
+.id-criteria .category.sex .heading {
   border-top: 5px solid #FF77AA;
   background-image: url('images/sex.png');
 }
 
-#criteria .category.drugs .heading {
+.id-criteria .category.drugs .heading {
   margin-top: 15px;
   border-top: 5px solid #33BB33;
   background-image: url('images/drugs.png');
 }
 
-#criteria .category .criteria {
+.id-criteria .category .criteria {
   background-color: #fff;
   padding: 15px 20px 15px 70px;
   margin-top: 15px;
@@ -491,29 +491,29 @@ textarea.invalid:disabled,
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-#criteria .category .criteria:hover {
+.id-criteria .category .criteria:hover {
   cursor: pointer;
   border: 1px solid #44AAFF;
   box-shadow: 0 0 5px 0 rgba(67,169,255,0.50), 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-#criteria .category .criteria.selected {
+.id-criteria .category .criteria.selected {
   color: #ffffff;
   background: #777777;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20);
   border: 1px solid #777777;
 }
 
-#criteria .category .criteria h5 {
+.id-criteria .category .criteria h5 {
   margin: 0 0 10px 0;
 }
 
-#criteria .category .criteria h5 span {
+.id-criteria .category .criteria h5 span {
   color: #777;
   font-weight: normal;
 }
 
-#criteria .category .criteria p {
+.id-criteria .category .criteria p {
   padding: 0;
   margin: 0 0 20px 0;
   font-size: 12px;
@@ -522,68 +522,68 @@ textarea.invalid:disabled,
   line-height: 17px;
 }
 
-#criteria .category .criteria.selected p,
-#criteria .category .criteria.selected h5,
-#criteria .category .criteria.selected h5 span {
+.id-criteria .category .criteria.selected p,
+.id-criteria .category .criteria.selected h5,
+.id-criteria .category .criteria.selected h5 span {
   color: #fff;
 }
 
-#criteria .category .criteria textarea {
+.id-criteria .category .criteria textarea {
   display: none;
   border: 1px solid #666666;
   border-radius: 0;
 }
-#criteria .category .criteria.has-comment textarea,
-#criteria .category .criteria.selected textarea {
+.id-criteria .category .criteria.has-comment textarea,
+.id-criteria .category .criteria.selected textarea {
   display: block;
 }
 
-#criteria .category .criteria.agelimit {
+.id-criteria .category .criteria.agelimit {
   background-position: 15px 15px;
   background-repeat: no-repeat;
   background-size: 40px 40px;
 }
 
-#criteria .category .criteria.agelimit-18 { background-image: url('images/agelimit-18.png'); }
-#criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
-#criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
-#criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
-#criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
+.id-criteria .category .criteria.agelimit-18 { background-image: url('images/agelimit-18.png'); }
+.id-criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
+.id-criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
+.id-criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
+.id-criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
 
-#criteria .category-container .category.sex, #criteria .category-container .category.drugs {
+.id-criteria .category-container .category.sex, .id-criteria .category-container .category.drugs {
   margin-right: 0;
 }
 
 
-#criteria .categories { float:left; margin-right: 30px; }
-#criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
+.id-criteria .categories { float:left; margin-right: 30px; }
+.id-criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
 
-#criteria .category-criteria { margin-left: 150px; min-height: 700px; }
-#criteria .category-criteria ol { display: none;}
-#criteria .category-criteria ol:first-of-type { display: block; }
-#criteria .category-criteria li { margin-bottom: 10px; }
-#criteria .category-criteria small { margin-left: 65px; display: block; }
-#criteria .category-criteria textarea { float: right; }
+.id-criteria .category-criteria { margin-left: 150px; min-height: 700px; }
+.id-criteria .category-criteria ol { display: none;}
+.id-criteria .category-criteria ol:first-of-type { display: block; }
+.id-criteria .category-criteria li { margin-bottom: 10px; }
+.id-criteria .category-criteria small { margin-left: 65px; display: block; }
+.id-criteria .category-criteria textarea { float: right; }
 
-#summary .comments textarea { width: 438px; }
-#summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
-#summary .left {width: 460px; padding: 0 10px 0 0;}
-#summary .right {width: 460px; padding: 0 0 0 10px;}
-#summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
-#summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
+.id-summary .comments textarea { width: 438px; }
+.id-summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
+.id-summary .left {width: 460px; padding: 0 10px 0 0;}
+.id-summary .right {width: 460px; padding: 0 0 0 10px;}
+.id-summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
+.id-summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
 
-#summary .header { border-bottom: 1px solid #D3D3D3; }
-#summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
-#summary .header .year { font-size: 16px; font-weight: normal; float: right;}
-#summary p { margin: 0 0 20px 0;}
+.id-summary .header { border-bottom: 1px solid #D3D3D3; }
+.id-summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
+.id-summary .header .year { font-size: 16px; font-weight: normal; float: right;}
+.id-summary p { margin: 0 0 20px 0;}
 
-#summary dl { margin: 15px 0 0 0; }
+.id-summary dl { margin: 15px 0 0 0; }
 
-#summary p,
-#summary dl dt,
-#summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
-#summary dl dt { font-weight: bold;}
-#summary dd .reason { font-weight: bold; }
+.id-summary p,
+.id-summary dl dt,
+.id-summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
+.id-summary dl dt { font-weight: bold;}
+.id-summary dd .reason { font-weight: bold; }
 
 .summary .agelimit  { padding: 15px 0 0 0;}
 .summary .warnings .warning { cursor: move; transition: width 0.3s; }
@@ -593,23 +593,23 @@ textarea.invalid:disabled,
 /*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 .summary .warnings .drop-target.active { width: 50px; }
 
-#email .emails label { text-align: left; width: 200px;}
-#email .emails input[name=registration-email] { width: 93%; }
+.id-email .emails label { text-align: left; width: 200px;}
+.id-email .emails input[name=registration-email] { width: 93%; }
 
-#email .left { width: 300px; }
-#email .right { width: 620px; }
+.id-email .left { width: 300px; }
+.id-email .right { width: 620px; }
 
-#email dl, #email .email-preview .body { line-height: 17px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
-#email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
-#email .email-preview pre { white-space: pre-line; }
-#email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
-#email dl dd { padding: 0 0 10px 0; min-height: 18px; }
-#email dl dt { font-weight: bold;}
+.id-email dl, .id-email .email-preview .body { line-height: 17px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.id-email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
+.id-email .email-preview pre { white-space: pre-line; }
+.id-email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
+.id-email dl dd { padding: 0 0 10px 0; min-height: 18px; }
+.id-email dl dt { font-weight: bold;}
 
-#email .emails ul { list-style: none; padding: 0; margin: 0 0; }
-#email .emails ul input { margin-right: 10px; }
-#email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
-#email .emails input.email.invalid.touched { background-color: #F0FFF0; }
+.id-email .emails ul { list-style: none; padding: 0; margin: 0 0; }
+.id-email .emails ul input { margin-right: 10px; }
+.id-email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
+.id-email .emails input.email.invalid.touched { background-color: #F0FFF0; }
 
 #billing-page .datepicker {
   cursor: pointer;

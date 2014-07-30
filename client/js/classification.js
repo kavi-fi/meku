@@ -19,7 +19,7 @@ function classificationPage() {
 function classificationForm(editMode) {
   var $page = $('#classification-page').html($('#templates .program-details').clone())
   var $form = $page.find('.program-details-form')
-  var $summary = $('.summary')
+  var $summary = $form.find('.summary')
   var $submit = $form.find('button[name=register]')
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
   var $billing = $form.find('input[name="classifications.0.billing"]')
@@ -51,13 +51,13 @@ function classificationForm(editMode) {
   validateTextChange($form.find('.duration'), utils.isValidDuration)
   validateTextChange($form.find('.email'), isEmail)
   validateTextChange($form.find('input[name=year]'), utils.isValidYear)
-  requiredCheckboxGroup($form.find('#email .emails'))
+  requiredCheckboxGroup($form.find('.id-email .emails'))
 
   $form.on('submit', function(e) {
     e.preventDefault()
     $.post('/programs/' + $form.data('id') + '/register', function(program) {
       $form.data('id', '').hide().trigger('show')
-      showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
+      showDialog($('<div>', {class: 'id-registration-confirmation dialog'})
         .append($('<span>', {class: 'name'}).text(program.name))
         .append(renderWarningSummary(classification.fullSummary(program)))
         .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(program.classifications[0].registrationDate)))
@@ -211,8 +211,8 @@ function classificationForm(editMode) {
     allowAdding: true
   })
 
-  warningDragOrder($form.find('#summary .summary'))
-  warningDragOrder($form.find('#classification .summary'))
+  warningDragOrder($form.find('.id-summary .summary'))
+  warningDragOrder($form.find('.id-classification .summary'))
 
   function selectAutocomplete(opts) {
     select2Autocomplete(opts, function(name, val) {
@@ -362,15 +362,15 @@ function classificationForm(editMode) {
     $form.find('textarea').trigger('autosize.resize')
 
     // Email functionality is disabled when using admin's editing tool
-    $form.find('#email .emails').toggle(!editMode)
-    $form.find('#email .preview').toggleClass('right', !editMode)
+    $form.find('.id-email .emails').toggle(!editMode)
+    $form.find('.id-email .preview').toggleClass('right', !editMode)
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
 
-    $form.find('#classification, #criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
+    $form.find('.id-classification, .id-criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
     $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
-    $form.find('#classification h2.main').text(classificationTitle)
+    $form.find('.id-classification h2.main').text(classificationTitle)
     $form.find('input[name], textarea[name]').toggleClass('touched', editMode)
   }
 
@@ -456,8 +456,8 @@ function classificationForm(editMode) {
   }
 
   function registrationPreview() {
-    var $emails = $form.find('#email .emails')
-    var $preview = $form.find('#email .email-preview')
+    var $emails = $form.find('.id-email .emails')
+    var $preview = $form.find('.id-email .email-preview')
     var currentBuyerId = null
 
     $emails.find('ul').on('change', 'input', function(e) {

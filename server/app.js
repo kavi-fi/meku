@@ -237,12 +237,12 @@ app.post('/programs/:id/register', function(req, res, next) {
     newClassification.author = { _id: req.user._id, name: req.user.name }
 
     delete program.draftClassifications[req.user._id]
-    program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    verifyTvSeries(program, function(err) {
+    var classifications = [newClassification].concat(program.classifications)
+    updateAndLogChanges(program, { classifications: classifications }, req.user, function(err, program) {
       if (err) return next(err)
-      program.save(function(err) {
+      verifyTvSeries(program, function(err) {
         if (err) return next(err)
         verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
@@ -334,6 +334,16 @@ app.post('/programs/:id', function(req, res, next) {
         if (err) return next(err)
         program.save(respond(res, next))
       })
+    })
+  })
+})
+
+app.post('/programs/autosave/:id', function(req, res, next) {
+  Program.findByIdAndUpdate(req.params.id, req.body, function(err, program) {
+    if (err) return next(err)
+    program.populateAllNames(function(err) {
+      if (err) return next(err)
+      program.save(respond(res, next))
     })
   })
 })

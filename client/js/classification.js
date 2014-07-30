@@ -415,7 +415,7 @@ function classificationPage() {
       $saveButton.prop('disabled', false)
     } else {
       field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
-      $.post('/programs/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {
+      $.post('/programs/autosave/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {
         updateSummary(program)
         preview.update(program)
       })

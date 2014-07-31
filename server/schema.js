@@ -129,6 +129,7 @@ var AccountSchema = new Schema({
   address: address,
   billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
   eInvoice: { address:String, operator:String },
+  billingPreference: String, // '' || 'address' || 'eInvoice'
   emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],
   apiToken: String,

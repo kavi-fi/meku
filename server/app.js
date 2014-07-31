@@ -53,13 +53,14 @@ app.post('/login', function(req, res, next) {
 })
 
 function setLoginCookie(res, user) {
+  var weekInMs = 604800000
   res.cookie('user', {
     _id: user._id.toString(),
     username: user.username,
     name: user.name,
     role: user.role,
     email: _.first(user.emails)
-  }, { signed: true })
+  }, { maxAge: weekInMs, signed: true })
 }
 
 app.post('/logout', function(req, res, next) {

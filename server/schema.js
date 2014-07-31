@@ -205,15 +205,8 @@ var XmlDoc = exports.XmlDoc = mongoose.model('xmldocs', new Schema({
   account: {_id: ObjectId, name: String}
 }))
 
-var LoginLog = exports.LoginLog = mongoose.model('loginlog', new Schema({
-  user: {_id: ObjectId, username: String},
-  date: Date,
-  ip: String,
-  userAgent: String
-}))
-
 var ChangeLog = exports.ChangeLog = mongoose.model('changelog', new Schema({
-  user: {_id: ObjectId, username: String},
+  user: {_id: ObjectId, username: String, ip: String},
   date: Date,
   operation: String,
   targetCollection: String,
@@ -253,7 +246,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, LoginLog, ChangeLog]
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

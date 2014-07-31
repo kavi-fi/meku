@@ -54,15 +54,15 @@ app.post('/login', function(req, res, next) {
 })
 
 function logUserIn(req, res, user) {
-  logUserLogin(req, user)
-
+  var weekInMs = 604800000
   res.cookie('user', {
     _id: user._id.toString(),
     username: user.username,
     name: user.name,
     role: user.role,
     email: _.first(user.emails)
-  }, { signed: true })
+  }, { maxAge: weekInMs, signed: true })
+  logUserLogin(req, user)
 }
 
 app.post('/logout', function(req, res, next) {
@@ -175,12 +175,10 @@ function search(responseFields, req, res, next) {
 }
 
 app.get('/programs/drafts', function(req, res, next) {
-  var term = utils.keyValue('draftClassifications.' + req.user._id, {$exists: true})
-  Program.find(term).exec(function(err, programs) {
+  Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }, function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {
-      var draft = p.draftClassifications[req.user._id]
-      return {_id: p._id, name: p.name, creationDate: draft.creationDate}
+      return {_id: p._id, name: p.name, creationDate: p.draftClassifications[req.user._id].creationDate}
     }))
   })
 })
@@ -201,8 +199,9 @@ app.get('/programs/recent', function(req, res, next) {
 })
 
 app.delete('/programs/drafts/:id', function(req, res, next) {
+  var pull = { draftsBy: req.user._id }
   var unset = utils.keyValue('draftClassifications.' + req.user._id, "")
-  Program.findByIdAndUpdate(req.params.id, {$unset: unset}, null, respond(res, next))
+  Program.findByIdAndUpdate(req.params.id, { $pull: pull, $unset: unset }, respond(res, next))
 })
 
 app.get('/programs/:id', function(req, res, next) {
@@ -212,9 +211,9 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-  var data = { draftClassifications: {}, programType: programType }
-  data.draftClassifications[req.user._id] = Program.createNewClassification(req.user)
-  new Program(data).save(function(err, program) {
+  var p = new Program({ programType: programType })
+  p.newDraftClassification(req.user)
+  p.save(function(err, program) {
     if (err) return next(err)
 
     logCreateOperation(req, req.user, program)
@@ -233,6 +232,8 @@ app.post('/programs/:id/register', function(req, res, next) {
     newClassification.author = { _id: req.user._id, name: req.user.name }
 
     delete program.draftClassifications[req.user._id]
+    program.draftsBy.pull(req.user._id)
+    program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
     var classifications = [newClassification].concat(program.classifications)
@@ -287,11 +288,8 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
     if (err) next(err)
     getRegistrationEmailsFromPreviousClassification(program, function(err, emails) {
       if (err) return next(err)
-      var newClassification = Program.createNewClassification(req.user)
-      newClassification.registrationEmailAddresses = emails
-      if (!program.draftClassifications) program.draftClassifications = {}
-      program.draftClassifications[req.user._id] = newClassification
-      program.markModified('draftClassifications')
+      var draft = program.newDraftClassification(req.user)
+      draft.registrationEmailAddresses = emails
       program.save(respond(res, next))
     })
   })

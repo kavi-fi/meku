@@ -1,38 +1,34 @@
 function classificationPage() {
   var $root = $('#classification-page')
-  var $form = $('#program-details')
-  var $summary = $('.summary')
+
+  $root.on('show', function (e, programId, edit) {
+    if (edit) {
+      setLocation('#luokittelu/' + programId + '/edit')
+      $.get('/programs/' + programId).done(classificationForm(true).show)
+    } else if (programId) {
+      setLocation('#luokittelu/' + programId)
+      $.get('/programs/' + programId).done(classificationForm(false).show)
+    } else {
+      setLocation('#luokittelu')
+    }
+
+    $('.navi li:first a').addClass('active')
+  })
+}
+
+function classificationForm(editMode) {
+  var $page = $('#classification-page').html($('#templates .program-details').clone())
+  var $form = $page.find('.program-details-form')
+  var $summary = $form.find('.summary')
   var $submit = $form.find('button[name=register]')
   var $buyer = $form.find('input[name="classifications.0.buyer"]')
   var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
-  var editMode
-  var modifiedFields
+  var modifiedFields = {}
 
   renderClassificationCriteria()
 
   var $throttledAutoSaveFields = $form.find('input[type=text], input[type=number], textarea').not('[name="registration-email"]')
-
-  $root.on('show', function(e, programId, edit) {
-    editMode = false
-    if (edit) {
-      setLocation('#luokittelu/'+programId+'/edit')
-
-      editMode = true
-      modifiedFields = {}
-
-      $.get('/programs/' + programId).done(show)
-    } else if (programId) {
-      setLocation('#luokittelu/'+programId)
-      $.get('/programs/' + programId).done(show)
-    } else if ($form.data('id')) {
-      setLocation('#luokittelu/'+$form.data('id'))
-    } else {
-      setLocation('#luokittelu')
-    }
-    $('.navi li:first a').addClass('active')
-    $form.find('.private-comments').toggle(hasRole('kavi'))
-  })
 
   $form.find('textarea').autosize()
 
@@ -49,13 +45,13 @@ function classificationPage() {
   validateTextChange($form.find('.duration'), utils.isValidDuration)
   validateTextChange($form.find('.email'), isEmail)
   validateTextChange($form.find('input[name=year]'), utils.isValidYear)
-  requiredCheckboxGroup($form.find('#email .emails'))
+  requiredCheckboxGroup($form.find('.classification-email .emails'))
 
   $form.on('submit', function(e) {
     e.preventDefault()
     $.post('/programs/' + $form.data('id') + '/register', function(program) {
       $form.data('id', '').hide().trigger('show')
-      showDialog($('<div>', {id: 'registration-confirmation', class: 'dialog'})
+      showDialog($('<div>', {class: 'registration-confirmation dialog'})
         .append($('<span>', {class: 'name'}).text(program.name))
         .append(renderWarningSummary(classification.fullSummary(program)))
         .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(program.classifications[0].registrationDate)))
@@ -209,14 +205,16 @@ function classificationPage() {
     allowAdding: true
   })
 
+  warningDragOrder($form.find('.classification-summary .summary'))
+  warningDragOrder($form.find('.classification-details .summary'))
+
   function selectAutocomplete(opts) {
     select2Autocomplete(opts, function(name, val) {
       saveProgramField($form.data('id'), name, val)
     })
   }
 
-  warningDragOrder($('#summary .summary'))
-  warningDragOrder($('#classification .summary'))
+  return { show: show }
 
   function warningDragOrder($el) {
     $el.on('dragstart', '.warnings .warning', function(e) {
@@ -322,6 +320,8 @@ function classificationPage() {
     $form.find('.comments .public-comments').toggleClass('hide', isExternalReclassification)
       .find('textarea').prop('disabled', isExternalReclassification || !isReclassification)
 
+    $form.find('.private-comments').toggle(hasRole('kavi'))
+
     $form.find('.author-and-reason').toggleClass('hide', isExternalReclassification)
       .find('input')
       .prop('disabled', isExternalReclassification)
@@ -329,11 +329,8 @@ function classificationPage() {
 
     $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
 
-    if (enums.util.isGameType(program)) {
-      $form.find('input[name=directors]').prop('disabled', true)
-    } else {
-      $form.find('input[name=gameFormat]').prop('disabled', isReclassification)
-    }
+    $form.find('input[name=directors]').prop('disabled', enums.util.isGameType(program) || isReclassification && !editMode)
+    $form.find('input[name=gameFormat]').prop('disabled', !enums.util.isGameType(program))
 
     $form.find('input[name="classifications.0.format"]').prop('disabled', enums.util.isGameType(program))
     var enableDuration = !enums.util.isGameType(program) || hasRole('kavi')
@@ -356,15 +353,15 @@ function classificationPage() {
     $form.find('textarea').trigger('autosize.resize')
 
     // Email functionality is disabled when using admin's editing tool
-    $form.find('#email .emails').toggle(!editMode)
-    $form.find('#email .preview').toggleClass('right', !editMode)
+    $form.find('.classification-email .emails').toggle(!editMode)
+    $form.find('.classification-email .preview').toggleClass('right', !editMode)
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
 
-    $form.find('#classification, #criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
+    $form.find('.classification-details, .classification-criteria').toggle(!(editMode && _.isEmpty(program.classifications)))
     $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
-    $form.find('#classification h2.main').text(classificationTitle)
+    $form.find('.classification-details h2.main').text(classificationTitle)
     $form.find('input[name], textarea[name]').toggleClass('touched', editMode)
   }
 
@@ -407,7 +404,7 @@ function classificationPage() {
           .append($('<p>').text(c.description))
           .append($('<textarea>', { name:'classifications.0.criteriaComments.' + c.id, placeholder:'Kommentit...' }))
       })
-      $('.category-container .' + category).append($criteria)
+      $form.find('.category-container .' + category).append($criteria)
     })
   }
 
@@ -450,8 +447,8 @@ function classificationPage() {
   }
 
   function registrationPreview() {
-    var $emails = $('#email .emails')
-    var $preview = $('#email .email-preview')
+    var $emails = $form.find('.classification-email .emails')
+    var $preview = $form.find('.classification-email .email-preview')
     var currentBuyerId = null
 
     $emails.find('ul').on('change', 'input', function(e) {

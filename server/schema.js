@@ -48,6 +48,7 @@ var ProgramSchema = new Schema({
   actors: {type: [String], index: true},
   synopsis: String,
   classifications: [classification],
+  draftsBy: { type: [ObjectId], index: true },
   draftClassifications: {}, // { userId:classification, userId:classification2 }
   programType: Number, // enums.programType
   gameFormat: String,
@@ -59,14 +60,19 @@ var ProgramSchema = new Schema({
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))
 
-ProgramSchema.statics.createNewClassification = function(user) {
-  return {
+ProgramSchema.methods.newDraftClassification = function(user) {
+  var draft = {
     _id: mongoose.Types.ObjectId(),
     creationDate: new Date(),
     status: 'in_process',
     author: { _id: user._id, name: user.name },
     warningOrder: [], criteria: [], criteriaComments: {}, registrationEmailAddresses: []
   }
+  if (!this.draftClassifications) this.draftClassifications = {}
+  this.draftClassifications[user._id] = draft
+  this.draftsBy.push(user._id)
+  this.markModified('draftClassifications')
+  return draft
 }
 ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
   var fields = { classifications: { $slice: 1 } }
@@ -106,7 +112,7 @@ ProgramSchema.methods.populateAllNames = function(callback) {
 var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 
 Program.publicFields = {
-  emekuId:0, customersId:0, allNames:0, draftClassifications:0,
+  emekuId:0, customersId:0, allNames:0, draftsBy: 0, draftClassifications:0,
   'classifications.emekuId':0, 'classifications.author':0,
   'classifications.billing': 0, 'classifications.buyer': 0, 'classifications.registrationEmailAddresses':0,
   'classifications.authorOrganization': 0, 'classifications.reason': 0,

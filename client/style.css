@@ -22,12 +22,10 @@ body {
 #login .feedback, #reset-password .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
 #error-dialog a { color: #00BB88; }
 
-#registration-confirmation { width: 860px; }
-
 #reset-password > div { border: 0; }
 #reset-password .instructions { text-align: left; margin-bottom: 10px; }
 
-#criteria .category, [draggable] {
+.classification-criteria .category, [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -182,9 +180,9 @@ label.top { vertical-align: top; }
 #search-page .recent .result .name { font-weight: bold; flex-shrink: 800; padding: 0 14px; margin-right: auto; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 #search-page .drafts .draft .remove { flex: 0 0 auto; text-align: right; width: 95px; }
 
-#search-page .recent .duration-or-game { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
-#search-page .recent .program-type { flex: 0 0 auto; font-size: 12px; width: 100px; }
-#search-page .recent .classification { flext: 0 0 auto; width: 140px; text-align: right; }
+#search-page .recent .result .duration-or-game { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
+#search-page .recent .result .program-type { flex: 0 0 auto; font-size: 12px; width: 100px; }
+#search-page .recent .result .classification { flex: 0 0 auto; width: 140px; text-align: right; }
 
 #search-page .new-classification { float: right; }
 #search-page .new-classification label { display: block; padding: 0 0 20px 0; }
@@ -233,23 +231,23 @@ label.top { vertical-align: top; }
 .program-box .categorization-form .categorization-form-tv-episode > div { margin-left: 5px; display: inline-block; vertical-align: top; }
 .program-box .categorization-form input[type=number] { width: 80px; display: inline-block; }
 
-#classification-page input[type=text],
-#classification-page input[type=number] {
+.program-details-form input[type=text],
+.program-details-form input[type=number] {
   width: 280px;
 }
-#classification-page .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
-#classification-page .program-info button[name=save] { float: right; }
+.program-details-form .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
+.program-details-form .program-info button[name=save] { float: right; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }
 .form input:disabled, .form textarea:disabled { background-color: #f4f4f4; cursor: not-allowed; }
 
-#program-details .reclassification { display: none; }
-#program-details.reclassification .classification { display: none; }
-#program-details.reclassification .reclassification { display: block; }
-#program-details.reclassification .reclassification label { width: 140px; }
+.program-details-form .reclassification { display: none; }
+.program-details-form.reclassification .classification { display: none; }
+.program-details-form.reclassification .reclassification { display: block; }
+.program-details-form.reclassification .reclassification label { width: 140px; }
 
-#program-details span.author { display: inline-block; height: 30px; width: 300px; }
+.program-details-form span.author { display: inline-block; height: 30px; width: 300px; }
 
 input[type=text],
 input[type=number],
@@ -394,58 +392,59 @@ textarea.invalid:disabled,
   background: #fff0f0;
 }
 
-#classification-page .new-program { margin-top: 10px }
+.program-details-form .new-program { margin-top: 10px }
 
-#program-details { display: none; }
+.program-details-form { display: none; }
 
-#program-details textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
-#program-details label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
-#program-details label[for=synopsis] { vertical-align: top; padding-top: 9px; }
+.program-details-form textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
+.program-details-form label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
+.program-details-form .id-synopsis-label { vertical-align: top; padding-top: 9px; }
 
-#program-details input.duration { margin-bottom: 3px }
-#program-details .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
+.program-details-form input.duration { margin-bottom: 3px }
+.program-details-form .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
 
-#program-details .tv-field { display: none; }
-#program-details.type-tv-other .tv-field { display: block; }
+.program-details-form .tv-field { display: none; }
+.program-details-form.type-tv-other .tv-field { display: block; }
 
-#program-details .tv-episode-field { display: none; }
-#program-details.type-tv-episode .tv-episode-field { display: block; }
-#program-details.type-tv-episode .tv-field { display: block; }
-#program-details.type-tv-episode .non-tv-episode-field { display: none; }
+.program-details-form .tv-episode-field { display: none; }
+.program-details-form.type-tv-episode .tv-episode-field { display: block; }
+.program-details-form.type-tv-episode .tv-field { display: block; }
+.program-details-form.type-tv-episode .non-tv-episode-field { display: none; }
 
-#program-details .movie-field { display: none; }
-#program-details.type-movie .movie-field { display: block; }
+.program-details-form .movie-field { display: none; }
+.program-details-form.type-movie .movie-field { display: block; }
 
-#program-details .game-field { display: none; }
-#program-details.type-game .game-field { display: block; }
-#program-details.type-game .non-game-field { display: none; }
+.program-details-form .game-field { display: none; }
+.program-details-form.type-game .game-field { display: block; }
+.program-details-form.type-game .non-game-field { display: none; }
 
-#program-details .season-episode-fields input + label { width: 50px; }
-#program-details .season-episode-fields input { width: 92px; }
+.program-details-form .season-episode-fields input + label { width: 50px; }
+.program-details-form .season-episode-fields input { width: 92px; }
 
-#classification h2 { margin: 0 0 10px 0; }
-#classification .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
-#classification .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
-#classification .summary .agelimit { padding: 0; display: inline-block;}
+.classification-details h2 { margin: 0 0 10px 0; }
+.classification-details .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
+.classification-details .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
+.classification-details .summary .agelimit { padding: 0; display: inline-block;}
 
-#registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
-#registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
-#registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
-#registration-confirmation .warning-summary { float: left; }
-#registration-confirmation .warning-summary img, #registration-confirmation .warning-summary .warning {
+.registration-confirmation { width: 860px; }
+.registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
+.registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
+.registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
+.registration-confirmation .warning-summary { float: left; }
+.registration-confirmation .warning-summary img, .registration-confirmation .warning-summary .warning {
   margin-right: 10px;
 }
 
-#criteria .header { position: relative; }
-#criteria .safe-container { position: absolute; left: 320px; top: 9px; }
-#criteria .safe-container input { margin: 0 5px 0 0; }
-#criteria .category {
+.classification-criteria .header { position: relative; }
+.classification-criteria .safe-container { position: absolute; left: 320px; top: 9px; }
+.classification-criteria .safe-container input { margin: 0 5px 0 0; }
+.classification-criteria .category {
   width: 300px;
   float: left;
   margin-right: 15px;
 }
 
-#criteria .category .heading {
+.classification-criteria .category .heading {
   outline: 1px solid #D3D3D3;
   background-color: #fff;
   padding: 0 0 0 70px;;
@@ -456,34 +455,34 @@ textarea.invalid:disabled,
   background-size: 40px 40px;
 }
 
-#criteria .category .heading h3 { margin: 24px 0; }
-#criteria .category.violence .heading h3 { color: #AA0050; }
-#criteria .category.fear .heading h3 { color: #44AAFF;}
-#criteria .category.sex .heading h3 { color: #FF77AA;}
-#criteria .category.drugs .heading h3 { color: #33BB33;}
+.classification-criteria .category .heading h3 { margin: 24px 0; }
+.classification-criteria .category.violence .heading h3 { color: #AA0050; }
+.classification-criteria .category.fear .heading h3 { color: #44AAFF;}
+.classification-criteria .category.sex .heading h3 { color: #FF77AA;}
+.classification-criteria .category.drugs .heading h3 { color: #33BB33;}
 
-#criteria .category.violence .heading {
+.classification-criteria .category.violence .heading {
   border-top: 5px solid #AA0050;
   background-image: url('images/violence.png');
 }
 
-#criteria .category.fear .heading {
+.classification-criteria .category.fear .heading {
   border-top: 5px solid #44AAFF;
   background-image: url('images/fear.png');
 }
 
-#criteria .category.sex .heading {
+.classification-criteria .category.sex .heading {
   border-top: 5px solid #FF77AA;
   background-image: url('images/sex.png');
 }
 
-#criteria .category.drugs .heading {
+.classification-criteria .category.drugs .heading {
   margin-top: 15px;
   border-top: 5px solid #33BB33;
   background-image: url('images/drugs.png');
 }
 
-#criteria .category .criteria {
+.classification-criteria .category .criteria {
   background-color: #fff;
   padding: 15px 20px 15px 70px;
   margin-top: 15px;
@@ -491,29 +490,29 @@ textarea.invalid:disabled,
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-#criteria .category .criteria:hover {
+.classification-criteria .category .criteria:hover {
   cursor: pointer;
   border: 1px solid #44AAFF;
   box-shadow: 0 0 5px 0 rgba(67,169,255,0.50), 0 2px 2px 0 rgba(0,0,0,0.10);
 }
 
-#criteria .category .criteria.selected {
+.classification-criteria .category .criteria.selected {
   color: #ffffff;
   background: #777777;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.20);
   border: 1px solid #777777;
 }
 
-#criteria .category .criteria h5 {
+.classification-criteria .category .criteria h5 {
   margin: 0 0 10px 0;
 }
 
-#criteria .category .criteria h5 span {
+.classification-criteria .category .criteria h5 span {
   color: #777;
   font-weight: normal;
 }
 
-#criteria .category .criteria p {
+.classification-criteria .category .criteria p {
   padding: 0;
   margin: 0 0 20px 0;
   font-size: 12px;
@@ -522,68 +521,68 @@ textarea.invalid:disabled,
   line-height: 17px;
 }
 
-#criteria .category .criteria.selected p,
-#criteria .category .criteria.selected h5,
-#criteria .category .criteria.selected h5 span {
+.classification-criteria .category .criteria.selected p,
+.classification-criteria .category .criteria.selected h5,
+.classification-criteria .category .criteria.selected h5 span {
   color: #fff;
 }
 
-#criteria .category .criteria textarea {
+.classification-criteria .category .criteria textarea {
   display: none;
   border: 1px solid #666666;
   border-radius: 0;
 }
-#criteria .category .criteria.has-comment textarea,
-#criteria .category .criteria.selected textarea {
+.classification-criteria .category .criteria.has-comment textarea,
+.classification-criteria .category .criteria.selected textarea {
   display: block;
 }
 
-#criteria .category .criteria.agelimit {
+.classification-criteria .category .criteria.agelimit {
   background-position: 15px 15px;
   background-repeat: no-repeat;
   background-size: 40px 40px;
 }
 
-#criteria .category .criteria.agelimit-18 { background-image: url('images/agelimit-18.png'); }
-#criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
-#criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
-#criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
-#criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
+.classification-criteria .category .criteria.agelimit-18 { background-image: url('images/agelimit-18.png'); }
+.classification-criteria .category .criteria.agelimit-16 { background-image: url('images/agelimit-16.png'); }
+.classification-criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
+.classification-criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
+.classification-criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
 
-#criteria .category-container .category.sex, #criteria .category-container .category.drugs {
+.classification-criteria .category-container .category.sex, .classification-criteria .category-container .category.drugs {
   margin-right: 0;
 }
 
 
-#criteria .categories { float:left; margin-right: 30px; }
-#criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
+.classification-criteria .categories { float:left; margin-right: 30px; }
+.classification-criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
 
-#criteria .category-criteria { margin-left: 150px; min-height: 700px; }
-#criteria .category-criteria ol { display: none;}
-#criteria .category-criteria ol:first-of-type { display: block; }
-#criteria .category-criteria li { margin-bottom: 10px; }
-#criteria .category-criteria small { margin-left: 65px; display: block; }
-#criteria .category-criteria textarea { float: right; }
+.classification-criteria .category-criteria { margin-left: 150px; min-height: 700px; }
+.classification-criteria .category-criteria ol { display: none;}
+.classification-criteria .category-criteria ol:first-of-type { display: block; }
+.classification-criteria .category-criteria li { margin-bottom: 10px; }
+.classification-criteria .category-criteria small { margin-left: 65px; display: block; }
+.classification-criteria .category-criteria textarea { float: right; }
 
-#summary .comments textarea { width: 438px; }
-#summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
-#summary .left {width: 460px; padding: 0 10px 0 0;}
-#summary .right {width: 460px; padding: 0 0 0 10px;}
-#summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
-#summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
+.classification-summary .comments textarea { width: 438px; }
+.classification-summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
+.classification-summary .left {width: 460px; padding: 0 10px 0 0;}
+.classification-summary .right {width: 460px; padding: 0 0 0 10px;}
+.classification-summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
+.classification-summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
 
-#summary .header { border-bottom: 1px solid #D3D3D3; }
-#summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
-#summary .header .year { font-size: 16px; font-weight: normal; float: right;}
-#summary p { margin: 0 0 20px 0;}
+.classification-summary .header { border-bottom: 1px solid #D3D3D3; }
+.classification-summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
+.classification-summary .header .year { font-size: 16px; font-weight: normal; float: right;}
+.classification-summary p { margin: 0 0 20px 0;}
 
-#summary dl { margin: 15px 0 0 0; }
+.classification-summary dl { margin: 15px 0 0 0; }
 
-#summary p,
-#summary dl dt,
-#summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
-#summary dl dt { font-weight: bold;}
-#summary dd .reason { font-weight: bold; }
+.classification-summary p,
+.classification-summary dl dt,
+.classification-summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
+.classification-summary dl dt { font-weight: bold;}
+.classification-summary dd .reason { font-weight: bold; }
 
 .summary .agelimit  { padding: 15px 0 0 0;}
 .summary .warnings .warning { cursor: move; transition: width 0.3s; }
@@ -593,23 +592,23 @@ textarea.invalid:disabled,
 /*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
 .summary .warnings .drop-target.active { width: 50px; }
 
-#email .emails label { text-align: left; width: 200px;}
-#email .emails input[name=registration-email] { width: 93%; }
+.classification-email .emails label { text-align: left; width: 200px;}
+.classification-email .emails input[name=registration-email] { width: 93%; }
 
-#email .left { width: 300px; }
-#email .right { width: 620px; }
+.classification-email .left { width: 300px; }
+.classification-email .right { width: 620px; }
 
-#email dl, #email .email-preview .body { line-height: 17px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
-#email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
-#email .email-preview pre { white-space: pre-line; }
-#email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
-#email dl dd { padding: 0 0 10px 0; min-height: 18px; }
-#email dl dt { font-weight: bold;}
+.classification-email dl, .classification-email .email-preview .body { line-height: 17px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.classification-email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
+.classification-email .email-preview pre { white-space: pre-line; }
+.classification-email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
+.classification-email dl dd { padding: 0 0 10px 0; min-height: 18px; }
+.classification-email dl dt { font-weight: bold;}
 
-#email .emails ul { list-style: none; padding: 0; margin: 0 0; }
-#email .emails ul input { margin-right: 10px; }
-#email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
-#email .emails input.email.invalid.touched { background-color: #F0FFF0; }
+.classification-email .emails ul { list-style: none; padding: 0; margin: 0 0; }
+.classification-email .emails ul input { margin-right: 10px; }
+.classification-email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
+.classification-email .emails input.email.invalid.touched { background-color: #F0FFF0; }
 
 #billing-page .datepicker {
   cursor: pointer;

@@ -247,7 +247,7 @@ function subscriberManagementPage() {
       .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
 
-    populateClassifiers()
+    populateClassifiers(subscriber ? subscriber.users : [])
 
     toggleBillingExtra($subscriberDetails)
 
@@ -268,8 +268,8 @@ function subscriberManagementPage() {
       }
     }
 
-    function populateClassifiers() {
-      var names = _.pluck(subscriber.users, 'name').join(',')
+    function populateClassifiers(users) {
+      var names = _.pluck(users, 'name').join(',')
       if (names.length === 0) return
       $.get('/users/names/' + names, function(data) {
         $subscriberDetails.find('input[name=classifiers]').trigger('setVal', data).end()

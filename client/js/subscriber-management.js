@@ -197,7 +197,7 @@ function subscriberManagementPage() {
   }
 
   function updateLocationHash(subscriberId) {
-    location.hash = '#tilaajat/' + subscriberId
+    setLocation('#tilaajat/' + subscriberId)
   }
 
   function renderSubscribers(subscribers) {

@@ -21,10 +21,8 @@ function createProe(dateRange, accountRows) {
   }).flatten().compact().join('\n')
 
   function accountHeaderRow(id, account) {
-    var address = utils.getProperty(account, 'billing.address') || account.address
-    if (_.isEmpty(address)) {
-      throw new Error('Tilaajalla ' + account.name + ' ei ole osoitetta.')
-    }
+    var address = account.billingPreference == 'address' ? utils.getProperty(account, 'billing.address') : account.address
+    if (!address) address = {}
     return header(id, 'L') + ws(2) + pad(account.name, 50)
       + ws(50) // asiakkaan nimi20
       + pad(address.street, 30)
@@ -35,7 +33,7 @@ function createProe(dateRange, accountRows) {
       + ws(3) // maksukehoituslupa/maksutapa/maksuhäiriökoodi
       + 'K' // tulostustapa: tulostetaan normaali lasku
       + ws(72) // Laskupvm/Eräpvm/Kirjauspvm/Viivästysmaksut/Hyvityslaskunumero/Laskunumero/Viitenumero
-      + (hasEInvoice(account) ? 'V' : ' ') // Laskun maksutapa
+      + (useEInvoice(account) ? 'V' : ' ') // Laskun maksutapa
       + ws(10) //Kumppani
       + 'EUR'
       + ws(5) // Laskulaji/Laskutusyksikkö
@@ -47,7 +45,7 @@ function createProe(dateRange, accountRows) {
   }
 
   function eInvoiceRow(id, account) {
-    if (!hasEInvoice(account)) return ''
+    if (!useEInvoice(account)) return ''
     var e = account.eInvoice
     return header(id, 'E') + pad(e.address, 35) + pad(e.operator, 35) + ws(100)
   }
@@ -120,8 +118,8 @@ function createProe(dateRange, accountRows) {
     return [0, 'FI', 'SE', 'EN'].indexOf(lang || 'FI')
   }
 
-  function hasEInvoice(account) {
-    return account.eInvoice && account.eInvoice.address && account.eInvoice.operator
+  function useEInvoice(account) {
+    return account.billingPreference == 'eInvoice'
   }
 }
 

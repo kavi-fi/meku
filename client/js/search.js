@@ -372,7 +372,7 @@ function searchPage(baseUrl) {
 
   function updateLocationHash(selectedProgramId) {
     var filters = $filters.filter(':checked').map(function() { return $(this).data('id') }).toArray().join('')
-    location.hash = '#haku/' + encodeURIComponent(state.q) + '/' + filters + '/' + (selectedProgramId || '')
+    history.replaceState(null, null, '#haku/' + encodeURIComponent(state.q) + '/' + filters + '/' + (selectedProgramId || ''))
   }
 
   function render(p, query) {

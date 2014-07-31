@@ -50,7 +50,7 @@ function billingPage() {
   function fetchInvoiceRows(date1, date2) {
     var begin = moment(date1).format(format)
     var end = moment(date2).format(format)
-    history.replaceState(null, null, '#laskutus/'+begin+'/'+end)
+    setLocation('#laskutus/'+begin+'/'+end)
     latestAjax($.get('/invoicerows/' + begin + '/' + end), $spinner).done(function(rows) {
       $page.find('input[name=begin]').val(begin)
       $page.find('input[name=end]').val(end)

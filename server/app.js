@@ -498,38 +498,20 @@ function logCreateOperation(user, document) {
 }
 
 app.post('/users/:id', function(req, res, next) {
-  User.findById(req.params.id, function(err, preUpdateUser) {
-    if (err) return next(err)
-
-    User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
-      if (err) return next(err)
-
-      logUpdateOperation(req.user, preUpdateUser, user, 'User')
-
-      res.send(user)
-    })
+  User.findById(req.params.id, function(err, user) {
+    updateAndLogChanges(user, req.body, req.user, respond(res, next), true)
   })
 })
 
-function logUpdateOperation(user, preUpdateObject, newObject, collection, updates) {
+function logUpdateOperation(user, document, updates) {
   new ChangeLog({
     user: { _id: user._id, username: user.username },
     date: new Date(),
     operation: 'update',
-    targetCollection: collection,
-    documentId: preUpdateObject._id,
-    updates: updates || difference(preUpdateObject, newObject)
+    targetCollection: document.constructor.modelName,
+    documentId: document._id,
+    updates: updates
   }).save(logError)
-
-  function difference(preUpdateObject, newObject) {
-    return _.omit(_.merge(preUpdateObject.toObject(), newObject.toObject(), function(x,y) {
-      return _.isEqual(x,y) ? { notChanged: true } : { new: y, old: x }
-    }), function(value) { return _.isEqual(value, { notChanged: true }) })
-  }
-}
-
-function logCustomUpdateOperation(user, document, updates) {
-  logUpdateOperation(user, document, undefined, document.constructor.modelName, updates)
 }
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
@@ -734,7 +716,7 @@ var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
       user.update({ active: false }, function(err) {
         if (err) return logError(err)
 
-        logCustomUpdateOperation({ _id: null, username: 'cron' }, user, 'User', {
+        logUpdateOperation({ _id: null, username: 'cron' }, user, {
           active: {
             old: user.active,
             new: false
@@ -913,7 +895,7 @@ function getRegistrationEmailsFromPreviousClassification(program, callback) {
   }
 }
 
-function updateAndLogChanges(document, updates, user, callback) {
+function updateAndLogChanges(document, updates, user, callback, filterNotChanged) {
   var oldObject = document.toObject()
   updates = utils.flattenObject(updates)
   _.forEach(updates, function(value, key) {
@@ -923,11 +905,15 @@ function updateAndLogChanges(document, updates, user, callback) {
     if (err) return callback(err)
     var newObject = updatedDocument.toObject()
     var changes = _(updates).keys().map(function(path) {
+      var newValue = utils.getProperty(newObject, path)
+      var oldValue = utils.getProperty(oldObject, path)
+
+      if (filterNotChanged === true && _.isEqual(newValue, oldValue)) return []
       return [
         path.replace(/\./g, ','),
-        { new: utils.getProperty(newObject, path), old: utils.getProperty(oldObject, path) }]
+        { new: newValue, old: oldValue }]
     }).zipObject().valueOf()
-    logCustomUpdateOperation(user, updatedDocument, changes)
+    logUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
   })
 }

@@ -379,7 +379,7 @@ app.post('/accounts', function(req, res, next) {
   new Account(req.body).save(function(err, account) {
     if (err) return next(err)
 
-    logCreateOperation(req.user, account, 'Account')
+    logCreateOperation(req.user, account)
 
     res.send(account)
   })
@@ -474,7 +474,7 @@ app.post('/users/new', function(req, res, next) {
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
 
-        logCreateOperation(req.user, user, 'User')
+        logCreateOperation(req.user, user)
 
         var subject = 'Käyttäjätunnusten aktivointi'
         var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
@@ -487,13 +487,13 @@ app.post('/users/new', function(req, res, next) {
   }
 })
 
-function logCreateOperation(user, object, collection) {
+function logCreateOperation(user, document) {
   new ChangeLog({
     user: { _id: user._id, username: user.username },
     date: new Date(),
     operation: 'create',
-    targetCollection: collection,
-    documentId: object._id
+    targetCollection: document.constructor.modelName,
+    documentId: document._id
   }).save(logError)
 }
 

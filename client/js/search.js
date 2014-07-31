@@ -284,7 +284,7 @@ function searchPage(baseUrl) {
     load()
   })
 
-  $page.on('click', '.result', function() {
+  $page.on('click', '.results .result, .recent .result', function() {
     if ($(this).hasClass('selected')) {
       updateLocationHash()
       closeDetail()

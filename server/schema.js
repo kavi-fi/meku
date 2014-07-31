@@ -127,7 +127,8 @@ var AccountSchema = new Schema({
   users: [{ _id: ObjectId, name: String }],
   apiToken: String,
   contactName: String,
-  phoneNumber: String
+  phoneNumber: String,
+  deleted: Boolean
 })
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))

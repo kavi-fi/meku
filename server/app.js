@@ -387,13 +387,18 @@ app.post('/accounts', function(req, res, next) {
 
 app.delete('/accounts/:id', function(req, res, next) {
   if (!utils.hasRole(req.user, 'root')) return res.send(403)
-  Account.findByIdAndRemove(req.params.id, respond(res, next))
+  Account.findById(req.params.id, function(err, account) {
+    if (err) return next(err)
+    softDeleteAndLog(account, req.user, respond(res, next))
+  })
 })
 
 app.get('/accounts', function(req, res, next) {
   if (!utils.hasRole(req.user, 'kavi')) return res.send(403)
   var selectedRoles = req.query.roles
-  Account.find(selectedRoles ? { roles: { $all: selectedRoles }} : {}, respond(res, next))
+  var query = selectedRoles ? { roles: { $all: selectedRoles }} : {}
+
+  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
 })
 
 app.get('/subscribers', function(req, res, next) {
@@ -402,12 +407,12 @@ app.get('/subscribers', function(req, res, next) {
   var query = _.isEmpty(selectedRoles)
     ? { roles: { $in: ['Classifier', 'Subscriber'] }}
     : { roles: { $all: selectedRoles }}
-  Account.find(query, respond(res, next))
+  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
 })
 
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
-  var q = { roles: { $in: roles }}
+  var q = { roles: { $in: roles }, deleted: { $ne: true }}
   if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
   }

@@ -218,8 +218,7 @@ var ChangeLog = exports.ChangeLog = mongoose.model('changelog', new Schema({
   operation: String,
   targetCollection: String,
   documentId: ObjectId,
-  updates: {},
-  deleted: {}
+  updates: {}
 }))
 
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }

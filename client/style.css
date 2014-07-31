@@ -180,9 +180,9 @@ label.top { vertical-align: top; }
 #search-page .recent .result .name { font-weight: bold; flex-shrink: 800; padding: 0 14px; margin-right: auto; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 #search-page .drafts .draft .remove { flex: 0 0 auto; text-align: right; width: 95px; }
 
-#search-page .recent .duration-or-game { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
-#search-page .recent .program-type { flex: 0 0 auto; font-size: 12px; width: 100px; }
-#search-page .recent .classification { flext: 0 0 auto; width: 140px; text-align: right; }
+#search-page .recent .result .duration-or-game { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; }
+#search-page .recent .result .program-type { flex: 0 0 auto; font-size: 12px; width: 100px; }
+#search-page .recent .result .classification { flex: 0 0 auto; width: 140px; text-align: right; }
 
 #search-page .new-classification { float: right; }
 #search-page .new-classification label { display: block; padding: 0 0 20px 0; }

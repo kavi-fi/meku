@@ -56,6 +56,10 @@ function loadTemplates(callback) {
   })
 }
 
+function setLocation(path) {
+  history.replaceState(null, null, path)
+}
+
 function parseLocationHash() {
   if (!location.hash) return undefined
   return location.hash.split('/').map(decodeURIComponent)

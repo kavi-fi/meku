@@ -16,19 +16,19 @@ function classificationPage() {
   $root.on('show', function(e, programId, edit) {
     editMode = false
     if (edit) {
-      location.hash = '#luokittelu/'+programId+'/edit'
+      setLocation('#luokittelu/'+programId+'/edit')
 
       editMode = true
       modifiedFields = {}
 
       $.get('/programs/' + programId).done(show)
     } else if (programId) {
-      location.hash = '#luokittelu/'+programId
+      setLocation('#luokittelu/'+programId)
       $.get('/programs/' + programId).done(show)
     } else if ($form.data('id')) {
-      location.hash = '#luokittelu/'+$form.data('id')
+      setLocation('#luokittelu/'+$form.data('id'))
     } else {
-      location.hash = '#luokittelu'
+      setLocation('#luokittelu')
     }
     $('.navi li:first a').addClass('active')
     $form.find('.private-comments').toggle(hasRole('kavi'))

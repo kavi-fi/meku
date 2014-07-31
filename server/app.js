@@ -9,6 +9,7 @@ var Program = schema.Program
 var User = schema.User
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
+var ChangeLog = schema.ChangeLog
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
@@ -45,14 +46,14 @@ app.post('/login', function(req, res, next) {
       user.checkPassword(password, function(err, ok) {
         if (err) return next(err)
         if (!ok) return res.send(403)
-        setLoginCookie(res, user)
+        logUserIn(req, res, user)
         res.send({})
       })
     }
   })
 })
 
-function setLoginCookie(res, user) {
+function logUserIn(req, res, user) {
   var weekInMs = 604800000
   res.cookie('user', {
     _id: user._id.toString(),
@@ -61,6 +62,7 @@ function setLoginCookie(res, user) {
     role: user.role,
     email: _.first(user.emails)
   }, { maxAge: weekInMs, signed: true })
+  logUserLogin(req, user)
 }
 
 app.post('/logout', function(req, res, next) {
@@ -134,7 +136,7 @@ app.post('/reset-password', function(req, res, next) {
       user.resetHash = null
       user.save(function (err, user) {
         if (err) return next(err)
-        setLoginCookie(res, user)
+        logUserIn(req, res, user)
         res.send({})
       })
     })
@@ -211,7 +213,13 @@ app.post('/programs/new', function(req, res, next) {
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
   var p = new Program({ programType: programType })
   p.newDraftClassification(req.user)
-  p.save(respond(res, next))
+  p.save(function(err, program) {
+    if (err) return next(err)
+
+    logCreateOperation(req, req.user, program)
+
+    res.send(program)
+  })
 })
 
 app.post('/programs/:id/register', function(req, res, next) {
@@ -228,9 +236,10 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    verifyTvSeries(program, function(err) {
+    var classifications = [newClassification].concat(program.classifications)
+    updateAndLogChanges(req, program, { classifications: classifications }, req.user, function(err, program) {
       if (err) return next(err)
-      program.save(function(err) {
+      verifyTvSeries(program, function(err) {
         if (err) return next(err)
         verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
@@ -296,23 +305,14 @@ app.get('/programs/:id/registrationEmails', requireRole('root'), function(req, r
 app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
-    program.programType = parseInt(req.body.programType)
-    if (enums.util.isTvEpisode(program)) {
-      program.series = {
-        _id: req.body.series._id,
-        name: req.body.series.name
-      }
-      program.episode = req.body.episode
-      program.season = _.isEmpty(req.body.season) ? null : req.body.season
-    }
-
-    verifyTvSeries(program, function(err) {
+    var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
+    updateAndLogChanges(req, program, updates, req.user, function(err, program) {
       if (err) return next(err)
-      program.save(function(err, saved) {
+      verifyTvSeries(program, function(err) {
         if (err) return next(err)
         verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
-          res.send(saved)
+          res.send(program)
         })
       })
     })
@@ -320,7 +320,19 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
 })
 
 app.post('/programs/:id', function(req, res, next) {
-  Program.findByIdAndUpdate(req.params.id, req.body, null, function(err, program) {
+  Program.findById(req.params.id, function(err, program) {
+    if (err) return next(err)
+    updateAndLogChanges(req, program, req.body, req.user, function(err, program) {
+      program.populateAllNames(function(err) {
+        if (err) return next(err)
+        program.save(respond(res, next))
+      })
+    })
+  })
+})
+
+app.post('/programs/autosave/:id', function(req, res, next) {
+  Program.findByIdAndUpdate(req.params.id, req.body, function(err, program) {
     if (err) return next(err)
     program.populateAllNames(function(err) {
       if (err) return next(err)
@@ -330,7 +342,10 @@ app.post('/programs/:id', function(req, res, next) {
 })
 
 app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
-  Program.findByIdAndUpdate(req.params.id, { deleted: true }, respond(res, next))
+  Program.findById(req.params.id, function(err, program) {
+    if (err) return next(err)
+    softDeleteAndLog(req, program, req.user, respond(res, next))
+  })
 })
 
 app.get('/series/search/:query', function(req, res, next) {
@@ -344,23 +359,34 @@ app.get('/series/search/:query', function(req, res, next) {
 })
 
 app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
-  Account.findByIdAndUpdate(req.params.id, req.body, function(err, account) {
+  Account.findById(req.params.id, function(err, account) {
     if (err) return next(err)
-    account.save(respond(res, next))
+    updateAndLogChanges(req, account, req.body, req.user, respond(res, next))
   })
 })
 
 app.post('/accounts', requireRole('kavi'), function(req, res, next) {
-  new Account(req.body).save(respond(res, next))
+  new Account(req.body).save(function(err, account) {
+    if (err) return next(err)
+
+    logCreateOperation(req, req.user, account)
+
+    res.send(account)
+  })
 })
 
 app.delete('/accounts/:id', requireRole('root'), function(req, res, next) {
-  Account.findByIdAndRemove(req.params.id, respond(res, next))
+  Account.findById(req.params.id, function (err, account) {
+    if (err) return next(err)
+    softDeleteAndLog(req, account, req.user, respond(res, next))
+  })
 })
 
 app.get('/accounts', requireRole('kavi'), function(req, res, next) {
   var selectedRoles = req.query.roles
-  Account.find(selectedRoles ? { roles: { $all: selectedRoles }} : {}, respond(res, next))
+  var query = selectedRoles ? { roles: { $all: selectedRoles }} : {}
+
+  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
 })
 
 app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
@@ -368,12 +394,12 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
   var query = _.isEmpty(selectedRoles)
     ? { roles: { $in: ['Classifier', 'Subscriber'] }}
     : { roles: { $all: selectedRoles }}
-  Account.find(query, respond(res, next))
+  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
 })
 
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
-  var q = { roles: { $in: roles }}
+  var q = { roles: { $in: roles }, deleted: { $ne: true }}
   if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
   }
@@ -419,6 +445,8 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
 
+        logCreateOperation(req, req.user, user)
+
         var subject = 'Käyttäjätunnusten aktivointi'
         var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
 
@@ -430,16 +458,15 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
   }
 })
 
+app.post('/users/:id', requireRole('root'), function(req, res, next) {
+  User.findById(req.params.id, function (err, user) {
+    updateAndLogChanges(req, user, req.body, req.user, respond(res, next))
+  })
+})
+
 app.get('/users/names/:names', function(req, res, next) {
   if (!utils.hasRole(req.user, 'kavi')) return res.send([])
   User.find({username: {$in: req.params.names.split(',')}}, 'name username', respond(res, next))
-})
-
-app.post('/users/:id', requireRole('root'), function(req, res, next) {
-  User.findByIdAndUpdate(req.params.id, req.body, function(err, user) {
-    if (err) return next(err)
-    res.send(user)
-  })
 })
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
@@ -641,7 +668,16 @@ var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
     if (err) throw err
 
     users.forEach(function(user) {
-      user.update({ active: false }, logError)
+      user.update({ active: false }, function(err) {
+        if (err) return logError(err)
+
+        logUpdateOperation(null, { username: 'cron', ip: 'localhost' }, user, {
+          active: {
+            old: user.active,
+            new: false
+          }
+        })
+      })
 
       sendEmail({
         recipients: [ user.emails[0] ],
@@ -819,4 +855,81 @@ function getRegistrationEmailsFromPreviousClassification(program, callback) {
   } else {
     callback(null, [])
   }
+}
+
+function updateAndLogChanges(req, document, updates, user, callback) {
+  var oldObject = document.toObject()
+  updates = utils.flattenObject(updates)
+  _.forEach(updates, function(value, key) {
+    document.set(key, value)
+  })
+  document.save(function(err, updatedDocument) {
+    if (err) return callback(err)
+    var newObject = updatedDocument.toObject()
+    var changes = _(updates).keys().map(function(path) {
+      var newValue = utils.getProperty(newObject, path)
+      var oldValue = utils.getProperty(oldObject, path)
+
+      if (_.isEqual(newValue, oldValue)) return []
+      return [
+        path.replace(/\./g, ','),
+        { new: newValue, old: oldValue }
+      ]
+    }).zipObject().valueOf()
+    logUpdateOperation(req, user, updatedDocument, changes)
+    callback(undefined, updatedDocument)
+  })
+}
+
+function softDeleteAndLog(req, document, user, callback) {
+  document.deleted = true
+  document.save(function (err, document) {
+    if (err) return callback(err)
+    logDeleteOperation(req, user, document)
+    callback(undefined, document)
+  })
+}
+
+function saveChangeLogEntry(req, user, document, operation, operationData) {
+  var data = {
+    user: { _id: user._id, username: user.username, ip: user.ip || getIpAddress(req) },
+    date: new Date(),
+    operation: operation,
+    targetCollection: document ? document.constructor.modelName : undefined,
+    documentId: document ? document._id : undefined
+  }
+
+  if (operationData) {
+    _.merge(data, operationData)
+  }
+
+  new ChangeLog(data).save(logError)
+}
+
+function logCreateOperation(req, user, document) {
+  saveChangeLogEntry(req, user, document, 'create')
+}
+
+function logUpdateOperation(req, user, document, updates) {
+  saveChangeLogEntry(req, user, document, 'update', { updates: updates })
+}
+
+function logDeleteOperation(req, user, document) {
+  saveChangeLogEntry(req, user, document, 'delete')
+}
+
+function logUserLogin(req, user) {
+  saveChangeLogEntry(req, user, null, 'login')
+}
+
+function getIpAddress(req) {
+  var ipAddr = req.headers["x-forwarded-for"];
+  if (ipAddr){
+    var list = ipAddr.split(",");
+    ipAddr = list[list.length-1];
+  } else {
+    ipAddr = req.connection.remoteAddress;
+  }
+
+  return ipAddr
 }

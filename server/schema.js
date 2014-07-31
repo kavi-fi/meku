@@ -133,7 +133,8 @@ var AccountSchema = new Schema({
   users: [{ _id: ObjectId, name: String }],
   apiToken: String,
   contactName: String,
-  phoneNumber: String
+  phoneNumber: String,
+  deleted: Boolean
 })
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))
@@ -210,6 +211,15 @@ var XmlDoc = exports.XmlDoc = mongoose.model('xmldocs', new Schema({
   account: {_id: ObjectId, name: String}
 }))
 
+var ChangeLog = exports.ChangeLog = mongoose.model('changelog', new Schema({
+  user: {_id: ObjectId, username: String, ip: String},
+  date: Date,
+  operation: String,
+  targetCollection: String,
+  documentId: ObjectId,
+  updates: {}
+}))
+
 var namedIndex = { name: { type: String, index: { unique: true } }, parts: { type:[String], index: true } }
 var DirectorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
 var ActorSchema = new Schema(namedIndex, { _id: false, versionKey: false })
@@ -242,7 +252,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence]
+var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

@@ -78,6 +78,23 @@ utils.getProperty = function(obj, prop) {
   }, obj)
 }
 
+// Flattens object like { a: 1, b: { c: 2, d: 4 }} to { a: 1, b.c: 2, b.d: 4 }
+utils.flattenObject = function flattenObject(deepObject) {
+  var resultObject = {}
+  _.forEach(deepObject, function(val, key) {
+    if (_.isObject(val) && !_.isArray(val)) {
+      var flatInnerObject = flattenObject(val)
+      _.forEach(flatInnerObject, function(innerVal, innerKey) {
+        var flatKey = key + '.' + innerKey
+        resultObject[flatKey] = innerVal
+      })
+    } else {
+      resultObject[key] = val
+    }
+  })
+  return resultObject
+}
+
 if (isNodeJs()) module.exports = utils
 
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

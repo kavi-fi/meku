@@ -329,8 +329,7 @@ enums.countries = {
   'ZA': 'Etelä-Afrikka',
   'ZM': 'Sambia',
   'ZW': 'Zimbabwe',
-  '-': 'Muu maa',
-  '?': 'Ei tiedossa'
+  '-': 'Muu maa'
 }
 
 enums.util.toCountry = function(code) { return enums.countries[code] || '-' }

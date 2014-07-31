@@ -181,7 +181,7 @@ function navi() {
   return { start: start }
 }
 
-function buyerPage() { $('#buyer-page').on('show', function() { location.hash = '#tilaajat' }) }
+function buyerPage() { $('#buyer-page').on('show', function() { setLocation('#tilaajat') }) }
 
 function stopPropagation(e) { e.stopPropagation() }
 

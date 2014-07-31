@@ -197,7 +197,7 @@ function subscriberManagementPage() {
   }
 
   function updateLocationHash(subscriberId) {
-    location.hash = '#tilaajat/' + subscriberId
+    setLocation('#tilaajat/' + subscriberId)
   }
 
   function renderSubscribers(subscribers) {
@@ -235,18 +235,19 @@ function subscriberManagementPage() {
       $el: $subscriberDetails.find('input[name=classifiers]'),
       path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
       multiple: true,
-      toOption: accountToSelect2Option,
+      toOption: userToSelect2Option,
       fromOption: select2OptionToIdNamePair
     })
 
     $subscriberDetails
-      .find('input[name=classifiers]').trigger('setVal', utils.getProperty(subscriber, 'users')).end()
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
       .find('input[name="billing.address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=billing-extra]').prop('checked', !(_.isEmpty(billingAddress) && _.isEmpty(eInvoice))).end()
       .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
+
+    populateClassifiers()
 
     toggleBillingExtra($subscriberDetails)
 
@@ -258,13 +259,21 @@ function subscriberManagementPage() {
       if (property !== undefined) $(this).val(property)
     }
 
-    function accountToSelect2Option(account) {
-      if (!account) return null
+    function userToSelect2Option(user) {
+      if (!user) return null
       return {
-        id: account._id,
-        text: account.name + (account.username ? ' (' + account.username + ')' : ''),
-        name: account.username ? account.username : account.name
+        id: user._id,
+        text: user.name + (user.username ? ' (' + user.username + ')' : ''),
+        name: user.username ? user.username : user.name
       }
+    }
+
+    function populateClassifiers() {
+      var names = _.pluck(subscriber.users, 'name').join(',')
+      if (names.length === 0) return
+      $.get('/users/names/' + names, function(data) {
+        $subscriberDetails.find('input[name=classifiers]').trigger('setVal', data).end()
+      })
     }
 
     function toggleBillingExtra() {

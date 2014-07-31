@@ -43,21 +43,6 @@ function internalSearchPage() {
     loadRecent()
   })
 
-  $page.find('.recent').on('click', '.result', function() {
-    var $box = $page.find('.recent').find('.program-box')
-    if ($box.length > 0) {
-      $box.slideUp(function() { $(this).remove() })
-    } else {
-      var $result = $(this)
-      $.get('/programs/' + $(this).data('id')).done(function (p) {
-        var $details = detailRenderer.render(p)
-        $result.after($details)
-        toggleDetailButtons($details, p)
-        $details.slideDown()
-      })
-    }
-  })
-
   $drafts.on('click', '.draft', function() {
     showClassificationPage($(this).data('id'))
   })
@@ -117,7 +102,10 @@ function internalSearchPage() {
       $.ajax('/programs/' + program._id, { type: 'DELETE' }).done(function() {
         closeDialog()
         searchPageApi.closeDetail()
-        $selected.slideUp(function() { $(this).remove() })
+        $selected.slideUp(function() {
+          if (!_.isEmpty($(this).parents('.recent'))) { loadRecent() }
+          $(this).remove()
+        })
       })
     }
   })
@@ -143,7 +131,7 @@ function internalSearchPage() {
     $recent.find('.program-box').remove()
     $.get('/programs/recent', function(recents) {
       recents.forEach(function(p) {
-        var $result = $('<div>').addClass('result').data('id', p._id)
+        var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
           .append($('<span>', { class: 'registrationDate' }).text(utils.asDate(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
@@ -296,7 +284,7 @@ function searchPage(baseUrl) {
     load()
   })
 
-  $results.on('click', '.result', function() {
+  $page.on('click', '.result', function() {
     if ($(this).hasClass('selected')) {
       updateLocationHash()
       closeDetail()
@@ -378,13 +366,13 @@ function searchPage(baseUrl) {
   }
 
   function closeDetail() {
-    $results.find('.result.selected').removeClass('selected')
-    $results.find('.program-box').slideUp(function() { $(this).remove() }).end()
+    $page.find('.result.selected').removeClass('selected')
+    $page.find('.program-box').slideUp(function() { $(this).remove() }).end()
   }
 
   function updateLocationHash(selectedProgramId) {
     var filters = $filters.filter(':checked').map(function() { return $(this).data('id') }).toArray().join('')
-    location.hash = '#haku/' + encodeURIComponent(state.q) + '/' + filters + '/' + (selectedProgramId || '')
+    setLocation('#haku/' + encodeURIComponent(state.q) + '/' + filters + '/' + (selectedProgramId || ''))
   }
 
   function render(p, query) {

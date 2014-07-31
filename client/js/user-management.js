@@ -204,23 +204,6 @@ function userManagementPage() {
 
     $detailTemplate.find('input[name=employers]').change(toggleInvalid).each(toggleInvalid)
 
-    $detailTemplate.find('button[name=remove]').click(function() {
-      var $selected = $page.find('.result.selected')
-      var user = $selected.data('user')
-      showDialog($('#templates').find('.remove-user-dialog').clone()
-        .find('.user-name').text(user.name).end()
-        .find('button[name=remove]').click(removeUser).end()
-        .find('button[name=cancel]').click(closeDialog).end())
-
-      function removeUser() {
-        $.ajax('/users/' + user._id, { type: 'DELETE' }).done(function() {
-          closeDialog()
-          closeDetails()
-          $selected.slideUp(function() { $(this).remove() })
-        })
-      }
-    })
-
     return $detailTemplate.css('display', 'none')
 
     function employersSearch(term) {

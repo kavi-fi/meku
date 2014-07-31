@@ -430,21 +430,6 @@ app.get('/users/search', function(req, res, next) {
   User.find(q).exec(respond(res, next))
 })
 
-app.delete('/users/:id', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'root')) return res.send(403)
-  User.findById(req.params.id, function(err, user) {
-    if (err) return next(err)
-
-    user.remove(function(err) {
-      if (err) return next(err)
-
-      logDeleteOperation(req.user, user, 'User')
-
-      res.send({})
-    })
-  })
-})
-
 app.get('/users/exists/:username', function(req, res, next) {
   User.findOne({ username: req.params.username }, function(err, user) {
     if (err) return next(err)

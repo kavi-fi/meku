@@ -445,16 +445,6 @@ app.delete('/users/:id', function(req, res, next) {
   })
 })
 
-function logDeleteOperation(user, document) {
-  new ChangeLog({
-    user: { _id: user._id, username: user.username },
-    date: new Date(),
-    operation: 'delete',
-    targetCollection: document.constructor.modelName,
-    documentId: document._id
-  }).save(logError)
-}
-
 app.get('/users/exists/:username', function(req, res, next) {
   User.findOne({ username: req.params.username }, function(err, user) {
     if (err) return next(err)
@@ -487,32 +477,11 @@ app.post('/users/new', function(req, res, next) {
   }
 })
 
-function logCreateOperation(user, document) {
-  new ChangeLog({
-    user: { _id: user._id, username: user.username },
-    date: new Date(),
-    operation: 'create',
-    targetCollection: document.constructor.modelName,
-    documentId: document._id
-  }).save(logError)
-}
-
 app.post('/users/:id', function(req, res, next) {
   User.findById(req.params.id, function(err, user) {
     updateAndLogChanges(user, req.body, req.user, respond(res, next), true)
   })
 })
-
-function logUpdateOperation(user, document, updates) {
-  new ChangeLog({
-    user: { _id: user._id, username: user.username },
-    date: new Date(),
-    operation: 'update',
-    targetCollection: document.constructor.modelName,
-    documentId: document._id,
-    updates: updates
-  }).save(logError)
-}
 
 app.get('/actors/search/:query', queryNameIndex('Actor'))
 app.get('/directors/search/:query', queryNameIndex('Director'))
@@ -925,4 +894,32 @@ function softDeleteAndLog(document, user, callback) {
     logDeleteOperation(user, document)
     callback(undefined, document)
   })
+}
+
+function saveChangeLogEntry(user, document, operation, operationData) {
+  var data = {
+    user: { _id: user._id, username: user.username },
+    date: new Date(),
+    operation: operation,
+    targetCollection: document.constructor.modelName,
+    documentId: document._id
+  }
+
+  if (operationData) {
+    _.merge(data, operationData)
+  }
+
+  new ChangeLog(data).save(logError)
+}
+
+function logCreateOperation(user, document) {
+  saveChangeLogEntry(user, document, 'create')
+}
+
+function logUpdateOperation(user, document, updates) {
+  saveChangeLogEntry(user, document, 'update', { updates: updates })
+}
+
+function logDeleteOperation(user, document) {
+  saveChangeLogEntry(user, document, 'delete')
 }

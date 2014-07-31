@@ -224,7 +224,13 @@ app.post('/programs/new', function(req, res, next) {
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
   var data = { draftClassifications: {}, programType: programType }
   data.draftClassifications[req.user._id] = Program.createNewClassification(req.user)
-  new Program(data).save(respond(res, next))
+  new Program(data).save(function(err, program) {
+    if (err) return next(err)
+
+    logCreateOperation(req.user, program)
+
+    res.send(program)
+  })
 })
 
 app.post('/programs/:id/register', function(req, res, next) {

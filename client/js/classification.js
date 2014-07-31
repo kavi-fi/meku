@@ -3,13 +3,13 @@ function classificationPage() {
 
   $root.on('show', function (e, programId, edit) {
     if (edit) {
-      location.hash = '#luokittelu/' + programId + '/edit'
+      setLocation('#luokittelu/' + programId + '/edit')
       $.get('/programs/' + programId).done(classificationForm(true).show)
     } else if (programId) {
-      location.hash = '#luokittelu/' + programId
+      setLocation('#luokittelu/' + programId)
       $.get('/programs/' + programId).done(classificationForm(false).show)
     } else {
-      location.hash = '#luokittelu'
+      setLocation('#luokittelu')
     }
 
     $('.navi li:first a').addClass('active')

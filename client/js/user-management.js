@@ -64,7 +64,7 @@ function userManagementPage() {
   $page.find('.filters').change(function() { $page.trigger('show') })
 
   function updateLocationHash(userId) {
-    location.hash = '#kayttajat/' + userId
+    setLocation('#kayttajat/' + userId)
   }
 
   function renderUsers(users) {

@@ -8,10 +8,10 @@ if (typeof module !== 'undefined' && module.exports) {
 
 exports.fullSummary = function(program) {
   var c = enums.util.isTvSeriesName(program) ? tvSeriesClassification(program) : program.classifications[0]
-  return summary(program, c)
+  return summary(c)
 }
 
-var summary = exports.summary = function(program, classification) {
+var summary = exports.summary = function(classification) {
   if (!classification) return undefined
   if (classification.safe) return { age:0, warnings:[] }
   var maxAgeLimit = ageLimit(classification)
@@ -90,7 +90,7 @@ exports.registrationEmail = function(program, classification, user) {
   var now = new Date()
   var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
   var buyer = classification.buyer ? classification.buyer.name : ''
-  var classificationSummary = summary(program, classification)
+  var classificationSummary = summary(classification)
   var recipients = classification.registrationEmailAddresses.map(function(e) { return e.email })
 
   function previousRecipients(classifications) {

@@ -423,7 +423,7 @@ function classificationForm(editMode) {
 
   function updateSummary(program) {
     var currentClassification = draftClassification(program)
-    var summary = classification.summary(program, currentClassification)
+    var summary = classification.summary(currentClassification)
     var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w.category, class:'warning ' + w.category, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = commentToHtml(program.synopsis ? program.synopsis : '-')
     var countries = enums.util.toCountryString(program.country)

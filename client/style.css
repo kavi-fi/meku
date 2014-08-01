@@ -595,7 +595,7 @@ textarea.invalid:disabled,
 .summary .warnings .drop-target.active { width: 50px; }
 
 .classification-email .emails label { text-align: left; width: 200px;}
-.classification-email .emails input[name=registration-email] { width: 93%; }
+.classification-email .emails input[name=registration-email] { font-weight: normal; margin-top: 5px; width: 93%; }
 
 .classification-email .left { width: 300px; }
 .classification-email .right { width: 620px; }

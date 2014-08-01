@@ -448,20 +448,24 @@ function classificationForm(editMode) {
   function registrationPreview() {
     var $emails = $form.find('.classification-email .emails')
     var $preview = $form.find('.classification-email .email-preview')
+    var $input = $emails.find('input[name=registration-email]')
     var currentBuyerId = null
 
-    $emails.find('ul').on('change', 'input', function(e) {
-      saveEmailState()
-    })
+    $emails.find('ul').on('change', 'input', saveEmailState)
+
+    $input.keypress(function(e) { if (e.which == 13) addEmail() })
 
     $emails.find('button.add-registration-email').on('click', function(e) {
       e.preventDefault()
-      var $input = $emails.find('input[name=registration-email]')
+      addEmail()
+    })
+
+    function addEmail() {
       if ($input.hasClass('invalid')) { return; }
       addManualEmailCheckbox(true, $input.val())
       $input.val('')
       saveEmailState()
-    })
+    }
 
     function saveEmailState() {
       var buyerEmails = $emails.find('ul.buyer input:checked')

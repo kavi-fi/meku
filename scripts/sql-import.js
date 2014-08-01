@@ -278,9 +278,9 @@ function accounts(callback) {
       ' ownership, phone_office, phone_alternate' +
       ' from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
     function onRow(row) {
-      var address = { street: trim(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
+      var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var billingAddress = row.billing_address_street
-        ? { street: trim(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)) }
+        ? { street: trim1line(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)) }
         : undefined
       if (_.isEqual(address, billingAddress)) {
         billingAddress = undefined
@@ -605,6 +605,11 @@ function optionListToArray(string) {
 function mapFormat(f) {
   if (enums.format.indexOf(f) >= 0) return f
   return 'Muu'
+}
+
+function trim1line(s) {
+  var r = trim(s)
+  return r && r.replace(/\n+/g, ', ') || r
 }
 
 function trim(s) {

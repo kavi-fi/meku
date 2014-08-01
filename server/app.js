@@ -236,10 +236,9 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    var classifications = [newClassification].concat(program.classifications)
-    updateAndLogChanges(req, program, { classifications: classifications }, req.user, function(err, program) {
+    verifyTvSeries(program, function(err) {
       if (err) return next(err)
-      verifyTvSeries(program, function(err) {
+      program.save(function(err) {
         if (err) return next(err)
         verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
@@ -248,6 +247,7 @@ app.post('/programs/:id/register', function(req, res, next) {
             sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
               if (err) return next(err)
               updateMetadataIndexes(program, function() {
+                logUpdateOperation(req, req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
                 return res.send(program)
               })
             })

@@ -14,7 +14,8 @@ function userManagementPage() {
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
     $userList.empty()
-    $.get('/users?' + $.param({ filters: currentFilters() }), function(users) {
+    var inactive = $page.find('.filters input[name=inactive]').prop('checked')
+    $.get('/users?' + $.param({ inactive: inactive, roles: roleFilters() }), function(users) {
       renderUsers(users)
 
       // Apply username search
@@ -278,7 +279,7 @@ function userManagementPage() {
     }
   }
 
-  function currentFilters() {
-    return $page.find('.filters input').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
+  function roleFilters() {
+    return $page.find('.filters input.role').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
   }
 }

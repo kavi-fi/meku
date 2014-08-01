@@ -413,8 +413,10 @@ app.get('/accounts/:id', function(req, res, next) {
 })
 
 app.get('/users', requireRole('root'), function(req, res, next) {
-  var roleFilters = req.query.filters
-  User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
+  var roleFilters = req.query.roles
+  var inactiveFilter = req.query.inactive ? req.query.inactive === 'true' : false
+  var filters = _.merge({}, roleFilters ? { role: { $in: roleFilters }} : {}, inactiveFilter ? {} : {active: true})
+  User.find(filters, respond(res, next))
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {

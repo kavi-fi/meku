@@ -187,6 +187,12 @@ function userManagementPage() {
       populate($detailTemplate, user)
     }
 
+    $detailTemplate.find('input[name=active]').on('change', function() {
+      $.post('/users/' + user._id, JSON.stringify({active: $(this).prop('checked')}), function(updatedUser) {
+        $userList.find('.result.selected').toggleClass('inactive', !updatedUser.active)
+      })
+    })
+
     $detailTemplate.find('form').on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
 
     $detailTemplate.find('form').on('validate', function() {

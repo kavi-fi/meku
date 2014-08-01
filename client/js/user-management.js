@@ -75,6 +75,7 @@ function userManagementPage() {
    return $('<div>', { class: 'result', 'data-id': user._id })
      .data('user', user).data('id', user._id)
      .append($('<span>', { class: 'name' }).text(user.name))
+     .append($('<span>', { class: 'username' }).text(user.username))
      .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="icon-warning-sign"></i>'))
      .append($('<span>', { class: 'cert-end' }).html(renderCertEnd(user)))
      .toggleClass('inactive', user.active === false)

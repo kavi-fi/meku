@@ -333,7 +333,8 @@ function changeLog(document) {
       if (logEntries.length > 0) {
         $changeLog.removeClass('hide')
 
-        $changeLog.find('button[name=show]').on('click', function () {
+        $changeLog.find('a.show-changelogs').on('click', function (e) {
+          e.preventDefault()
           $(this).toggleClass('clicked')
           $changeLog.find('.entries-container').toggleClass('hide', !$(this).hasClass('clicked'))
         })
@@ -348,32 +349,21 @@ function changeLog(document) {
         var operation = operations[entry.operation]
         var date = moment(entry.date).format('DD.MM.YYYY H:m:s')
 
-        var $element = $('<div>', { class: 'entry-row', 'data-id': entry._id }).data('entry', entry)
-        var entryString = operation + ', ' + date + ', ' + entry.user.username + ' (' + entry.user.ip + ')'
+        var $element = $('<div>', { class: 'entry-row', 'data-id': entry._id })
+        var entryString = date + ', ' + entry.user.username + ' (' + entry.user.ip + '), ' + operation
         $element.append($('<label>').text(entryString))
 
         if (entry.operation === 'update' && entry.updates) {
-          $element.append($('<button>', { class: 'button' }).text('Muuttuneet tiedot'))
+          var $entryDetails = $('<div>', { class: 'entry-details' })
+          $element.append($entryDetails)
 
-          $element.on('click', '.button', function () {
-            $changeLog.find('.selected').not($element).removeClass('selected')
-            $changeLog.find('.entry-details').remove()
+          _.forEach(entry.updates, function(value, key) {
+            var $detailRow = $('<div>', { class: 'entry-detail-row' })
 
-            $element.toggleClass('selected')
+            $detailRow.append($('<label>').text(key))
+            $detailRow.append(renderDetailRow(value))
 
-            if ($element.hasClass('selected')) {
-              var $entryDetails = $('<div>', { class: 'entry-details' })
-              $element.append($entryDetails)
-
-              _.forEach(entry.updates, function(value, key) {
-                var $detailRow = $('<div>', { class: 'entry-detail-row' })
-
-                $detailRow.append($('<label>').text(key))
-                $detailRow.append(renderDetailRow(value))
-
-                $entryDetails.append($detailRow)
-              })
-            }
+            $entryDetails.append($detailRow)
           })
         }
 

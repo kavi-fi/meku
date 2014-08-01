@@ -675,10 +675,13 @@ textarea.invalid:disabled,
 #subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
 #subscriber-management-page button[name=new-subscriber] { float: right; }
 
-.change-log .entry-row { border-bottom: 1px solid #d3d3d3; }
-.change-log .entry-row label { display: inline-block; width: 600px; }
-.change-log .entry-row button { display: inline-block; margin-left: 50px; }
-.change-log .entry-detail-row label { width: 150px; height: 20px; }
+.change-log a {
+    color: #49f;
+    text-decoration: underline;
+}
+.change-log .entry-row { padding: 10px; }
+.change-log .entry-row:nth-child(odd) { background: #F8F8F8; }
+.change-log .entry-row .entry-detail-row label { margin-right: 10px; }
 
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }

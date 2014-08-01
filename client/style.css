@@ -645,6 +645,7 @@ textarea.invalid:disabled,
 #user-management-page .result span:nth-child(1) { -webkit-flex-grow: 2; flex-grow: 2; }
 #user-management-page .result span:nth-child(2) { width: 200px; }
 #user-management-page .result span:nth-child(3) { width: 200px; }
+#user-management-page .result span.cert-end { width: 75px; text-align: right; }
 #user-management-page .result span.cert-end span.expires-soon { background: #ff9999; padding: 3px; border-radius: 5px; margin-left: -3px; }
 #user-management-page .result .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 #user-management-page .user-details label.employers { float: right; margin-right: 34px; }

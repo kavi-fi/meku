@@ -144,7 +144,8 @@ function subscriberManagementPage() {
       }
     })
 
-    $form.find('input').on('blur select2-blur', function() { $(this).addClass('touched') })
+    $form.find('input').on('input blur select2-blur', function() { $(this).addClass('touched') })
+    $form.find('input[name=classifiers]').on('change', function() { $(this).addClass('touched') })
 
     $form.find('input.select2-offscreen').on('change validate', function() {
       $(this).toggleClass('invalid', !this.checkValidity())
@@ -155,7 +156,8 @@ function subscriberManagementPage() {
     $form.on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
 
     $form.on('validate', function() {
-      $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
+      var enabled = $form.find('.touched').length > 0 && this.checkValidity()
+      $(this).find('button[type=submit]').prop('disabled', !enabled)
     })
 
     $form.find('input[name=emailAddresses]').on('change', function(event) {

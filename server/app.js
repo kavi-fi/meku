@@ -622,6 +622,10 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
   }
 })
 
+app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next) {
+  ChangeLog.find({ documentId: req.params.documentId }, respond(res, next))
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)

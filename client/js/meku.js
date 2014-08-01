@@ -322,3 +322,34 @@ function select2OptionToInt(x) { return parseInt(x.id) }
 function select2DataFromEnumObject(object) {
   return _.map(object, function(value, key) { return { id: key, text: value }})
 }
+
+function changeLog(document) {
+  function render() {
+    var $changeLog = $('#templates').find('.change-log').clone()
+
+    $.get('/changelogs/' + document._id, function (logEntries) {
+      logEntries.forEach(function (entry) {
+        var entryString = entry.operation + ', ' + entry.date + ', ' + entry.user.username + ' (' + entry.user.ip + ')'
+        var $element = $('<li>', { class: 'entry-row', 'data-id': entry._id }).data('entry', entry).text(entryString)
+        $element.append($('<button>', { class: 'button' }).text('Näytä'))
+
+        $element.on('click', '.button', function () {
+          $changeLog.find('.selected').not($element).removeClass('selected')
+          $changeLog.find('.entry-details').remove()
+
+          $element.toggleClass('selected')
+
+          if ($element.hasClass('selected')) {
+            $element.append($('<pre>', { class: 'entry-details' }).text(JSON.stringify(entry, null, 2)))
+          }
+        })
+
+        $changeLog.find('.entries').append($element)
+      })
+    })
+
+    return $changeLog
+  }
+
+  return { render: render }
+}

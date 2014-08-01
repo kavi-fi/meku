@@ -367,6 +367,8 @@ function searchPage(baseUrl) {
     $row.addClass('selected').after($details)
     animate ? $details.slideDown() : $details.show()
     $details.trigger('showDetails', p)
+
+    if (hasRole('root')) $details.append(changeLog(p).render())
   }
 
   function closeDetail() {

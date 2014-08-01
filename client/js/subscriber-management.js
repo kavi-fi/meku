@@ -82,6 +82,8 @@ function subscriberManagementPage() {
     $subscriberDetails.find('.new-only').remove()
     $subscriberDetails.find('button[name=remove]').toggle(utils.hasRole(user, 'root'))
 
+    if (hasRole('root')) $subscriberDetails.append(changeLog(subscriber).render())
+
     bindEventHandlers($subscriberDetails, function(subscriberData) {
       $.ajax('/accounts/' + subscriber._id, { type: 'PUT', data: JSON.stringify(subscriberData) })
         .done(function(subscriber) {

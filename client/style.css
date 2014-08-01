@@ -675,6 +675,8 @@ textarea.invalid:disabled,
 #subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
 #subscriber-management-page button[name=new-subscriber] { float: right; }
 
+.change-log .entry-row button { margin-left: 100px; margin-bottom: 10px; }
+
 .tt-query, .tt-hint { border: 2px solid #ccc; outline: none; }
 .tt-hint { color: #999; }
 .tt-dropdown-menu { padding: 8px 0; background-color: #fff; border: 1px solid rgba(0, 0, 0, 0.2); }

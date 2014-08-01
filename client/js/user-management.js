@@ -185,6 +185,8 @@ function userManagementPage() {
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
       populate($detailTemplate, user)
+
+      if (hasRole('root')) $detailTemplate.append(changeLog(user).render())
     }
 
     $detailTemplate.find('form').on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))

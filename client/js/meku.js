@@ -58,12 +58,15 @@ function setup() {
 
   var login = loginPage()
   var error = errorDialog()
+  var conflict = conflictDialog()
 
   $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json' })
 
   $(document).ajaxError(function(e, req) {
     if (req.status == 403) {
       login.show()
+    } else if (req.status == 409) {
+      conflict.show()
     } else if (req.statusText != 'abort') {
       error.show()
     }
@@ -87,6 +90,12 @@ function errorDialog() {
   var $overlay = $('#error-overlay')
   var $dialog = $('#error-dialog')
   $dialog.find('a').click(function(e) { e.preventDefault(); location.reload() })
+  return { show: function() { $dialog.add($overlay).show() }}
+}
+
+function conflictDialog() {
+  var $overlay = $('#conflict-overlay')
+  var $dialog = $('#conflict-dialog')
   return { show: function() { $dialog.add($overlay).show() }}
 }
 

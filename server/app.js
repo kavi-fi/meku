@@ -227,12 +227,14 @@ app.post('/programs/:id/register', function(req, res, next) {
     if (err) return next(err)
 
     var newClassification = program.draftClassifications[req.user._id]
+    if (!newClassification) return res.send(409)
+
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
     newClassification.author = { _id: req.user._id, name: req.user.name }
 
-    delete program.draftClassifications[req.user._id]
-    program.draftsBy.pull(req.user._id)
+    program.draftClassifications = {}
+    program.draftsBy = []
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
@@ -332,8 +334,9 @@ app.post('/programs/:id', function(req, res, next) {
 })
 
 app.post('/programs/autosave/:id', function(req, res, next) {
-  Program.findByIdAndUpdate(req.params.id, req.body, function(err, program) {
+  Program.findOneAndUpdate({ _id: req.params.id, draftsBy: req.user._id }, req.body, function(err, program) {
     if (err) return next(err)
+    if (!program) return res.send(409)
     program.populateAllNames(function(err) {
       if (err) return next(err)
       program.save(respond(res, next))

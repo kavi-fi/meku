@@ -411,11 +411,10 @@ function classificationForm(editMode) {
   function saveProgramField(id, field, value) {
     if (editMode) {
       modifiedFields[field] = value
-
       $saveButton.prop('disabled', false)
     } else {
       field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
-      $.post('/programs/autosave/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {
+      $.post('/programs/autosave/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(program) {
         updateSummary(program)
         preview.update(program)
       })

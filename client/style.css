@@ -14,15 +14,15 @@ body {
 .dialog { width: 300px; margin: 0 auto; border: 1px solid #D3D3D3; background-color: #fff; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); padding: 20px 40px 40px 40px; }
 .dialog .buttons { display: -webkit-flex; display: flex; width: 100%; -webkit-justify-content: space-around; justify-content: space-around; }
 
-#login-overlay, #error-overlay { z-index: 2; }
-#login, #error-dialog, #reset-password { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
-#login > div, #error-dialog > div, #reset-password > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
+#login-overlay, #error-overlay, #conflict-overlay { z-index: 2; }
+#login, #error-dialog, #conflict-dialog, #reset-password { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
+#login > div, #error-dialog > div, #conflict-dialog > div, #reset-password > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
 #login label, #reset-password label { text-align: left; }
 #login input, #reset-password input { width: 330px; font-weight: normal; margin: 10px 0; }
 #login input.invalid, #reset-password input.invalid { background-color: #fff; }
 #login button, #reset-password button { margin-top: 10px; }
 #login .feedback, #reset-password .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
-#error-dialog a { color: #00BB88; }
+#error-dialog a, #conflict-dialog a { color: #00BB88; }
 
 #reset-password > div { border: 0; }
 #reset-password .instructions { text-align: left; margin-bottom: 10px; }
@@ -90,7 +90,7 @@ textarea { resize: vertical; }
   right: 0;
   z-index: 1000;
 }
-#overlay, #login-overlay, #error-overlay { display: none; position: fixed; top:0; bottom:0; left:0; right:0; background: #222; opacity: 0.6; }
+#overlay, #login-overlay, #error-overlay, #conflict-overlay { display: none; position: fixed; top:0; bottom:0; left:0; right:0; background: #222; opacity: 0.6; }
 
 /* layout */
 #header {

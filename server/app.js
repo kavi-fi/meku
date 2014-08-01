@@ -37,7 +37,7 @@ app.post('/login', function(req, res, next) {
   var username = req.body.username
   var password = req.body.password
   if (!username || !password) return res.send(403)
-  User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
+  User.findOne({ username: username, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
@@ -75,7 +75,7 @@ app.post('/forgot-password', function(req, res, next) {
 
   if (!username) return res.send(403)
 
-  User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
+  User.findOne({ username: username, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
 
@@ -118,7 +118,7 @@ function createAndSaveHash(user, callback) {
 }
 
 app.get('/check-reset-hash/:hash', function(req, res, next) {
-  User.findOne({ resetHash: req.params.hash, active: { $ne: false } }, function(err, user) {
+  User.findOne({ resetHash: req.params.hash, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.password) return res.send({ name: user.name })
@@ -129,7 +129,7 @@ app.get('/check-reset-hash/:hash', function(req, res, next) {
 app.post('/reset-password', function(req, res, next) {
   var resetHash = req.body.resetHash
   if (resetHash) {
-    User.findOne({ resetHash: resetHash, active: { $ne: false } }, function (err, user) {
+    User.findOne({ resetHash: resetHash, active: true }, function (err, user) {
       if (err) return next(err)
       if (!user) return res.send(403)
       user.password = req.body.password
@@ -664,7 +664,7 @@ var server = app.listen(process.env.PORT || 3000, function() {
 var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
   User.find({ $and: [
     { certificateEndDate: { $lt: new Date() }},
-    { active: { $ne: false }},
+    { active: true},
     {'emails.0': { $exists: true }}
   ]}, function(err, users) {
     if (err) throw err
@@ -694,7 +694,7 @@ checkExpiredCerts.start()
 var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
   User.find({ $and: [
     { certificateEndDate: { $lt: moment().add(3, 'months').toDate(), $gt: new Date() }},
-    { active: { $ne: false }},
+    { active: true},
     {'emails.0': { $exists: true }},
     { $or: [
       { certExpiryReminderSent: { $exists: false }},

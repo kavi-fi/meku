@@ -62,7 +62,7 @@ function logUserIn(req, res, user) {
     role: user.role,
     email: _.first(user.emails)
   }, { maxAge: weekInMs, signed: true })
-  logUserLogin(req, user)
+  saveChangeLogEntry(user, null, 'login')
 }
 
 app.post('/logout', function(req, res, next) {
@@ -215,9 +215,7 @@ app.post('/programs/new', function(req, res, next) {
   p.newDraftClassification(req.user)
   p.save(function(err, program) {
     if (err) return next(err)
-
-    logCreateOperation(req, req.user, program)
-
+    logCreateOperation(req.user, program)
     res.send(program)
   })
 })
@@ -249,7 +247,7 @@ app.post('/programs/:id/register', function(req, res, next) {
             sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
               if (err) return next(err)
               updateMetadataIndexes(program, function() {
-                logUpdateOperation(req, req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
+                logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
                 return res.send(program)
               })
             })
@@ -308,7 +306,7 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
     var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
-    updateAndLogChanges(req, program, updates, req.user, function(err, program) {
+    updateAndLogChanges(program, updates, req.user, function(err, program) {
       if (err) return next(err)
       verifyTvSeries(program, function(err) {
         if (err) return next(err)
@@ -324,7 +322,7 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
 app.post('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
-    updateAndLogChanges(req, program, req.body, req.user, function(err, program) {
+    updateAndLogChanges(program, req.body, req.user, function(err, program) {
       program.populateAllNames(function(err) {
         if (err) return next(err)
         program.save(respond(res, next))
@@ -347,7 +345,7 @@ app.post('/programs/autosave/:id', function(req, res, next) {
 app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
-    softDeleteAndLog(req, program, req.user, respond(res, next))
+    softDeleteAndLog(program, req.user, respond(res, next))
   })
 })
 
@@ -364,16 +362,14 @@ app.get('/series/search/:query', function(req, res, next) {
 app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
   Account.findById(req.params.id, function(err, account) {
     if (err) return next(err)
-    updateAndLogChanges(req, account, req.body, req.user, respond(res, next))
+    updateAndLogChanges(account, req.body, req.user, respond(res, next))
   })
 })
 
 app.post('/accounts', requireRole('kavi'), function(req, res, next) {
   new Account(req.body).save(function(err, account) {
     if (err) return next(err)
-
-    logCreateOperation(req, req.user, account)
-
+    logCreateOperation(req.user, account)
     res.send(account)
   })
 })
@@ -381,7 +377,7 @@ app.post('/accounts', requireRole('kavi'), function(req, res, next) {
 app.delete('/accounts/:id', requireRole('root'), function(req, res, next) {
   Account.findById(req.params.id, function (err, account) {
     if (err) return next(err)
-    softDeleteAndLog(req, account, req.user, respond(res, next))
+    softDeleteAndLog(account, req.user, respond(res, next))
   })
 })
 
@@ -444,15 +440,11 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
   if (userHasRequiredFields(req.body)) {
     new User(req.body).save(function(err, user) {
       if (err) return next(err)
-
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
-
-        logCreateOperation(req, req.user, user)
-
+        logCreateOperation(req.user, user)
         var subject = 'Käyttäjätunnusten aktivointi'
         var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
-
         sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
       })
     })
@@ -463,7 +455,7 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
 
 app.post('/users/:id', requireRole('root'), function(req, res, next) {
   User.findById(req.params.id, function (err, user) {
-    updateAndLogChanges(req, user, req.body, req.user, respond(res, next))
+    updateAndLogChanges(user, req.body, req.user, respond(res, next))
   })
 })
 
@@ -663,25 +655,14 @@ var server = app.listen(process.env.PORT || 3000, function() {
 })
 
 var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
-  User.find({ $and: [
-    { certificateEndDate: { $lt: new Date() }},
-    { active: { $ne: false }},
-    {'emails.0': { $exists: true }}
-  ]}, function(err, users) {
+  var q = { $and: [{ certificateEndDate: { $lt: new Date() }}, { active: { $ne: false }}, {'emails.0': { $exists: true }}]}
+  User.find(q, function(err, users) {
     if (err) throw err
-
     users.forEach(function(user) {
       user.update({ active: false }, function(err) {
         if (err) return logError(err)
-
-        logUpdateOperation(null, { username: 'cron', ip: 'localhost' }, user, {
-          active: {
-            old: user.active,
-            new: false
-          }
-        })
+        logUpdateOperation({ username: 'cron', ip: 'localhost' }, user, { active: { old: user.active, new: false } })
       })
-
       sendEmail({
         recipients: [ user.emails[0] ],
         subject: 'Luokittelusertifikaattisi on vanhentunut',
@@ -738,6 +719,7 @@ function authenticate(req, res, next) {
   var cookie = req.signedCookies.user
   if (cookie) {
     req.user = cookie
+    req.user.ip = getIpAddress(req)
     return next()
   }
   return res.send(403)
@@ -860,7 +842,7 @@ function getRegistrationEmailsFromPreviousClassification(program, callback) {
   }
 }
 
-function updateAndLogChanges(req, document, updates, user, callback) {
+function updateAndLogChanges(document, updates, user, callback) {
   var oldObject = document.toObject()
   updates = utils.flattenObject(updates)
   _.forEach(updates, function(value, key) {
@@ -879,23 +861,23 @@ function updateAndLogChanges(req, document, updates, user, callback) {
         { new: newValue, old: oldValue }
       ]
     }).zipObject().valueOf()
-    logUpdateOperation(req, user, updatedDocument, changes)
+    logUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
   })
 }
 
-function softDeleteAndLog(req, document, user, callback) {
+function softDeleteAndLog(document, user, callback) {
   document.deleted = true
-  document.save(function (err, document) {
+  document.save(function(err, document) {
     if (err) return callback(err)
-    logDeleteOperation(req, user, document)
+    saveChangeLogEntry(user, document, 'delete')
     callback(undefined, document)
   })
 }
 
-function saveChangeLogEntry(req, user, document, operation, operationData) {
+function saveChangeLogEntry(user, document, operation, operationData) {
   var data = {
-    user: { _id: user._id, username: user.username, ip: user.ip || getIpAddress(req) },
+    user: { _id: user._id, username: user.username, ip: user.ip },
     date: new Date(),
     operation: operation,
     targetCollection: document ? document.constructor.modelName : undefined,
@@ -909,30 +891,21 @@ function saveChangeLogEntry(req, user, document, operation, operationData) {
   new ChangeLog(data).save(logError)
 }
 
-function logCreateOperation(req, user, document) {
-  saveChangeLogEntry(req, user, document, 'create')
+function logCreateOperation(user, document) {
+  saveChangeLogEntry(user, document, 'create')
 }
 
-function logUpdateOperation(req, user, document, updates) {
-  saveChangeLogEntry(req, user, document, 'update', { updates: updates })
-}
-
-function logDeleteOperation(req, user, document) {
-  saveChangeLogEntry(req, user, document, 'delete')
-}
-
-function logUserLogin(req, user) {
-  saveChangeLogEntry(req, user, null, 'login')
+function logUpdateOperation(user, document, updates) {
+  saveChangeLogEntry(user, document, 'update', { updates: updates })
 }
 
 function getIpAddress(req) {
-  var ipAddr = req.headers["x-forwarded-for"];
+  var ipAddr = req.headers['x-forwarded-for']
   if (ipAddr){
-    var list = ipAddr.split(",");
-    ipAddr = list[list.length-1];
+    var list = ipAddr.split(",")
+    ipAddr = list[list.length-1]
   } else {
-    ipAddr = req.connection.remoteAddress;
+    ipAddr = req.connection.remoteAddress
   }
-
   return ipAddr
 }

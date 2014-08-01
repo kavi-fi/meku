@@ -6,6 +6,8 @@ body {
   color: #444444;
 }
 
+.pika-lendar { width: 248px; }
+
 .hide { display: none !important; }
 
 .clearfix:after { content:''; display:table; clear:both; }
@@ -651,7 +653,6 @@ textarea.invalid:disabled,
 
 #user-management-page .new-user { width: 340px; }
 #user-management-page .new-user button { margin-left: 15px; }
-
 
 .detail-box .form label { box-sizing: border-box; width: 266px; margin-right: 10px; }
 .detail-box .form label.double { width: 547px; box-sizing: border-box; }

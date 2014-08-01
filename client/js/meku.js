@@ -324,32 +324,101 @@ function select2DataFromEnumObject(object) {
 }
 
 function changeLog(document) {
+  var $changeLog = $('#templates').find('.change-log').clone()
+
+  return { render: render }
+
   function render() {
-    var $changeLog = $('#templates').find('.change-log').clone()
-
     $.get('/changelogs/' + document._id, function (logEntries) {
-      logEntries.forEach(function (entry) {
-        var entryString = entry.operation + ', ' + entry.date + ', ' + entry.user.username + ' (' + entry.user.ip + ')'
-        var $element = $('<li>', { class: 'entry-row', 'data-id': entry._id }).data('entry', entry).text(entryString)
-        $element.append($('<button>', { class: 'button' }).text('Näytä'))
+      if (logEntries.length > 0) {
+        $changeLog.removeClass('hide')
 
-        $element.on('click', '.button', function () {
-          $changeLog.find('.selected').not($element).removeClass('selected')
-          $changeLog.find('.entry-details').remove()
-
-          $element.toggleClass('selected')
-
-          if ($element.hasClass('selected')) {
-            $element.append($('<pre>', { class: 'entry-details' }).text(JSON.stringify(entry, null, 2)))
-          }
+        $changeLog.find('button[name=show]').on('click', function () {
+          $(this).toggleClass('clicked')
+          $changeLog.find('.entries-container').toggleClass('hide', !$(this).hasClass('clicked'))
         })
+      }
+
+      logEntries.forEach(function (entry) {
+        var operations = {
+          'update': 'Päivitys',
+          'create': 'Luonti',
+          'delete': 'Poisto'
+        }
+        var operation = operations[entry.operation]
+        var date = moment(entry.date).format('DD.MM.YYYY H:m:s')
+
+        var $element = $('<div>', { class: 'entry-row', 'data-id': entry._id }).data('entry', entry)
+        var entryString = operation + ', ' + date + ', ' + entry.user.username + ' (' + entry.user.ip + ')'
+        $element.append($('<label>').text(entryString))
+
+        if (entry.operation === 'update' && entry.updates) {
+          $element.append($('<button>', { class: 'button' }).text('Muuttuneet tiedot'))
+
+          $element.on('click', '.button', function () {
+            $changeLog.find('.selected').not($element).removeClass('selected')
+            $changeLog.find('.entry-details').remove()
+
+            $element.toggleClass('selected')
+
+            if ($element.hasClass('selected')) {
+              var $entryDetails = $('<div>', { class: 'entry-details' })
+              $element.append($entryDetails)
+
+              _.forEach(entry.updates, function(value, key) {
+                var $detailRow = $('<div>', { class: 'entry-detail-row' })
+
+                $detailRow.append($('<label>').text(key))
+                $detailRow.append(renderDetailRow(value))
+
+                $entryDetails.append($detailRow)
+              })
+            }
+          })
+        }
 
         $changeLog.find('.entries').append($element)
       })
     })
 
+    function renderDetailRow(value) {
+      if (_.isObject(value.old) || _.isObject(value.new)) {
+        var $container = $('<div>', { class: 'update-container' })
+        var $inserted = $('<div>', { class: 'inserted hide' })
+        var $deleted = $('<div>', { class: 'deleted hide' })
+
+        _.forEach(value.old, function (oldValue) {
+          if (!_.find(value.new, function (newValue) {
+            return _.isEqual(newValue, oldValue)
+          })) {
+            $deleted.removeClass('hide')
+            $deleted.append($('<pre>').text('Poistettu: ' + JSONstringify(oldValue)))
+          }
+        })
+
+        _.forEach(value.new, function (newValue) {
+          if (!_.find(value.old, function (oldValue) {
+            return _.isEqual(oldValue, newValue)
+          })) {
+            $inserted.removeClass('hide')
+            $inserted.append($('<pre>').text('Lisätty: ' + JSONstringify(newValue)))
+          }
+        })
+
+        return $container.append($inserted).append($deleted)
+      } else {
+        var oldToNew = value.old
+          ? '"' + value.old + '" -> "' + value.new + '"'
+          : 'undefined -> "' + value.new + '"'
+
+        return $('<span>').text(oldToNew)
+      }
+
+      function JSONstringify(value) {
+        return JSON.stringify(value, null, 2)
+      }
+    }
+
     return $changeLog
   }
-
-  return { render: render }
 }

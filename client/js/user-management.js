@@ -135,10 +135,10 @@ function userManagementPage() {
     return $detailTemplate
   }
 
-  function renderExistingUserDetails(currentUser) {
-    var $detailTemplate = renderUserDetails(currentUser)
+  function renderExistingUserDetails(selectedUser) {
+    var $detailTemplate = renderUserDetails(selectedUser)
 
-    $detailTemplate.find('input[name=active]').prop('disabled', currentUser.username === user.username)
+    $detailTemplate.find('input[name=active]').prop('disabled', selectedUser.username === user.username)
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
@@ -146,11 +146,11 @@ function userManagementPage() {
       var $this = $(this)
       var userData = getUserData($this)
 
-      if (enums.util.isClassifier(currentUser.role)) {
+      if (enums.util.isClassifier(selectedUser.role)) {
         userData = _.merge(userData, getClassifierData($this))
       }
 
-      $.post('/users/' + currentUser._id, JSON.stringify(userData), function(updatedUser) {
+      $.post('/users/' + selectedUser._id, JSON.stringify(userData), function(updatedUser) {
         $userList.find('.result.selected').replaceWith(renderUser(updatedUser))
         closeDetails()
       })

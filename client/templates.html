@@ -168,10 +168,12 @@
   <div class="no-more-results"><i>FIN</i></div>
 </div>
 
-<div class="user-details detail-box">
-  <form class="form">
-    <button name="save" type="submit" disabled class="button">Tallenna</button>
+<div class="user-details detail-box clearfix">
+  <div class="activity modify-only">
+    <button class="active-toggle button"></button>
+  </div>
 
+  <form class="form">
     <label>Nimi <input type="text" name="name" required></label>
     <label>Käyttäjätunnus
       <input type="text" name="username" required disabled><i class="fa fa-spinner fa-spin"></i>
@@ -179,7 +181,9 @@
 
     <label>Sähköposti <input type="email" name="email" required></label>
     <label>Puhelinnumero <input type="tel" name="phoneNumber" required></label>
-    <label class="modify-only"><input type="checkbox" name="active"> Käyttäjätunnus aktiivinen</label>
+
+    <div class="classifier"></div>
+    <button name="save" type="submit" disabled class="button">Tallenna</button>
   </form>
 </div>
 

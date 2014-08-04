@@ -1,7 +1,7 @@
 exports.users = [
-  {username:'root', password:'root', role:'root', name:'root', emails:['root@fake-meku.fi'] },
-  {username:'kavi', password:'kavi', role:'kavi', name:'kavi', emails:['kavi@fake-meku.fi'] },
-  {username:'user', password:'user', role:'user', name:'user', emails:['user@fake-meku.fi'] }
+  {username:'root', active: true, password:'root', role:'root', name:'root', emails:['root@fake-meku.fi'] },
+  {username:'kavi', active: true, password:'kavi', role:'kavi', name:'kavi', emails:['kavi@fake-meku.fi'] },
+  {username:'user', active: true, password:'user', role:'user', name:'user', emails:['user@fake-meku.fi'] }
 ]
 
 exports.accounts = [

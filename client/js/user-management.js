@@ -197,6 +197,8 @@ function userManagementPage() {
       $.post('/users/' + user._id, JSON.stringify({active: active}), function(updatedUser) {
         $selected.toggleClass('inactive', !updatedUser.active)
         toggleActiveButton($selected.next(), updatedUser.active)
+        $selected.data('user', updatedUser)
+        closeDetails()
       })
     })
 

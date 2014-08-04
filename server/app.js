@@ -242,7 +242,7 @@ app.post('/programs/:id/register', function(req, res, next) {
         if (err) return next(err)
         verifyTvSeriesClassification(program, function(err) {
           if (err) return next(err)
-          addInvoicerows(newClassification, function(err, _) {
+          addInvoicerows(newClassification, function(err) {
             if (err) return next(err)
             sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
               if (err) return next(err)

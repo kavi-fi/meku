@@ -165,7 +165,7 @@ function userManagementPage() {
     var isClassifier = enums.util.isClassifier(role) || user && enums.util.isClassifier(user.role)
 
     if (isClassifier) {
-      $detailTemplate.find('form').append($('#templates').find('.classifier-details').clone())
+      $detailTemplate.find('form .classifier').append($('#templates').find('.classifier-details').clone())
 
       var $endDate = $detailTemplate.find('input[name=certificateEndDate]')
         .pikaday(_.defaults({ defaultDate: moment().add('years', 5).toDate() }, pikadayDefaults))
@@ -191,9 +191,12 @@ function userManagementPage() {
       populate($detailTemplate, user)
     }
 
-    $detailTemplate.find('input[name=active]').on('change', function() {
-      $.post('/users/' + user._id, JSON.stringify({active: $(this).prop('checked')}), function(updatedUser) {
-        $userList.find('.result.selected').toggleClass('inactive', !updatedUser.active)
+    $detailTemplate.find('.active-toggle').on('click', function() {
+      var $selected = $userList.find('.result.selected')
+      var active = $selected.next().find('.active-toggle').hasClass('inactive')
+      $.post('/users/' + user._id, JSON.stringify({active: active}), function(updatedUser) {
+        $selected.toggleClass('inactive', !updatedUser.active)
+        toggleActiveButton($selected.next(), updatedUser.active)
       })
     })
 
@@ -227,16 +230,23 @@ function userManagementPage() {
       $element.find('input[name=name]').val(user.name).end()
         .find('input[name=email]').val(user.emails[0]).end()
         .find('input[name=username]').val(user.username).end()
-        .find('input[name=active]').prop('checked', user.active).end()
         .find('input[name=phoneNumber]').val(user.phoneNumber).end()
         .find('input[name=certificateStartDate]').val(cStartDate).end()
         .find('input[name=certificateEndDate]').val(cEndDate).end()
         .find('textarea[name=comment]').val(user.comment).end()
         .find('input[name=employers]').trigger('setVal', user.employers).end()
+      toggleActiveButton($element, user.active)
     }
 
     function toggleInvalid() {
       $(this).toggleClass('invalid', !this.checkValidity())
+    }
+
+    function toggleActiveButton($details, active) {
+      $details
+        .find('.active-toggle')
+        .text(active ? "Käyttäjä aktiivinen" : "Käyttäjä ei aktiivinen")
+        .toggleClass('inactive', !active)
     }
   }
 

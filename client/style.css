@@ -652,6 +652,15 @@ textarea.invalid:disabled,
 #user-management-page .controls .select2-container { width: 222px; box-sizing: border-box; }
 #user-management-page .controls button { vertical-align: top; }
 
+#user-management-page .user-details button.active-toggle { width: 170px; }
+#user-management-page .user-details button.inactive {
+  background: -o-linear-gradient(-90deg,  #00AA77 0%, #00BB88 100%);
+  background: -moz-linear-gradient(-90deg, #00AA77 0%, #00BB88 100%);
+  background: -ms-linear-gradient(-90deg, #00AA77 0%, #00BB88 100%);
+  background: linear-gradient(-180deg, #00AA77 0%, #00BB88 100%);
+}
+
+#user-management-page .user-details .activity { text-align: right; border-bottom: 1px solid #e8e8e8; padding: 0 0 10px 0; margin-bottom: 15px; }
 #user-management-page .new-user { width: 340px; }
 #user-management-page .new-user button { margin-left: 15px; }
 

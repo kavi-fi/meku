@@ -860,7 +860,7 @@ function updateAndLogChanges(document, updates, user, callback) {
       var newValue = utils.getProperty(newObject, path)
       var oldValue = utils.getProperty(oldObject, path)
 
-      if (_.isEqual(newValue, oldValue)) return []
+      if (_.isEqual(newValue, oldValue) || oldValue === undefined && newValue === "") return []
       return [
         path.replace(/\./g, ','),
         { new: newValue, old: oldValue }

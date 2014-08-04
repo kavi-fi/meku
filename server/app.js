@@ -489,14 +489,10 @@ app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, 
       function accountName(tuple) { return tuple.account.name }
 
       var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
-      try {
-        var result = proe(dates, data)
-        res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
-        res.setHeader('Content-Type', 'text/plain')
-        res.send(result)
-      } catch (error) {
-        next(error)
-      }
+      var result = proe(dates, data)
+      res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
+      res.setHeader('Content-Type', 'text/plain')
+      res.send(result)
     })
   })
 })

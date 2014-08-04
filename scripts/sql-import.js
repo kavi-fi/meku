@@ -282,18 +282,20 @@ function accounts(callback) {
       var billingAddress = row.billing_address_street
         ? { street: trim1line(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)) }
         : undefined
-      if (_.isEqual(address, billingAddress)) {
-        billingAddress = undefined
-      }
+      if (_.isEqual(address, billingAddress)) billingAddress = undefined
+
+      var eInvoice = row.e_invoice
+        ? { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
+        : undefined
+
       var phoneNumber = row.phone_office || row.phone_alternate || undefined
 
       return {
         emekuId: row.id, sequenceId:seq++, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
         address: address,
-        billing: {
-          address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text)
-        },
-        eInvoice: { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) },
+        billing: { address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text) },
+        eInvoice: eInvoice,
+        billingPreference: (!!eInvoice && 'eInvoice') || (!!billingAddress && 'address') || '',
         contactName: row.ownership,
         phoneNumber: phoneNumber
       }

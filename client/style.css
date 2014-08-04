@@ -657,6 +657,8 @@ textarea.invalid:disabled,
   background: linear-gradient(-180deg, #00AA77 0%, #00BB88 100%);
 }
 
+#user-management-page .user-details .button-wrapper { text-align: right; }
+#user-management-page .user-details button { float: none; }
 #user-management-page .user-details .activity { text-align: right; border-bottom: 1px solid #e8e8e8; padding: 0 0 10px 0; margin-bottom: 15px; }
 #user-management-page .new-user { width: 340px; }
 #user-management-page .new-user button { margin-left: 15px; }

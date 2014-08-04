@@ -211,7 +211,7 @@ function subscriberManagementPage() {
       .append($('<span>', { class: 'roles' }).html(renderRoles(subscriber.roles)))
 
     function renderRoles(roles) {
-      if (_.isEmpty(roles)) return '<i class="icon-warning-sign"></i>'
+      if (_.isEmpty(roles)) return '<i class="fa fa-warning"></i>'
       return _.map(roles, function(role) { return enums.roles[role] }).join(', ')
     }
   }

@@ -75,7 +75,7 @@ function userManagementPage() {
    return $('<div>', { class: 'result', 'data-id': user._id })
      .data('user', user).data('id', user._id)
      .append($('<span>', { class: 'name' }).text(user.name))
-     .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="icon-warning-sign"></i>'))
+     .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="fa fa-warning"></i>'))
      .append($('<span>', { class: 'cert-end' }).html(renderCertEnd(user)))
      .toggleClass('inactive', user.active === false)
   }
@@ -88,7 +88,7 @@ function userManagementPage() {
       return $('<span>').text(certEnd.format(utils.dateFormat))
         .toggleClass('expires-soon', certEnd.isBefore(moment().add(3, 'months')))
     } else {
-      return '<i class="icon-warning-sign"></i>'
+      return '<i class="fa fa-warning"></i>'
     }
   }
 
@@ -254,7 +254,7 @@ function userManagementPage() {
   var usernameValidator = _.debounce((function() {
     var getLatestAjax = switchLatestDeferred()
     return function(username, $username, $detailTemplate) {
-      getLatestAjax($.get('/users/exists/' + encodeURIComponent(username)), $username.siblings('i.icon-spinner'))
+      getLatestAjax($.get('/users/exists/' + encodeURIComponent(username)), $username.siblings('i.fa-spinner'))
         .done(function(data) {
           $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
           $username.removeClass('pending')

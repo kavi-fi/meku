@@ -268,7 +268,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, linkUserAccounts, linkSecurityGroupAccounts], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts], callback)
 
   function accountBase(callback) {
     var seq = 1
@@ -327,6 +327,18 @@ function accounts(callback) {
   function userEmails(callback) {
     var q = 'select u.id, e.email_address, j.primary_address from users u join email_addr_bean_rel j on (j.bean_id = u.id) join email_addresses e on (j.email_address_id = e.id) where u.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Users"'
     batchUpdater(q, idToEmailMapper, singleFieldUpdater('User', 'emails'), callback)
+  }
+
+  function userRoles(callback) {
+    // KAVI Turvaryhmät: 6f6ec169-9572-c2d2-0363-4e3663b9e3ed Meku-pääluokittelija, 8d4ad931-1055-a4f5-96da-4e3664911855 Meku-toimistohenkilö, b02cf3e0-cf10-f827-766c-4e36641b1d78 Meku-luokittelija
+    var kaviUsers = "select distinct u.id from securitygroups_users sgu join users u on (u.id = sgu.user_id) where sgu.securitygroup_id in ('6f6ec169-9572-c2d2-0363-4e3663b9e3ed', '8d4ad931-1055-a4f5-96da-4e3664911855', 'b02cf3e0-cf10-f827-766c-4e36641b1d78') and u.user_name not like 'Y%' and u.user_name not like '2%' and sgu.deleted != '1' and u.deleted != '1'"
+    conn.query(kaviUsers, function(err, rows) {
+      if (err) return callback(err)
+      schema.User.update({ emekuId: { $in: _.pluck(rows, 'id') } }, { role:'kavi' }, { multi: true }, function(err) {
+        if (err) return callback(err)
+        schema.User.update({ emekuId: { $in: ['bb0d1a8e-3862-58eb-5f3b-4e4cc62b34fb', 'd095df75-d622-e91a-6476-50693f4d5852'] } }, { role:'admin' }, { multi: true }, callback)
+      })
+    })
   }
 
   function linkUserAccounts(callback) {

@@ -151,7 +151,7 @@ var UserSchema = new Schema({
   phoneNumber: String,
   username: { type: String, index: { unique: true } },
   password: String,
-  role: String,
+  role: String, // user, kavi, root
   name: String,
   active: Boolean,
   resetHash: String,

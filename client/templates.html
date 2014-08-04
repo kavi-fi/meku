@@ -176,7 +176,7 @@
   <form class="form">
     <label>Nimi <input type="text" name="name" required></label>
     <label>Käyttäjätunnus
-      <input type="text" name="username" required disabled><i class="icon-spinner icon-spin"></i>
+      <input type="text" name="username" required disabled><i class="fa fa-spinner fa-spin"></i>
     </label>
 
     <label>Sähköposti <input type="email" name="email" required></label>
@@ -200,6 +200,14 @@
     <input type="text" name="employers" required class="required invalid">
   </label>
   <label class="double">Kommenttikenttä <textarea name="comment" class="two-column"></textarea></label>
+</div>
+
+<div class="change-log hide">
+  <a class="show-changelogs">Näytä muutosloki</a>
+  <div class="entries-container hide">
+    <div class="entries">
+    </div>
+  </div>
 </div>
 
 <div class="remove-user-dialog remove-dialog dialog">
@@ -287,7 +295,7 @@
 <div class="program-details">
   <form class="program-details-form" data-id="">
     <div class="program-info form content clearfix">
-      <a href="#haku" class="back-to-search"><i class="icon-long-arrow-left"></i> Takaisin hakuun</a>
+      <a href="#haku" class="back-to-search"><i class="fa fa-long-arrow-left"></i> Takaisin hakuun</a>
       <button name="save" class="button">Tallenna muutokset</button>
 
       <h2 class="main">Uusi kuvaohjelma - ?</h2>

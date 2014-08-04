@@ -82,6 +82,8 @@ function subscriberManagementPage() {
     $subscriberDetails.find('.new-only').remove()
     $subscriberDetails.find('button[name=remove]').toggle(utils.hasRole(user, 'root'))
 
+    if (hasRole('root')) $subscriberDetails.append(changeLog(subscriber).render())
+
     bindEventHandlers($subscriberDetails, function(subscriberData) {
       $.ajax('/accounts/' + subscriber._id, { type: 'PUT', data: JSON.stringify(subscriberData) })
         .done(function(subscriber) {
@@ -209,7 +211,7 @@ function subscriberManagementPage() {
       .append($('<span>', { class: 'roles' }).html(renderRoles(subscriber.roles)))
 
     function renderRoles(roles) {
-      if (_.isEmpty(roles)) return '<i class="icon-warning-sign"></i>'
+      if (_.isEmpty(roles)) return '<i class="fa fa-warning"></i>'
       return _.map(roles, function(role) { return enums.roles[role] }).join(', ')
     }
   }

@@ -11,7 +11,7 @@ function programBox() {
 
     var classifications = p.classifications.map(function(c, index) {
       var registrationDate = utils.asDate(c.registrationDate) || 'Tuntematon rekisteröintiaika'
-      return $('<span>').addClass('classification').toggleClass('selected', index == 0).data(c).text(registrationDate).prepend($('<i>').addClass('icon-play'))
+      return $('<span>').addClass('classification').toggleClass('selected', index == 0).data(c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
     })
 
     var drafts = _.values(p.draftClassifications || {}).map(function(draft) {

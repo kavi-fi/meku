@@ -325,7 +325,9 @@ app.post('/programs/:id', function(req, res, next) {
     updateAndLogChanges(program, req.body, req.user, function(err, program) {
       program.populateAllNames(function(err) {
         if (err) return next(err)
-        program.save(respond(res, next))
+        updateMetadataIndexes(program, function() {
+          program.save(respond(res, next))
+        })
       })
     })
   })

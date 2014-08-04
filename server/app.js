@@ -569,6 +569,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
             if (err) return callback(err)
             p.save(function (err) {
               if (err) return callback(err)
+              logCreateOperation(req.user, p)
               verifyTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
                 var seconds = durationToSeconds(_.first(p.classifications).duration)
@@ -735,6 +736,7 @@ function authenticateXmlApi(req, res, next) {
   Account.findOne({apiToken: req.params.token}).lean().exec(function(err, data) {
     if (data) {
       req.account = data
+      req.user = {username: 'xml-api', ip: getIpAddress(req)}
       return next()
     } else {
       res.send(403)

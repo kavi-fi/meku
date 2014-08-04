@@ -79,7 +79,6 @@ function setup() {
   var navigation = navi()
   internalSearchPage()
   classificationPage()
-  buyerPage()
   billingPage()
   userManagementPage()
   subscriberManagementPage()
@@ -189,8 +188,6 @@ function navi() {
 
   return { start: start }
 }
-
-function buyerPage() { $('#buyer-page').on('show', function() { setLocation('#tilaajat') }) }
 
 function stopPropagation(e) { e.stopPropagation() }
 

@@ -679,6 +679,10 @@ textarea.invalid:disabled,
     color: #49f;
     text-decoration: underline;
 }
+
+.change-log span, label, pre { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }
+.change-log label { display: inline-block; padding: 5px 0 0 0; }
+
 .change-log .entry-row { padding: 10px; }
 .change-log .entry-row:nth-child(odd) { background: #F8F8F8; }
 .change-log .entry-row .entry-detail-row label { margin-right: 10px; }

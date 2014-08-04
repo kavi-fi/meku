@@ -347,7 +347,7 @@ function changeLog(document) {
           'delete': 'Poisto'
         }
         var operation = operations[entry.operation]
-        var date = moment(entry.date).format('DD.MM.YYYY H:m:s')
+        var date = moment(entry.date).format('D.M.YYYY HH:mm:ss')
 
         var $element = $('<div>', { class: 'entry-row', 'data-id': entry._id })
         var entryString = date + ', ' + entry.user.username + ' (' + entry.user.ip + '), ' + operation
@@ -360,7 +360,7 @@ function changeLog(document) {
           _.forEach(entry.updates, function(value, key) {
             var $detailRow = $('<div>', { class: 'entry-detail-row' })
 
-            $detailRow.append($('<label>').text(key))
+            $detailRow.append($('<label>').text(key.replace(/,/g, '.')))
             $detailRow.append(renderDetailRow(value))
 
             $entryDetails.append($detailRow)
@@ -397,7 +397,7 @@ function changeLog(document) {
 
         return $container.append($inserted).append($deleted)
       } else {
-        var oldToNew = value.old
+        var oldToNew = value.old !== undefined
           ? '"' + value.old + '" -> "' + value.new + '"'
           : 'undefined -> "' + value.new + '"'
 

@@ -217,7 +217,7 @@ var ChangeLog = exports.ChangeLog = mongoose.model('changelog', new Schema({
   date: Date,
   operation: String,
   targetCollection: String,
-  documentId: ObjectId,
+  documentId: { type: ObjectId, index: true },
   updates: {}
 }))
 

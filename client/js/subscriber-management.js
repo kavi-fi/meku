@@ -237,8 +237,8 @@ function subscriberManagementPage() {
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
       .find('input[name="billing.address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
-      .find('input[name=billing-extra]').prop('checked', !!subscriber.billingPreference).end()
-      .find('input[name=billing-extra-type][value=' + (subscriber.billingPreference || 'address') + ']').prop('checked', true).end()
+      .find('input[name=billing-extra]').prop('checked', subscriber && !!subscriber.billingPreference).end()
+      .find('input[name=billing-extra-type][value=' + (subscriber && subscriber.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
 
     populateClassifiers(subscriber ? subscriber.users : [])

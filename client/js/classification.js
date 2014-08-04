@@ -291,7 +291,7 @@ function classificationForm(editMode) {
       .find('input[name=gameFormat]').trigger('setVal', program.gameFormat).end()
       .find('input[name=genre]').trigger('setVal', program.genre).end()
 
-      .find('span.author').text(user.name).end()
+      .find('span.author').text(currentClassification.author.name).end()
 
       .find('input[name="classifications.0.reason"]').trigger('setVal', reasonVal).end()
       .find('input[name="classifications.0.authorOrganization"]').trigger('setVal', authorOrgVal).end()
@@ -411,11 +411,10 @@ function classificationForm(editMode) {
   function saveProgramField(id, field, value) {
     if (editMode) {
       modifiedFields[field] = value
-
       $saveButton.prop('disabled', false)
     } else {
       field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
-      $.post('/programs/autosave/' + id, JSON.stringify(utils.keyValue(field, value))).done(function (program) {
+      $.post('/programs/autosave/' + id, JSON.stringify(utils.keyValue(field, value))).done(function(program) {
         updateSummary(program)
         preview.update(program)
       })
@@ -424,7 +423,7 @@ function classificationForm(editMode) {
 
   function updateSummary(program) {
     var currentClassification = draftClassification(program)
-    var summary = classification.summary(program, currentClassification)
+    var summary = classification.summary(currentClassification)
     var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w.category, class:'warning ' + w.category, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = commentToHtml(program.synopsis ? program.synopsis : '-')
     var countries = enums.util.toCountryString(program.country)
@@ -449,20 +448,24 @@ function classificationForm(editMode) {
   function registrationPreview() {
     var $emails = $form.find('.classification-email .emails')
     var $preview = $form.find('.classification-email .email-preview')
+    var $input = $emails.find('input[name=registration-email]')
     var currentBuyerId = null
 
-    $emails.find('ul').on('change', 'input', function(e) {
-      saveEmailState()
-    })
+    $emails.find('ul').on('change', 'input', saveEmailState)
+
+    $input.keypress(function(e) { if (e.which == 13) addEmail() })
 
     $emails.find('button.add-registration-email').on('click', function(e) {
       e.preventDefault()
-      var $input = $emails.find('input[name=registration-email]')
+      addEmail()
+    })
+
+    function addEmail() {
       if ($input.hasClass('invalid')) { return; }
       addManualEmailCheckbox(true, $input.val())
       $input.val('')
       saveEmailState()
-    })
+    }
 
     function saveEmailState() {
       var buyerEmails = $emails.find('ul.buyer input:checked')

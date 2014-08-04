@@ -155,9 +155,13 @@ function internalSearchPage() {
       $detail.find('button.continue-classification').show()
       $detail.find('button.reclassify').hide()
       $detail.find('button.categorize').hide()
+    } else if (p.classifications.length == 0) {
+      $detail.find('button.continue-classification').hide()
+      $detail.find('button.reclassify').toggle(hasRole('kavi'))
+      $detail.find('button.categorize').hide()
     } else {
       var head = p.classifications[0]
-      var canReclassify = (!head || !enums.isKHO(head.authorOrganization)) && (hasRole('kavi') || !head || (head.status != 'registered'))
+      var canReclassify = !enums.isKHO(head.authorOrganization) && (hasRole('kavi') || (head.status != 'registered'))
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(!!canReclassify)
       $detail.find('button.categorize').hide()

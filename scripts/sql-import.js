@@ -336,7 +336,7 @@ function accounts(callback) {
       if (err) return callback(err)
       schema.User.update({ emekuId: { $in: _.pluck(rows, 'id') } }, { role:'kavi' }, { multi: true }, function(err) {
         if (err) return callback(err)
-        schema.User.update({ emekuId: { $in: ['bb0d1a8e-3862-58eb-5f3b-4e4cc62b34fb', 'd095df75-d622-e91a-6476-50693f4d5852'] } }, { role:'admin' }, { multi: true }, callback)
+        schema.User.update({ emekuId: { $in: ['bb0d1a8e-3862-58eb-5f3b-4e4cc62b34fb', 'd095df75-d622-e91a-6476-50693f4d5852'] } }, { role:'root' }, { multi: true }, callback)
       })
     })
   }

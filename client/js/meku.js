@@ -324,6 +324,7 @@ function select2DataFromEnumObject(object) {
 }
 
 function changeLog(document) {
+  var operations = { update: 'Päivitys', create: 'Luonti', delete: 'Poisto' }
   var $changeLog = $('#templates').find('.change-log').clone()
 
   return { render: render }
@@ -340,15 +341,9 @@ function changeLog(document) {
         })
       }
 
-      logEntries.forEach(function (entry) {
-        var operations = {
-          'update': 'Päivitys',
-          'create': 'Luonti',
-          'delete': 'Poisto'
-        }
+      logEntries.forEach(function(entry) {
         var operation = operations[entry.operation]
         var date = moment(entry.date).format('D.M.YYYY HH:mm:ss')
-
         var $element = $('<div>', { class: 'entry-row', 'data-id': entry._id })
         var entryString = date + ', ' + entry.user.username + ' (' + entry.user.ip + '), ' + operation
         $element.append($('<label>').text(entryString))
@@ -356,17 +351,13 @@ function changeLog(document) {
         if (entry.operation === 'update' && entry.updates) {
           var $entryDetails = $('<div>', { class: 'entry-details' })
           $element.append($entryDetails)
-
           _.forEach(entry.updates, function(value, key) {
-            var $detailRow = $('<div>', { class: 'entry-detail-row' })
-
-            $detailRow.append($('<label>').text(key.replace(/,/g, '.')))
-            $detailRow.append(renderDetailRow(value))
-
-            $entryDetails.append($detailRow)
+            $('<div>', { class: 'entry-detail-row' })
+              .append($('<label>').text(key.replace(/,/g, '.')))
+              .append(renderDetailRow(value))
+              .appendTo($entryDetails)
           })
         }
-
         $changeLog.find('.entries').append($element)
       })
     })

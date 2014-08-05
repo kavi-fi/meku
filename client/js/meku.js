@@ -257,8 +257,8 @@ function spinner() {
 
 function select2Autocomplete(opts, onChangeFn) {
   var defaults = {
-    toOption: function(x) { return {id: x, text: x} },
-    fromOption: function(x) { return x.id },
+    toOption: function(x) { return {id: x.replace(/,/g, '&#44;'), text: x} },
+    fromOption: function(x) { return x.id.replace(/&#44;/g, ',') },
     multiple: false,
     allowAdding: false,
     termMinLength: 1
@@ -268,8 +268,9 @@ function select2Autocomplete(opts, onChangeFn) {
   var $select = opts.$el
 
   function createSearchChoice(term, data) {
-    if (_.indexOf(data, term) === -1) {
-      return {id: term, text: term, isNew: true }
+    var id = term.replace(/,/g, '&#44;')
+    if (_.indexOf(data, id) === -1) {
+      return {id: id, text: term, isNew: true }
     }
   }
 

@@ -14,7 +14,8 @@ function userManagementPage() {
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
     $userList.empty()
-    $.get('/users?' + $.param({ filters: currentFilters() }), function(users) {
+    var active = $page.find('.filters input[name=active]').prop('checked')
+    $.get('/users?' + $.param({ active: active, roles: roleFilters() }), function(users) {
       renderUsers(users)
 
       // Apply username search
@@ -75,9 +76,10 @@ function userManagementPage() {
    return $('<div>', { class: 'result', 'data-id': user._id })
      .data('user', user).data('id', user._id)
      .append($('<span>', { class: 'name' }).text(user.name))
-     .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="icon-warning-sign"></i>'))
+     .append($('<span>', { class: 'username' }).text(user.username))
+     .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="fa fa-warning"></i>'))
      .append($('<span>', { class: 'cert-end' }).html(renderCertEnd(user)))
-     .toggleClass('inactive', user.active === false)
+     .toggleClass('inactive', !user.active)
   }
 
   function renderCertEnd(user) {
@@ -88,7 +90,7 @@ function userManagementPage() {
       return $('<span>').text(certEnd.format(utils.dateFormat))
         .toggleClass('expires-soon', certEnd.isBefore(moment().add(3, 'months')))
     } else {
-      return '<i class="icon-warning-sign"></i>'
+      return '<i class="fa fa-warning"></i>'
     }
   }
 
@@ -133,8 +135,10 @@ function userManagementPage() {
     return $detailTemplate
   }
 
-  function renderExistingUserDetails(user) {
-    var $detailTemplate = renderUserDetails(user)
+  function renderExistingUserDetails(selectedUser) {
+    var $detailTemplate = renderUserDetails(selectedUser)
+
+    $detailTemplate.find('input[name=active]').prop('disabled', selectedUser.username === user.username)
 
     $detailTemplate.submit(function(event) {
       event.preventDefault()
@@ -142,11 +146,11 @@ function userManagementPage() {
       var $this = $(this)
       var userData = getUserData($this)
 
-      if (enums.util.isClassifier(user.role)) {
+      if (enums.util.isClassifier(selectedUser.role)) {
         userData = _.merge(userData, getClassifierData($this))
       }
 
-      $.post('/users/' + user._id, JSON.stringify(userData), function(updatedUser) {
+      $.post('/users/' + selectedUser._id, JSON.stringify(userData), function(updatedUser) {
         $userList.find('.result.selected').replaceWith(renderUser(updatedUser))
         closeDetails()
       })
@@ -161,7 +165,7 @@ function userManagementPage() {
     var isClassifier = enums.util.isClassifier(role) || user && enums.util.isClassifier(user.role)
 
     if (isClassifier) {
-      $detailTemplate.find('form').append($('#templates').find('.classifier-details').clone())
+      $detailTemplate.find('form .classifier').append($('#templates').find('.classifier-details').clone())
 
       var $endDate = $detailTemplate.find('input[name=certificateEndDate]')
         .pikaday(_.defaults({ defaultDate: moment().add('years', 5).toDate() }, pikadayDefaults))
@@ -185,7 +189,20 @@ function userManagementPage() {
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
       populate($detailTemplate, user)
+
+      if (hasRole('root')) $detailTemplate.append(changeLog(user).render())
     }
+
+    $detailTemplate.find('.active-toggle').on('click', function() {
+      var $selected = $userList.find('.result.selected')
+      var active = $selected.next().find('.active-toggle').hasClass('inactive')
+      $.post('/users/' + user._id, JSON.stringify({active: active}), function(updatedUser) {
+        $selected.toggleClass('inactive', !updatedUser.active)
+        toggleActiveButton($selected.next(), updatedUser.active)
+        $selected.data('user', updatedUser)
+        closeDetails()
+      })
+    })
 
     $detailTemplate.find('form').on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
 
@@ -217,16 +234,23 @@ function userManagementPage() {
       $element.find('input[name=name]').val(user.name).end()
         .find('input[name=email]').val(user.emails[0]).end()
         .find('input[name=username]').val(user.username).end()
-        .find('input[name=active]').prop('checked', user.active).end()
         .find('input[name=phoneNumber]').val(user.phoneNumber).end()
         .find('input[name=certificateStartDate]').val(cStartDate).end()
         .find('input[name=certificateEndDate]').val(cEndDate).end()
         .find('textarea[name=comment]').val(user.comment).end()
         .find('input[name=employers]').trigger('setVal', user.employers).end()
+      toggleActiveButton($element, user.active)
     }
 
     function toggleInvalid() {
       $(this).toggleClass('invalid', !this.checkValidity())
+    }
+
+    function toggleActiveButton($details, active) {
+      $details
+        .find('.active-toggle')
+        .text(active ? "Käyttäjä aktiivinen" : "Käyttäjä ei aktiivinen")
+        .toggleClass('inactive', !active)
     }
   }
 
@@ -252,7 +276,7 @@ function userManagementPage() {
   var usernameValidator = _.debounce((function() {
     var getLatestAjax = switchLatestDeferred()
     return function(username, $username, $detailTemplate) {
-      getLatestAjax($.get('/users/exists/' + encodeURIComponent(username)), $username.siblings('i.icon-spinner'))
+      getLatestAjax($.get('/users/exists/' + encodeURIComponent(username)), $username.siblings('i.fa-spinner'))
         .done(function(data) {
           $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
           $username.removeClass('pending')
@@ -271,7 +295,7 @@ function userManagementPage() {
     }
   }
 
-  function currentFilters() {
-    return $page.find('.filters input').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
+  function roleFilters() {
+    return $page.find('.filters input.role').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
   }
 }

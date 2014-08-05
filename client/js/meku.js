@@ -79,7 +79,6 @@ function setup() {
   var navigation = navi()
   internalSearchPage()
   classificationPage()
-  buyerPage()
   billingPage()
   userManagementPage()
   subscriberManagementPage()
@@ -189,8 +188,6 @@ function navi() {
 
   return { start: start }
 }
-
-function buyerPage() { $('#buyer-page').on('show', function() { setLocation('#tilaajat') }) }
 
 function stopPropagation(e) { e.stopPropagation() }
 
@@ -321,4 +318,85 @@ function select2OptionToInt(x) { return parseInt(x.id) }
 
 function select2DataFromEnumObject(object) {
   return _.map(object, function(value, key) { return { id: key, text: value }})
+}
+
+function changeLog(document) {
+  var operations = { update: 'Päivitys', create: 'Luonti', delete: 'Poisto' }
+  var $changeLog = $('#templates').find('.change-log').clone()
+
+  return { render: render }
+
+  function render() {
+    $.get('/changelogs/' + document._id, function (logEntries) {
+      if (logEntries.length > 0) {
+        $changeLog.removeClass('hide')
+
+        $changeLog.find('a.show-changelogs').on('click', function (e) {
+          e.preventDefault()
+          $(this).toggleClass('clicked')
+          $changeLog.find('.entries-container').slideToggle()
+        })
+      }
+
+      logEntries.forEach(function(entry) {
+        var operation = operations[entry.operation]
+        var date = moment(entry.date).format('D.M.YYYY HH:mm:ss')
+        var $element = $('<div>', { class: 'entry-row', 'data-id': entry._id })
+        var entryString = date + ', ' + entry.user.username + ' (' + entry.user.ip + '), ' + operation
+        $element.append($('<label>').text(entryString))
+
+        if (entry.operation === 'update' && entry.updates) {
+          var $entryDetails = $('<div>', { class: 'entry-details' })
+          $element.append($entryDetails)
+          _.forEach(entry.updates, function(value, key) {
+            $('<div>', { class: 'entry-detail-row' })
+              .append($('<label>').text(key.replace(/,/g, '.')))
+              .append(renderDetailRow(value))
+              .appendTo($entryDetails)
+          })
+        }
+        $changeLog.find('.entries').append($element)
+      })
+    })
+
+    function renderDetailRow(value) {
+      if (_.isObject(value.old) || _.isObject(value.new)) {
+        var $container = $('<div>', { class: 'update-container' })
+        var $inserted = $('<div>', { class: 'inserted hide' })
+        var $deleted = $('<div>', { class: 'deleted hide' })
+
+        _.forEach(value.old, function (oldValue) {
+          if (!_.find(value.new, function (newValue) {
+            return _.isEqual(newValue, oldValue)
+          })) {
+            $deleted.removeClass('hide')
+            $deleted.append($('<pre>').text('Poistettu: ' + JSONstringify(oldValue)))
+          }
+        })
+
+        _.forEach(value.new, function (newValue) {
+          if (!_.find(value.old, function (oldValue) {
+            return _.isEqual(oldValue, newValue)
+          })) {
+            $inserted.removeClass('hide')
+            $inserted.append($('<pre>').text('Lisätty: ' + JSONstringify(newValue)))
+          }
+        })
+
+        return $container.append($inserted).append($deleted)
+      } else {
+        var oldToNew = value.old !== undefined
+          ? '"' + value.old + '" -> "' + value.new + '"'
+          : 'undefined -> "' + value.new + '"'
+
+        return $('<span>').text(oldToNew)
+      }
+
+      function JSONstringify(value) {
+        return JSON.stringify(value, null, 2)
+      }
+    }
+
+    return $changeLog
+  }
 }

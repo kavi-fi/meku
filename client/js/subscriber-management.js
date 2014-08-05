@@ -82,6 +82,8 @@ function subscriberManagementPage() {
     $subscriberDetails.find('.new-only').remove()
     $subscriberDetails.find('button[name=remove]').toggle(utils.hasRole(user, 'root'))
 
+    if (hasRole('root')) $subscriberDetails.append(changeLog(subscriber).render())
+
     bindEventHandlers($subscriberDetails, function(subscriberData) {
       $.ajax('/accounts/' + subscriber._id, { type: 'PUT', data: JSON.stringify(subscriberData) })
         .done(function(subscriber) {
@@ -113,28 +115,23 @@ function subscriberManagementPage() {
         },
         billing: {
           invoiceText: $form.find('textarea[name="billing.invoiceText"]').val(),
-          language: findInput('billing.language').val()
-        },
-        eInvoice: {},
-        contactName: findInput('contactName').val(),
-        phoneNumber: findInput('phoneNumber').val(),
-        users: findInput('classifiers').select2('data').map(select2OptionToIdNamePair)
-      }
-      if ($form.find('input[name=billing-extra]').prop('checked')) {
-        var extraBillingType = $form.find('input[name=billing-extra-type]:checked').val()
-        if (extraBillingType === 'address') {
-          subscriberData.billing.address = {
+          language: findInput('billing.language').val(),
+          address: {
             street: findInput('billing.address.street').val(),
             city: findInput('billing.address.city').val(),
             zip: findInput('billing.address.zip').val(),
             country: findInput('billing.address.country').val()
           }
-        } else if (extraBillingType === 'eInvoice') {
-          subscriberData.eInvoice = {
-            address: findInput('eInvoice.address').val(),
-            operator: findInput('eInvoice.operator').val()
-          }
-        }
+        },
+        eInvoice: {
+          address: findInput('eInvoice.address').val(),
+          operator: findInput('eInvoice.operator').val()
+        },
+        contactName: findInput('contactName').val(),
+        phoneNumber: findInput('phoneNumber').val(),
+        users: findInput('classifiers').select2('data').map(select2OptionToIdNamePair),
+        billingPreference: $form.find('input[name=billing-extra]').prop('checked')
+          ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
 
       submitCallback(subscriberData)
@@ -214,7 +211,7 @@ function subscriberManagementPage() {
       .append($('<span>', { class: 'roles' }).html(renderRoles(subscriber.roles)))
 
     function renderRoles(roles) {
-      if (_.isEmpty(roles)) return '<i class="icon-warning-sign"></i>'
+      if (_.isEmpty(roles)) return '<i class="fa fa-warning"></i>'
       return _.map(roles, function(role) { return enums.roles[role] }).join(', ')
     }
   }
@@ -225,12 +222,7 @@ function subscriberManagementPage() {
 
   function renderSubscriberDetails(subscriber) {
     var $subscriberDetails = $('#templates').find('.subscriber-details').clone()
-    var eInvoice = utils.getProperty(subscriber, 'eInvoice')
-    var billingAddress = utils.getProperty(subscriber, 'billing.address')
-    var extraBillingType = _.isEmpty(billingAddress) ? 'eInvoice' : 'address'
-
     $subscriberDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, subscriber))
-
     $subscriberDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
 
     select2Autocomplete({
@@ -245,8 +237,8 @@ function subscriberManagementPage() {
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
       .find('input[name="billing.address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
-      .find('input[name=billing-extra]').prop('checked', !(_.isEmpty(billingAddress) && _.isEmpty(eInvoice))).end()
-      .find('input[name=billing-extra-type][value=' + extraBillingType + ']').prop('checked', true).end()
+      .find('input[name=billing-extra]').prop('checked', subscriber && !!subscriber.billingPreference).end()
+      .find('input[name=billing-extra-type][value=' + (subscriber && subscriber.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
 
     populateClassifiers(subscriber ? subscriber.users : [])

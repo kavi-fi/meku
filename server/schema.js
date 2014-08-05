@@ -129,6 +129,7 @@ var AccountSchema = new Schema({
   address: address,
   billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
   eInvoice: { address:String, operator:String },
+  billingPreference: String, // '' || 'address' || 'eInvoice'
   emailAddresses: [String],
   users: [{ _id: ObjectId, name: String }],
   apiToken: String,
@@ -216,7 +217,7 @@ var ChangeLog = exports.ChangeLog = mongoose.model('changelog', new Schema({
   date: Date,
   operation: String,
   targetCollection: String,
-  documentId: ObjectId,
+  documentId: { type: ObjectId, index: true },
   updates: {}
 }))
 

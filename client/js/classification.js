@@ -294,7 +294,7 @@ function classificationForm(editMode) {
       .find('input[name=gameFormat]').trigger('setVal', program.gameFormat).end()
       .find('input[name=genre]').trigger('setVal', program.genre).end()
 
-      .find('span.author').text(currentClassification.author.name).end()
+      .find('span.author').text(utils.getProperty(currentClassification, 'author.name') || '-').end()
 
       .find('input[name="classifications.0.reason"]').trigger('setVal', reasonVal).end()
       .find('input[name="classifications.0.authorOrganization"]').trigger('setVal', authorOrgVal).end()

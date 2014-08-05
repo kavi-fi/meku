@@ -37,7 +37,7 @@ app.post('/login', function(req, res, next) {
   var username = req.body.username
   var password = req.body.password
   if (!username || !password) return res.send(403)
-  User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
+  User.findOne({ username: username, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
@@ -75,7 +75,7 @@ app.post('/forgot-password', function(req, res, next) {
 
   if (!username) return res.send(403)
 
-  User.findOne({ username: username, active: { $ne: false } }, function(err, user) {
+  User.findOne({ username: username, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
 
@@ -118,7 +118,7 @@ function createAndSaveHash(user, callback) {
 }
 
 app.get('/check-reset-hash/:hash', function(req, res, next) {
-  User.findOne({ resetHash: req.params.hash, active: { $ne: false } }, function(err, user) {
+  User.findOne({ resetHash: req.params.hash, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.password) return res.send({ name: user.name })
@@ -129,7 +129,7 @@ app.get('/check-reset-hash/:hash', function(req, res, next) {
 app.post('/reset-password', function(req, res, next) {
   var resetHash = req.body.resetHash
   if (resetHash) {
-    User.findOne({ resetHash: resetHash, active: { $ne: false } }, function (err, user) {
+    User.findOne({ resetHash: resetHash, active: true }, function (err, user) {
       if (err) return next(err)
       if (!user) return res.send(403)
       user.password = req.body.password
@@ -242,7 +242,7 @@ app.post('/programs/:id/register', function(req, res, next) {
         if (err) return next(err)
         updateTvSeriesClassification(program, function(err) {
           if (err) return next(err)
-          addInvoicerows(newClassification, function(err, _) {
+          addInvoicerows(newClassification, function(err) {
             if (err) return next(err)
             sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
               if (err) return next(err)
@@ -425,8 +425,10 @@ app.get('/accounts/:id', function(req, res, next) {
 })
 
 app.get('/users', requireRole('root'), function(req, res, next) {
-  var roleFilters = req.query.filters
-  User.find(roleFilters ? { role: { $in: roleFilters }} : {}, respond(res, next))
+  var roleFilters = req.query.roles
+  var activeFilter = req.query.active ? req.query.active === 'true' : false
+  var filters = _.merge({}, roleFilters ? { role: { $in: roleFilters }} : {}, activeFilter ? {active: true} : {})
+  User.find(filters, respond(res, next))
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
@@ -502,14 +504,10 @@ app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, 
       function accountName(tuple) { return tuple.account.name }
 
       var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
-      try {
-        var result = proe(dates, data)
-        res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
-        res.setHeader('Content-Type', 'text/plain')
-        res.send(result)
-      } catch (error) {
-        next(error)
-      }
+      var result = proe(dates, data)
+      res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
+      res.setHeader('Content-Type', 'text/plain')
+      res.send(result)
     })
   })
 })
@@ -584,6 +582,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
             if (err) return callback(err)
             p.save(function (err) {
               if (err) return callback(err)
+              logCreateOperation(req.user, p)
               updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
                 var seconds = durationToSeconds(_.first(p.classifications).duration)
@@ -639,6 +638,10 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
   }
 })
 
+app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next) {
+  ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).exec(respond(res, next))
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
@@ -668,8 +671,11 @@ var server = app.listen(process.env.PORT || 3000, function() {
 })
 
 var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
-  var q = { $and: [{ certificateEndDate: { $lt: new Date() }}, { active: { $ne: false }}, {'emails.0': { $exists: true }}]}
-  User.find(q, function(err, users) {
+  User.find({ $and: [
+    { certificateEndDate: { $lt: new Date() }},
+    { active: true},
+    {'emails.0': { $exists: true }}
+  ]}, function(err, users) {
     if (err) throw err
     users.forEach(function(user) {
       user.update({ active: false }, function(err) {
@@ -689,7 +695,7 @@ checkExpiredCerts.start()
 var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
   User.find({ $and: [
     { certificateEndDate: { $lt: moment().add(3, 'months').toDate(), $gt: new Date() }},
-    { active: { $ne: false }},
+    { active: true},
     {'emails.0': { $exists: true }},
     { $or: [
       { certExpiryReminderSent: { $exists: false }},
@@ -743,6 +749,7 @@ function authenticateXmlApi(req, res, next) {
   Account.findOne({apiToken: req.params.token}).lean().exec(function(err, data) {
     if (data) {
       req.account = data
+      req.user = {username: 'xml-api', ip: getIpAddress(req)}
       return next()
     } else {
       res.send(403)
@@ -868,7 +875,7 @@ function updateAndLogChanges(document, updates, user, callback) {
       var newValue = utils.getProperty(newObject, path)
       var oldValue = utils.getProperty(oldObject, path)
 
-      if (_.isEqual(newValue, oldValue)) return []
+      if (_.isEqual(newValue, oldValue) || oldValue === undefined && newValue === "") return []
       return [
         path.replace(/\./g, ','),
         { new: newValue, old: oldValue }

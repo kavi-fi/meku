@@ -3,7 +3,7 @@
 <head>
   <link href="vendor/normalize-3.0.1.css" media="all" rel="stylesheet" />
   <link href="vendor/select2-3.4.6/select2.css" rel="stylesheet"/>
-  <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+  <link href="vendor/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet"/>
   <link href="vendor/jquery-date-range-picker/daterangepicker.css" rel="stylesheet"/>
   <link href="vendor/pikaday.css" rel="stylesheet">
   <link href="style.css" media="all" rel="stylesheet" />
@@ -86,7 +86,7 @@
   <div id="billing-page" class="page">
     <div class="row">
       <div class="content">
-        <div class="date-selection"><span>Rekisteröinnit ja luokittelut väliltä </span><span class="datepicker"><span></span><i class="icon-calendar"></i></span></div>
+        <div class="date-selection"><span>Rekisteröinnit ja luokittelut väliltä </span><span class="datepicker"><span></span><i class="fa fa-calendar"></i></span></div>
         <form method="POST" action="/proe">
           <input type="hidden" name="begin" />
           <input type="hidden" name="end" />
@@ -109,9 +109,10 @@
         <input class="query" type="text" id="user-name-query" placeholder="Hae nimellä...">
       </div>
       <div class="filters">
-        <label><input type="checkbox" name="root">Pääkäyttäjä</label>
-        <label><input type="checkbox" name="kavi">Kavi</label>
-        <label><input type="checkbox" name="user">Luokittelija</label>
+        <label><input type="checkbox" class="role" name="root">Pääkäyttäjät</label>
+        <label><input type="checkbox" class="role" name="kavi">Kavilaiset</label>
+        <label><input type="checkbox" class="role" name="user">Luokittelijat</label>
+        <label><input type="checkbox" name="active" checked>Aktiiviset</label>
       </div>
     </div>
     <div class="user-list results"></div>

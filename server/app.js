@@ -37,7 +37,7 @@ app.post('/login', function(req, res, next) {
   var username = req.body.username
   var password = req.body.password
   if (!username || !password) return res.send(403)
-  User.findOne({ username: username, active: true }, function(err, user) {
+  User.findOne({ username: username, password: {$exists: true}, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {

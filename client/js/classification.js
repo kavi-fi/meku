@@ -25,6 +25,7 @@ function classificationForm(editMode) {
   var $billing = $form.find('input[name="classifications.0.billing"]')
   var preview = registrationPreview()
   var modifiedFields = {}
+  var currentProgram
 
   renderClassificationCriteria()
 
@@ -256,6 +257,8 @@ function classificationForm(editMode) {
   }
 
   function show(program) {
+    if (editMode) currentProgram = program
+
     $(window).scrollTop(0)
     var currentClassification = draftClassification(program)
     var isReclassification = classification.isReclassification(program, currentClassification)
@@ -411,6 +414,12 @@ function classificationForm(editMode) {
   function saveProgramField(id, field, value) {
     if (editMode) {
       modifiedFields[field] = value
+
+      setValueForPath(field.split('.'), currentProgram, value)
+
+      updateSummary(currentProgram)
+      preview.update(currentProgram)
+
       $saveButton.prop('disabled', false)
     } else {
       field = field.replace(/^classifications\.0/, 'draftClassifications.' + user._id)
@@ -418,6 +427,18 @@ function classificationForm(editMode) {
         updateSummary(program)
         preview.update(program)
       })
+    }
+  }
+
+  function setValueForPath(path, property, value) {
+    if (path.length === 1) property[path[0]] = value
+    else {
+      if (!property[path[0]]) {
+        if (_.isNumber(path[0])) property[path[0]] = []
+        else property[path[0]] = {}
+      }
+
+      setValueForPath(_.rest(path), property[path[0]], value)
     }
   }
 

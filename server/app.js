@@ -236,11 +236,11 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    verifyTvSeries(program, function(err) {
+    verifyTvSeriesExistsOrCreate(program, function(err) {
       if (err) return next(err)
       program.save(function(err) {
         if (err) return next(err)
-        verifyTvSeriesClassification(program, function(err) {
+        updateTvSeriesClassification(program, function(err) {
           if (err) return next(err)
           addInvoicerows(newClassification, function(err) {
             if (err) return next(err)
@@ -308,9 +308,9 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
     var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
     updateAndLogChanges(program, updates, req.user, function(err, program) {
       if (err) return next(err)
-      verifyTvSeries(program, function(err) {
+      verifyTvSeriesExistsOrCreate(program, function(err) {
         if (err) return next(err)
-        verifyTvSeriesClassification(program, function(err) {
+        updateTvSeriesClassification(program, function(err) {
           if (err) return next(err)
           res.send(program)
         })
@@ -323,9 +323,22 @@ app.post('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
     updateAndLogChanges(program, req.body, req.user, function(err, program) {
+      if (err) return next(err)
       program.populateAllNames(function(err) {
         if (err) return next(err)
-        program.save(respond(res, next))
+        updateMetadataIndexes(program, function() {
+          if (err) return next(err)
+          verifyTvSeriesExistsOrCreate(program, function(err) {
+            if (err) return next(err)
+            program.save(function(err, program) {
+              if (err) return next(err)
+              updateTvSeriesClassification(program, function(err) {
+                if (err) return next(err)
+                res.send(program)
+              })
+            })
+          })
+        })
       })
     })
   })
@@ -570,7 +583,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
             p.save(function (err) {
               if (err) return callback(err)
               logCreateOperation(req.user, p)
-              verifyTvSeriesClassification(p, function(err) {
+              updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
                 var seconds = durationToSeconds(_.first(p.classifications).duration)
                 InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
@@ -817,12 +830,12 @@ function respond(res, next, overrideData) {
   }
 }
 
-function verifyTvSeriesClassification(program, callback) {
+function updateTvSeriesClassification(program, callback) {
   if (!enums.util.isTvEpisode(program)) return callback()
   Program.updateTvSeriesClassification(program.series._id, callback)
 }
 
-function verifyTvSeries(program, callback) {
+function verifyTvSeriesExistsOrCreate(program, callback) {
   if (enums.util.isTvEpisode(program) && program.series._id == null) {
     createParentProgram(program, program.series.name.trim(), callback)
   } else return callback()

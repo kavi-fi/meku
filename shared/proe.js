@@ -23,6 +23,7 @@ function createProe(dateRange, accountRows) {
   function accountHeaderRow(id, account) {
     var address = account.billingPreference == 'address' ? utils.getProperty(account, 'billing.address') : account.address
     if (!address) address = {}
+    var invoiceText = (utils.getProperty(account, 'billing.invoiceText') || '').replace(/\n/g, ' ')
     return header(id, 'L') + ws(2) + pad(account.name, 50)
       + ws(50) // asiakkaan nimi20
       + pad(address.street, 30)
@@ -37,7 +38,7 @@ function createProe(dateRange, accountRows) {
       + ws(10) //Kumppani
       + 'EUR'
       + ws(5) // Laskulaji/Laskutusyksikkö
-      + pad(address.invoiceText, 30) //Laskun selite/
+      + pad(invoiceText, 30) //Laskun selite/
       + ws(111) //Turvakielto/Työnantaja1/Työnantaja2/Osoite2
       + pad(address.country, 30)
       + pad(account.yTunnus, 11)

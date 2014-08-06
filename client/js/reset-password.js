@@ -21,7 +21,7 @@ function resetPassword() {
         window.location = '/'
       })
       .fail(function() {
-        $feedback.html('Virhe salasanan vaihtamisessa.').slideDown()
+        $feedback.text('Virhe salasanan vaihtamisessa.').slideDown()
       })
   })
 

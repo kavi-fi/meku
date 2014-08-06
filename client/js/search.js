@@ -135,7 +135,7 @@ function internalSearchPage() {
           .append($('<span>', { class: 'registrationDate' }).text(utils.asDate(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
-          .append($('<span>', { class: 'program-type' }).html(enums.util.programTypeName(p.programType)))
+          .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
           .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
         $recent.show().append($result)
       })

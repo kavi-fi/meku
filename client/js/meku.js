@@ -126,7 +126,7 @@ function loginPage() {
       .fail(function(jqXHR) {
         if (jqXHR.status == 403) {
           $password.val('').trigger('input').focus()
-          $feedback.html('Väärä käyttäjätunnus tai salasana.').slideDown()
+          $feedback.text('Väärä käyttäjätunnus tai salasana.').slideDown()
         }
       })
   })
@@ -134,12 +134,12 @@ function loginPage() {
   $forgotPasswordButton.click(function() {
     $.post('/forgot-password', JSON.stringify({ username: $username.val() }))
       .done(function() {
-        $feedback.html('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.').slideDown()
+        $feedback.text('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.').slideDown()
         $username.val('')
         $forgotPasswordButton.prop('disabled', true)
       })
       .fail(function() {
-        $feedback.html('Käyttäjätunnusta ei ole olemassa.').slideDown()
+        $feedback.text('Käyttäjätunnusta ei ole olemassa.').slideDown()
       })
     $password.val('').trigger('input').focus()
   })

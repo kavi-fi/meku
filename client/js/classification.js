@@ -359,6 +359,10 @@ function classificationForm(editMode) {
     $form.find('.classification-email .emails').toggle(!editMode)
     $form.find('.classification-email .preview').toggleClass('right', !editMode)
 
+    if (editMode && _.isEmpty(program.classifications)) {
+      $page.find('.classification-summary').add('.classification-email').remove()
+    }
+
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
 

@@ -360,7 +360,7 @@ function classificationForm(editMode) {
     $form.find('.classification-email .preview').toggleClass('right', !editMode)
 
     if (editMode && _.isEmpty(program.classifications)) {
-      $page.find('.classification-summary').add('.classification-email').remove()
+      $page.find('.classification-summary').add('.classification-email', $page).remove()
     }
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'

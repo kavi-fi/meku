@@ -325,8 +325,7 @@ function searchPage(baseUrl) {
 
   function load(callback) {
     if (state.q && state.q.search(/user:/) !== -1) {
-      var query = state.q.split('user:')[1].split(' ')
-      var username = query[0]
+      var username = state.q.split('user:')[1].split(' ')[0]
     }
 
     $loading.show()

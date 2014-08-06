@@ -163,7 +163,7 @@ function search(responseFields, req, res, next) {
     var q = { deleted: { $ne:true } }
 
     if (req.query.username) {
-      _.merge(q, { 'classifications.author.name': req.query.username.toLowerCase() })
+      _.merge(q, { 'classifications.author.name': new RegExp("^" + req.query.username.toLowerCase() + "$", 'i') })
     } else {
       var nameQuery = toMongoArrayQuery(terms)
     }

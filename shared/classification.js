@@ -79,7 +79,7 @@ exports.registrationEmail = function(program, classification, user) {
   var text =
     "<p><%- date %><br/><%- buyer %></p><p>" +
     (reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
-    "<p>" + ((user.role == 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name) +
+    "<p>" + ((user.role == 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : "<%- classifier %>") +
     ' on <%- date %> luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
     ((user.role == 'kavi' && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>. Perustelut: <%- publicComments %></p>' : '') +
     ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
@@ -108,6 +108,7 @@ exports.registrationEmail = function(program, classification, user) {
     link: (user.role == 'kavi') ? linkKavi : linkOther,
     publicComments: classification.publicComments,
     authorEmail: user.email,
+    classifier: user.name,
     reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty'
   }
 

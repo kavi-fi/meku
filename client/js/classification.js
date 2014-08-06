@@ -123,7 +123,7 @@ function classificationForm(editMode) {
 
   selectAutocomplete({
     $el: $form.find('input[name=productionCompanies]'),
-    path: '/productionCompanies/search/',
+    path: function(term) { return '/productionCompanies/search?q=' + encodeURIComponent(term) },
     multiple: true,
     allowAdding: true
   })
@@ -170,14 +170,14 @@ function classificationForm(editMode) {
 
   selectAutocomplete({
     $el: $form.find('input[name=directors]'),
-    path: '/directors/search/',
+    path: function(term) { return '/directors/search?q=' + encodeURIComponent(term) },
     multiple: true,
     allowAdding: true
   })
 
   selectAutocomplete({
     $el: $form.find('input[name=actors]'),
-    path: '/actors/search/',
+    path: function(term) { return '/actors/search?q=' + encodeURIComponent(term) },
     multiple: true,
     allowAdding: true
   })
@@ -200,7 +200,7 @@ function classificationForm(editMode) {
 
   selectAutocomplete({
     $el: $form.find('input[name=series]'),
-    path: '/series/search/',
+    path: function(term) { return '/series/search?q=' + encodeURIComponent(term) },
     toOption: idNamePairToSelect2Option,
     fromOption: select2OptionToIdNamePair,
     allowAdding: true

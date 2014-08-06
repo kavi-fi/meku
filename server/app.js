@@ -362,9 +362,9 @@ app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
   })
 })
 
-app.get('/series/search/:query', function(req, res, next) {
+app.get('/series/search', function(req, res, next) {
   var q = { programType: 2 }
-  var parts = toMongoArrayQuery(req.params.query)
+  var parts = toMongoArrayQuery(req.query.q)
   if (parts) q.allNames = parts
   Program.find(q, { name: 1 }).lean().limit(20).sort('name').exec(function(err, data) {
     if (err) return next(err)
@@ -487,9 +487,9 @@ app.get('/users/names/:names', function(req, res, next) {
   })
 })
 
-app.get('/actors/search/:query', queryNameIndex('Actor'))
-app.get('/directors/search/:query', queryNameIndex('Director'))
-app.get('/productionCompanies/search/:query', queryNameIndex('ProductionCompany'))
+app.get('/actors/search', queryNameIndex('Actor'))
+app.get('/directors/search', queryNameIndex('Director'))
+app.get('/productionCompanies/search', queryNameIndex('ProductionCompany'))
 
 app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next) {
   var format = "DD.MM.YYYY"
@@ -809,7 +809,7 @@ function durationToSeconds(duration) {
 function queryNameIndex(schemaName) {
   return function(req, res, next) {
     var q = {}
-    var parts = toMongoArrayQuery(req.params.query)
+    var parts = toMongoArrayQuery(req.query.q)
     if (parts) q.parts = parts
     schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').exec(function(err, docs) {
       if (err) return next(err)

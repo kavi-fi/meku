@@ -462,7 +462,7 @@ function classificationForm(editMode) {
       .find('.actors').text((program.actors).join(', ') || '-').end()
       .find('.agelimit img').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
-      .find('.reason').html(enums.reclassificationReason[currentClassification.reason]).end()
+      .find('.reason').text(enums.reclassificationReason[currentClassification.reason]).end()
       .find('.comments').html(comments).end()
   }
 

@@ -62,7 +62,7 @@ function logUserIn(req, res, user) {
     role: user.role,
     email: _.first(user.emails)
   }, { maxAge: weekInMs, signed: true })
-  saveChangeLogEntry(user, null, 'login')
+  saveChangeLogEntry(_.merge(user, { ip: getIpAddress(req) }), null, 'login')
 }
 
 app.post('/logout', function(req, res, next) {

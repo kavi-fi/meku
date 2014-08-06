@@ -141,8 +141,7 @@ function subscriberManagementPage() {
       }
     })
 
-    $form.find('input').on('input blur select2-blur', function() { $(this).addClass('touched') })
-    $form.find('input[name=classifiers]').on('change', function() { $(this).addClass('touched') })
+    $form.find('input, textarea').on('input change', function() { $(this).addClass('touched') })
 
     $form.find('input.select2-offscreen').on('change validate', function() {
       $(this).toggleClass('invalid', !this.checkValidity())

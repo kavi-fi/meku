@@ -385,12 +385,18 @@ function changeLog(document) {
         })
 
         return $container.append($inserted).append($deleted)
-      } else {
-        var oldToNew = value.old !== undefined
-          ? '"' + value.old + '" -> "' + value.new + '"'
-          : 'undefined -> "' + value.new + '"'
+      }
 
-        return $('<span>').text(oldToNew)
+      return $('<span>').text(getOldToNewString(value.old, value.new))
+
+      function getOldToNewString(oldVal, newVal) {
+        var oldToNewString = ' -> "' + newVal + '"'
+
+        if (value.old === undefined || value.old === null || value.old === '') {
+          return 'tyhjä' + oldToNewString
+        } else {
+          return '"' + value.old + '"' + oldToNewString
+        }
       }
 
       function JSONstringify(value) {

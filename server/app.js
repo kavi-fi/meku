@@ -161,7 +161,13 @@ function search(responseFields, req, res, next) {
   function query() {
     var terms = req.params.q
     var q = { deleted: { $ne:true } }
-    var nameQuery = toMongoArrayQuery(terms)
+
+    if (req.query.username) {
+      _.merge(q, { 'classifications.author.name': req.query.username.toLowerCase() })
+    } else {
+      var nameQuery = toMongoArrayQuery(terms)
+    }
+
     if (nameQuery) {
       if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
         q.$or = [{ allNames:nameQuery }, { sequenceId: terms }]

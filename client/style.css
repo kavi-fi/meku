@@ -173,7 +173,7 @@ label.top { vertical-align: top; }
 
 #search-page .recent { margin-bottom: 40px; }
 #search-page .drafts h3, #search-page .recent h3 { margin-bottom: 10px; }
-#search-page .drafts > div, #search-page .recent .result { margin-bottom: 40px; }
+#search-page .extra > div { margin-bottom: 40px; }
 #search-page .drafts .draft,
 #search-page .recent .result { text-decoration: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; margin: 0; padding: 8px 0; }
 #search-page .drafts .draft .creationDate,

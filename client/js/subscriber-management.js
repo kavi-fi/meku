@@ -266,7 +266,11 @@ function subscriberManagementPage() {
       var names = _.pluck(users, 'name').join(',')
       if (names.length === 0) return
       $.get('/users/names/' + names, function(data) {
-        $subscriberDetails.find('input[name=classifiers]').trigger('setVal', data).end()
+        var usersWithNames = _.map(users, function(user) {
+          return _.merge({}, user, { username: user.name, name: data[user.name] })
+        })
+
+        $subscriberDetails.find('input[name=classifiers]').trigger('setVal', usersWithNames).end()
       })
     }
 

@@ -262,7 +262,7 @@ function classificationForm(editMode) {
     $(window).scrollTop(0)
     var currentClassification = draftClassification(program)
     var isReclassification = classification.isReclassification(program, currentClassification)
-    var isExternalReclassification = isReclassification && user.role == 'user'
+    var isExternalReclassification = isReclassification && enums.util.isClassifier(user.role)
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 

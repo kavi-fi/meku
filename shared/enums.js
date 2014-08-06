@@ -63,7 +63,8 @@ enums.gameFormat = [
 enums.userRoles = {
   root: { name: 'Pääkäyttäjä', order: 1 },
   kavi: { name: 'Kavi', order: 2 },
-  user: { name: 'Luokittelija', order: 3 }
+  user: { name: 'Luokittelija', order: 3 },
+  trainee: { name: 'Luokittelija (koulutus)', order: 3 }
 }
 enums.util.userRoleName = function(role) {
   var userRole = enums.userRoles[role]
@@ -71,7 +72,7 @@ enums.util.userRoleName = function(role) {
 }
 
 enums.util.isClassifier = function(role) {
-  return role === 'user'
+  return role === 'user' || role === 'trainee'
 }
 
 enums.roles = {

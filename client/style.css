@@ -24,6 +24,16 @@ body {
 #login .feedback, #reset-password .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
 #error-dialog a, #conflict-dialog a { color: #00BB88; }
 
+.training-ribbon { display: none; position: fixed; left: -50px; top: 40px; -webkit-transform: rotate(-45deg); transform: rotate(-45deg); background-color: #a00; z-index: 10; }
+.training-ribbon span {
+  border: 1px solid #faa;
+  color: #fff;
+  display: block;
+  font: bold 16px Helvetica, Arial, sans-serif;
+  margin: 1px 0;
+  padding: 10px 50px;
+}
+
 #reset-password > div { border: 0; }
 #reset-password .instructions { text-align: left; margin-bottom: 10px; }
 

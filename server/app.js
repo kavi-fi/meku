@@ -656,6 +656,10 @@ app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next)
   ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).exec(respond(res, next))
 })
 
+app.get('/environment', function(req, res, next) {
+  res.json({ environment: app.get('env') })
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)

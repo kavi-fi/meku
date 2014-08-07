@@ -54,7 +54,7 @@ function classificationForm(editMode) {
       $form.data('id', '').hide().trigger('show')
       showDialog($('<div>', {class: 'registration-confirmation dialog'})
         .append($('<span>', {class: 'name'}).text(program.name))
-        .append(renderWarningSummary(classification.fullSummary(program)))
+        .append(renderWarningSummary(classificationUtils.fullSummary(program)))
         .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(program.classifications[0].registrationDate)))
         .append($('<p>', {class: 'buttons'}).html($('<button>', { click: closeDialog, class: 'button' }).text('Sulje'))))
       $("#search-page").trigger('show').show()
@@ -261,7 +261,7 @@ function classificationForm(editMode) {
 
     $(window).scrollTop(0)
     var currentClassification = draftClassification(program)
-    var isReclassification = classification.isReclassification(program, currentClassification)
+    var isReclassification = classificationUtils.isReclassification(program, currentClassification)
     var isExternalReclassification = isReclassification && enums.util.isClassifier(user.role)
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
@@ -448,7 +448,7 @@ function classificationForm(editMode) {
 
   function updateSummary(program) {
     var currentClassification = draftClassification(program)
-    var summary = classification.summary(currentClassification)
+    var summary = classificationUtils.summary(currentClassification)
     var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w.category, class:'warning ' + w.category, draggable:true }).add($('<span>', { class:'drop-target' })) }))
     var synopsis = commentToHtml(program.synopsis ? program.synopsis : '-')
     var countries = enums.util.toCountryString(program.country)
@@ -515,7 +515,7 @@ function classificationForm(editMode) {
       manualEmails.filter(function(email) { return notIn(manualInDom, email) })
         .forEach(addManualEmailCheckbox(true))
 
-      var email = classification.registrationEmail(program, cl, user)
+      var email = classificationUtils.registrationEmail(program, cl, user)
 
       if (editMode) {
         $.get('/programs/'+program._id+'/registrationEmails', function(emails) {

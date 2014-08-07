@@ -13,7 +13,7 @@ var ChangeLog = schema.ChangeLog
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
-var classification = require('../shared/classification')
+var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var builder = require('xmlbuilder')
@@ -249,7 +249,7 @@ app.post('/programs/:id/register', function(req, res, next) {
           if (err) return next(err)
           addInvoicerows(newClassification, function(err) {
             if (err) return next(err)
-            sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
+            sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user), function(err) {
               if (err) return next(err)
               updateMetadataIndexes(program, function() {
                 logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
@@ -264,7 +264,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     function addInvoicerows(currentClassification, callback) {
       var seconds = durationToSeconds(currentClassification.duration)
 
-      if (classification.isReclassification(program, currentClassification)) {
+      if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
         } else if (!utils.hasRole(req.user, 'kavi')) {
@@ -277,7 +277,7 @@ app.post('/programs/:id/register', function(req, res, next) {
           if (err) return next(err)
           if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
-            var classificationPrice = classification.price(program, seconds)
+            var classificationPrice = classificationUtils.price(program, seconds)
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
             callback()

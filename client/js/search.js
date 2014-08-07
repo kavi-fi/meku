@@ -136,7 +136,7 @@ function internalSearchPage() {
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
           .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
-          .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
+          .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
         $recent.show().append($result)
       })
     })
@@ -399,7 +399,7 @@ function searchPage(baseUrl) {
         .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
-        .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
+        .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
 
 

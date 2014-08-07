@@ -153,6 +153,6 @@ exports.classificationPrice = function(duration) {
   return price[2] * 100
 }
 
-})(typeof exports === 'undefined'? this['classification']={}: exports)
+})(typeof exports === 'undefined'? this['classificationUtils']={}: exports)
 
 

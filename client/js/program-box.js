@@ -54,7 +54,7 @@ function programBox() {
   }
 
   function renderClassification($e, p, c) {
-    var summary = classification.summary(c)
+    var summary = classificationUtils.summary(c)
     $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warningIcons(summary)).end()
       .find('.reason').labeledText(enums.reclassificationReason[c.reason]).end()

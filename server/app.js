@@ -235,7 +235,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
-    newClassification.author = { _id: req.user._id, name: req.user.name }
+    newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
 
     program.draftClassifications = {}
     program.draftsBy = []

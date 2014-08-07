@@ -227,7 +227,7 @@ function classifications(callback) {
       _.values(result.classifications).forEach(function(c) {
         if (c.assigned_user_id) {
           var u = userMap[c.assigned_user_id]
-          c.author = { _id: u._id, name: u.name }
+          c.author = { _id: u._id, name: u.name, username: u.username }
         }
       })
       callback(null, result)
@@ -381,7 +381,7 @@ function accounts(callback) {
   function pushUserToAccount(row, callback) {
     schema.User.findOne({ emekuId: row.userId }, { username: 1 }, function (err, user) {
       if (err || !user) return callback(err || new Error('No such user ' + row.userId))
-      var data = { _id: user._id, name: user.username }
+      var data = { _id: user._id, username: user.username }
       schema.Account.update({ emekuId: row.accountId }, { $addToSet: { users: data } }, callback)
     })
   }

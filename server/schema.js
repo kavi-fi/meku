@@ -55,7 +55,8 @@ var ProgramSchema = new Schema({
   season: String, episode: String,
   series: { _id: { type: ObjectId, index:true }, name: String },
   tvSeriesCriteria: [Number],
-  tvSeriesLegacyAgeLimit: Number
+  tvSeriesLegacyAgeLimit: Number,
+  createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))

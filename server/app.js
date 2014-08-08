@@ -163,13 +163,6 @@ function search(responseFields, req, res, next) {
     var ObjectId = mongoose.Types.ObjectId
     var terms = req.params.q
     var q = { deleted: { $ne:true } }
-
-    if (req.query.username) {
-      _.merge(q, { 'classifications.author.name': new RegExp("^" + req.query.username.toLowerCase() + "$", 'i') })
-    } else {
-      var nameQuery = toMongoArrayQuery(terms)
-    }
-
     var and = []
     if (req.user.role == 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
     var nameQuery = toMongoArrayQuery(terms)

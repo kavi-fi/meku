@@ -324,13 +324,9 @@ function searchPage(baseUrl) {
   }
 
   function load(callback) {
-    if (state.q && state.q.search(/user:/) !== -1) {
-      var name = state.q.split('user:"')[1].split('"')[0]
-    }
-
     $loading.show()
     var url = baseUrl+encodeURIComponent(state.q)
-    var data = $.param({ page:state.page, filters:currentFilters(), 'username': name })
+    var data = $.param({ page: state.page, filters: currentFilters() })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
       $noResults.toggle(state.page == 0 && results.length == 0)

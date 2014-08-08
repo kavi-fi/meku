@@ -104,7 +104,8 @@ function sendHashLinkViaEmail(user, subject, text, callback) {
   var emailData = {
     recipients: user.emails,
     subject: subject,
-    body: text + '<a href="' + url + '">' + url + '</a>'
+    body: text + '<a href="' + url + '">' + url + '</a>',
+    sendInTraining: true
   }
 
   sendEmail(emailData, callback)
@@ -791,7 +792,7 @@ function sendEmail(data, callback) {
   var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: data.subject, html: data.body })
   data.recipients.forEach(function(to) { email.addTo(to) })
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV === 'training' && data.sendInTraining)) {
     sendgrid.send(email, callback)
   } else {
     console.log('email (suppressed): ', email)

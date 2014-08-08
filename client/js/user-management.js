@@ -4,12 +4,16 @@ function userManagementPage() {
   var $userNameQuery = $page.find('#user-name-query')
 
   var $newUserType = $page.find('.new-user input[name="new-user-type"]')
-  $newUserType.select2({
-    data: _.map(enums.userRoles, function(roleValue, roleKey) {
-      return { id: roleKey, text: roleValue.name }
-    }),
-    minimumResultsForSearch: -1
-  }).select2('val', 'user')
+
+  $.get('/environment', function(data) {
+    var userRoles = data.environment != 'training' ? _.omit(enums.userRoles, 'trainee') : enums.userRoles
+    $newUserType.select2({
+      data: _.map(userRoles, function(roleValue, roleKey) {
+        return { id: roleKey, text: roleValue.name }
+      }),
+      minimumResultsForSearch: -1
+    }).select2('val', 'user')
+  })
 
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')

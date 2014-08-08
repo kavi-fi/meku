@@ -256,8 +256,8 @@ function subscriberManagementPage() {
       if (!user) return null
       return {
         id: user._id,
-        text: user.name + (user.username ? ' (' + user.username + ')' : ''),
-        name: user.username
+        text: user.name + ' (' + user.username + ')',
+        username: user.username
       }
     }
 
@@ -290,7 +290,7 @@ function subscriberManagementPage() {
 
   function select2OptionToIdNamePair(x) {
     if (!x) return null
-    return { _id: x.id, username: x.name }
+    return { _id: x.id, username: x.username }
   }
 
 }

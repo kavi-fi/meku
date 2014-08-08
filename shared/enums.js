@@ -83,6 +83,16 @@ enums.roles = {
   'Other': 'Muu'
 }
 
+enums.providingType = {
+  'Recordings_provide': 'Tallenteiden tarjoaminen',
+  'Public_presentation': 'Julkinen esittäminen',
+  'National_TV': 'Valtakunnallinen televisio-ohjelmisto',
+  'Regional_TV': 'Alueellinen televisio-ohjelmisto',
+  'Transmitted_abroad_program': 'Ulkomailta välitetty ohjelmisto',
+  'Subscription_of_program': 'Tilausohjelmapalvelu'
+}
+
+
 enums.programType = {
   0: { type: 'unknown', fi: '?' },
   1: { type: 'movie', fi: 'Elokuva' },

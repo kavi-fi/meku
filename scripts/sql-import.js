@@ -268,7 +268,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, locations, userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts], callback)
 
   function accountBase(callback) {
     var seq = 1
@@ -309,9 +309,69 @@ function accounts(callback) {
   }
 
   function providers(callback) {
-    var q = 'select id, name from accounts where customer_type like "%Location_of_providing%" and deleted != "1"'
-    function onRow(row) { return { emekuId: row.id, name: trim(row.name) } }
+    var q = 'select id, name, customer_type, sic_code,' +
+      ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
+      ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
+      ' ownership, phone_office, phone_alternate' +
+      ' from accounts where customer_type LIKE "%Provider%" and deleted != "1"'
+    function onRow(row) {
+      var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
+      var billingAddress = row.billing_address_street
+        ? { street: trim1line(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)) }
+        : undefined
+      if (_.isEqual(address, billingAddress)) billingAddress = undefined
+
+      var eInvoice = row.e_invoice
+        ? { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
+        : undefined
+
+      var phoneNumber = row.phone_office || row.phone_alternate || undefined
+
+      return {
+        emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        address: address,
+        language: langCode(trim(row.customer_lang)),
+        billing: { address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text) },
+        eInvoice: eInvoice,
+        billingPreference: (!!eInvoice && 'eInvoice') || (!!billingAddress && 'address') || '',
+        contactName: row.ownership,
+        phoneNumber: phoneNumber,
+        deleted: false,
+        locations: []
+      }
+    }
     batchInserter(q, onRow, 'Provider', callback)
+  }
+
+  function locations(callback) {
+    var q = 'select id, name, customer_type, sic_code, parent_id, invoice_payer, bills_lang, bills_text, providing_type, ' +
+      ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
+      ' ownership, phone_office, phone_alternate' +
+      ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
+    function toDocument(row) {
+      var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
+      var phoneNumber = row.phone_office || row.phone_alternate || undefined
+      return {
+        emekuId: row.id,
+        name: trim(row.name),
+        yTunnus: trim(row.sic_code),
+        address: address,
+        isPayer: row.invoice_payer != '1' ? true : false,
+        contactName: row.ownership,
+        phoneNumber: phoneNumber,
+        providingType: optionListToArray(row.providing_type),
+        deleted: false,
+        language: langCode(trim(row.customer_lang)),
+      }
+    }
+    
+    function pushLocationToProvider(row, callback) {
+      schema.Provider.update({ emekuId: row.parent_id }, {$addToSet: {locations: toDocument(row)}}, callback)
+    }
+
+    conn.query(q)
+      .stream()
+      .pipe(consumer(pushLocationToProvider, callback))
   }
 
   function userBase(callback) {

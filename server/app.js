@@ -104,7 +104,8 @@ function sendHashLinkViaEmail(user, subject, text, callback) {
   var emailData = {
     recipients: user.emails,
     subject: subject,
-    body: text + '<a href="' + url + '">' + url + '</a>'
+    body: text + '<a href="' + url + '">' + url + '</a>',
+    sendInTraining: true
   }
 
   sendEmail(emailData, callback)
@@ -159,17 +160,21 @@ function search(responseFields, req, res, next) {
   Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
   function query() {
+    var ObjectId = mongoose.Types.ObjectId
     var terms = req.params.q
     var q = { deleted: { $ne:true } }
+    var and = []
+    if (req.user.role == 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
     var nameQuery = toMongoArrayQuery(terms)
     if (nameQuery) {
       if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
-        q.$or = [{ allNames:nameQuery }, { sequenceId: terms }]
+        and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
       } else {
-        q.allNames = nameQuery
+        and.push({allNames: nameQuery})
       }
     }
     if (filters.length > 0) q.programType = { $in: filters }
+    if (and.length > 0) q.$and = and
     return q
   }
 }
@@ -211,7 +216,7 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-  var p = new Program({ programType: programType })
+  var p = new Program({ programType: programType, createdBy: {_id: req.user._id, username: req.user.username, name: req.user.user, role: req.user.role}})
   p.newDraftClassification(req.user)
   p.save(function(err, program) {
     if (err) return next(err)
@@ -229,7 +234,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
-    newClassification.author = { _id: req.user._id, name: req.user.name }
+    newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
 
     program.draftClassifications = {}
     program.draftsBy = []
@@ -650,6 +655,10 @@ app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next)
   ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).exec(respond(res, next))
 })
 
+app.get('/environment', function(req, res, next) {
+  res.json({ environment: app.get('env') })
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
@@ -772,11 +781,11 @@ function requireRole(role) {
   }
 }
 
-function sendEmail(data, callback) {
-  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: data.subject, html: data.body })
-  data.recipients.forEach(function(to) { email.addTo(to) })
+function sendEmail(opts, callback) {
+  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
+  opts.recipients.forEach(function(to) { email.addTo(to) })
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV === 'training' && opts.sendInTraining)) {
     sendgrid.send(email, callback)
   } else {
     console.log('email (suppressed): ', email)

@@ -256,17 +256,17 @@ function subscriberManagementPage() {
       if (!user) return null
       return {
         id: user._id,
-        text: user.name + (user.username ? ' (' + user.username + ')' : ''),
-        name: user.username ? user.username : user.name
+        text: user.name + ' (' + user.username + ')',
+        username: user.username
       }
     }
 
     function populateClassifiers(users) {
-      var names = _.pluck(users, 'name').join(',')
+      var names = _.pluck(users, 'username').join(',')
       if (names.length === 0) return
       $.get('/users/names/' + names, function(data) {
         var usersWithNames = _.map(users, function(user) {
-          return _.merge({}, user, { username: user.name, name: data[user.name] })
+          return _.merge({}, user, { name: data[user.username] })
         })
 
         $subscriberDetails.find('input[name=classifiers]').trigger('setVal', usersWithNames).end()
@@ -290,7 +290,7 @@ function subscriberManagementPage() {
 
   function select2OptionToIdNamePair(x) {
     if (!x) return null
-    return { _id: x.id, name: x.name }
+    return { _id: x.id, username: x.username }
   }
 
 }

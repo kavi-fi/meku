@@ -58,7 +58,7 @@ function programBox() {
     $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warningIcons(summary)).end()
       .find('.reason').labeledText(enums.reclassificationReason[c.reason]).end()
-      .find('.author').labeledText(c.author ? c.author.name : '').end()
+      .find('.author').labeledText(c.author ? c.author.name + ' (' + c.author.username + ')' : '').end()
       .find('.authorOrganization').labeledText(enums.authorOrganization[c.authorOrganization]).end()
       .find('.buyer').labeledText(c.buyer && c.buyer.name || '').end()
       .find('.billing').labeledText(c.billing && c.billing.name || '').end()

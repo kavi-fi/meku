@@ -159,6 +159,7 @@ function search(responseFields, req, res, next) {
   Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
   function query() {
+    var ObjectId = mongoose.Types.ObjectId
     var terms = req.params.q
     var q = { deleted: { $ne:true } }
 
@@ -168,14 +169,18 @@ function search(responseFields, req, res, next) {
       var nameQuery = toMongoArrayQuery(terms)
     }
 
+    var and = []
+    if (req.user.role == 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
+    var nameQuery = toMongoArrayQuery(terms)
     if (nameQuery) {
       if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
-        q.$or = [{ allNames:nameQuery }, { sequenceId: terms }]
+        and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
       } else {
-        q.allNames = nameQuery
+        and.push({allNames: nameQuery})
       }
     }
     if (filters.length > 0) q.programType = { $in: filters }
+    if (and.length > 0) q.$and = and
     return q
   }
 }
@@ -217,7 +222,7 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-  var p = new Program({ programType: programType })
+  var p = new Program({ programType: programType, createdBy: {_id: req.user._id, username: req.user.username, name: req.user.user, role: req.user.role}})
   p.newDraftClassification(req.user)
   p.save(function(err, program) {
     if (err) return next(err)

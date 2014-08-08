@@ -788,11 +788,11 @@ function requireRole(role) {
   }
 }
 
-function sendEmail(data, callback) {
-  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: data.subject, html: data.body })
-  data.recipients.forEach(function(to) { email.addTo(to) })
+function sendEmail(opts, callback) {
+  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
+  opts.recipients.forEach(function(to) { email.addTo(to) })
 
-  if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV === 'training' && data.sendInTraining)) {
+  if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV === 'training' && opts.sendInTraining)) {
     sendgrid.send(email, callback)
   } else {
     console.log('email (suppressed): ', email)

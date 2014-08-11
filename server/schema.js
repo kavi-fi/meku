@@ -142,6 +142,7 @@ AccountSchema.pre('save', ensureSequenceId('Account'))
 
 var Provider = exports.Provider = mongoose.model('providers', {
   emekuId: String,
+  yTunnus: String,
   name: String,
   address: { street: String, city: String, zip: String, country: String },
   billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]

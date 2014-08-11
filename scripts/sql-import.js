@@ -268,7 +268,7 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, locations, userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts], callback)
+  async.applyEachSeries([accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts], callback)
 
   function accountBase(callback) {
     var seq = 1
@@ -343,8 +343,13 @@ function accounts(callback) {
     batchInserter(q, onRow, 'Provider', callback)
   }
 
+  function providerEmailAddresses(callback) {
+    var q = 'select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts" and a.customer_type LIKE "%Provider%"'
+    batchUpdater(q, idToEmailMapper, singleFieldUpdater('Provider', 'emailAddresses'), callback)
+  }
+
   function locations(callback) {
-    var q = 'select id, name, customer_type, sic_code, parent_id, invoice_payer, bills_lang, bills_text, providing_type, ' +
+    var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, bills_lang, bills_text, providing_type, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
@@ -360,6 +365,7 @@ function accounts(callback) {
         contactName: row.ownership,
         phoneNumber: phoneNumber,
         providingType: optionListToArray(row.providing_type),
+        approved: row.provider_status == 'Approved',
         deleted: false,
         language: langCode(trim(row.customer_lang)),
       }

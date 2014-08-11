@@ -1,16 +1,16 @@
 function classificationPage() {
   var $root = $('#classification-page')
 
-  $root.on('show', function (e, programId, edit) {
-    if (edit) {
-      setLocation('#luokittelu/' + programId + '/edit')
+  $root.on('show', function (e, programId, rootEditMode, classificationId) {
+    if (rootEditMode) {
+      setLocation('#luokittelu/' + programId + '/edit/' + classificationId)
       $.get('/programs/' + programId).done(function(program) {
-        classificationForm(program, classificationFinder(true), true)
+        classificationForm(program, rootClassificationFinder(classificationId), true)
       })
     } else if (programId) {
       setLocation('#luokittelu/' + programId)
       $.get('/programs/' + programId).done(function(program) {
-        classificationForm(program, classificationFinder(false), false)
+        classificationForm(program, draftClassificationFinder, false)
       })
     } else {
       setLocation('#luokittelu')
@@ -18,27 +18,27 @@ function classificationPage() {
     $('.navi li:first a').addClass('active')
   })
 
-  function classificationFinder(rootEditMode) {
+  function rootClassificationFinder(classificationId) {
     return function(program) {
-      if (rootEditMode) {
-        return program.classifications[0] || { criteria: [], warningOrder: [], registrationEmailAddresses: [] }
-      } else {
-        return program.draftClassifications[user._id]
-      }
+      return _.find(program.classifications, { _id:classificationId }) || { criteria: [], warningOrder: [], registrationEmailAddresses: [] }
     }
+  }
+  function draftClassificationFinder(program) {
+    return program.draftClassifications[user._id]
   }
 }
 
 function classificationForm(program, classificationFinder, rootEditMode) {
+  var selectedClassification = classificationFinder(program)
   var rootModifiedFields = {}
   var cfu = classificationFormUtils()
-  var $form = cfu.renderForm(program, classificationFinder(program), rootEditMode)
+  var $form = cfu.renderForm(program, selectedClassification, rootEditMode)
   var select2Opts = cfu.select2Opts($form)
   var detailRenderer = programBox()
-  var emailRenderer = cfu.registrationEmails($form, save).render(program, classificationFinder(program), rootEditMode)
+  var emailRenderer = cfu.registrationEmails($form, save).render(program, selectedClassification, rootEditMode)
 
   setProgramFields(program)
-  setClassificationFields(classificationFinder(program))
+  setClassificationFields(selectedClassification)
   configureValidation()
   configureEventBinding()
   onProgramUpdated(program)
@@ -166,7 +166,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
 
   function save(field, value) {
     if (rootEditMode) {
-      field = field.replace(/^classification/, 'classifications.0')
+      var classificationIndex = _.findIndex(program.classifications, { _id: selectedClassification._id })
+      field = field.replace(/^classification/, 'classifications.'+classificationIndex)
       rootModifiedFields[field] = value
       utils.setValueForPath(field.split('.'), program, value)
       onProgramUpdated(program)

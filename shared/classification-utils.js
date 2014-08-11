@@ -58,7 +58,14 @@ var criteriaText = exports.criteriaText = function(warnings) {
 
 var isReclassification = exports.isReclassification = function(program, classification) {
   if (program.classifications.length == 0) return false
-  return _.any(program.classifications, function(c) { return String(classification._id) != String(c._id) })
+  var index = _.findIndex(program.classifications, { _id: classification._id })
+  if (index == -1) {
+    // classification is a draft, and other classifications already exist
+    return true
+  } else {
+    // reclassification if not the last in the array
+    return index < (program.classifications.length - 1)
+  }
 }
 
 var ageAsText = function(age) { return age && age.toString() || 'S' }

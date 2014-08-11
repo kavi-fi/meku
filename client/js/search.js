@@ -87,7 +87,8 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.edit', function() {
-    showClassificationEditPage($(this).parents('.program-box').data('id'))
+    var $programBox = $(this).parents('.program-box')
+    showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('_id'))
   })
 
   $results.on('click', 'button.remove', function() {
@@ -176,9 +177,9 @@ function internalSearchPage() {
     $('#classification-page').trigger('show', programId).show()
   }
 
-  function showClassificationEditPage(programId) {
+  function showClassificationEditPage(programId, classificationId) {
     $('body').children('.page').hide()
-    $('#classification-page').trigger('show', [programId, 'edit']).show()
+    $('#classification-page').trigger('show', [programId, 'edit', classificationId]).show()
   }
 
   function showCategorizationForm(id) {

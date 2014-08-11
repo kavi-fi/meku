@@ -256,7 +256,7 @@ label.top { vertical-align: top; }
 .form textarea { width: 280px; height: 130px; }
 .form input:disabled, .form textarea:disabled { background-color: #f4f4f4; cursor: not-allowed; }
 
-.program-details-form span.author { display: inline-block; height: 30px; width: 300px; }
+.program-details-form .textified-field { display: inline-block; line-height: 30px; width: 300px; margin: 5px 0 18px 0; }
 
 input[type=text],
 input[type=number],
@@ -405,8 +405,8 @@ textarea.invalid:disabled,
 
 .program-details-form textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
 .program-details-form label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
+.program-details-form .select2-label { vertical-align: super; }
 .program-details-form .synopsis-label { vertical-align: top; padding-top: 9px; }
-
 .program-details-form .program-box label { width: auto; text-align: inherit; padding: 19px 0 0 0; }
 
 .program-details-form input.duration { margin-bottom: 3px }

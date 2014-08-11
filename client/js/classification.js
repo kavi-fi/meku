@@ -252,8 +252,10 @@ function classificationFormUtils() {
   }
 
   function configureRootEditMode($form, p, c) {
-    $form.find('input[name="classification.buyer"]').replaceWith($('<span>').text(utils.getProperty(c, 'buyer.name') || '-'))
-    $form.find('input[name="classification.billing"]').replaceWith($('<span>').text(utils.getProperty(c, 'billing.name') || '-'))
+    $form.find('input[name="classification.buyer"]').prev().removeClass('select2-label').end()
+      .replaceWith($('<span>').addClass('textified-field').text(utils.getProperty(c, 'buyer.name') || '-'))
+    $form.find('input[name="classification.billing"]').prev().removeClass('select2-label').end()
+      .replaceWith($('<span>').addClass('textified-field').text(utils.getProperty(c, 'billing.name') || '-'))
     if (_.isEmpty(p.classifications)) {
       $form.find('.classification-details, .classification-summary, .classification-criteria, .classification-email').remove()
       $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))

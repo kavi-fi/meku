@@ -193,7 +193,7 @@ function internalSearchPage() {
 
     select2Autocomplete({
       $el: $series,
-      path: '/series/search/',
+      path: function(term) { return '/series/search?q=' + encodeURIComponent(term) },
       toOption: idNamePairToSelect2Option,
       fromOption: select2OptionToIdNamePair,
       allowAdding: true

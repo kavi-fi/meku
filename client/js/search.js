@@ -196,7 +196,8 @@ function internalSearchPage() {
       path: function(term) { return '/series/search?q=' + encodeURIComponent(term) },
       toOption: idNamePairToSelect2Option,
       fromOption: select2OptionToIdNamePair,
-      allowAdding: true
+      allowAdding: true,
+      termMinLength: 0
     })
 
     $categorySelection.select2(programTypesSelect2).select2('val', 1)

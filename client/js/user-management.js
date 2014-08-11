@@ -184,7 +184,8 @@ function userManagementPage() {
         path: employersSearch,
         multiple: true,
         toOption: idNamePairToSelect2Option,
-        fromOption: select2OptionToIdNamePair
+        fromOption: select2OptionToIdNamePair,
+        termMinLength: 0
       })
     }
 

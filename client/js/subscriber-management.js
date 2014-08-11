@@ -229,7 +229,8 @@ function subscriberManagementPage() {
       path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
       multiple: true,
       toOption: userToSelect2Option,
-      fromOption: select2OptionToIdNamePair
+      fromOption: select2OptionToIdNamePair,
+      termMinLength: 0
     })
 
     $subscriberDetails

@@ -11,6 +11,7 @@ var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var ChangeLog = schema.ChangeLog
 var Provider = schema.Provider
+var ProviderLocation = schema.ProviderLocation
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
@@ -411,11 +412,32 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
 })
 
 app.get('/providers', requireRole('kavi'), function(req, res, next) {
-  Provider.find({deleted: false}, '-locations', respond(res, next))
+  Provider.find({deleted: false}, '', respond(res, next))
+})
+
+app.put('/providers/:id', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, function(err, provider) {
+    if (err) return next(err)
+    updateAndLogChanges(provider, req.body, req.user, respond(res, next))
+  })
+})
+
+app.delete('/providers/:id', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, function (err, provider) {
+    if (err) return next(err)
+    softDeleteAndLog(provider, req.user, respond(res, next))
+  })
 })
 
 app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.id, respond(res, next))
+  Provider.findById(req.params.id).lean().exec(function(err, provider) {
+    if (err) return next(err)
+    ProviderLocation.find({provider: provider._id}).sort('name').exec(function(err, locations) {
+      if (err) return next(err)
+      provider.locations = locations
+      res.send(provider)
+    })
+  })
 })
 
 app.get('/accounts/search', function(req, res, next) {

@@ -45,7 +45,7 @@ function providerPage() {
       if (hasRole('root')) $providerDetails.append(changeLog(provider).render())
 
       bindEventHandlers($providerDetails, function(providerData) {
-        $.ajax('/provider/' + provider._id, { type: 'PUT', data: JSON.stringify(providerData) })
+        $.ajax('/providers/' + provider._id, { type: 'PUT', data: JSON.stringify(providerData) })
           .done(function(provider) {
             $providers.find('.result.selected').replaceWith(renderProvider(provider))
             closeDetails()
@@ -139,7 +139,7 @@ function providerPage() {
         .find('button[name=cancel]').click(closeDialog).end())
 
       function removeProvider() {
-        $.ajax('/accounts/' + provider._id, { type: 'DELETE' }).done(function() {
+        $.ajax('/providers/' + provider._id, { type: 'DELETE' }).done(function() {
           closeDialog()
           closeDetails()
           $selected.slideUp(function() { $(this).remove() })
@@ -174,6 +174,10 @@ function providerPage() {
     $providerDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, provider))
     $providerDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
 
+    var locations = provider.locations.map(function(location) {
+      return $('<div>').text(location.name)
+    })
+
     $providerDetails
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
@@ -181,6 +185,8 @@ function providerPage() {
       .find('input[name=billing-extra]').prop('checked', provider && !!provider.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
+      .append($('<div>', { class: 'locations' }).html(locations))
+
 
     toggleBillingExtra($providerDetails)
 

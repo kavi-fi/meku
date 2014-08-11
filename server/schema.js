@@ -148,21 +148,23 @@ var Provider = exports.Provider = mongoose.model('providers', {
   billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
   contactName: String,
   phoneNumber: String,
-  emailAddresses: String,
+  emailAddresses: [String],
   language: String,
+  deleted: Boolean
+})
+
+var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocations', {
+  emekuId: String,
+  provider: {type: ObjectId, index: true},
+  name: String,
+  address: { street: String, city: String, zip: String, country: String },
+  contactName: String,
+  phoneNumber: String,
+  emailAddresses: [String],
+  language: String,
+  providingType: [String],
   deleted: Boolean,
-  locations: [{
-    emekuId: String,
-    name: String,
-    address: { street: String, city: String, zip: String, country: String },
-    contactName: String,
-    phoneNumber: String,
-    emailAddresses: String,
-    language: String,
-    providingType: [String],
-    deleted: Boolean,
-    isPayer: Boolean
-  }]
+  isPayer: Boolean
 })
 
 var UserSchema = new Schema({

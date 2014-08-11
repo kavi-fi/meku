@@ -268,7 +268,10 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts], callback)
+  async.applyEachSeries([
+    accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, linkProviderLocations, locationEmailAddresses,
+    userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts
+  ], callback)
 
   function accountBase(callback) {
     var seq = 1
@@ -343,17 +346,12 @@ function accounts(callback) {
     batchInserter(q, onRow, 'Provider', callback)
   }
 
-  function providerEmailAddresses(callback) {
-    var q = 'select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts" and a.customer_type LIKE "%Provider%"'
-    batchUpdater(q, idToEmailMapper, singleFieldUpdater('Provider', 'emailAddresses'), callback)
-  }
-
   function locations(callback) {
     var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, bills_lang, bills_text, providing_type, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
-    function toDocument(row) {
+    function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var phoneNumber = row.phone_office || row.phone_alternate || undefined
       return {
@@ -371,13 +369,33 @@ function accounts(callback) {
       }
     }
     
-    function pushLocationToProvider(row, callback) {
-      schema.Provider.update({ emekuId: row.parent_id }, {$addToSet: {locations: toDocument(row)}}, callback)
-    }
+    batchInserter(q, onRow, 'ProviderLocation', callback)
+  }
 
+  function linkProviderLocations(callback) {
+    var q = 'select id, parent_id from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
     conn.query(q)
       .stream()
-      .pipe(consumer(pushLocationToProvider, callback))
+      .pipe(consumer(function(row, callback) {
+        schema.Provider.findOne({emekuId: row.parent_id}, function(err, parent) {
+          if (err) return callback(err)
+          if (!parent) return callback() // parent has been deleted
+          schema.ProviderLocation.update({emekuId: row.id}, { provider: parent._id }, callback)
+        })
+      }, callback))
+  }
+
+  function providerEmailAddresses(callback) {
+    accountEmailsTo('Provider', 'Provider', callback)
+  }
+
+  function locationEmailAddresses(callback) {
+    accountEmailsTo('ProviderLocation', 'Location_of_providing', callback)
+  }
+
+  function accountEmailsTo(coll, customerType, callback) {
+    var q = 'select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts" and a.customer_type LIKE "%' + customerType + '%"'
+    batchUpdater(q, idToEmailMapper, singleFieldUpdater(coll, 'emailAddresses'), callback)
   }
 
   function userBase(callback) {
@@ -719,7 +737,7 @@ function wipe(callback) {
 }
 function wipeAccounts(callback) {
   connectMongoose(function() {
-    async.each(['accounts', 'providers', 'users'], dropCollection, callback)
+    async.each(['accounts', 'providers', 'providerlocations', 'users'], dropCollection, callback)
   })
 }
 function wipeMetadataIndex(callback) {

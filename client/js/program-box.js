@@ -78,8 +78,8 @@ function programBox() {
       var cr = enums.classificationCriteria[id - 1]
       var category = enums.classificationCategoriesFI[cr.category]
       return $('<div>')
-        .append($('<label>').text(category + ' ('+cr.id+')'))
-        .append($('<span>').text(c.criteriaComments && c.criteriaComments[cr.id] || ''))
+        .append($('<label>', { title: cr.description }).text(category + ' ('+cr.id+')'))
+        .append($('<p>').text(c.criteriaComments && c.criteriaComments[cr.id] || ''))
     })
   }
 }

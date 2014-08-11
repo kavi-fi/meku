@@ -232,6 +232,8 @@ label.top { vertical-align: top; }
 .program-box .classification .fa-play { margin-right: 5px; visibility: hidden; }
 .program-box .classification.selected .fa-play { visibility: visible; }
 .program-box .classification { line-height: 19px; }
+.program-box .criteria label { border-bottom: 1px dotted; cursor: help; display: inline-block; }
+.program-box .criteria p { margin: 0; }
 
 .program-box .drafts div { margin: 3px 0; padding: 7px 11px; display: inline-block; background-color: #00BB88; color: #fff; border-radius: 7px; }
 .program-box .categorization-form { display: none; }

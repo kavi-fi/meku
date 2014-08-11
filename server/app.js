@@ -99,7 +99,7 @@ app.post('/forgot-password', function(req, res, next) {
 })
 
 function sendHashLinkViaEmail(user, subject, text, callback) {
-  var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
+  var hostUrl = getHostname()
   var url = hostUrl + '/reset-password.html#' + user.resetHash
   var emailData = {
     recipients: user.emails,
@@ -945,4 +945,10 @@ function getIpAddress(req) {
     ipAddr = req.connection.remoteAddress
   }
   return ipAddr
+}
+
+function getHostname() {
+  if (isDev()) return 'http://localhost:3000'
+  else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
+  else return 'https://meku.herokuapp.com'
 }

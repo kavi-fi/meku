@@ -164,7 +164,7 @@ function search(responseFields, req, res, next) {
     var terms = req.params.q
     var q = { deleted: { $ne:true } }
     var and = []
-    if (req.user.role == 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
+    if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
     var nameQuery = toMongoArrayQuery(terms)
     if (nameQuery) {
       if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {

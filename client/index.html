@@ -28,6 +28,7 @@
   <script src="js/billing.js"></script>
   <script src="js/user-management.js"></script>
   <script src="js/subscriber-management.js"></script>
+  <script src="js/providers.js"></script>
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
@@ -73,6 +74,7 @@
         <li><a href="#tilaajat" data-href="#subscriber-management-page">Tilaajat</a></li>
         <li><a href="#laskutus" data-href="#billing-page">Laskutus</a></li>
         <li><a href="#kayttajat" data-href="#user-management-page">Käyttäjät</a></li>
+        <li><a href="#tarjoajat" data-href="#provider-page">Tarjoajat</a></li>
       </ul>
     </div>
   </div>
@@ -132,6 +134,17 @@
       </div>
     </div>
     <div class="subscribers-list results"></div>
+  </div>
+
+  <div id="provider-page" class="page">
+    <h2 class="main">Tarjoajat</h2>
+    <div class="controls">
+      <div class="search">
+        <label for="provider-name-query" class="search-label">Nimi</label>
+        <input class="query" type="search" id="provider-name-query" placeholder="Hae nimellä...">
+      </div>
+    </div>
+    <div class="providers-list results"></div>
   </div>
 
   <div id="templates"></div>

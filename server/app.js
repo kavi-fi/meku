@@ -10,6 +10,7 @@ var User = schema.User
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var ChangeLog = schema.ChangeLog
+var Provider = schema.Provider
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
@@ -407,6 +408,14 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
     ? { roles: { $in: ['Classifier', 'Subscriber'] }}
     : { roles: { $all: selectedRoles }}
   Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
+})
+
+app.get('/providers', requireRole('kavi'), function(req, res, next) {
+  Provider.find({deleted: false}, '-locations', respond(res, next))
+})
+
+app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, respond(res, next))
 })
 
 app.get('/accounts/search', function(req, res, next) {

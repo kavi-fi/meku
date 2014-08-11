@@ -82,6 +82,7 @@ function setup() {
   billingPage()
   userManagementPage()
   subscriberManagementPage()
+  providerPage()
   navigation.start()
 }
 

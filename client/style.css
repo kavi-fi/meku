@@ -250,16 +250,11 @@ label.top { vertical-align: top; }
   width: 280px;
 }
 .program-details-form .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
-.program-details-form .program-info button[name=save] { float: right; }
+.program-details-form .program-info button[name=save] { display: none; float: right; }
 
 .form select {width: 300px;}
 .form textarea { width: 280px; height: 130px; }
 .form input:disabled, .form textarea:disabled { background-color: #f4f4f4; cursor: not-allowed; }
-
-.program-details-form .reclassification { display: none; }
-.program-details-form.reclassification .classification { display: none; }
-.program-details-form.reclassification .reclassification { display: block; }
-.program-details-form.reclassification .reclassification label { width: 140px; }
 
 .program-details-form span.author { display: inline-block; height: 30px; width: 300px; }
 
@@ -408,29 +403,14 @@ textarea.invalid:disabled,
 
 .program-details-form .new-program { margin-top: 10px }
 
-.program-details-form { display: none; }
-
 .program-details-form textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
 .program-details-form label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
-.program-details-form .id-synopsis-label { vertical-align: top; padding-top: 9px; }
+.program-details-form .synopsis-label { vertical-align: top; padding-top: 9px; }
+
+.program-details-form .program-box label { width: auto; text-align: inherit; padding: 19px 0 0 0; }
 
 .program-details-form input.duration { margin-bottom: 3px }
 .program-details-form .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
-
-.program-details-form .tv-field { display: none; }
-.program-details-form.type-tv-other .tv-field { display: block; }
-
-.program-details-form .tv-episode-field { display: none; }
-.program-details-form.type-tv-episode .tv-episode-field { display: block; }
-.program-details-form.type-tv-episode .tv-field { display: block; }
-.program-details-form.type-tv-episode .non-tv-episode-field { display: none; }
-
-.program-details-form .movie-field { display: none; }
-.program-details-form.type-movie .movie-field { display: block; }
-
-.program-details-form .game-field { display: none; }
-.program-details-form.type-game .game-field { display: block; }
-.program-details-form.type-game .non-game-field { display: none; }
 
 .program-details-form .season-episode-fields input + label { width: 50px; }
 .program-details-form .season-episode-fields input { width: 92px; }
@@ -451,6 +431,7 @@ textarea.invalid:disabled,
 
 .classification-criteria .header { position: relative; }
 .classification-criteria .safe-container { position: absolute; left: 320px; top: 9px; }
+.classification-criteria .safe-container span { cursor: pointer; }
 .classification-criteria .safe-container input { margin: 0 5px 0 0; }
 .classification-criteria .category {
   width: 300px;
@@ -567,7 +548,6 @@ textarea.invalid:disabled,
   margin-right: 0;
 }
 
-
 .classification-criteria .categories { float:left; margin-right: 30px; }
 .classification-criteria .categories li { cursor: pointer; background: transparent no-repeat; background-size: 40px; height: 40px; padding: 10px 0 0 45px; }
 
@@ -577,26 +557,6 @@ textarea.invalid:disabled,
 .classification-criteria .category-criteria li { margin-bottom: 10px; }
 .classification-criteria .category-criteria small { margin-left: 65px; display: block; }
 .classification-criteria .category-criteria textarea { float: right; }
-
-.classification-summary .comments textarea { width: 438px; }
-.classification-summary .comments p { font-size: 14px; color: #666666; line-height: 17px; }
-.classification-summary .left {width: 460px; padding: 0 10px 0 0;}
-.classification-summary .right {width: 460px; padding: 0 0 0 10px;}
-.classification-summary dl dt { display: inline-block; float: left; width: 150px; padding: 0 0 10px 0;}
-.classification-summary dl dd { display: inline-block; width: 225px; padding: 0 0 10px 0;}
-
-.classification-summary .header { border-bottom: 1px solid #D3D3D3; }
-.classification-summary .header h4 { display: inline-block; padding: 0 0 15px 0; margin: 0;}
-.classification-summary .header .year { font-size: 16px; font-weight: normal; float: right;}
-.classification-summary p { margin: 0 0 20px 0;}
-
-.classification-summary dl { margin: 15px 0 0 0; }
-
-.classification-summary p,
-.classification-summary dl dt,
-.classification-summary dl dd { font-size: 14px; color: #666666; line-height: 17px; }
-.classification-summary dl dt { font-weight: bold;}
-.classification-summary dd .reason { font-weight: bold; }
 
 .summary .agelimit  { padding: 15px 0 0 0;}
 .summary .warnings .warning { cursor: move; transition: width 0.3s; }

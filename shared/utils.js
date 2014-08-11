@@ -78,6 +78,18 @@ utils.getProperty = function(obj, prop) {
   }, obj)
 }
 
+utils.setValueForPath = function(path, property, value) {
+  if (path.length === 1) {
+    property[path[0]] = value
+  } else {
+    if (!property[path[0]]) {
+      if (_.isNumber(path[0])) property[path[0]] = []
+      else property[path[0]] = {}
+    }
+    utils.setValueForPath(_.rest(path), property[path[0]], value)
+  }
+}
+
 // Flattens object like { a: 1, b: { c: 2, d: 4 }} to { a: 1, b.c: 2, b.d: 4 }
 utils.flattenObject = function flattenObject(deepObject) {
   var resultObject = {}

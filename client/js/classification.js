@@ -183,6 +183,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     var updatedClassification = classificationFinder(updatedProgram)
     cfu.updateSummary($form, updatedProgram, updatedClassification)
     $form.find('.program-box-container').html(detailRenderer.render(cfu.cloneForProgramBox(updatedProgram, classificationFinder, rootEditMode)).show())
+    $form.find('.program-box-container .buttons').remove()
     emailRenderer.update(updatedProgram, updatedClassification, rootEditMode)
   }
 }

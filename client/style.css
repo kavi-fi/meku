@@ -326,8 +326,8 @@ input, select, .select2-container, textarea {
 }
 
 .select2-container .select2-choice {
-  height: 36px;
-  line-height: 36px;
+  height: 35px;
+  line-height: 35px;
 }
 
 label, input {
@@ -406,14 +406,19 @@ textarea.invalid:disabled,
 .program-details-form textarea { transition: height 0.2s; -webkit-transition: height 0.2s; }
 .program-details-form label { width: 145px; text-align: right; padding: 0 20px 0 0;  }
 .program-details-form .select2-label { vertical-align: super; }
-.program-details-form .synopsis-label { vertical-align: top; padding-top: 9px; }
+.program-details-form .select2-multiline-label { vertical-align: inherit; }
+.program-details-form .text-area-label { vertical-align: top; padding-top: 10px; }
 .program-details-form .program-box label { width: auto; text-align: inherit; padding: 19px 0 0 0; }
 
 .program-details-form input.duration { margin-bottom: 3px }
-.program-details-form .duration-hint { float:right; font-size: 75%; padding-right: 8px; }
-
+.program-details-form .field-hint { float:right; font-size: 75%; padding-right: 8px; }
+.program-details-form .private-comments textarea { margin-bottom: 3px; }
+.program-details-form .private-comments .field-hint { padding-right: 3px; }
 .program-details-form .season-episode-fields input + label { width: 50px; }
 .program-details-form .season-episode-fields input { width: 92px; }
+
+.program-details-form .comments { margin-top: 13px; }
+.program-details-form .comments textarea { width: 750px; height: 60px }
 
 .classification-details h2 { margin: 0 0 10px 0; }
 .classification-details .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }

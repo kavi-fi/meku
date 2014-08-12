@@ -321,11 +321,11 @@
           <label class="select2-label">Ohjaajat</label><input name="directors" class="required" type="hidden"/>
           <label class="select2-label">Näyttelijät</label><input name="actors" class="" type="hidden"/>
         </div>
-        <label class="synopsis-label">Synopsis</label><textarea class="required throttledInput" name="synopsis"></textarea>
+        <label class="text-area-label">Synopsis</label><textarea class="required throttledInput" name="synopsis"></textarea>
       </div>
     </div>
     <div class="classification-details row">
-      <div class="form content">
+      <div class="form content clearfix">
         <h2 class="main">Luokittelu</h2>
         <div class="summary">
           <span class="name"></span>
@@ -334,15 +334,19 @@
             <div class="warnings"></div>
           </div>
         </div>
-        <div class="left">
+        <div>
           <label>Luokittelijan nimi</label>
           <span class="author textified-field"></span>
-          <div class="author-and-reason-fields">
-            <label class="select2-label">Luokittelija</label><input name="classification.authorOrganization" class="required" type="hidden"/>
-            <label class="select2-label">Peruste</label><input name="classification.reason" class="required" type="hidden"/>
-          </div>
+        </div>
+        <div class="left author-and-reason-fields">
+          <label class="select2-label">Peruste</label><input name="classification.reason" class="required" type="hidden"/>
+        </div>
+        <div class="right author-and-reason-fields">
+          <label class="select2-label">Luokittelija</label><input name="classification.authorOrganization" class="required" type="hidden"/>
+        </div>
+        <div class="left">
           <label class="select2-label">Luokittelun tilaaja</label><input name="classification.buyer" class="required" type="hidden" />
-          <label class="select2-label">Rekisteröinnistä laskutetaan</label><input name="classification.billing" class="required" type="hidden" />
+          <label class="select2-multiline-label">Rekisteröinnistä laskutetaan</label><input name="classification.billing" class="required" type="hidden" />
         </div>
         <div class="right">
           <div class="non-game-field">
@@ -350,24 +354,17 @@
           </div>
           <div class="duration-field">
             <label>Kesto</label><input name="classification.duration" class="required duration throttledInput" data-type="duration" type="text" />
-            <span class="duration-hint">hh:mm:ss</span>
+            <span class="field-hint">hh:mm:ss</span>
           </div>
         </div>
       </div>
-    </div>
-    <div class="classification-summary row">
-      <div class="content">
-        <div class="comments">
-          <div class="private-comments">
-            <h3 class="main">KAVIN sisäiset kommentit</h3>
-            <textarea placeholder="KAVIN sisäiset kommentit" name="classification.comments" class="throttledInput"></textarea>
-            <p>KAVI:n sisäiset kommentit näkyvät vain KAVIN työntekijöille.</p>
-          </div>
-
-          <div class="public-comments">
-            <h3 class="main">Julkiset kommentit</h3>
-            <textarea placeholder="Perusteet uudelleenluokittelulle" name="classification.publicComments" class="required throttledInput"></textarea>
-          </div>
+      <div class="form comments">
+        <div class="public-comments">
+          <label class="text-area-label">Julkiset kommentit</label><textarea placeholder="Perusteet uudelleenluokittelulle" name="classification.publicComments" class="required throttledInput"></textarea>
+        </div>
+        <div class="private-comments">
+          <label class="text-area-label">KAVIN sisäiset kommentit</label><textarea placeholder="KAVIN sisäiset kommentit" name="classification.comments" class="throttledInput"></textarea>
+          <span class="field-hint">KAVI:n sisäiset kommentit näkyvät vain KAVIN työntekijöille.</span>
         </div>
       </div>
     </div>

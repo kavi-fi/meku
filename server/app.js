@@ -84,8 +84,13 @@ app.post('/forgot-password', function(req, res, next) {
       return res.send(500)
     }
 
-    var subject = 'Ohjeet salasanan vaihtamista varten'
-    var text = 'Tämän linkin avulla voit vaihtaa salasanasi: '
+    var subject = 'Salasanan uusiminen'
+    var text = '<p>Hei,<br/>' +
+      'uusiaksesi salasanasi seuraa oheista linkkiä <a href="<%- link %>"><%- link %></a>, ' +
+      'ja kirjoita mieleisesi salasana sille annettuihin kenttiin ja paina "tallenna salasana"-painiketta.</p>' +
+      '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
+      'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+      '<p>Terveisin,<br/>KAVI</p>'
 
     if (user.resetHash) {
       sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
@@ -99,12 +104,11 @@ app.post('/forgot-password', function(req, res, next) {
 })
 
 function sendHashLinkViaEmail(user, subject, text, callback) {
-  var hostUrl = getHostname()
-  var url = hostUrl + '/reset-password.html#' + user.resetHash
+  var url = getHostname() + '/reset-password.html#' + user.resetHash
   var emailData = {
     recipients: user.emails,
     subject: subject,
-    body: text + '<a href="' + url + '">' + url + '</a>',
+    body: _.template(text, { link: url }),
     sendInTraining: true
   }
 
@@ -463,8 +467,17 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
         logCreateOperation(req.user, user)
-        var subject = 'Käyttäjätunnusten aktivointi'
-        var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
+        var subject = 'Käyttäjätunnuksen aktivointi'
+        var text = '<p>Hei,<br/>' +
+          'Olet saanut käyttäjätunnuksen Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
+          '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
+          'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
+          'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +
+          '<p>Jos unohdat salasanasi, voit uusia sen sisäänkirjautumisikkunan kautta:<br/>' +
+          'Anna käyttäjätunnus ja paina "unohdin salasanani" -painiketta.</p>' +
+          '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
+          'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+          '<p>Terveisin,<br/>KAVI</p>'
         sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
       })
     })
@@ -702,7 +715,9 @@ var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
       sendEmail({
         recipients: [ user.emails[0] ],
         subject: 'Luokittelusertifikaattisi on vanhentunut',
-        body: 'Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.'
+        body: '<p>Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.<br/>' +
+          '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+          '<p>Terveisin,<br/>KAVI</p>'
       }, logError)
     })
   })
@@ -723,8 +738,10 @@ var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
       sendEmail({
         recipients: [ user.emails[0] ],
         subject: 'Luokittelusertifikaattisi on vanhentumassa',
-        body: 'Luokittelusertifikaattisi on vanhentumassa ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
-          '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.'
+        body: '<p>Luokittelusertifikaattisi on vanhentumassa ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
+          '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.</p>' +
+          '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+          '<p>Terveisin,<br/>KAVI</p>'
       }, function(err) {
         if (err) console.error(err)
         else user.update({ certExpiryReminderSent: new Date() }, logError)

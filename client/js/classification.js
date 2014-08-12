@@ -448,7 +448,8 @@ function classificationFormUtils() {
         path: function(term) { return '/series/search?q=' + encodeURIComponent(term) },
         toOption: idNamePairToSelect2Option,
         fromOption: select2OptionToIdNamePair,
-        allowAdding: true
+        allowAdding: true,
+        termMinLength: 0
       },
       countries: {
         $el: $form.find('input[name="country"]'),
@@ -459,7 +460,8 @@ function classificationFormUtils() {
         $el: $form.find('input[name=productionCompanies]'),
         path: function(term) { return '/productionCompanies/search?q=' + encodeURIComponent(term) },
         multiple: true,
-        allowAdding: true
+        allowAdding: true,
+        termMinLength: 0
       },
       gameFormat: {
         $el: $form.find('input[name=gameFormat]'),
@@ -477,13 +479,15 @@ function classificationFormUtils() {
         $el: $form.find('input[name=directors]'),
         path: function(term) { return '/directors/search?q=' + encodeURIComponent(term) },
         multiple: true,
-        allowAdding: true
+        allowAdding: true,
+        termMinLength: 0
       },
       actors: {
         $el: $form.find('input[name=actors]'),
         path: function(term) { return '/actors/search?q=' + encodeURIComponent(term) },
         multiple: true,
-        allowAdding: true
+        allowAdding: true,
+        termMinLength: 0
       },
       buyer: {
         $el: $form.find('input[name="classification.buyer"]'),

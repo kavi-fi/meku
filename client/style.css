@@ -35,7 +35,7 @@ body {
 }
 
 #reset-password > div { border: 0; }
-#reset-password .instructions { text-align: left; margin-bottom: 10px; }
+#reset-password .feedback { text-align: left; }
 
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;

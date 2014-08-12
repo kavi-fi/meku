@@ -147,6 +147,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $(this).prev().click()
     })
     $form.find('input[name="classification.reason"]').on('change', function(e) {
+      if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
       $buyerAndBilling.removeClass('touched').select2('enable', enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate')
     })
@@ -253,10 +254,7 @@ function classificationFormUtils() {
   }
 
   function configureRootEditMode($form, p, c) {
-    $form.find('input[name="classification.buyer"]').prev().removeClass('select2-label').end()
-      .replaceWith($('<span>').addClass('textified-field').text(utils.getProperty(c, 'buyer.name') || '-'))
-    $form.find('input[name="classification.billing"]').prev().removeClass('select2-label').end()
-      .replaceWith($('<span>').addClass('textified-field').text(utils.getProperty(c, 'billing.name') || '-'))
+    $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     if (_.isEmpty(p.classifications)) {
       $form.find('.classification-details, .classification-summary, .classification-criteria, .classification-email').remove()
       $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))

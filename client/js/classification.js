@@ -241,6 +241,7 @@ function classificationFormUtils() {
 
     var showDuration = !enums.util.isGameType(program) || hasRole('kavi')
     if (!showDuration) $form.find('.duration-field').remove()
+    if (showDuration && enums.util.isGameType(program)) $form.find('.duration-field label').text('Luokittelun kesto')
 
     if (isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)

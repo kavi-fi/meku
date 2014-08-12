@@ -2,7 +2,7 @@ $.fn.throttledInput = function(fn) {
   return $(this).each(function() {
     var prev = undefined
     var timeout = null
-    var $input = $(this).on('keyup', function() {
+    var $input = $(this).on('keyup input', function() {
       var txt = $input.val()
       var that = this
       if (timeout) clearTimeout(timeout)

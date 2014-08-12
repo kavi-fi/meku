@@ -420,11 +420,6 @@ textarea.invalid:disabled,
 .program-details-form .comments { margin-top: 13px; }
 .program-details-form .comments textarea { width: 750px; height: 60px }
 
-.classification-details h2 { margin: 0 0 10px 0; }
-.classification-details .summary { border-bottom: 1px solid #D3D3D3; padding: 20px 0; margin: 0 0 30px 0; }
-.classification-details .summary .name { display: inline-block; float: left; padding: 0 20px 0 0; line-height: 40px; font-size: 20px; font-weight: bold; }
-.classification-details .summary .agelimit { padding: 0; display: inline-block;}
-
 .registration-confirmation { width: 860px; }
 .registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
 .registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
@@ -434,10 +429,19 @@ textarea.invalid:disabled,
   margin-right: 10px;
 }
 
-.classification-criteria .header { position: relative; }
-.classification-criteria .safe-container { position: absolute; left: 320px; top: 9px; }
+.classification-criteria .safe-container { font-weight: normal; font-size: 16px; color: #444444; }
 .classification-criteria .safe-container span { cursor: pointer; }
-.classification-criteria .safe-container input { margin: 0 5px 0 0; }
+.classification-criteria .safe-container input { margin: 0 7px 0 0; vertical-align: text-top; }
+
+.classification-criteria .warning-order { float: right; width: 620px; margin-top: -15px; }
+.classification-criteria .warning-order img { margin: 20px 0; }
+.classification-criteria .warning-order .warnings .warning { cursor: move; transition: width 0.3s; margin: 20px 0; }
+.classification-criteria .warning-order .warnings .warning.dragging { opacity: 0.3; }
+.classification-criteria .warning-order .warnings .warning.dragging, .classification-criteria .warning-order .warnings .drop-target.dragging { width: 0; opacity: 0; }
+.classification-criteria .warning-order .warnings .drop-target { display: inline-block; width: 25px; height: 80px; transition: width 0.3s; }
+.classification-criteria .warning-order .warnings .drop-target.active { width: 90px; }
+/* .classification-criteria .warning-order .warnings .drop-target { background-color: rgba(81, 203, 238, 0.5) } */
+
 .classification-criteria .category {
   width: 300px;
   float: left;
@@ -562,14 +566,6 @@ textarea.invalid:disabled,
 .classification-criteria .category-criteria li { margin-bottom: 10px; }
 .classification-criteria .category-criteria small { margin-left: 65px; display: block; }
 .classification-criteria .category-criteria textarea { float: right; }
-
-.summary .agelimit  { padding: 15px 0 0 0;}
-.summary .warnings .warning { cursor: move; transition: width 0.3s; }
-.summary .warnings .warning.dragging { opacity: 0.3; }
-.summary .warnings .warning.dragging, .summary .warnings .drop-target.dragging { width: 0; opacity: 0; }
-.summary .warnings .drop-target { display: inline-block; width: 10px; height: 30px; transition: width 0.3s; }
-/*.summary .warnings .drop-target.valid { background-color: rgba(81, 203, 238, 0.5) }*/
-.summary .warnings .drop-target.active { width: 50px; }
 
 .classification-email .emails label { text-align: left; width: 200px;}
 .classification-email .emails input[name=registration-email] { font-weight: normal; margin-top: 5px; width: 93%; }

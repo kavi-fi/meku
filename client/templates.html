@@ -327,13 +327,6 @@
     <div class="classification-details row">
       <div class="form content clearfix">
         <h2 class="main">Luokittelu</h2>
-        <div class="summary">
-          <span class="name"></span>
-          <div class="agelimit warning-summary">
-            <img src="images/agelimit-0.png" />
-            <div class="warnings"></div>
-          </div>
-        </div>
         <div>
           <label>Luokittelijan nimi</label>
           <span class="author textified-field"></span>
@@ -370,10 +363,16 @@
     </div>
     <div class="classification-criteria row">
       <div class="content">
-        <div class="header">
-          <span class="safe-container"><input name="classification.safe" type="checkbox" /><span>Ei sisällä lapsille haitallista materiaalia</span></span>
-          <h2 class="main">Luokittelun kriteerit</h2>
+        <div class="warning-order">
+          <div class="agelimit warning-summary">
+            <img src="images/agelimit-0.png" />
+            <div class="warnings"></div>
+          </div>
         </div>
+        <h2 class="main">
+          Luokittelun kriteerit
+          <div class="safe-container"><input name="classification.safe" type="checkbox" /><span>Ei sisällä lapsille haitallista materiaalia</span></div>
+        </h2>
         <div class="category-container">
           <div class="category violence">
             <div class="heading"><h3>Väkivalta</h3></div>

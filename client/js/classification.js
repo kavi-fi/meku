@@ -162,7 +162,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.on('blur', '.category .criteria.has-comment:not(.selected) textarea', function() {
       $(this).parents('.criteria').toggleClass('has-comment', isNotEmpty($(this).val()))
     })
-    cfu.warningDragOrder($form.find('.classification-details .summary'), save)
+    cfu.warningDragOrder($form.find('.classification-criteria .warning-order'), save)
   }
 
   function save(field, value) {
@@ -181,7 +181,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
 
   function onProgramUpdated(updatedProgram) {
     var updatedClassification = classificationFinder(updatedProgram)
-    cfu.updateSummary($form, updatedProgram, updatedClassification)
+    cfu.updateWarningOrdering($form, updatedClassification)
     $form.find('.program-box-container').html(detailRenderer.render(cfu.cloneForProgramBox(updatedProgram, classificationFinder, rootEditMode)).show())
     $form.find('.program-box-container .buttons').remove()
     emailRenderer.update(updatedProgram, updatedClassification, rootEditMode)
@@ -191,7 +191,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
 function classificationFormUtils() {
 
   return {
-    renderForm: renderForm, updateSummary: updateSummary,
+    renderForm: renderForm, updateWarningOrdering: updateWarningOrdering,
     registrationEmails: registrationEmails, warningDragOrder: warningDragOrder,
     cloneForProgramBox: cloneForProgramBox,  select2Opts: select2Opts
   }
@@ -264,11 +264,10 @@ function classificationFormUtils() {
     $form.find('button[name=save]').show()
   }
 
-  function updateSummary($form, program, classification) {
+  function updateWarningOrdering($form, classification) {
     var summary = classificationUtils.summary(classification)
     var warnings = [$('<span>', { class:'drop-target' })].concat(summary.warnings.map(function(w) { return $('<span>', { 'data-id': w.category, class:'warning ' + w.category, draggable:true }).add($('<span>', { class:'drop-target' })) }))
-    $form.find('.summary')
-      .find('.name').text(program.name.join(', ') || '-').end()
+    $form.find('.warning-order')
       .find('.agelimit img').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
   }

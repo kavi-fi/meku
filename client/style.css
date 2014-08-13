@@ -38,6 +38,8 @@ body {
   padding: 10px 50px;
 }
 
+#register-provider { width: 100%; text-align: center; }
+
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;

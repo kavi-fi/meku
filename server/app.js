@@ -23,6 +23,8 @@ var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
 var CronJob = require('cron').CronJob
 var providerUtils = require('./provider-utils')
+var multer  = require('multer')
+var providerImport = require('./provider-import')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -35,6 +37,7 @@ app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
 app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
+app.use(multer({ dest: '/tmp/'}))
 
 mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/meku')
 
@@ -1024,6 +1027,16 @@ app.get('/environment', function(req, res, next) {
   res.json({ environment: app.get('env') })
 })
 
+app.post('/files/provider-import', function(req, res, next) {
+  if (_.isEmpty(req.files)) return res.send(400)
+  providerImport.import(req.files.providerFile.path, function(err, providerAndLocationsPreview) {
+    if (err) return res.send({ error: err })
+    res.send({
+      message: 'Ilmoitettu tarjoaja, sekä ' + providerAndLocationsPreview.locations.length + ' tarjoamispaikkaa.'
+    })
+  })
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
@@ -1116,7 +1129,7 @@ function authenticate(req, res, next) {
     'GET:/index.html', 'GET:/public.html', 'GET:/templates.html',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
-    'POST:/reset-password', 'GET:/check-reset-hash'
+    'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/xlsx'
   ]
   var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
 

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="vendor/normalize-3.0.1.css" media="all" rel="stylesheet" />
+  <link href="style.css" media="all" rel="stylesheet" />
+  <script src="vendor/jquery-2.1.0.min.js"></script>
+  <script src="vendor/lodash.min.js"></script>
+  <script>
+    if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
+  </script>
+  <script>
+    $(function() {
+      var $form = $('#register-provider')
+      var $button = $form.find('button')
+      var $feedback = $form.find('.feedback')
+
+      $button.on('click', function(e) {
+        e.preventDefault()
+
+        $button.prop('disabled', true)
+        $feedback.text('Tiedostoa ladataan palvelimelle...')
+
+        $.ajax({
+          url: '/files/provider-import',
+          data: new FormData($form.get(0)),
+          cache: false,
+          contentType: false,
+          processData: false,
+          type: 'POST',
+          success: function(data) {
+            if (data.error) {
+              $feedback.text(data.error.message)
+              $button.prop('disabled', false)
+            } else {
+              $form.find('div, p').not('.feedback').hide()
+              $feedback.text(data.message)
+            }
+          },
+          error: function() {
+            $feedback.text('Tiedoston lukeminen ei onnistunut, tarkista että taulukko on täytetty ohjeiden mukaisesti.')
+            $button.prop('disabled', false)
+          }
+        })
+      })
+
+      $form.on('change', function() {
+        $button.prop('disabled', _.isEmpty($form.find('input[name=providerFile]').val()))
+      })
+    })
+  </script>
+</head>
+<body>
+  <div id="header">
+    <div class="content reset-password-page">
+      <div>
+        <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
+      </div>
+    </div>
+  </div>
+  <form id="register-provider" enctype="multipart/form-data">
+    <h2>Tarjoajaksi ilmoittautuminen</h2>
+    <p>
+      Ilmoittaudu kuvaohjelmatarjoajaksi täyttämällä taulukko
+      (lataa <a href="http://www.meku.fi/images/dokumentit/tarjoaja%20excel%20moni-ilmoittajat.xls">tästä</a>)
+      ja lähettämällä se alla olevan lomakkeen avulla.
+    </p>
+    <div>
+      <label>Valitse taulukko-tiedosto <input type="file" name="providerFile" /></label>
+    </div>
+    <div>
+      <button class="button" disabled>Lähetä tiedosto</button>
+    </div>
+    <div class="feedback"></div>
+  </form>
+</body>
+</html>

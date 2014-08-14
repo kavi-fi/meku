@@ -686,17 +686,19 @@ textarea.invalid:disabled,
 .detail-box .form .double-margin { margin-top: 18px; }
 .detail-box .form textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }
 .detail-box .form input, .detail-box .form textarea, .detail-box .form .select2-container { font-weight: normal; }
+.detail-box label.full { width: 830px; }
 
 #subscriber-management-page .result { display: -webkit-flex; display: flex; }
 #subscriber-management-page .result span { width: 50%; box-sizing: border-box; }
 #subscriber-management-page .subscriber-details .emails { float: right; margin-right: 34px; }
 #subscriber-management-page .subscriber-details .emails .select2-choices { overflow: auto; }
 #subscriber-management-page .subscriber-details .roles label { width: auto; }
-#subscriber-management-page label.full { width: 830px; }
 #subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
 #subscriber-management-page button[name=new-subscriber] { float: right; }
 
 #provider-page .controls button[name=new-provider] { float: right; }
+#provider-page .emails { float: right; margin-right: 34px; }
+#provider-page .emails .select2-choices { overflow: auto; }
 
 .change-log a { color: #00BB88; cursor: pointer; margin-top: 10px; display: inline-block; }
 .change-log span, label, pre { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }

@@ -10,9 +10,27 @@ function resetPassword() {
   var resetHash = location.hash.substring(1)
 
   $form.on('validate', function () {
-    var invalid = !($password.hasClass('invalid') && $password.val() === $passwordConfirmation.val())
-    $button.prop('disabled', invalid)
-    $feedback.slideUp()
+    var invalidPassword = $form.find('input[name]').hasClass('invalid')
+    var notSamePasswords = ($password.val() !== $passwordConfirmation.val())
+
+    $button.prop('disabled', invalidPassword || notSamePasswords)
+
+    var feedback = []
+
+    if (invalidPassword) {
+      feedback.push('Salasanan tulee olla vähintään kuusi merkkiä pitkä.')
+    }
+
+    if (notSamePasswords) {
+      feedback.push('Salasanat eivät täsmää.')
+    }
+
+    if (feedback.length > 0) {
+      $feedback.text(feedback.join(' '))
+      $feedback.slideDown()
+    } else {
+      $feedback.slideUp()
+    }
   })
 
   $button.click(function() {
@@ -37,6 +55,6 @@ function resetPassword() {
   }
 
   function checkInput() {
-    $(this).toggleClass('invalid', $(this).val().length > 3).trigger('validate')
+    $(this).toggleClass('invalid', ($(this).val().length < 6)).trigger('validate')
   }
 }

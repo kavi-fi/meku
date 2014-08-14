@@ -58,7 +58,7 @@ function programBox() {
     $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warningIcons(summary)).end()
       .find('.reason').labeledText(enums.reclassificationReason[c.reason]).end()
-      .find('.author').labeledText(c.author ? c.author.name : '').end()
+      .find('.author').labeledText(c.author ? c.author.name + ' (' + c.author.username + ')' : '').end()
       .find('.authorOrganization').labeledText(enums.authorOrganization[c.authorOrganization]).end()
       .find('.buyer').labeledText(c.buyer && c.buyer.name || '').end()
       .find('.billing').labeledText(c.billing && c.billing.name || '').end()
@@ -78,8 +78,8 @@ function programBox() {
       var cr = enums.classificationCriteria[id - 1]
       var category = enums.classificationCategoriesFI[cr.category]
       return $('<div>')
-        .append($('<label>').text(category + ' ('+cr.id+')'))
-        .append($('<span>').text(c.criteriaComments && c.criteriaComments[cr.id] || ''))
+        .append($('<label>', { title: cr.description }).text(category + ' ('+cr.id+')'))
+        .append($('<p>').text(c.criteriaComments && c.criteriaComments[cr.id] || ''))
     })
   }
 }

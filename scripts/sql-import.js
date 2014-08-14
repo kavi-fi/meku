@@ -11,13 +11,14 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
 
 /*
  Dependencies:
-   sequences & base & names before everything
-   accounts before classifications
+   sequences before everything
+   accounts before programs and classifications
+   programs before names
    linkTvSeries before nameIndex
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js sequences base && node scripts/sql-import.js names && node scripts/sql-import.js metadata accounts classifications markTrainingProgramsDeleted markUnclassifiedProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
+   node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications markTrainingProgramsDeleted markUnclassifiedProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
 
  Should remove programs which have no classifications? -> ~7400
    check how many are tv-series-names?
@@ -25,7 +26,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
 */
 
 var tasks = {
-  wipe: wipe, sequences: sequences, base: base,
+  wipe: wipe, sequences: sequences, programs: programs,
   wipeMetadata: wipeMetadata, metadata: metadata,
   wipeNames: wipeNames, names: names,
   wipeClassifications: wipeClassifications, classifications: classifications,
@@ -66,25 +67,32 @@ function run(job, callback) {
   })
 }
 
-function base(callback) {
+function programs(callback) {
   var seq = 1
-  var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format FROM meku_audiovisualprograms where (program_type != "11" or program_type is null) and deleted != "1"'
-  batchInserter(q, programMapper, 'Program', callback)
+  var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format, created_by FROM meku_audiovisualprograms where (program_type != "11" or program_type is null) and deleted != "1"'
+  schema.User.find({}, function(err, users) {
+    var userMap = _.indexBy(users, 'emekuId')
+    batchInserter(q, programMapper, 'Program', callback)
 
-  function programMapper(row) {
-    var obj = { emekuId: row.id, sequenceId:seq++ }
-    obj.programType = enums.legacyProgramTypes[row.program_type] || 0
-    if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
-    if (row.year && row.year != 'undefined') obj.year = row.year
-    if (row.countries) obj.country = optionListToArray(row.countries)
-    if (row.description) obj.synopsis = trim(row.description)
-    var legacyGenre = optionListToArray(row.genre).map(function(g) { return enums.legacyGenres[g] })
-      .concat(optionListToArray(row.tv_program_genre).map(function(g) { return enums.legacyTvGenres[g] }))
-      .concat(optionListToArray(row.game_genre))
-    if (legacyGenre) obj.legacyGenre = _(legacyGenre).compact().uniq().value()
-    if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = row.game_format
-    return obj
-  }
+    function programMapper(row) {
+      var obj = { emekuId: row.id, sequenceId:seq++ }
+      obj.programType = enums.legacyProgramTypes[row.program_type] || 0
+      if (row.publish_year && row.publish_year != 'undefined') obj.year = row.publish_year
+      if (row.year && row.year != 'undefined') obj.year = row.year
+      if (row.countries) obj.country = optionListToArray(row.countries)
+      if (row.description) obj.synopsis = trim(row.description)
+      var legacyGenre = optionListToArray(row.genre).map(function(g) { return enums.legacyGenres[g] })
+        .concat(optionListToArray(row.tv_program_genre).map(function(g) { return enums.legacyTvGenres[g] }))
+        .concat(optionListToArray(row.game_genre))
+      if (legacyGenre) obj.legacyGenre = _(legacyGenre).compact().uniq().value()
+      if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = row.game_format
+      if (row.created_by) {
+        var user = userMap[row.created_by]
+        obj.createdBy = { _id: user._id, name: user.name, username: user.username, role: user.role }
+      }
+      return obj
+    }
+  })
 }
 
 function names(callback) {
@@ -219,7 +227,7 @@ function classifications(callback) {
       _.values(result.classifications).forEach(function(c) {
         if (c.assigned_user_id) {
           var u = userMap[c.assigned_user_id]
-          c.author = { _id: u._id, name: u.name }
+          c.author = { _id: u._id, name: u.name, username: u.username }
         }
       })
       callback(null, result)
@@ -457,7 +465,7 @@ function accounts(callback) {
   function pushUserToAccount(row, callback) {
     schema.User.findOne({ emekuId: row.userId }, { username: 1 }, function (err, user) {
       if (err || !user) return callback(err || new Error('No such user ' + row.userId))
-      var data = { _id: user._id, name: user.username }
+      var data = { _id: user._id, username: user.username }
       schema.Account.update({ emekuId: row.accountId }, { $addToSet: { users: data } }, callback)
     })
   }

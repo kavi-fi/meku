@@ -193,10 +193,11 @@ function internalSearchPage() {
 
     select2Autocomplete({
       $el: $series,
-      path: '/series/search/',
+      path: function(term) { return '/series/search?q=' + encodeURIComponent(term) },
       toOption: idNamePairToSelect2Option,
       fromOption: select2OptionToIdNamePair,
-      allowAdding: true
+      allowAdding: true,
+      termMinLength: 0
     })
 
     $categorySelection.select2(programTypesSelect2).select2('val', 1)
@@ -326,7 +327,7 @@ function searchPage(baseUrl) {
   function load(callback) {
     $loading.show()
     var url = baseUrl+encodeURIComponent(state.q)
-    var data = $.param({ page:state.page, filters:currentFilters() })
+    var data = $.param({ page: state.page, filters: currentFilters() })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
       $noResults.toggle(state.page == 0 && results.length == 0)

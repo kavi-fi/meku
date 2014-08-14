@@ -86,8 +86,13 @@ app.post('/forgot-password', function(req, res, next) {
       return res.send(500)
     }
 
-    var subject = 'Ohjeet salasanan vaihtamista varten'
-    var text = 'Tämän linkin avulla voit vaihtaa salasanasi: '
+    var subject = 'Salasanan uusiminen'
+    var text = '<p>Hei,<br/>' +
+      'uusiaksesi salasanasi seuraa oheista linkkiä <a href="<%- link %>"><%- link %></a>, ' +
+      'ja kirjoita mieleisesi salasana sille annettuihin kenttiin ja paina "tallenna salasana"-painiketta.</p>' +
+      '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
+      'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+      '<p>Terveisin,<br/>KAVI</p>'
 
     if (user.resetHash) {
       sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
@@ -101,12 +106,12 @@ app.post('/forgot-password', function(req, res, next) {
 })
 
 function sendHashLinkViaEmail(user, subject, text, callback) {
-  var hostUrl = isDev() ? 'http://localhost:3000' : 'https://meku.herokuapp.com'
-  var url = hostUrl + '/reset-password.html#' + user.resetHash
+  var url = getHostname() + '/reset-password.html#' + user.resetHash
   var emailData = {
     recipients: user.emails,
     subject: subject,
-    body: text + '<a href="' + url + '">' + url + '</a>'
+    body: _.template(text, { link: url }),
+    sendInTraining: true
   }
 
   sendEmail(emailData, callback)
@@ -161,17 +166,21 @@ function search(responseFields, req, res, next) {
   Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
   function query() {
+    var ObjectId = mongoose.Types.ObjectId
     var terms = req.params.q
     var q = { deleted: { $ne:true } }
+    var and = []
+    if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
     var nameQuery = toMongoArrayQuery(terms)
     if (nameQuery) {
       if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
-        q.$or = [{ allNames:nameQuery }, { sequenceId: terms }]
+        and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
       } else {
-        q.allNames = nameQuery
+        and.push({allNames: nameQuery})
       }
     }
     if (filters.length > 0) q.programType = { $in: filters }
+    if (and.length > 0) q.$and = and
     return q
   }
 }
@@ -213,7 +222,7 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-  var p = new Program({ programType: programType })
+  var p = new Program({ programType: programType, createdBy: {_id: req.user._id, username: req.user.username, name: req.user.user, role: req.user.role}})
   p.newDraftClassification(req.user)
   p.save(function(err, program) {
     if (err) return next(err)
@@ -231,7 +240,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
-    newClassification.author = { _id: req.user._id, name: req.user.name }
+    newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
 
     program.draftClassifications = {}
     program.draftsBy = []
@@ -489,8 +498,17 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
       createAndSaveHash(user, function(err) {
         if (err) return next(err)
         logCreateOperation(req.user, user)
-        var subject = 'Käyttäjätunnusten aktivointi'
-        var text = 'Tämän linkin avulla pääset aktivoimaan käyttäjätunnuksesi: '
+        var subject = 'Käyttäjätunnuksen aktivointi'
+        var text = '<p>Hei,<br/>' +
+          'Olet saanut käyttäjätunnuksen Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
+          '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
+          'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
+          'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +
+          '<p>Jos unohdat salasanasi, voit uusia sen sisäänkirjautumisikkunan kautta:<br/>' +
+          'Anna käyttäjätunnus ja paina "unohdin salasanani" -painiketta.</p>' +
+          '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
+          'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+          '<p>Terveisin,<br/>KAVI</p>'
         sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
       })
     })
@@ -681,6 +699,10 @@ app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next)
   ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).exec(respond(res, next))
 })
 
+app.get('/environment', function(req, res, next) {
+  res.json({ environment: app.get('env') })
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
@@ -724,7 +746,9 @@ var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
       sendEmail({
         recipients: [ user.emails[0] ],
         subject: 'Luokittelusertifikaattisi on vanhentunut',
-        body: 'Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.'
+        body: '<p>Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.<br/>' +
+          '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+          '<p>Terveisin,<br/>KAVI</p>'
       }, logError)
     })
   })
@@ -745,8 +769,10 @@ var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
       sendEmail({
         recipients: [ user.emails[0] ],
         subject: 'Luokittelusertifikaattisi on vanhentumassa',
-        body: 'Luokittelusertifikaattisi on vanhentumassa ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
-          '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.'
+        body: '<p>Luokittelusertifikaattisi on vanhentumassa ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
+          '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.</p>' +
+          '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+          '<p>Terveisin,<br/>KAVI</p>'
       }, function(err) {
         if (err) console.error(err)
         else user.update({ certExpiryReminderSent: new Date() }, logError)
@@ -803,11 +829,11 @@ function requireRole(role) {
   }
 }
 
-function sendEmail(data, callback) {
-  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: data.subject, html: data.body })
-  data.recipients.forEach(function(to) { email.addTo(to) })
+function sendEmail(opts, callback) {
+  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
+  opts.recipients.forEach(function(to) { email.addTo(to) })
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV === 'training' && opts.sendInTraining)) {
     sendgrid.send(email, callback)
   } else {
     console.log('email (suppressed): ', email)
@@ -967,4 +993,10 @@ function getIpAddress(req) {
     ipAddr = req.connection.remoteAddress
   }
   return ipAddr
+}
+
+function getHostname() {
+  if (isDev()) return 'http://localhost:3000'
+  else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
+  else return 'https://meku.herokuapp.com'
 }

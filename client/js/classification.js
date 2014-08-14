@@ -262,7 +262,7 @@ function classificationForm(editMode) {
     $(window).scrollTop(0)
     var currentClassification = draftClassification(program)
     var isReclassification = classification.isReclassification(program, currentClassification)
-    var isExternalReclassification = isReclassification && user.role == 'user'
+    var isExternalReclassification = isReclassification && enums.util.isClassifier(user.role)
     var reasonVal = typeof currentClassification.reason == 'number' ? currentClassification.reason.toString() : ''
     var authorOrgVal = typeof currentClassification.authorOrganization == 'number' ? currentClassification.authorOrganization.toString() : ''
 
@@ -330,7 +330,7 @@ function classificationForm(editMode) {
       .prop('disabled', isExternalReclassification)
       .select2('enable', isReclassification && hasRole('kavi'))
 
-    $form.find('input[name=series]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
+    $form.find('input[name=series], input[name=episode]').prop('disabled', isReclassification || !enums.util.isTvEpisode(program))
 
     $form.find('input[name=directors]').prop('disabled', enums.util.isGameType(program) || isReclassification && !editMode)
     $form.find('input[name=gameFormat]').prop('disabled', !enums.util.isGameType(program))

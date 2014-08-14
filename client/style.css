@@ -24,8 +24,18 @@ body {
 #login .feedback, #reset-password .feedback { display: none; font-size: 14px; font-weight: 200; padding: 10px 0; }
 #error-dialog a, #conflict-dialog a { color: #00BB88; }
 
+.training-ribbon { display: none; position: fixed; left: -50px; top: 40px; -webkit-transform: rotate(-45deg); transform: rotate(-45deg); background-color: #a00; z-index: 10; }
+.training-ribbon span {
+  border: 1px solid #faa;
+  color: #fff;
+  display: block;
+  font: bold 16px Helvetica, Arial, sans-serif;
+  margin: 1px 0;
+  padding: 10px 50px;
+}
+
 #reset-password > div { border: 0; }
-#reset-password .instructions { text-align: left; margin-bottom: 10px; }
+#reset-password .feedback { text-align: left; }
 
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;
@@ -222,6 +232,8 @@ label.top { vertical-align: top; }
 .program-box .classification .fa-play { margin-right: 5px; visibility: hidden; }
 .program-box .classification.selected .fa-play { visibility: visible; }
 .program-box .classification { line-height: 19px; }
+.program-box .criteria label { border-bottom: 1px dotted; cursor: help; display: inline-block; }
+.program-box .criteria p { margin: 0; }
 
 .program-box .drafts div { margin: 3px 0; padding: 7px 11px; display: inline-block; background-color: #00BB88; color: #fff; border-radius: 7px; }
 .program-box .categorization-form { display: none; }

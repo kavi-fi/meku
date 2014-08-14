@@ -1,4 +1,4 @@
-var user;
+var user
 var pikadayDefaults = {
   defaultDate: new Date(),
   firstDay: 1,
@@ -61,6 +61,12 @@ function setup() {
   var conflict = conflictDialog()
 
   $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json' })
+
+  $.get('/environment', function(res) {
+    if (res.environment === 'training') {
+      $('.training-ribbon').show()
+    }
+  })
 
   $(document).ajaxError(function(e, req) {
     if (req.status == 403) {

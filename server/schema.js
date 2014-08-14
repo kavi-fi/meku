@@ -9,7 +9,7 @@ var bcryptSaltFactor = 12
 
 var classification = {
   emekuId: { type: String, index: true },
-  author: {_id: {type: ObjectId, index: true}, name: String},
+  author: { _id: { type: ObjectId, index: true }, name: String, username: String },
   authorOrganization: Number,
   buyer: {_id: ObjectId, name: String},
   billing: {_id: ObjectId, name: String},
@@ -55,7 +55,8 @@ var ProgramSchema = new Schema({
   season: String, episode: String,
   series: { _id: { type: ObjectId, index:true }, name: String },
   tvSeriesCriteria: [Number],
-  tvSeriesLegacyAgeLimit: Number
+  tvSeriesLegacyAgeLimit: Number,
+  createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))
@@ -65,7 +66,7 @@ ProgramSchema.methods.newDraftClassification = function(user) {
     _id: mongoose.Types.ObjectId(),
     creationDate: new Date(),
     status: 'in_process',
-    author: { _id: user._id, name: user.name },
+    author: { _id: user._id, name: user.name, username: user.username },
     warningOrder: [], criteria: [], criteriaComments: {}, registrationEmailAddresses: []
   }
   if (!this.draftClassifications) this.draftClassifications = {}
@@ -131,7 +132,7 @@ var AccountSchema = new Schema({
   eInvoice: { address:String, operator:String },
   billingPreference: String, // '' || 'address' || 'eInvoice'
   emailAddresses: [String],
-  users: [{ _id: ObjectId, name: String }],
+  users: [{ _id: ObjectId, username: String }],
   apiToken: String,
   contactName: String,
   phoneNumber: String,

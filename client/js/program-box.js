@@ -53,7 +53,7 @@ function programBox() {
       return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
     })
     var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
-      return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDate(draft.creationDate)).end()
+      return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDateTime(draft.creationDate)).end()
     })
 
     $e.find('.classification-container').html($classificationTemplates.normal.clone())

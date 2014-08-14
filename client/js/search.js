@@ -115,7 +115,7 @@ function internalSearchPage() {
     $drafts.find('.draft').remove()
     $.get('/programs/drafts', function(drafts) {
       drafts.forEach(function(draft) {
-        var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
+        var $date = $('<span>', {class: 'creationDate'}).text(utils.asDateTime(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
         var $remove = $('<div>', {class: 'remove'}).append($('<button>', { class: 'button' }).text('Poista'))
         var $draft = $('<div>', {class: 'result draft'})
@@ -133,7 +133,7 @@ function internalSearchPage() {
     $.get('/programs/recent', function(recents) {
       recents.forEach(function(p) {
         var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
-          .append($('<span>', { class: 'registrationDate' }).text(utils.asDate(p.classifications[0].registrationDate)))
+          .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
           .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))

@@ -118,7 +118,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         showDialog($('<div>', {class: 'registration-confirmation dialog'})
           .append($('<span>', {class: 'name'}).text(savedProgram.name))
           .append(renderWarningSummary(classificationUtils.fullSummary(savedProgram)))
-          .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(savedProgram.classifications[0].registrationDate)))
+          .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDateTime(savedProgram.classifications[0].registrationDate)))
           .append($('<p>', {class: 'buttons'}).html($('<button>', { click: closeDialog, class: 'button' }).text('Sulje'))))
         $(window).scrollTop(0)
       })

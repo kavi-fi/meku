@@ -147,6 +147,7 @@ var Provider = exports.Provider = mongoose.model('providers', {
   name: String,
   address: { street: String, city: String, zip: String, country: String },
   billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
+  eInvoice: { address:String, operator:String },
   contactName: String,
   phoneNumber: String,
   emailAddresses: [String],

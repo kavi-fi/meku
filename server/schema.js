@@ -52,7 +52,7 @@ var ProgramSchema = new Schema({
   draftClassifications: {}, // { userId:classification, userId:classification2 }
   programType: Number, // enums.programType
   gameFormat: String,
-  season: String, episode: String,
+  season: Number, episode: Number,
   series: { _id: { type: ObjectId, index:true }, name: String },
   tvSeriesCriteria: [Number],
   tvSeriesLegacyAgeLimit: Number,

@@ -77,8 +77,9 @@ textarea { resize: vertical; }
 .detail-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 
 .filters { font-size: 14px; color: #444444; }
-.filters label { padding-right: 12px; font-weight: normal; }
-.filters input { margin-right: 10px; }
+.filters label { padding-right: 12px; font-weight: normal; min-width: 118px; }
+.filters label.first { min-width: 80px; }
+.filters input { margin-right: 7px; margin-bottom: 10px; }
 
 .warning-summary { display: inline-block; }
 .warning-summary img { width: 40px; height: 40px;}

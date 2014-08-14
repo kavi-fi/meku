@@ -10,14 +10,14 @@ function resetPassword() {
   var resetHash = location.hash.substring(1)
 
   $form.on('validate', function () {
-    var invalidPassword = $form.find('input[name]').hasClass('invalid')
+    var tooShortPassword = $form.find('input[name="password"]').hasClass('invalid')
     var notSamePasswords = ($password.val() !== $passwordConfirmation.val())
 
-    $button.prop('disabled', invalidPassword || notSamePasswords)
+    $button.prop('disabled', tooShortPassword || notSamePasswords)
 
     var feedback = []
 
-    if (invalidPassword) {
+    if (tooShortPassword) {
       feedback.push('Salasanan tulee olla vähintään kuusi merkkiä pitkä.')
     }
 

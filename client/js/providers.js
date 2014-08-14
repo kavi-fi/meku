@@ -20,6 +20,21 @@ function providerPage() {
     })
   })
 
+  $page.on('click', 'button[name=new-provider]', function() {
+    var $providerDetails = renderProviderDetails()
+    bindEventHandlers($providerDetails, function(provider) {
+      $.post('/providers', JSON.stringify(_.merge(provider, { deleted: false })), function(newProvider) {
+        var $providerRow = renderProvider(newProvider)
+        $providers.prepend($providerRow)
+        $providerRow.slideDown()
+        closeDetails()
+      })
+    })
+    closeDetails()
+    $providers.prepend($providerDetails)
+    $providerDetails.slideDown()
+  })
+
   $providerNameQuery.on('input', function() {
     var searchString = $(this).val().toLowerCase()
     $providers.find('.result').each(function() {
@@ -174,9 +189,9 @@ function providerPage() {
     $providerDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, provider))
     $providerDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
 
-    var locations = provider.locations.map(function(location) {
+    var locations = provider ? provider.locations.map(function(location) {
       return $('<div>').text(location.name)
-    })
+    }) : ''
 
     $providerDetails
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()

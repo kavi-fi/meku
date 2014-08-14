@@ -424,6 +424,14 @@ app.get('/providers', requireRole('kavi'), function(req, res, next) {
   Provider.find({deleted: false}, '', respond(res, next))
 })
 
+app.post('/providers', requireRole('kavi'), function(req, res, next) {
+  new Provider(req.body).save(function(err, provider) {
+    if (err) return next(err)
+    logCreateOperation(req.user, provider)
+    res.send(provider)
+  })
+})
+
 app.put('/providers/:id', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, provider) {
     if (err) return next(err)

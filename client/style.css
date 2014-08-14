@@ -696,6 +696,8 @@ textarea.invalid:disabled,
 #subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
 #subscriber-management-page button[name=new-subscriber] { float: right; }
 
+#provider-page .controls button[name=new-provider] { float: right; }
+
 .change-log a { color: #00BB88; cursor: pointer; margin-top: 10px; display: inline-block; }
 .change-log span, label, pre { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }
 .change-log label { display: inline-block; padding: 5px 0 0 0; }

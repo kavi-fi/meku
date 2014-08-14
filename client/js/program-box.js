@@ -5,20 +5,16 @@ function programBox() {
   return { render: render }
 
   function render(p) {
+    var $e = renderProgram(p)
+    renderClassifications($e, p)
+    return $e
+  }
+
+  function renderProgram(p) {
     var names = { n: p.name.join(', '), fi: p.nameFi.join(', '), sv: p.nameSv.join(', '), other: p.nameOther.join(', ')}
     var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
-
-    var classifications = p.classifications.map(function(c, index) {
-      var registrationDate = utils.asDate(c.registrationDate) || 'Tuntematon rekisteröintiaika'
-      return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
-    })
-
-    var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
-      return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDate(draft.creationDate)).end()
-    })
-
-    var $e = $detailTemplate.clone()
+    return $detailTemplate.clone()
       .data('id', p._id)
       .find('.sequenceId').text(p.sequenceId).end()
       .find('.primary-name').text(p.name[0]).end()
@@ -35,8 +31,18 @@ function programBox() {
       .find('.directors').labeledText(p.directors.join(', ')).end()
       .find('.actors').labeledText(p.actors.join(', ')).end()
       .find('.synopsis').labeledText(p.synopsis).end()
-      .find('.classifications').html(classifications).end()
-      .find('.drafts').html(drafts).end()
+  }
+
+  function renderClassifications($e, p) {
+    var classificationLinks = p.classifications.map(function(c, index) {
+      var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
+      return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
+    })
+    var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
+      return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDate(draft.creationDate)).end()
+    })
+
+    $e.find('.classifications').html(classificationLinks).end().find('.drafts').html(drafts).end()
 
     if (p.classifications[0]) {
       var c = p.classifications[0]
@@ -44,13 +50,10 @@ function programBox() {
       $e.find('.current-format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
         .find('.current-duration').labeledText(c.duration).end()
     }
-
     $e.on('click', '.classification', function() {
       $(this).addClass('selected').siblings('.selected').removeClass('selected')
       renderClassification($e, p, $(this).data('classification'))
     })
-
-    return $e
   }
 
   function renderClassification($e, p, c) {

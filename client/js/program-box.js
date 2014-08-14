@@ -1,12 +1,16 @@
 function programBox() {
   var $detailTemplate = $('#templates > .program-box').clone()
+  var $classificationTemplates = {
+    normal: $('#templates > .program-box-normal-classification-details').clone(),
+    tvSeries: $('#templates > .program-box-tv-series-classification-details').clone()
+  }
   var $draftTemplate = $('<div>').html('Luokittelusta on käyttäjän <b></b> <span></span> tallentama luonnos.')
 
   return { render: render }
 
   function render(p) {
     var $e = renderProgram(p)
-    renderClassifications($e, p)
+    enums.util.isTvSeriesName(p) ? renderTvSeries($e, p) : renderClassifications($e, p)
     return $e
   }
 
@@ -33,6 +37,16 @@ function programBox() {
       .find('.synopsis').labeledText(p.synopsis).end()
   }
 
+  function renderTvSeries($e, p) {
+    var summary = classificationUtils.fullSummary(p)
+    $e.find('.classification-container').html($classificationTemplates.tvSeries.clone()).end()
+      .find('.agelimit').attr('src', ageLimitIcon(summary)).end()
+      .find('.warnings').html(warningIcons(summary)).end()
+      .find('.current-duration, .current-format').labeledText().end()
+      .find('.comment-container').remove().end()
+
+  }
+
   function renderClassifications($e, p) {
     var classificationLinks = p.classifications.map(function(c, index) {
       var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
@@ -42,6 +56,7 @@ function programBox() {
       return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDate(draft.creationDate)).end()
     })
 
+    $e.find('.classification-container').html($classificationTemplates.normal.clone())
     $e.find('.classifications').html(classificationLinks).end().find('.drafts').html(drafts).end()
 
     if (p.classifications[0]) {

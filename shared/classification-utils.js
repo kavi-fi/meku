@@ -29,7 +29,7 @@ var summary = exports.summary = function(classification) {
   return { age: maxAgeLimit, warnings: warnings }
 }
 
-var tvSeriesClassification = function(program) {
+var tvSeriesClassification = exports.tvSeriesClassification = function(program) {
   return {
     criteria: program.tvSeriesCriteria,
     legacyAgeLimit: program.tvSeriesLegacyAgeLimit,

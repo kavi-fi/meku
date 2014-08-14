@@ -624,20 +624,20 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     })
 
     function verifyValidAuthor(program, callback) {
-      var userName = program.classifications[0].author.name
-      var user = _.find(req.account.users, { name: userName })
+      var username = program.classifications[0].author.name
+      var user = _.find(req.account.users, { username: username })
       if (user) {
         program.classifications[0].author._id = user._id
-        User.findOne({ username: userName, active: true }, { _id: 1 }).lean().exec(function(err, doc) {
+        User.findOne({ username: username, active: true }, { _id: 1 }).lean().exec(function(err, doc) {
           if (err) return callback(err)
           if (doc) {
             return callback()
           } else {
-            return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + userName)
+            return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
           }
         })
       } else {
-        return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + userName)
+        return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
       }
     }
 

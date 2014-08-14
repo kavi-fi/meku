@@ -29,7 +29,7 @@ function demoAccounts(callback) {
     async.map(a.users, function(username, callback) {
       schema.User.findOne({ username: username }, null, function(err, user) {
         if (err) return callback(err)
-        return callback(null, {_id: user._id, name: user.username})
+        return callback(null, {_id: user._id, username: user.username})
       })
     }, function(err, users) {
       if (err) return callback(err)

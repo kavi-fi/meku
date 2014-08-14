@@ -70,6 +70,10 @@ utils.asDateTime = function(date) {
   return date ? moment(date).format(df) : ''
 }
 
+utils.asDate = function(date) {
+  return date ? moment(date).format(utils.dateFormat) : ''
+}
+
 utils.getProperty = function(obj, prop) {
   var path = prop.split('.')
   // Retrieve nested properties like object.billing.address

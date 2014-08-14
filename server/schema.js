@@ -22,7 +22,7 @@ var classification = {
   legacyAgeLimit: Number,
   creationDate: Date,
   registrationDate: Date,
-  registrationEmailAddresses: [{email: String, manual: Boolean}],
+  registrationEmailAddresses: [String],
   comments: String,
   publicComments: String,
   reason: Number,
@@ -56,6 +56,7 @@ var ProgramSchema = new Schema({
   series: { _id: { type: ObjectId, index:true }, name: String },
   tvSeriesCriteria: [Number],
   tvSeriesLegacyAgeLimit: Number,
+  sentRegistrationEmailAddresses: [String],
   createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })

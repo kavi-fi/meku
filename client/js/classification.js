@@ -278,112 +278,54 @@ function classificationFormUtils() {
   function registrationEmails($form, saveFn) {
     var $emails = $form.find('.classification-email .emails')
     var $preview = $form.find('.classification-email .email-preview')
-    var $input = $emails.find('input[name=registration-email]')
+    var $input = $form.find('input[name="classification.registrationEmailAddresses"]')
     var currentBuyerId = null
 
-    validateTextChange($input, isEmail)
-    requiredCheckboxGroup($emails)
-    $input.trigger('validate')
-
-    $emails.find('ul').on('change', 'input', saveEmailState)
-
-    $input.keypress(function(e) {
-      if (e.which == 13) {
-        e.preventDefault()
-        addEmail()
-      }
+    $input.select2({tags: [], formatNoMatches: ''}).on('change', function() {
+      var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).pluck('id').value()
+      saveFn($(this).attr('name'), manual)
     })
 
-    $emails.find('button.add-registration-email').on('click', function(e) {
-      e.preventDefault()
-      addEmail()
-    })
+    validateTextChange($input, isMultiEmail)
 
     function render(program, classification, rootEditMode) {
-      classification.registrationEmailAddresses
-        .filter(function(e) { return !e.manual })
-        .map(function(e) { return e.email })
-        .forEach(addBuyerEmailCheckbox(true))
       if (rootEditMode) {
-        $emails.remove()
-        $preview.parent().removeClass('right')
+        $form.find('button[name=register]').remove()
+        $input.select2('enable', false)
       }
       update(program, classification, rootEditMode)
       return this
     }
 
     function update(program, classification, rootEditMode) {
-      var buyerEmails = classification.registrationEmailAddresses
-        .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
-      var manualEmails = classification.registrationEmailAddresses
-        .filter(function(email) { return email.manual }).map(function(e) { return e.email })
-
-      var manualInDom = $emails.find('ul.manual li input').map(function() { return $(this).val() }).get()
-      manualEmails.filter(function(email) { return notIn(manualInDom, email) })
-        .forEach(addManualEmailCheckbox(true))
-
-      var email = classificationUtils.registrationEmail(program, classification, user)
-
-      if (rootEditMode) {
-        $.get('/programs/'+program._id+'/registrationEmails', function(emails) {
-          $preview.find('.recipients').text(_.pluck(emails, 'email').join(', '))
-        })
-      } else {
-        $preview.find('.recipients').text(email.recipients.join(', '))
-      }
-
-      $preview.find('.subject').text(email.subject)
-      $preview.find('.body').html(email.body)
-
       if (shouldUpdateBuyer(classification)) {
         currentBuyerId = classification.buyer._id
-        $.get('/accounts/' + currentBuyerId).done(function(data) {
-          // Remove all email addresses linked to the selected buyer
-          $emails.find('ul.buyer li').remove()
-          data.emailAddresses.forEach(function(email) {
-            if (notIn(buyerEmails, email)) {
-              addBuyerEmailCheckbox(false, email)
-            } else {
-              addBuyerEmailCheckbox(true, email)
-            }
-          })
-          $emails.find('ul li input:checkbox').trigger('validate')
+        $.get('/accounts/' + currentBuyerId).done(function(account) {
+          updateEmails('buyer', account.emailAddresses)
         })
-      } else {
-        $emails.find('ul li input:checkbox').trigger('validate')
       }
-    }
 
-    function addEmail() {
-      if ($input.hasClass('invalid')) return
-      addManualEmailCheckbox(true, $input.val())
-      $input.val('')
-      saveEmailState()
-    }
+      updateEmails('sent', program.sentRegistrationEmailAddresses)
+      updateEmails('manual', classification.registrationEmailAddresses)
 
-    function saveEmailState() {
-      var buyerEmails = $emails.find('ul.buyer input:checked')
-        .map(function() { return $(this).val() }).get()
-        .map(function(email) { return {email: email, manual: false}})
+      function updateEmails(source, emails) {
+        var current = $input.select2('data')
+        var bySource = _.curry(function(source, e) { return e.source == source })
+        var toOption = _.curry(function(source, locked, e) { return {id: e, text: e, locked: locked, source: source } })
+        var sent = source == 'sent' ? emails.map(toOption('sent', true)) : current.filter(bySource('sent'))
+        var buyer = source == 'buyer' ? emails.map(toOption('buyer', true)) : current.filter(bySource('buyer'))
+        var manual = source == 'manual' ? emails.map(toOption('manual', false)) : current.filter(bySource('manual'))
+        $input.select2('data', sent.concat(buyer).concat(manual)).trigger('validate')
+      }
 
-      var manualEmails = $emails.find('ul.manual input:checked')
-        .map(function() { return $(this).val() }).get()
-        .map(function(email) { return {email: email, manual: true}})
-
-      saveFn($emails.find('ul li input:first').attr('name'), buyerEmails.concat(manualEmails))
+      var email = classificationUtils.registrationEmail(program, classification, user)
+      $preview.find('.subject').text(email.subject)
+      $preview.find('.body').html(email.body)
     }
 
     function shouldUpdateBuyer(cl) {
       return cl && cl.buyer && cl.buyer._id != currentBuyerId
     }
-
-    function addEmailCheckbox($el, checked, email) {
-      var $input = $('<input>', { type: 'checkbox', checked: !!checked, name: 'classification.registrationEmailAddresses', value: email })
-      $el.append($('<li>').append($('<label>').append($input).append($('<span>').text(email))))
-    }
-
-    var addBuyerEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.buyer'))
-    var addManualEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.manual'))
 
     return { render: render, update: update}
   }

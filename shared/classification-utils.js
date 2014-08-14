@@ -98,12 +98,6 @@ exports.registrationEmail = function(program, classification, user) {
   var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
   var buyer = classification.buyer ? classification.buyer.name : ''
   var classificationSummary = summary(classification)
-  var recipients = classification.registrationEmailAddresses.map(function(e) { return e.email })
-
-  function previousRecipients(classifications) {
-    var old = _.find(classifications, function(c) { return String(c._id) != String(classification._id) })
-    return old ? old.registrationEmailAddresses.map(function(email) { return email.email }) : []
-  }
 
   var data = {
     date: dateString,
@@ -120,7 +114,7 @@ exports.registrationEmail = function(program, classification, user) {
   }
 
   return {
-    recipients: recipients.concat(previousRecipients(program.classifications)),
+    recipients: program.sentRegistrationEmailAddresses,
     from: "no-reply@kavi.fi",
     subject: _.template(subject, data),
     body: _.template(text, data)

@@ -206,6 +206,10 @@ function isEmail(txt) {
   return regexp.test(txt)
 }
 
+function isMultiEmail(xs) {
+  return _.all(xs.split(','), isEmail)
+}
+
 function validate(f) {
   return function() {
     $(this).toggleClass('invalid', !f($(this).val())).trigger('validation')
@@ -215,14 +219,6 @@ function validate(f) {
 function validateTextChange($el, validatorFn) {
   var validator = validate(validatorFn)
   $el.on('input change validate', validator).on('blur', function() { $(this).addClass('touched') })
-}
-
-function requiredCheckboxGroup($el) {
-  function validate() {
-    $el.toggleClass('invalid', $el.find('input:checkbox:checked').length == 0).trigger('validation')
-  }
-  $el.on('validate', validate)
-  $el.on('change validate', 'input:checkbox', validate)
 }
 
 function showDialog($html) {

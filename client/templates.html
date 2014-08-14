@@ -394,27 +394,16 @@
       <div class="program-box-container"></div>
     </div>
     <div class="classification-email row">
-      <div class="content">
-        <h2 class="main">Luokittelupäätös</h2>
-        <div class="emails left required-pseudo">
-          <h3 class="main">Lähetä luokittelupäätös</h3>
-          <ul class="buyer"></ul>
-          <ul class="manual"></ul>
-          <div>
-            <label>Lisää sähköpostiosoite: <input type="text" class="email" name="registration-email"/></label><button class="button add-registration-email">Lisää</button>
-          </div>
-          <button name="register" disabled class="button">Rekisteröi</button>
+      <div class="content preview">
+        <h3 class="main">Lähetä luokittelupäätös</h3>
+        <div class="email-preview box">
+          <dl>
+            <dt class="recipients">Vastaanottajat</dt><dd><input name="classification.registrationEmailAddresses" type="hidden" /></dd>
+            <dt>Aihe</dt><dd class="subject"></dd>
+          </dl>
+          <div class="body"></div>
         </div>
-        <div class="preview right">
-          <h3 class="main">Luokittelupäätöksen esikatselu</h3>
-          <div class="email-preview box">
-            <dl>
-              <dt>Vastaanottajat</dt><dd class="recipients"></dd>
-              <dt>Aihe</dt><dd class="subject"></dd>
-            </dl>
-            <div class="body"></div>
-          </div>
-        </div>
+        <button name="register" disabled class="button">Rekisteröi</button>
       </div>
     </div>
   </form>

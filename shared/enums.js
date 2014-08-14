@@ -174,8 +174,8 @@ enums.classificationStatus = [
   'reclassification1',
   'reclassification3',
   'registered',
-  'disapproved',
   'in_process'
+  //'disapproved',
   // 'in_pocess',
   // NULL,
 ]

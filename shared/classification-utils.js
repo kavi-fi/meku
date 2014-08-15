@@ -120,10 +120,19 @@ exports.registrationEmail = function(program, classification, user) {
     } else return {}
   }
 
+  function programName() {
+    var name = program.name.join(', ')
+    if (enums.util.isTvEpisode(program) && program.series && program.episode) {
+      return program.series.name + ': jakso ' + program.episode + ' ' + name
+    } else {
+      return name
+    }
+  }
+
   var data = {
     date: dateString,
     buyer: buyer,
-    name: program.name.join(', '),
+    name: programName(),
     year: program.year || '',
     classification: classificationText(classificationSummary),
     classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),

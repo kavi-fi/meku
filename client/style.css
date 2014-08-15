@@ -591,6 +591,9 @@ textarea.invalid:disabled,
 .classification-email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
 .classification-email .emails input.email.invalid.touched { background-color: #F0FFF0; }
 
+#classification-page .register { padding: 25px 0; }
+#classification-page .register button { font-size: 25px; width: 100%; }
+
 #billing-page .datepicker {
   cursor: pointer;
   border: 1px solid #ccc;

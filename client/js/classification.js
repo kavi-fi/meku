@@ -93,17 +93,18 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function configureValidation() {
     $form.on('validation', function() {
       // For select2's, we only care about the original element from which the invalid class has been removed
-      var required = $form.find('.required.invalid, .required-pseudo.invalid')
+      var required = $form.find('.required.invalid')
         .not('.select2-container.required.invalid')
         .not('.select2-drop.required.invalid')
         .not('input:disabled, textarea:disabled')
       // Enable to log validation:
-      // required.length == 0 ? console.log('valid.') : console.log('invalid: ', required.map(function() { return $(this).prop('name') || this.classList[0] }).toArray())
+      // required.length == 0 ? console.log('valid.') : console.log('invalid: ', required.map(function() { return $(this).prop('name') }).toArray())
       $form.find('button[name=register]').prop('disabled', required.length > 0)
     })
     validateTextChange($form.find('.required'), isNotEmpty)
     validateTextChange($form.find('input[name=year]'), utils.isValidYear)
     validateTextChange($form.find('.duration'), utils.isValidDuration)
+    validateTextChange($form.find('input[name="classification.registrationEmailAddresses"]'), isMultiEmail)
     $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
     $form.find('.required').trigger('validate')
   }
@@ -286,7 +287,6 @@ function classificationFormUtils() {
       saveFn($(this).attr('name'), manual)
     })
 
-    validateTextChange($input, isMultiEmail)
 
     function render(program, classification, rootEditMode) {
       if (rootEditMode) {

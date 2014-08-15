@@ -95,7 +95,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       // For select2's, we only care about the original element from which the invalid class has been removed
       var required = $form.find('.required.invalid, .required-pseudo.invalid')
         .not('.select2-container.required.invalid')
+        .not('.select2-drop.required.invalid')
         .not('input:disabled, textarea:disabled')
+      // Enable to log validation:
+      // required.length == 0 ? console.log('valid.') : console.log('invalid: ', required.map(function() { return $(this).prop('name') || this.classList[0] }).toArray())
       $form.find('button[name=register]').prop('disabled', required.length > 0)
     })
     validateTextChange($form.find('.required'), isNotEmpty)

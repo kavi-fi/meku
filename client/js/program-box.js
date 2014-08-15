@@ -45,6 +45,37 @@ function programBox() {
       .find('.current-duration, .current-format').labeledText().end()
       .find('.comment-container').remove().end()
 
+    var $episodes = $e.find('.episodes')
+    var $episodeHeader = $e.find('.episode-container > h3')
+
+    $.get('/episodes/'+ p._id).done(function(episodes) {
+      if (episodes.length == 0) {
+        $episodeHeader.find('.fa-play').remove().end().text('Ei jaksoja.')
+        $episodes.remove()
+      } else {
+        $episodeHeader.append(' '+episodes.length + ' kpl').click(function() {
+          $(this).toggleClass('open')
+          $episodes.slideToggle()
+        })
+        $episodes.append(episodes.map(function(p) {
+          return $('<div>').addClass('result').data('id', p._id).data('program', p)
+            .append($('<span>').text(utils.seasonEpisodeCode(p)))
+            .append($('<span>').text(p.name[0]))
+            .append($('<span>').text(utils.asDate(utils.getProperty(p, 'classifications.0.registrationDate'))))
+            .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
+        }))
+      }
+    })
+    $episodes.on('click', '.result', function(e) {
+      e.stopPropagation()
+      var $result = $(this)
+      $result.siblings('.selected').removeClass('selected').next('.program-box').slideUp(function() { $(this).remove() }).end()
+      if ($result.hasClass('selected')) {
+        $result.removeClass('selected').next('.program-box').slideUp(function() { $(this).remove() }).end()
+      } else {
+        $result.addClass('selected').after(programBox().render($result.data('program')).slideDown())
+      }
+    })
   }
 
   function renderClassifications($e, p) {
@@ -56,8 +87,10 @@ function programBox() {
       return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDateTime(draft.creationDate)).end()
     })
 
-    $e.find('.classification-container').html($classificationTemplates.normal.clone())
-    $e.find('.classifications').html(classificationLinks).end().find('.drafts').html(drafts).end()
+    $e.find('.classification-container').html($classificationTemplates.normal.clone()).end()
+      .find('.classifications').html(classificationLinks).end()
+      .find('.drafts').html(drafts).end()
+      .find('.episode-container').remove().end()
 
     if (p.classifications[0]) {
       var c = p.classifications[0]

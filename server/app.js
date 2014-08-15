@@ -184,6 +184,10 @@ function search(responseFields, req, res, next) {
   }
 }
 
+app.get('/episodes/:seriesId', function(req, res, next) {
+  Program.find({ 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).exec(respond(res, next))
+})
+
 app.get('/programs/drafts', function(req, res, next) {
   Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }, function(err, programs) {
     if (err) return next(err)
@@ -766,7 +770,7 @@ function authenticate(req, res, next) {
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash'
   ]
-  var optionalList = ['GET:/programs/search/']
+  var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
 
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()

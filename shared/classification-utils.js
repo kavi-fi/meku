@@ -42,7 +42,17 @@ var classificationText = function(summary) {
     return 'Kuvaohjelma on sallittu.'
   } else {
     return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age)
-         + ' vuotta ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+         + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+         + criteriaText(summary.warnings) + '.'
+  }
+}
+
+var previousClassificationText = function(summary) {
+  if (summary.age == 0) {
+    return 'sallituksi.'
+  } else {
+    return 'ikärajaksi ' + ageAsText(summary.age)
+         + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
          + criteriaText(summary.warnings) + '.'
   }
 }
@@ -85,11 +95,12 @@ exports.registrationEmail = function(program, classification, user) {
   var reclassification = isReclassification(program, classification)
   var text =
     "<p><%- date %><br/><%- buyer %></p><p>" +
-    (reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
-    "<p>" + ((user.role == 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : "<%- classifier %>") +
-    ' on <%- date %> luokitellut kuvaohjelman <%- name %>. <%- classification %></p>' +
-    ((user.role == 'kavi' && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>. Perustelut: <%- publicComments %></p>' : '') +
-    ((user.role == 'kavi') ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
+    (reclassification ? "Ilmoitus kuvaohjelman uudelleen luokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
+    "<p>" + ((utils.hasRole(user, 'kavi')) ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : "<%- classifier %>") +
+    ' on <%- date %> ' + (reclassification ? 'uudelleen' : '') + ' luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
+    (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
+    ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleen luokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
+    ((utils.hasRole(user, 'kavi')) ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
     '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
     'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
@@ -98,6 +109,17 @@ exports.registrationEmail = function(program, classification, user) {
   var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
   var buyer = classification.buyer ? classification.buyer.name : ''
   var classificationSummary = summary(classification)
+
+  function previousClassification() {
+    if (reclassification) {
+      var previous = program.classifications[0]
+      var date = new Date(previous.registrationDate)
+      return {
+        criteriaText: previousClassificationText(summary(previous)),
+        date: date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear(),
+      }
+    } else return {}
+  }
 
   var data = {
     date: dateString,
@@ -110,7 +132,8 @@ exports.registrationEmail = function(program, classification, user) {
     publicComments: classification.publicComments,
     authorEmail: user.email,
     classifier: user.name,
-    reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty'
+    reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
+    previous: previousClassification()
   }
 
   return {

@@ -150,12 +150,13 @@ app.post('/reset-password', function(req, res, next) {
   }
 })
 
-app.get('/public/search/:q?', function(req, res, next) {
-  search(Program.publicFields, req, res, next)
-})
 app.get('/programs/search/:q?', function(req, res, next) {
-  var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
-  search(fields, req, res, next)
+  if (req.user) {
+    var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
+    search(fields, req, res, next)
+  } else {
+    search(Program.publicFields, req, res, next)
+  }
 })
 
 function search(responseFields, req, res, next) {
@@ -760,22 +761,28 @@ function nocache(req, res, next) {
 
 function authenticate(req, res, next) {
   var whitelist = [
-    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html', 'GET:/public/search/',
+    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash'
   ]
+  var optionalList = ['GET:/programs/search/']
+
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
   if (isWhitelistedPath) return next()
+  var isOptional =  _.any(optionalList, function(p) { return url.indexOf(p) == 0 })
   var cookie = req.signedCookies.user
   if (cookie) {
     req.user = cookie
     req.user.ip = getIpAddress(req)
     return next()
+  } else if (isOptional) {
+    return next()
+  } else {
+    return res.send(403)
   }
-  return res.send(403)
 }
 
 function authenticateXmlApi(req, res, next) {

@@ -1,5 +1,5 @@
 function publicSearchPage() {
-  searchPage('/public/search/')
+  searchPage()
 
   var $page = $('#search-page')
   $page.find('.new-classification').remove()
@@ -15,7 +15,7 @@ function publicSearchPage() {
 }
 
 function internalSearchPage() {
-  var searchPageApi = searchPage('/programs/search/')
+  var searchPageApi = searchPage()
 
   var $page = $('#search-page')
   var $results = $page.find('.results').add($page.find('.recent'))
@@ -252,7 +252,7 @@ function internalSearchPage() {
   }
 }
 
-function searchPage(baseUrl) {
+function searchPage() {
   var $page = $('#search-page').html($('#templates .search-page').clone())
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
@@ -327,7 +327,7 @@ function searchPage(baseUrl) {
 
   function load(callback) {
     $loading.show()
-    var url = baseUrl+encodeURIComponent(state.q)
+    var url = '/programs/search/'+encodeURIComponent(state.q)
     var data = $.param({ page: state.page, filters: currentFilters() })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return

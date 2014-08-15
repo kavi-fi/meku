@@ -187,6 +187,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     cfu.updateWarningOrdering($form, updatedClassification)
     $form.find('.program-box-container').html(detailRenderer.render(cfu.cloneForProgramBox(updatedProgram, classificationFinder, rootEditMode)).show())
     $form.find('.program-box-container .buttons').remove()
+    if (rootEditMode) $form.find('.program-box-container .classifications .classification[data-id="'+updatedClassification._id+'"]').click()
     emailRenderer.update(updatedProgram, updatedClassification, rootEditMode)
   }
 }

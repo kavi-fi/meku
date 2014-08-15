@@ -38,7 +38,9 @@ body {
   padding: 10px 50px;
 }
 
-#register-provider { width: 100%; text-align: center; }
+#register-provider { width: 600px; margin: 0 auto; }
+#register-provider h2 { text-align: center; }
+#register-provider .feedback { padding: 10px; }
 
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;

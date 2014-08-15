@@ -29,7 +29,9 @@ var locationFieldMap = {
   'Sähköpostiosoite': 'emailAddresses',
   'Laskutuskieli': 'language',
   'Tarjoamistapa': 'providingType',
-  'Lasku pääorganisaatiolle': 'isPayer'
+  'Lasku pääorganisaatiolle': 'isPayer',
+  'K18 ohjelmia': 'adultContent',
+  'Pelejä (ei PEGI)': 'gamesWithoutPegi'
 }
 
 exports.import = function(file, callback) {
@@ -46,7 +48,6 @@ exports.import = function(file, callback) {
   }
 
   var provider = createObjectAndSetValuesWithMap(providerAndLocations.provider, providerFieldMap)
-  if (!isValidProvider(provider)) return callback({ message: 'Tarjoajan pakollisia tietoja ei ole annettu' })
 
   new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
     if (err) return callback(err)
@@ -55,8 +56,7 @@ exports.import = function(file, callback) {
 
     async.forEach(providerAndLocations.locations, function(location, callback) {
       location = createObjectAndSetValuesWithMap(location, locationFieldMap)
-      if (!isValidLocation(location)) return callback({ message: 'Tarjoamispaikan pakollisia tietoja ei ole annettu' })
-
+      location.providingType = location.providingType.split(',')
       location.provider = provider._id
       new schema.ProviderLocation(location).save(function(err, location) {
         if (err) return callback(err)
@@ -70,30 +70,54 @@ exports.import = function(file, callback) {
       })
     })
   })
-
-  function isValidProvider(provider) {
-    return !_.isUndefined(provider.name)
-  }
-
-  function isValidLocation(location) {
-    return !_.isUndefined(location.name)
-  }
 }
 
 function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
   var providerSheet = providerSpreadSheet.Sheets['Tarjoajan yhteystiedot']
 
-  return {
-    provider: _.merge(
-      parseFieldRowAndValueRowAfterColumn(providerSheet, 'Tarjoaja'), {
-        Laskutus: parseFieldRowAndValueRowAfterColumn(providerSheet, 'Laskutustiedot')
-      }),
-    locations: parseFieldRowAndValueRows(providerSpreadSheet.Sheets['Tarj.paikan yht.tiedot ja tapa'])
+  var requiredProviderFields = {
+    name: 'Tarjoajan yhteystiedot',
+    values: [
+      'Yritys/Toiminimi', 'Y-tunnus', 'Tarjoajan yht.hlö', 'Lähiosoite', 'Postinro', 'Postitoimipaikka',
+      'Puh.nro', 'Kotipaikka', 'Asiointikieli'
+    ]
   }
 
-  function parseFieldRowAndValueRowAfterColumn(sheet, column) {
+  var requiredBillingFields = {
+    name: 'Tarjoajan laskutustiedot',
+    values: [
+      'Yritys / toiminimi', 'Yht.hlö', 'Postiosoite', 'Postinro', 'Postitoimipaikka', 'Maa', 'Puh.nro',
+      'Asiointikieli', 'Laskutuskieli'
+    ]
+  }
+
+  var requiredLocationFields = {
+    name: 'Tarj.paikan yht.tiedot ja tapa',
+    values: [
+      'Tarjoamispaikan nimi', 'Tarjoamistapa', 'K18 ohjelmia', 'Pelejä (ei PEGI)', 'Yht.hlö', 'Käyntiosoite',
+      'Postinro', 'Postitoimipaikka', 'Puh.nro', 'Lasku pääorganisaatiolle', 'Asiointikieli',
+    ]
+  }
+
+  var errors = []
+
+  var providerData = parseFieldRowAndValueRowAfterColumn(providerSheet, 'Tarjoaja', requiredProviderFields)
+  var billingData = parseFieldRowAndValueRowAfterColumn(providerSheet, 'Laskutustiedot', requiredBillingFields)
+  var locationsData = parseFieldRowAndValueRows(providerSpreadSheet.Sheets['Tarj.paikan yht.tiedot ja tapa'],
+    requiredLocationFields)
+
+  if (locationsData.length === 0) errors.push('Tarjoamispaikkojen tiedot puuttuvat')
+
+  if (errors.length > 0) throw { message: errors.join(', ') }
+
+  return {
+    provider: _.merge(providerData, { Laskutus: billingData }),
+    locations: locationsData
+  }
+
+  function parseFieldRowAndValueRowAfterColumn(sheet, column, requiredFields) {
     var rowNumber = findColumnRowByValue(sheet, column)
-    return toObject(getFields(sheet, rowNumber + 1), getValues(sheet, rowNumber + 2))
+    return toObject(getFields(sheet, rowNumber + 1), getValues(sheet, rowNumber + 2), requiredFields)
   }
 
   function findColumnRowByValue(from, value) {
@@ -108,16 +132,31 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
 
     return columnRowNumber
 
-    function parseRowNumber(key) {
-      return parseInt(key.substring(key.search(/\d/)))
-    }
+    function parseRowNumber(key) { return parseInt(key.substring(key.search(/\d/))) }
   }
 
-  function toObject(fields, values) {
-    return _.reduce(values, function(result, value) {
+  function toObject(fields, values, requiredFields) {
+    fields = _.clone(fields)
+    var object = _.reduce(values, function(result, value) {
       result[fields[value[0]]] = value[1]
+      delete fields[value[0]]
       return result
     }, {})
+
+    if (requiredFields) {
+      _.forEach(fields, function (field) {
+        if (_.contains(requiredFields.values, field)) {
+          var errorString = '<%- name %> pakollinen kenttä "<%- field %>" puuttuu'
+          if (requiredFields.row) errorString = 'Rivillä <%- row %>. ' + errorString
+
+          errors.push(_.template(errorString, {
+            name: requiredFields.name, field: field, row: requiredFields.row
+          }))
+        }
+      })
+    }
+
+    return object
   }
 
   function getFields(from, row) {
@@ -133,12 +172,10 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
       return result
     }, [])
 
-    function parseColumnKey(key) {
-      return key.substring(0, key.search(/\d/))
-    }
+    function parseColumnKey(key) { return key.substring(0, key.search(/\d/)) }
   }
 
-  function parseFieldRowAndValueRows(sheet) {
+  function parseFieldRowAndValueRows(sheet, requiredFields) {
     var fields = getFields(sheet, 1)
 
     var index = 2
@@ -147,7 +184,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
     while (true) {
       var currentValues = getValues(sheet, index)
       if (currentValues.length > 0) {
-        values.push(toObject(fields, currentValues))
+        values.push(toObject(fields, currentValues, _.merge(requiredFields, { row: index })))
         index += 1
       }
       else return values

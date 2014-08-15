@@ -152,7 +152,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
-      $buyerAndBilling.removeClass('touched').select2('enable', enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate')
+      $buyerAndBilling.removeClass('touched').select2('enable', enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
     })
 
     $form.on('click', '.category .criteria', function() {

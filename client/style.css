@@ -166,7 +166,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 .controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
 
-.result { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; padding: 10px 0; }
+.result, .location-row { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; padding: 10px 0; }
 .result.inactive { color: #afafaf; }
 
 .search-label { display: block; padding: 0 0 20px 0; width: 350px; }
@@ -699,6 +699,8 @@ textarea.invalid:disabled,
 #provider-page .controls button[name=new-provider] { float: right; }
 #provider-page .emails { float: right; margin-right: 34px; }
 #provider-page .emails .select2-choices { overflow: auto; }
+#provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
+#provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
 
 .change-log a { color: #00BB88; cursor: pointer; margin-top: 10px; display: inline-block; }
 .change-log span, label, pre { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }

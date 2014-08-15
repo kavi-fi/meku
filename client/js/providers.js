@@ -190,8 +190,10 @@ function providerPage() {
     $providerDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
 
     var locations = provider ? provider.locations.map(function(location) {
-      return $('<div>').text(location.name)
+      return $('<div>', { 'data-id': location._id, class: 'location-row' }).text(location.name).data('location', location)
     }) : ''
+
+    var $locations = $('<div>', { class: 'locations' }).html(locations)
 
     $providerDetails
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
@@ -200,8 +202,22 @@ function providerPage() {
       .find('input[name=billing-extra]').prop('checked', provider && !!provider.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
-      .append($('<div>', { class: 'locations' }).html(locations))
+      .append($locations)
 
+    $locations.on('click', '.location-row', function() {
+      var $this = $(this)
+      var wasSelected = $this.hasClass('selected')
+
+      $providerDetails.find('.selected').removeClass('selected')
+      $providerDetails.find('.location-details').slideUp()
+
+      if (!wasSelected) {
+        var $locationDetails = renderLocationDetails($this.data('location'), setInputValWithProperty)
+
+        $this.addClass('selected').after($locationDetails)
+        $locationDetails.slideDown()
+      }
+    })
 
     toggleBillingExtra($providerDetails)
 
@@ -210,7 +226,12 @@ function providerPage() {
     function setInputValWithProperty(object) {
       var name = $(this).attr('name')
       var property = utils.getProperty(object, name)
-      if (property !== undefined) $(this).val(property)
+
+      if ($(this).attr('type') === 'checkbox') {
+        $(this).prop('checked', property || false)
+      } else {
+        if (property !== undefined) $(this).val(property)
+      }
     }
 
     function userToSelect2Option(user) {
@@ -235,6 +256,15 @@ function providerPage() {
         $eInvoiceInputs.prop('disabled', type === 'address')
       }
     }
+  }
+
+  function renderLocationDetails(location, setInputWithFunction) {
+    var $locationDetails = $('#templates').find('.location-details').clone()
+    $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputWithFunction, location))
+    $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
+      .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
+
+    return $locationDetails
   }
 
   function select2OptionToIdNamePair(x) {

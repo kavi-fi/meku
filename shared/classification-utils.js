@@ -96,8 +96,7 @@ exports.registrationEmail = function(program, classification, user) {
   var text =
     "<p><%- date %><br/><%- buyer %></p><p>" +
     (reclassification ? "Ilmoitus kuvaohjelman uudelleen luokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
-    "<p>" + ((utils.hasRole(user, 'kavi')) ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : "<%- classifier %>") +
-    ' on <%- date %> ' + (reclassification ? 'uudelleen' : '') + ' luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
+    '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : '') + ' luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
     (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
     ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleen luokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
     ((utils.hasRole(user, 'kavi')) ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
@@ -131,7 +130,7 @@ exports.registrationEmail = function(program, classification, user) {
     link: (user.role == 'kavi') ? linkKavi : linkOther,
     publicComments: classification.publicComments,
     authorEmail: user.email,
-    classifier: user.name,
+    classifier: utils.hasRole(user, 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name,
     reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
     previous: previousClassification()
   }

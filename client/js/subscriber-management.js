@@ -46,9 +46,6 @@ function subscriberManagementPage() {
     $newSubscriberForm.find('.modify-only').remove()
 
     bindEventHandlers($newSubscriberForm, function(subscriberData) {
-      subscriberData.roles = $newSubscriberForm.find('input[name=roles]')
-        .filter(':checked').map(function() { return $(this).val() }).toArray()
-
       $.post('/accounts/', JSON.stringify(subscriberData), function(subscriber) {
         $subscribers.find('.result.selected').data('subscriber', subscriber)
         var $subscriber = renderSubscriber(subscriber).css('display', 'none')
@@ -56,15 +53,6 @@ function subscriberManagementPage() {
         $subscriber.slideToggle()
         closeDetails()
       })
-    })
-
-    $newSubscriberForm.find('input[name=roles]').on('change', function() {
-      var $roles = $newSubscriberForm.find('input[name=roles]')
-      if ($newSubscriberForm.find('input[name=roles]:checked').length >= 1) {
-        $roles.get().forEach(function(e) { e.setCustomValidity('') })
-      } else {
-        $roles.get().forEach(function(e) { e.setCustomValidity('You must choose at least one role') })
-      }
     })
 
     // This triggers validation for roles checkboxes, which are by default invalid
@@ -104,6 +92,9 @@ function subscriberManagementPage() {
       event.preventDefault()
 
       var subscriberData = {
+        roles: findInput('roles').filter(':checked').map(function() {
+          return $(this).val()
+        }).toArray(),
         name: findInput('name').val(),
         emailAddresses: _.pluck(findInput('emailAddresses').select2('data'), 'text'),
         yTunnus: findInput('yTunnus').val(),
@@ -184,6 +175,15 @@ function subscriberManagementPage() {
           closeDetails()
           $selected.slideUp(function() { $(this).remove() })
         })
+      }
+    })
+
+    $subscriberDetails.find('input[name=roles]').on('change', function() {
+      var $roles = $subscriberDetails.find('input[name=roles]')
+      if ($subscriberDetails.find('input[name=roles]:checked').length >= 1) {
+        $roles.get().forEach(function(e) { e.setCustomValidity('') })
+      } else {
+        $roles.get().forEach(function(e) { e.setCustomValidity('You must choose at least one role') })
       }
     })
   }

@@ -79,7 +79,7 @@ enums.roles = {
   'Provider': 'Tarjoaja',
   'Location_of_providing': 'Tarjoamispaikka',
   'Subscriber': 'Tilaaja',
-  'Classifier': 'Luokittelija',
+  'Classifier': 'Työnantaja/Luokitteluyritys',
   'Distributor': 'Levittäjä',
   'Other': 'Muu'
 }

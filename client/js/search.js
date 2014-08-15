@@ -7,7 +7,7 @@ function publicSearchPage() {
   $page.find('.recent').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program._id+']')
+    var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program.sequenceId+']')
     var subject = encodeURIComponent('Kuvaohjelman uudelleenluokittelupyyntö')
     var q = '?subject='+subject+'&body='+body
     $(this).find('.request-reclassification').attr('href', 'mailto:kavi@kavi.fi'+q).show()

@@ -167,7 +167,9 @@ var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocati
   language: String,
   providingType: [String],
   deleted: Boolean,
-  isPayer: Boolean
+  isPayer: Boolean,
+  adultContent: Boolean,
+  gamesWithoutPegi: Boolean
 })
 
 var UserSchema = new Schema({

@@ -357,7 +357,7 @@ function accounts(callback) {
   function locations(callback) {
     var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, bills_lang, bills_text, providing_type, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
-      ' ownership, phone_office, phone_alternate' +
+      ' ownership, phone_office, phone_alternate, pegi, k18' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
@@ -374,6 +374,8 @@ function accounts(callback) {
         approved: row.provider_status == 'Approved',
         deleted: false,
         language: langCode(trim(row.customer_lang)),
+        adultContent: row.k18,
+        gamesWithoutPegi: row.pegi
       }
     }
     

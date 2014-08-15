@@ -305,7 +305,9 @@ function classificationFormUtils() {
         })
       }
 
-      updateEmails('sent', program.sentRegistrationEmailAddresses)
+      var email = classificationUtils.registrationEmail(program, classification, user)
+
+      updateEmails('sent', email.recipients)
       updateEmails('manual', classification.registrationEmailAddresses)
 
       function updateEmails(source, emails) {
@@ -318,7 +320,6 @@ function classificationFormUtils() {
         $input.select2('data', sent.concat(buyer).concat(manual)).trigger('validate')
       }
 
-      var email = classificationUtils.registrationEmail(program, classification, user)
       $preview.find('.subject').text(email.subject)
       $preview.find('.body').html(email.body)
     }

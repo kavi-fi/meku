@@ -114,7 +114,7 @@ exports.registrationEmail = function(program, classification, user) {
   }
 
   return {
-    recipients: program.sentRegistrationEmailAddresses,
+    recipients: _.filter(program.sentRegistrationEmailAddresses, function(x) { return x != user.email }),
     from: "no-reply@kavi.fi",
     subject: _.template(subject, data),
     body: _.template(text, data)

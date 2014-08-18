@@ -239,6 +239,10 @@ function providerPage() {
       })
 
       setCommonValidators($form)
+
+      $form.find('input[name=isPayer]').on('change', function() {
+        $form.find('.required-if-payer').prop('required', this.checked)
+      })
     }
   }
 

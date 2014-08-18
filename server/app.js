@@ -457,6 +457,13 @@ app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
   })
 })
 
+app.put('/providerlocations/:id', requireRole('kavi'), function(req, res, next) {
+  ProviderLocation.findById(req.params.id, function(err, location) {
+    if (err) return next(err)
+    updateAndLogChanges(location, req.body, req.user, respond(res, next))
+  })
+})
+
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }, deleted: { $ne: true }}

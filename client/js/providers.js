@@ -79,71 +79,16 @@ function providerPage() {
     $form.submit(function(event) {
       event.preventDefault()
 
-      var providerData = {
-        name: findInput('name').val(),
-        emailAddresses: _.pluck(findInput('emailAddresses').select2('data'), 'text'),
-        yTunnus: findInput('yTunnus').val(),
-        address: {
-          street: findInput('address.street').val(),
-          city: findInput('address.city').val(),
-          zip: findInput('address.zip').val(),
-          country: findInput('address.country').val()
-        },
-        billing: {
-          invoiceText: $form.find('textarea[name="billing.invoiceText"]').val(),
-          language: findInput('billing.language').val(),
-          address: {
-            street: findInput('billing.address.street').val(),
-            city: findInput('billing.address.city').val(),
-            zip: findInput('billing.address.zip').val(),
-            country: findInput('billing.address.country').val()
-          }
-        },
-        eInvoice: {
-          address: findInput('eInvoice.address').val(),
-          operator: findInput('eInvoice.operator').val()
-        },
-        contactName: findInput('contactName').val(),
-        phoneNumber: findInput('phoneNumber').val(),
+      var specialFields = {
+        emailAddresses: _.pluck($form.find('input[name=emailAddresses').select2('data'), 'text'),
         billingPreference: $form.find('input[name=billing-extra]').prop('checked')
           ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
 
-      submitCallback(providerData)
-
-      function findInput(name) {
-        return $providerDetails.find('input[name="' + name + '"]')
-      }
+      submitCallback(_.merge(createDataObjectFromForm($form), specialFields))
     })
 
-    $form.find('input, textarea').on('input change', function() { $(this).addClass('touched') })
-
-    $form.find('input.select2-offscreen').on('change validate', function() {
-      $(this).toggleClass('invalid', !this.checkValidity())
-    })
-
-    $form.find('input.select2-offscreen').trigger('validate')
-
-    $form.on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
-
-    $form.on('validate', function() {
-      var enabled = $form.find('.touched').length > 0 && this.checkValidity()
-      $(this).find('button[type=submit]').prop('disabled', !enabled)
-    })
-
-    $form.find('input[name=emailAddresses]').on('change', function(event) {
-      var emails = event.val
-      if (!_.isEmpty(emails) && _.all(emails, validateEmail)) {
-        this.setCustomValidity('')
-      } else {
-        this.setCustomValidity('Invalid email')
-      }
-      $(this).trigger('validate')
-
-      function validateEmail(email) {
-        return new RegExp('.+@.+\\..+').test(email)
-      }
-    })
+    setCommonValidators($form)
 
     $providerDetails.find('button[name=remove]').click(function() {
       var $selected = $page.find('.result.selected')
@@ -200,10 +145,8 @@ function providerPage() {
     var $locations = $providerDetails.find('.locations')
 
     if (provider.locations) {
-      provider.locations.forEach(function (location) {
-        $('<div>', { 'data-id': location._id, class: 'location-row' }).text(location.name)
-          .data('location', location)
-          .appendTo($locations)
+      provider.locations.forEach(function(location) {
+        $locations.append(renderLocation(location))
       })
     }
 
@@ -211,8 +154,8 @@ function providerPage() {
       var $this = $(this)
       var wasSelected = $this.hasClass('selected')
 
-      $providerDetails.find('.selected').removeClass('selected')
-      $providerDetails.find('.location-details').slideUp(function() { $(this).remove() })
+      $locations.find('.selected').removeClass('selected')
+      $locations.find('.location-details').slideUp(function() { $(this).remove() })
 
       if (!wasSelected) {
         var $locationDetails = renderLocationDetails($this.data('location'))
@@ -266,13 +209,81 @@ function providerPage() {
       $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
         .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
 
+      bindEventHandlers($locationDetails, function(locationData) {
+        $.ajax('/providerlocations/' + location._id, { type: 'PUT', data: JSON.stringify(locationData) })
+          .done(function(location) {
+            $locations.find('.selected').replaceWith(renderLocation(location)).removeClass('selected')
+            $locations.find('.location-details').slideUp(function() { $(this).remove() })
+          })
+      })
+
       return $locationDetails
+    }
+
+    function renderLocation(location) {
+      return $('<div>', { 'data-id': location._id, class: 'location-row' }).text(location.name).data('location', location)
+    }
+
+    function bindEventHandlers($locationDetails, submitCallback) {
+      var $form = $locationDetails.find('form')
+
+      $form.submit(function (event) {
+        event.preventDefault()
+
+        var specialFields = {
+          emailAddresses: _.pluck($form.find('input[name=emailAddresses]').select2('data'), 'text'),
+          providingType: _.pluck($form.find('input[name=providingType]').select2('data'), 'id')
+        }
+
+        submitCallback(_.merge(createDataObjectFromForm($form), specialFields))
+      })
+
+      setCommonValidators($form)
     }
   }
 
-  function select2OptionToIdNamePair(x) {
-    if (!x) return null
-    return { _id: x.id, name: x.name }
+  function setCommonValidators($form) {
+    $form.find('input, textarea').on('input change', function () {
+      $(this).addClass('touched')
+    })
+
+    $form.find('input.select2-offscreen').on('change validate', function () {
+      $(this).toggleClass('invalid', !this.checkValidity())
+    })
+
+    $form.find('input.select2-offscreen').trigger('validate')
+
+    $form.on('input change', _.debounce(function () {
+      $(this).trigger('validate')
+    }, 200))
+
+    $form.on('validate', function () {
+      var enabled = $form.find('.touched').length > 0 && this.checkValidity()
+      $(this).find('button[type=submit]').prop('disabled', !enabled)
+    })
+
+    $form.find('input[name=emailAddresses]').on('change', function (event) {
+      var emails = event.val
+      if (!_.isEmpty(emails) && _.all(emails, validateEmail)) {
+        this.setCustomValidity('')
+      } else {
+        this.setCustomValidity('Invalid email')
+      }
+      $(this).trigger('validate')
+
+      function validateEmail(email) {
+        return new RegExp('.+@.+\\..+').test(email)
+      }
+    })
   }
 
+  function createDataObjectFromForm($form) {
+    var object = {}
+
+    $form.find('textarea[name], input[name]').each(function(index, elem) {
+      utils.setValueForPath(elem.name.split('.'), object, elem.type === 'checkbox' ? elem.checked : elem.value)
+    })
+
+    return object
+  }
 }

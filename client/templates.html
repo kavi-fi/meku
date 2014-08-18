@@ -333,8 +333,7 @@
     <button name="remove" type="button" class="button modify-only">Poista</button>
 
     <label>Tarjoamispaikan nimi <input type="text" name="name" required></label>
-    <!-- TODO: should be "Laskutetaan tarjoamispaikkaa", which is weird because of isPayer. -->
-    <label>Maksan itse laskuni <input type="checkbox" name="isPayer"></label>
+    <label><input type="checkbox" name="isPayer"> Laskutetaan tarjoamispaikkaa</label>
 
     <div class="address">
       <label>Lähiosoite <input type="text" name="address.street" required></label>
@@ -347,7 +346,7 @@
     <label class="emails">Sähköposti <input type="text" name="emailAddresses" required class="required invalid"></label>
 
     <label>Tarjoamistapa <input type="text" name="providingType" required class="required invalid"></label>
-    
+
     <label class="full"><input type="checkbox" name="adultContent"> Tarjolla myös LUOKITTELEMATTOMIA alle 18-vuotiailta kiellettyjä kuvaohjelmia</label>
     <label class="full"><input type="checkbox" name="gamesWithoutPegi"> Tarjolla muita kuin PEGI-luokiteltuja pelejä</label>
   </form>

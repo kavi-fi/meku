@@ -58,6 +58,7 @@ function internalSearchPage() {
   })
 
   $page.on('showDetails', '.program-box', function(e, program) {
+    e.stopPropagation()
     toggleDetailButtons($(this), program)
   })
 

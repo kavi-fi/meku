@@ -82,7 +82,7 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.categorize', function(e) {
-    showCategorizationForm($(this).parents('.program-box').data('id'))
+    showCategorizationForm($(this).closest('.program-box'))
     $(this).hide()
   })
 
@@ -182,8 +182,9 @@ function internalSearchPage() {
     $('#classification-page').trigger('show', [programId, 'edit', classificationId]).show()
   }
 
-  function showCategorizationForm(id) {
-    var $categorizationForm = $page.find('.categorization-form')
+  function showCategorizationForm($programBox) {
+    var id = $programBox.data('id')
+    var $categorizationForm = $programBox.find('.categorization-form')
     var $categorySelection = $categorizationForm.find('input[name=category-select]')
     var $categorySaveButton = $categorizationForm.find('.save-category')
 
@@ -240,14 +241,10 @@ function internalSearchPage() {
         categoryData.season = $season.val()
       }
 
-      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData))
-        .done(function(program) {
-          toggleDetailButtons($('.program-box'), program)
-          $categorizationForm.hide()
-          $results.find('.selected .program-type').text(enums.util.programTypeName(program.programType))
-          var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
-          searchPageApi.programDataUpdated($row)
-        })
+      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
+        var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
+        searchPageApi.programDataUpdated($row)
+      })
     })
   }
 }

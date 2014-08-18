@@ -302,7 +302,11 @@ function accounts(callback) {
       var phoneNumber = row.phone_office || row.phone_alternate || undefined
 
       return {
-        emekuId: row.id, sequenceId:seq++, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        emekuId: row.id,
+        sequenceId:seq++,
+        name: trim(row.name),
+        roles: _.filter(optionListToArray(row.customer_type), function(t) { return t != 'Distributor' }),
+        yTunnus: trim(row.sic_code),
         address: address,
         billing: { address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text) },
         eInvoice: eInvoice,

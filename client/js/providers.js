@@ -189,12 +189,6 @@ function providerPage() {
     $providerDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, provider))
     $providerDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
 
-    var locations = provider ? provider.locations.map(function(location) {
-      return $('<div>', { 'data-id': location._id, class: 'location-row' }).text(location.name).data('location', location)
-    }) : ''
-
-    var $locations = $('<div>', { class: 'locations' }).html(locations)
-
     $providerDetails
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
@@ -202,14 +196,23 @@ function providerPage() {
       .find('input[name=billing-extra]').prop('checked', provider && !!provider.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
-      .append($locations)
+
+    var $locations = $providerDetails.find('.locations')
+
+    if (provider.locations) {
+      provider.locations.forEach(function (location) {
+        $('<div>', { 'data-id': location._id, class: 'location-row' }).text(location.name)
+          .data('location', location)
+          .appendTo($locations)
+      })
+    }
 
     $locations.on('click', '.location-row', function() {
       var $this = $(this)
       var wasSelected = $this.hasClass('selected')
 
       $providerDetails.find('.selected').removeClass('selected')
-      $providerDetails.find('.location-details').slideUp()
+      $providerDetails.find('.location-details').slideUp(function() { $(this).remove() })
 
       if (!wasSelected) {
         var $locationDetails = renderLocationDetails($this.data('location'), setInputValWithProperty)

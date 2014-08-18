@@ -51,10 +51,9 @@ function internalSearchPage() {
     e.stopPropagation()
     var $draft = $(this).parents('.draft')
     $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function(p) {
-      var programId = $draft.data('id')
       $draft.remove()
       $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
-      searchPageApi.programDataUpdated($page.find('.result[data-id=' + programId + ']').data('program', p))
+      searchPageApi.programDataUpdated(p)
     })
   })
 
@@ -242,8 +241,7 @@ function internalSearchPage() {
       }
 
       $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
-        var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
-        searchPageApi.programDataUpdated($row)
+        searchPageApi.programDataUpdated(program)
       })
     })
   }
@@ -349,9 +347,10 @@ function searchPage() {
     })
   }
 
-  function programDataUpdated($row) {
+  function programDataUpdated(program) {
+    var $row = $page.find('.result[data-id=' + program._id + ']')
     if (_.isEmpty($row)) return
-    var $newRow = render($row.data('program'), state.q)
+    var $newRow = render(program, state.q)
     $row.next('.program-box').remove()
     $row.replaceWith($newRow)
     if ($row.is('.selected')) {

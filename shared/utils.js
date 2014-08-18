@@ -74,7 +74,8 @@ utils.getProperty = function(obj, prop) {
   var path = prop.split('.')
   // Retrieve nested properties like object.billing.address
   return _.reduce(path, function(res, pathElement) {
-    return _.has(res, pathElement) ? res[pathElement] : undefined
+    if (res == null) return undefined
+    return res[pathElement]
   }, obj)
 }
 

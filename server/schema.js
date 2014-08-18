@@ -1,6 +1,7 @@
 var _ = require('lodash')
 var async = require('async')
 var utils = require('../shared/utils')
+var classificationUtils = require('../shared/classification-utils')
 var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
 var ObjectId = mongoose.Schema.Types.ObjectId
@@ -80,11 +81,8 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
   var fields = { classifications: { $slice: 1 } }
   Program.find(query, fields).lean().exec(function(err, programs) {
     if (err) return callback(err)
-    var classifications = programs.map(function(p) { return p.classifications[0] })
-    var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
-    var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
-    if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
-    Program.update({ _id: seriesId }, { tvSeriesCriteria: criteria, tvSeriesLegacyAgeLimit: legacyAgeLimit }, callback)
+    var data = classificationUtils.aggregateClassification(programs)
+    Program.update({ _id: seriesId }, { tvSeriesCriteria: data.criteria, tvSeriesLegacyAgeLimit: data.legacyAgeLimit }, callback)
   })
 }
 

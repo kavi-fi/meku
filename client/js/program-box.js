@@ -48,22 +48,30 @@ function programBox() {
     var $episodes = $e.find('.episodes')
     var $episodeHeader = $e.find('.episode-container > h3')
 
-    $.get('/episodes/'+ p._id).done(function(episodes) {
-      if (episodes.length == 0) {
+    $.get('/episodes/'+ p._id).done(function(allEpisodes) {
+      if (allEpisodes.length == 0) {
         $episodeHeader.find('.fa-play').remove().end().text('Ei jaksoja.')
         $episodes.remove()
       } else {
-        $episodeHeader.append(' '+episodes.length + ' kpl').click(function() {
+        $episodeHeader.append(' '+allEpisodes.length + ' kpl').click(function() {
           $(this).toggleClass('open')
           $episodes.slideToggle()
         })
-        $episodes.append(episodes.map(function(p) {
-          return $('<div>').addClass('result').data('id', p._id).data('program', p)
-            .append($('<span>').text(utils.seasonEpisodeCode(p)))
-            .append($('<span>').text(p.name[0]))
-            .append($('<span>').text(utils.asDate(utils.getProperty(p, 'classifications.0.registrationDate'))))
-            .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
-        }))
+        var grouped = _.groupBy(allEpisodes, 'season')
+        var seasons = Object.keys(grouped).sort()
+        seasons.forEach(function(season) {
+          var episodes = grouped[season]
+          $episodes.append($('<div>').addClass('season-header')
+            .append($('<span>').text(season == 'undefined' ? 'Tuntematon tuotantokausi' : 'Tuotantokausi '+season))
+            .append($('<span>').append(renderWarningSummary(classificationUtils.aggregateSummary(episodes)))))
+            .append(episodes.map(function(p) {
+              return $('<div>').addClass('result').data('id', p._id).data('program', p)
+                .append($('<span>').text(utils.seasonEpisodeCode(p)))
+                .append($('<span>').text(p.name[0]))
+                .append($('<span>').text(utils.asDate(utils.getProperty(p, 'classifications.0.registrationDate'))))
+                .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
+            }))
+        })
       }
     })
     $episodes.on('click', '.result', function(e) {

@@ -37,6 +37,18 @@ var tvSeriesClassification = exports.tvSeriesClassification = function(program) 
   }
 }
 
+var aggregateClassification = exports.aggregateClassification = function(programs) {
+  var classifications = _.compact(programs.map(function(p) { return p.classifications[0] }))
+  var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
+  var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
+  if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
+  return { criteria: criteria, legacyAgeLimit: legacyAgeLimit, warningOrder: [] }
+}
+
+exports.aggregateSummary = function(programs) {
+  return summary(aggregateClassification(programs))
+}
+
 var classificationText = function(summary) {
   if (summary.age == 0) {
     return 'Kuvaohjelma on sallittu.'

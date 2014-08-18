@@ -15,7 +15,7 @@ var ProviderLocation = schema.ProviderLocation
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
-var classification = require('../shared/classification')
+var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 var builder = require('xmlbuilder')
@@ -255,7 +255,7 @@ app.post('/programs/:id/register', function(req, res, next) {
           if (err) return next(err)
           addInvoicerows(newClassification, function(err) {
             if (err) return next(err)
-            sendEmail(classification.registrationEmail(program, newClassification, req.user), function(err) {
+            sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user), function(err) {
               if (err) return next(err)
               updateMetadataIndexes(program, function() {
                 logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
@@ -270,7 +270,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     function addInvoicerows(currentClassification, callback) {
       var seconds = durationToSeconds(currentClassification.duration)
 
-      if (classification.isReclassification(program, currentClassification)) {
+      if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
         } else if (!utils.hasRole(req.user, 'kavi')) {
@@ -283,7 +283,7 @@ app.post('/programs/:id/register', function(req, res, next) {
           if (err) return next(err)
           if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
-            var classificationPrice = classification.price(program, seconds)
+            var classificationPrice = classificationUtils.price(program, seconds)
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
             callback()
@@ -663,20 +663,20 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     })
 
     function verifyValidAuthor(program, callback) {
-      var userName = program.classifications[0].author.name
-      var user = _.find(req.account.users, { name: userName })
+      var username = program.classifications[0].author.name
+      var user = _.find(req.account.users, { username: username })
       if (user) {
         program.classifications[0].author._id = user._id
-        User.findOne({ username: userName, active: true }, { _id: 1 }).lean().exec(function(err, doc) {
+        User.findOne({ username: username, active: true }, { _id: 1 }).lean().exec(function(err, doc) {
           if (err) return callback(err)
           if (doc) {
             return callback()
           } else {
-            return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + userName)
+            return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
           }
         })
       } else {
-        return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + userName)
+        return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
       }
     }
 

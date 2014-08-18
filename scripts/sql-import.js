@@ -169,7 +169,7 @@ function classifications(callback) {
         ' from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
-        ' where (p.program_type != "11" or p.program_type is null) and p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "in_pocess" and c.status != "in_process"')
+        ' where (p.program_type != "11" or p.program_type is null) and p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "disapproved" and c.status != "in_pocess" and c.status != "in_process"')
       .stream()
       .pipe(consumer(function(row, done) {
         tick()

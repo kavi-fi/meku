@@ -11,7 +11,7 @@ function programBox() {
 
     var classifications = p.classifications.map(function(c, index) {
       var registrationDate = utils.asDate(c.registrationDate) || 'Tuntematon rekisteröintiaika'
-      return $('<span>').addClass('classification').toggleClass('selected', index == 0).data(c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
+      return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
     })
 
     var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
@@ -47,14 +47,14 @@ function programBox() {
 
     $e.on('click', '.classification', function() {
       $(this).addClass('selected').siblings('.selected').removeClass('selected')
-      renderClassification($e, p, $(this).data())
+      renderClassification($e, p, $(this).data('classification'))
     })
 
     return $e
   }
 
   function renderClassification($e, p, c) {
-    var summary = classification.summary(c)
+    var summary = classificationUtils.summary(c)
     $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warningIcons(summary)).end()
       .find('.reason').labeledText(enums.reclassificationReason[c.reason]).end()

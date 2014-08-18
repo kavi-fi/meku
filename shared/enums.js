@@ -79,7 +79,8 @@ enums.roles = {
   'Provider': 'Tarjoaja',
   'Location_of_providing': 'Tarjoamispaikka',
   'Subscriber': 'Tilaaja',
-  'Classifier': 'Luokittelija',
+  'Classifier': 'Työnantaja/Luokitteluyritys',
+  'Distributor': 'Levittäjä',
   'Other': 'Muu'
 }
 
@@ -183,8 +184,8 @@ enums.classificationStatus = [
   'reclassification1',
   'reclassification3',
   'registered',
-  'disapproved',
   'in_process'
+  //'disapproved',
   // 'in_pocess',
   // NULL,
 ]

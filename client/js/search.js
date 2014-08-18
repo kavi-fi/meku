@@ -87,7 +87,8 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.edit', function() {
-    showClassificationEditPage($(this).parents('.program-box').data('id'))
+    var $programBox = $(this).parents('.program-box')
+    showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('classification')._id)
   })
 
   $results.on('click', 'button.remove', function() {
@@ -136,7 +137,7 @@ function internalSearchPage() {
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
           .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
-          .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
+          .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
         $recent.show().append($result)
       })
     })
@@ -176,9 +177,9 @@ function internalSearchPage() {
     $('#classification-page').trigger('show', programId).show()
   }
 
-  function showClassificationEditPage(programId) {
+  function showClassificationEditPage(programId, classificationId) {
     $('body').children('.page').hide()
-    $('#classification-page').trigger('show', [programId, 'edit']).show()
+    $('#classification-page').trigger('show', [programId, 'edit', classificationId]).show()
   }
 
   function showCategorizationForm(id) {
@@ -399,7 +400,7 @@ function searchPage(baseUrl) {
         .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
-        .append($('<span>').append(renderWarningSummary(classification.fullSummary(p)) || ' - '))
+        .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
 
 

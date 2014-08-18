@@ -293,7 +293,7 @@ function select2Autocomplete(opts, onChangeFn) {
       })
     },
     initSelection: function(element, callback) {
-      var val = opts.multiple ? opts.val.map(opts.toOption) : opts.toOption(opts.val)
+      var val = opts.multiple ? (opts.val || []).map(opts.toOption) : opts.toOption(opts.val)
       return callback(val)
     },
     multiple: opts.multiple,
@@ -301,7 +301,7 @@ function select2Autocomplete(opts, onChangeFn) {
     createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
   })
 
-  $select.on('change', function() {
+  return $select.on('change', function() {
     var data = $(this).select2('data')
     var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
     onChangeFn && onChangeFn($(this).attr('name'), val)
@@ -310,6 +310,33 @@ function select2Autocomplete(opts, onChangeFn) {
     var data = opts.multiple ? arr : (arr[0] && arr[0] || '')
     $(this).select2('data', data).trigger('validate')
   })
+}
+
+function select2EnumAutocomplete(opts, onChangeFn) {
+  opts = _.merge({
+    data: opts.data,
+    placeholder: 'Valitse...',
+    multiple: opts.multiple || false,
+    initSelection: function(e, callback) { callback() },
+    fromOption: function(x) { return x.id }
+  }, opts)
+
+  return opts.$el.select2(opts).on('change', onChange).on('setVal', setValue)
+
+  function idToOption(id) {
+    var opt = _.find(opts.data, function(item) { return item.id === id })
+    return opt ? opt : { id: id, text: id }
+  }
+  function onChange() {
+    var data = $(this).select2('data')
+    var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
+    onChangeFn && onChangeFn($(this).attr('name'), val)
+  }
+  function setValue(e) {
+    var arr = Array.prototype.slice.call(arguments, 1).map(idToOption)
+    var data = opts.multiple ? arr : (arr[0] && arr[0] || '')
+    $(this).select2('data', data).trigger('validate')
+  }
 }
 
 function idNamePairToSelect2Option(x) {

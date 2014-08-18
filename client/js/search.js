@@ -23,7 +23,6 @@ function internalSearchPage() {
   var $newClassificationButton = $page.find('.new-classification button')
   var $drafts = $page.find('.drafts')
   var $recent = $page.find('.recent')
-  var detailRenderer = programBox()
 
   var programTypesSelect2 = {
     data: [
@@ -172,7 +171,6 @@ function internalSearchPage() {
       $detail.find('button.reclassify').toggle(!!canReclassify)
       $detail.find('button.categorize').hide()
     }
-
     $detail.find('button.edit').toggle(hasRole('root'))
     $detail.find('button.remove').toggle(hasRole('root'))
   }
@@ -404,8 +402,6 @@ function searchPage() {
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
         .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
-
-
   }
 }
 

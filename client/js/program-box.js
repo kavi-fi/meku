@@ -73,7 +73,10 @@ function programBox() {
       if ($result.hasClass('selected')) {
         $result.removeClass('selected').next('.program-box').slideUp(function() { $(this).remove() }).end()
       } else {
-        $result.addClass('selected').after(programBox().render($result.data('program')).slideDown())
+        var p = $result.data('program')
+        var $details = programBox().render(p).slideDown()
+        $result.addClass('selected').after($details)
+        $details.trigger('showDetails', p)
       }
     })
   }

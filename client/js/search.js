@@ -91,19 +91,24 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.remove', function() {
-    var $selected = $('.result.selected')
-    var program = $selected.data('program')
+    var $programBox = $(this).closest('.program-box')
+    var $row = $programBox.prev('.result')
+    var program = $row.data('program')
     showDialog($('#templates').find('.remove-program-dialog').clone()
       .find('.program-name').text(program.name).end()
       .find('button[name=remove]').click(removeProgram).end()
       .find('button[name=cancel]').click(closeDialog).end())
 
     function removeProgram() {
-      $.ajax('/programs/' + program._id, { type: 'DELETE' }).done(function() {
+      $.ajax('/programs/' + program._id, { type: 'delete' }).done(function() {
         closeDialog()
-        searchPageApi.closeDetail()
-        $selected.slideUp(function() {
+        $programBox.slideUp(function() { $(this).remove() })
+        $row.slideUp(function() {
           if (!_.isEmpty($(this).parents('.recent'))) { loadRecent() }
+          if (!_.isEmpty($(this).parents('.episodes'))) {
+            var $parentRow = $row.closest('.program-box').prev('.result')
+            $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
+          }
           $(this).remove()
         })
       })
@@ -295,7 +300,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, closeDetail: closeDetail }
+  return { programDataUpdated: programDataUpdated }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }

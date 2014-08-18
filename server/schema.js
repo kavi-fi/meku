@@ -153,7 +153,8 @@ var Provider = exports.Provider = mongoose.model('providers', {
   phoneNumber: String,
   emailAddresses: [String],
   language: String,
-  deleted: Boolean
+  deleted: Boolean,
+  active: Boolean
 })
 
 var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocations', {
@@ -166,7 +167,9 @@ var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocati
   emailAddresses: [String],
   language: String,
   providingType: [String],
+  registrationDate: Date,
   deleted: Boolean,
+  active: Boolean,
   isPayer: Boolean,
   adultContent: Boolean,
   gamesWithoutPegi: Boolean
@@ -280,7 +283,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
+var models = exports.models = [Program, Account, Provider, ProviderLocation, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

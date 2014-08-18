@@ -327,7 +327,7 @@ function accounts(callback) {
     var q = 'select id, name, customer_type, sic_code,' +
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
-      ' ownership, phone_office, phone_alternate' +
+      ' ownership, phone_office, phone_alternate, provider_status' +
       ' from accounts where customer_type LIKE "%Provider%" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
@@ -352,6 +352,7 @@ function accounts(callback) {
         contactName: row.ownership,
         phoneNumber: phoneNumber,
         deleted: false,
+        active: row.provider_status === 'Approved' || row.provider_status === 'Changed',
         locations: []
       }
     }
@@ -361,21 +362,24 @@ function accounts(callback) {
   function locations(callback) {
     var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, bills_lang, bills_text, providing_type, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
-      ' ownership, phone_office, phone_alternate, pegi, k18' +
+      ' ownership, phone_office, phone_alternate, pegi, k18, date_entered' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var phoneNumber = row.phone_office || row.phone_alternate || undefined
+      var active = row.provider_status === 'Approved' || row.provider_status === 'Changed'
+      var registrationDate = active ? (row.date_entered ? readAsUTCDate(row.date_entered) : new Date(0)) : undefined
       return {
         emekuId: row.id,
         name: trim(row.name),
         yTunnus: trim(row.sic_code),
         address: address,
-        isPayer: row.invoice_payer != '1' ? true : false,
+        isPayer: row.invoice_payer != '1',
         contactName: row.ownership,
         phoneNumber: phoneNumber,
         providingType: optionListToArray(row.providing_type),
-        approved: row.provider_status == 'Approved',
+        active: active,
+        registrationDate: registrationDate,
         deleted: false,
         language: langCode(trim(row.customer_lang)),
         adultContent: row.k18,

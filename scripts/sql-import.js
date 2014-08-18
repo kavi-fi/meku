@@ -287,7 +287,7 @@ function accounts(callback) {
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate' +
-      ' from accounts where customer_type != "^Location_of_providing^" and customer_type != "^Provider^" and deleted != "1"'
+      ' from accounts where customer_type != "^Location_of_providing^" and customer_type != "^Provider^" and customer_type != "^Distributor^" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var billingAddress = row.billing_address_street
@@ -438,7 +438,7 @@ function accounts(callback) {
   }
 
   function linkUserAccounts(callback) {
-    conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and a.deleted != "1"')
+    conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and customer_type != "^Distributor^" and a.deleted != "1"')
       .stream()
       .pipe(consumer(function(row, callback) {
         pushUserToAccount(row, function(err) {

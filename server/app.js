@@ -185,7 +185,7 @@ function search(responseFields, req, res, next) {
 }
 
 app.get('/episodes/:seriesId', function(req, res, next) {
-  Program.find({ 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).exec(respond(res, next))
+  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).exec(respond(res, next))
 })
 
 app.get('/programs/drafts', function(req, res, next) {

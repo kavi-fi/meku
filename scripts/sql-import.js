@@ -287,7 +287,7 @@ function accounts(callback) {
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate' +
-      ' from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
+      ' from accounts where customer_type != "^Location_of_providing^" and customer_type != "^Provider^" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var billingAddress = row.billing_address_street

@@ -215,7 +215,7 @@ function providerPage() {
       $providerDetails.find('.location-details').slideUp(function() { $(this).remove() })
 
       if (!wasSelected) {
-        var $locationDetails = renderLocationDetails($this.data('location'), setInputValWithProperty)
+        var $locationDetails = renderLocationDetails($this.data('location'))
 
         $this.addClass('selected').after($locationDetails)
         $locationDetails.slideDown()
@@ -259,15 +259,15 @@ function providerPage() {
         $eInvoiceInputs.prop('disabled', type === 'address')
       }
     }
-  }
 
-  function renderLocationDetails(location, setInputWithFunction) {
-    var $locationDetails = $('#templates').find('.location-details').clone()
-    $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputWithFunction, location))
-    $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
-      .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
+    function renderLocationDetails(location) {
+      var $locationDetails = $('#templates').find('.location-details').clone()
+      $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, location))
+      $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
+        .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
 
-    return $locationDetails
+      return $locationDetails
+    }
   }
 
   function select2OptionToIdNamePair(x) {

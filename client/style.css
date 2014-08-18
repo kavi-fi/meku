@@ -701,6 +701,7 @@ textarea.invalid:disabled,
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
+#provider-page .location-details .emails { margin-right: 24px; }
 
 .change-log a { color: #00BB88; cursor: pointer; margin-top: 10px; display: inline-block; }
 .change-log span, label, pre { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }

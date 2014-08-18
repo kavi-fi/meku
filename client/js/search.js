@@ -70,14 +70,14 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.reclassify', function(e) {
-    var id = $(this).parents('.program-box').data('id')
+    var id = $(this).closest('.program-box').data('id')
     $.post('/programs/' + id + '/reclassification').done(function(program) {
       showClassificationPage(program._id)
     })
   })
 
   $results.on('click', 'button.continue-classification', function(e) {
-    var id = $(this).parents('.program-box').data('id')
+    var id = $(this).closest('.program-box').data('id')
     showClassificationPage(id)
   })
 
@@ -87,7 +87,7 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.edit', function() {
-    var $programBox = $(this).parents('.program-box')
+    var $programBox = $(this).closest('.program-box')
     showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('classification')._id)
   })
 

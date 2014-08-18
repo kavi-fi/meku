@@ -336,6 +336,7 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
 app.post('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
+    var oldSeries = program.toObject().series
     updateAndLogChanges(program, req.body, req.user, function(err, program) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
@@ -348,7 +349,11 @@ app.post('/programs/:id', function(req, res, next) {
               if (err) return next(err)
               updateTvSeriesClassification(program, function(err) {
                 if (err) return next(err)
-                res.send(program)
+                if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
+                  Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
+                } else {
+                  res.send(program)
+                }
               })
             })
           })
@@ -372,7 +377,10 @@ app.post('/programs/autosave/:id', function(req, res, next) {
 app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
-    softDeleteAndLog(program, req.user, respond(res, next))
+    softDeleteAndLog(program, req.user, function(err, program) {
+      if (err) return next(err)
+      updateTvSeriesClassification(program, respond(res, next, program))
+    })
   })
 })
 
@@ -877,11 +885,14 @@ function respond(res, next, overrideData) {
 
 function updateTvSeriesClassification(program, callback) {
   if (!enums.util.isTvEpisode(program)) return callback()
-  Program.updateTvSeriesClassification(program.series._id, callback)
+  var seriesId = program.series && program.series._id
+  if (!seriesId) return callback()
+  console.log('Program.updateTvSeriesClassification '+seriesId)
+  Program.updateTvSeriesClassification(seriesId, callback)
 }
 
 function verifyTvSeriesExistsOrCreate(program, callback) {
-  if (enums.util.isTvEpisode(program) && program.series._id == null) {
+  if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
     createParentProgram(program, program.series.name.trim(), callback)
   } else return callback()
 }

@@ -76,8 +76,9 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   return draft
 }
 ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
+  var query = { 'series._id': seriesId, 'classifications.0': { $exists: true }, deleted: { $ne: true } }
   var fields = { classifications: { $slice: 1 } }
-  Program.find({ 'series._id': seriesId, 'classifications.0': { $exists: true } }, fields).lean().exec(function(err, programs) {
+  Program.find(query, fields).lean().exec(function(err, programs) {
     if (err) return callback(err)
     var classifications = programs.map(function(p) { return p.classifications[0] })
     var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()

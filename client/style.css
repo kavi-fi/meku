@@ -247,6 +247,8 @@ label.top { vertical-align: top; }
 .program-box .categorization-form input[type=number] { width: 80px; display: inline-block; }
 
 .program-box .episode-container > h3 { cursor: pointer; border-bottom: none; }
+.program-box .episode-container > h3.disabled { cursor: default; }
+.program-box .episode-container > h3 .spinner span { background-color: #00BB88; }
 .program-box .episode-container > h3 .fa-play { margin-right: 5px; -webkit-transition: .3s linear; -moz-transition: .3s linear; -o-transition: .3s linear; transition: .3s linear; }
 .program-box .episode-container > h3.open .fa-play { -webkit-transform: rotate(90deg); -moz-transform: rotate(90deg); -o-transform: rotate(90deg); -ms-transform: rotate(90deg); transform: rotate(90deg); }
 .program-box .episode-container .episodes { display: none; }

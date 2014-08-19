@@ -7,7 +7,7 @@ if (typeof module !== 'undefined' && module.exports) {
 (function(exports) {
 
 exports.fullSummary = function(program) {
-  var c = enums.util.isTvSeriesName(program) ? tvSeriesClassification(program) : program.classifications[0]
+  var c = enums.util.isTvSeriesName(program) ? tvSeriesClassification(program.episodes) : program.classifications[0]
   return summary(c)
 }
 
@@ -29,12 +29,8 @@ var summary = exports.summary = function(classification) {
   return { age: maxAgeLimit, warnings: warnings }
 }
 
-var tvSeriesClassification = exports.tvSeriesClassification = function(program) {
-  return {
-    criteria: program.tvSeriesCriteria,
-    legacyAgeLimit: program.tvSeriesLegacyAgeLimit,
-    warningOrder:[]
-  }
+var tvSeriesClassification = exports.tvSeriesClassification = function(episodes) {
+  return { criteria: episodes.criteria, legacyAgeLimit: episodes.legacyAgeLimit, warningOrder:[] }
 }
 
 var aggregateClassification = exports.aggregateClassification = function(programs) {

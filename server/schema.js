@@ -52,11 +52,10 @@ var ProgramSchema = new Schema({
   draftsBy: { type: [ObjectId], index: true },
   draftClassifications: {}, // { userId:classification, userId:classification2 }
   programType: Number, // enums.programType
-  gameFormat: String,
-  season: Number, episode: Number,
-  series: { _id: { type: ObjectId, index:true }, name: String },
-  tvSeriesCriteria: [Number],
-  tvSeriesLegacyAgeLimit: Number,
+  gameFormat: String, // in programType == game(7)
+  season: Number, episode: Number, // in programType == episode(3)
+  series: { _id: { type: ObjectId, index:true }, name: String }, // in programType == episode(3)
+  episodes: { count: Number, criteria: [Number], legacyAgeLimit: Number }, // in programType == series(2)
   createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
@@ -77,12 +76,12 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   return draft
 }
 ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
-  var query = { 'series._id': seriesId, 'classifications.0': { $exists: true }, deleted: { $ne: true } }
+  var query = { 'series._id': seriesId, deleted: { $ne: true } }
   var fields = { classifications: { $slice: 1 } }
   Program.find(query, fields).lean().exec(function(err, programs) {
     if (err) return callback(err)
     var data = classificationUtils.aggregateClassification(programs)
-    Program.update({ _id: seriesId }, { tvSeriesCriteria: data.criteria, tvSeriesLegacyAgeLimit: data.legacyAgeLimit }, callback)
+    Program.update({ _id: seriesId }, { episodes: { count: programs.length, criteria: data.criteria, legacyAgeLimit: data.legacyAgeLimit } }, callback)
   })
 }
 

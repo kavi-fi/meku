@@ -47,33 +47,22 @@ function programBox() {
 
     var $episodes = $e.find('.episodes')
     var $episodeHeader = $e.find('.episode-container > h3')
+    if (p.episodes.count > 0) {
+      var $spinner = spinner()
+      $episodeHeader.append(' '+p.episodes.count + ' kpl').append($spinner).one('click', function() {
+        $spinner.addClass('active')
+        $.get('/episodes/'+ p._id).done(function(allEpisodes) {
+          $spinner.remove()
+          $episodeHeader.click(toggleEpisodesOpen)
+          renderEpisodes(allEpisodes)
+          toggleEpisodesOpen()
+        })
+      })
+    } else {
+      $episodeHeader.empty().addClass('disabled').text('Ei jaksoja.')
+      $episodes.remove()
+    }
 
-    $.get('/episodes/'+ p._id).done(function(allEpisodes) {
-      if (allEpisodes.length == 0) {
-        $episodeHeader.find('.fa-play').remove().end().text('Ei jaksoja.')
-        $episodes.remove()
-      } else {
-        $episodeHeader.append(' '+allEpisodes.length + ' kpl').click(function() {
-          $(this).toggleClass('open')
-          $episodes.slideToggle()
-        })
-        var grouped = _.groupBy(allEpisodes, 'season')
-        var seasons = Object.keys(grouped).sort()
-        seasons.forEach(function(season) {
-          var episodes = grouped[season]
-          $episodes.append($('<div>').addClass('season-header')
-            .append($('<span>').text(season == 'undefined' ? 'Tuntematon tuotantokausi' : 'Tuotantokausi '+season))
-            .append($('<span>').append(renderWarningSummary(classificationUtils.aggregateSummary(episodes)))))
-            .append(episodes.map(function(p) {
-              return $('<div>').addClass('result').data('id', p._id).data('program', p)
-                .append($('<span>').text(utils.seasonEpisodeCode(p)))
-                .append($('<span>').text(p.name[0]))
-                .append($('<span>').text(utils.asDate(utils.getProperty(p, 'classifications.0.registrationDate'))))
-                .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
-            }))
-        })
-      }
-    })
     $episodes.on('click', '.result', function(e) {
       e.stopPropagation()
       var $result = $(this)
@@ -87,6 +76,29 @@ function programBox() {
         $details.trigger('showDetails', p)
       }
     })
+
+    function toggleEpisodesOpen() {
+      $episodeHeader.toggleClass('open')
+      $episodes.slideToggle()
+    }
+
+    function renderEpisodes(allEpisodes) {
+      var grouped = _.groupBy(allEpisodes, 'season')
+      var seasons = Object.keys(grouped).sort()
+      seasons.forEach(function(season) {
+        var episodes = grouped[season]
+        $episodes.append($('<div>').addClass('season-header')
+          .append($('<span>').text(season == 'undefined' ? 'Tuntematon tuotantokausi' : 'Tuotantokausi '+season))
+          .append($('<span>').append(renderWarningSummary(classificationUtils.aggregateSummary(episodes)))))
+          .append(episodes.map(function(p) {
+            return $('<div>').addClass('result').data('id', p._id).data('program', p)
+              .append($('<span>').text(utils.seasonEpisodeCode(p)))
+              .append($('<span>').text(p.name[0]))
+              .append($('<span>').text(utils.asDate(utils.getProperty(p, 'classifications.0.registrationDate'))))
+              .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
+          }))
+      })
+    }
   }
 
   function renderClassifications($e, p) {

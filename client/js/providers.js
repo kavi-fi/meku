@@ -284,6 +284,23 @@ function providerPage() {
       }
     })
 
+    $locations.on('click', 'button[name=remove]', function() {
+      var $selected = $locations.find('.selected')
+      var location = $selected.data('location')
+      showDialog($('#templates').find('.remove-location-dialog').clone()
+        .find('.location-name').text(location.name).end()
+        .find('button[name=remove]').click(removeLocation).end()
+        .find('button[name=cancel]').click(closeDialog).end())
+
+      function removeLocation() {
+        $.ajax('/providerlocations/' + location._id, { type: 'DELETE' }).done(function() {
+          closeDialog()
+          closeLocationDetails()
+          $selected.slideUp(function() { $(this).remove() })
+        })
+      }
+    })
+
     return $locations
 
     function closeLocationDetails() {

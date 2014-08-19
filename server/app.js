@@ -449,7 +449,7 @@ app.delete('/providers/:id', requireRole('kavi'), function(req, res, next) {
 app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id).lean().exec(function(err, provider) {
     if (err) return next(err)
-    ProviderLocation.find({provider: provider._id}).sort('name').exec(function(err, locations) {
+    ProviderLocation.find({provider: provider._id, deleted: false }).sort('name').exec(function(err, locations) {
       if (err) return next(err)
       provider.locations = locations
       res.send(provider)
@@ -465,10 +465,17 @@ app.put('/providerlocations/:id', requireRole('kavi'), function(req, res, next) 
 })
 
 app.post('/providerlocations', requireRole('kavi'), function(req, res, next) {
-  new ProviderLocation(req.body).save(function(err, providerlocation) {
+  new ProviderLocation(_.merge({}, req.body, { deleted: false })).save(function(err, location) {
     if (err) return next(err)
-    logCreateOperation(req.user, providerlocation)
-    res.send(providerlocation)
+    logCreateOperation(req.user, location)
+    res.send(location)
+  })
+})
+
+app.delete('/providerlocations/:id', requireRole('kavi'), function(req, res, next) {
+  ProviderLocation.findById(req.params.id, function (err, location) {
+    if (err) return next(err)
+    softDeleteAndLog(location, req.user, respond(res, next))
   })
 })
 

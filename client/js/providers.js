@@ -108,6 +108,14 @@ function providerPage() {
     })
   }
 
+  function toggleActiveButton(newState) {
+    var $selected = $providers.find('.result.selected')
+    var provider = $selected.data('provider')
+    $.ajax('/providers/' + provider._id, { type: 'PUT', data: JSON.stringify({ active: newState === 'on' })}).done(function(updatedProvider) {
+      $selected.replaceWith(renderProvider(updatedProvider))
+    })
+  }
+
   function closeDetails() {
     $providers.find('.result.selected').removeClass('selected')
     $providers.find('.provider-details').slideUp(function() { $(this).remove() })
@@ -126,6 +134,7 @@ function providerPage() {
   function renderProvider(provider) {
     return $('<div>', { class: 'result', 'data-id': provider._id })
       .data('provider', provider)
+      .toggleClass('inactive', !provider.active)
       .append($('<span>', { class: 'name' }).text(provider.name))
   }
 
@@ -141,10 +150,13 @@ function providerPage() {
       .find('input[name=billing-extra]').prop('checked', provider && !!provider.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
+      .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
+
+    $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
 
     var $locations = $providerDetails.find('.locations')
 
-    if (provider.locations) {
+    if (provider && provider.locations) {
       provider.locations.forEach(function(location) {
         $locations.append(renderLocation(location))
       })

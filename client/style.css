@@ -663,6 +663,8 @@ textarea.invalid:disabled,
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
 #provider-page .location-details .emails { margin-right: 24px; }
+#provider-page .provider-details .activity { margin-bottom: 10px; }
+#provider-page .provider-details .buttons { margin-top: -45px; float: right; }
 
 .rotating.fa-play {
     margin-right: 5px;

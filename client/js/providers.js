@@ -233,7 +233,7 @@ function providerPage() {
   function renderProviderLocations($providerDetails, provider) {
     var $locations = $('<div>', { class: 'locations' })
 
-    if (provider.locations) {
+    if (provider && provider.locations) {
       provider.locations.forEach(function(location) {
         $locations.append(renderLocation(location))
       })

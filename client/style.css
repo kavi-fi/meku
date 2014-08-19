@@ -664,22 +664,24 @@ textarea.invalid:disabled,
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
 #provider-page .location-details .emails { margin-right: 24px; }
 
+.rotating.fa-play {
+    margin-right: 5px;
+    -webkit-transition: .3s linear;
+    -moz-transition: .3s linear;
+    -o-transition: .3s linear;
+    transition: .3s linear;
+}
+.selected .rotating.fa-play {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
 .change-log a { color: #00BB88; cursor: pointer; margin-top: 10px; display: inline-block; }
 .change-log span, label, pre { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }
 .change-log label { display: inline-block; padding: 5px 0 0 0; }
-.change-log .fa-play { margin-right: 5px;
-  -webkit-transition: .3s linear;
-  -moz-transition: .3s linear;
-  -o-transition: .3s linear;
-  transition: .3s linear;
-}
-.change-log .show-changelogs.clicked .fa-play {
-  -webkit-transform: rotate(90deg);
-  -moz-transform: rotate(90deg);
-  -o-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-  transform: rotate(90deg);
-}
 .change-log .entries-container { display: none; }
 .change-log .entry-row { padding: 10px; }
 .change-log .entry-row:nth-child(odd) { background: #F8F8F8; }

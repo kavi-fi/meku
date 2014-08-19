@@ -368,7 +368,7 @@ function changeLog(document) {
 
         $changeLog.find('a.show-changelogs').on('click', function (e) {
           e.preventDefault()
-          $(this).toggleClass('clicked')
+          $(this).toggleClass('selected')
           $changeLog.find('.entries-container').slideToggle()
         })
       }

@@ -221,7 +221,10 @@ function providerPage() {
     }
 
     function renderLocation(location) {
-      return $('<div>', { 'data-id': location._id, class: 'location-row' }).text(location.name).data('location', location)
+      return $('<div>', { 'data-id': location._id, class: 'location-row' })
+        .data('location', location)
+        .append($('<i>', { class: 'rotating fa fa-play' }))
+        .append($('<span>').text(location.name))
     }
 
     function bindEventHandlers($locationDetails, submitCallback) {

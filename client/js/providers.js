@@ -80,7 +80,7 @@ function providerPage() {
       event.preventDefault()
 
       var specialFields = {
-        emailAddresses: _.pluck($form.find('input[name=emailAddresses').select2('data'), 'text'),
+        emailAddresses: _.pluck($form.find('input[name=emailAddresses]').select2('data'), 'text'),
         billingPreference: $form.find('input[name=billing-extra]').prop('checked')
           ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
@@ -151,55 +151,13 @@ function providerPage() {
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
+      .find('.locations').html(renderProviderLocations($providerDetails, provider))
 
     $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
-
-    var $locations = $providerDetails.find('.locations')
-
-    if (provider && provider.locations) {
-      provider.locations.forEach(function(location) {
-        $locations.append(renderLocation(location))
-      })
-    }
-
-    $locations.on('click', '.location-row', function() {
-      var $this = $(this)
-      var wasSelected = $this.hasClass('selected')
-
-      $locations.find('.selected').removeClass('selected')
-      $locations.find('.location-details').slideUp(function() { $(this).remove() })
-
-      if (!wasSelected) {
-        var $locationDetails = renderLocationDetails($this.data('location'))
-
-        $this.addClass('selected').after($locationDetails)
-        $locationDetails.slideDown()
-      }
-    })
 
     toggleBillingExtra($providerDetails)
 
     return $providerDetails
-
-    function setInputValWithProperty(object) {
-      var name = $(this).attr('name')
-      var property = utils.getProperty(object, name)
-
-      if ($(this).attr('type') === 'checkbox') {
-        $(this).prop('checked', property || false)
-      } else {
-        if (property !== undefined) $(this).val(property)
-      }
-    }
-
-    function userToSelect2Option(user) {
-      if (!user) return null
-      return {
-        id: user._id,
-        text: user.name + (user.username ? ' (' + user.username + ')' : ''),
-        name: user.username ? user.username : user.name
-      }
-    }
 
     function toggleBillingExtra() {
       var extraBillingEnabled = $providerDetails.find('input[name=billing-extra]').prop('checked')
@@ -214,50 +172,16 @@ function providerPage() {
         $eInvoiceInputs.prop('disabled', type === 'address')
       }
     }
+  }
 
-    function renderLocationDetails(location) {
-      var $locationDetails = $('#templates').find('.location-details').clone()
-      $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, location))
-      $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
-        .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
+  function setInputValWithProperty(object) {
+    var name = $(this).attr('name')
+    var property = utils.getProperty(object, name)
 
-      bindEventHandlers($locationDetails, function(locationData) {
-        $.ajax('/providerlocations/' + location._id, { type: 'PUT', data: JSON.stringify(locationData) })
-          .done(function(location) {
-            $locations.find('.selected').replaceWith(renderLocation(location)).removeClass('selected')
-            $locations.find('.location-details').slideUp(function() { $(this).remove() })
-          })
-      })
-
-      return $locationDetails
-    }
-
-    function renderLocation(location) {
-      return $('<div>', { 'data-id': location._id, class: 'location-row' })
-        .data('location', location)
-        .append($('<i>', { class: 'rotating fa fa-play' }))
-        .append($('<span>').text(location.name))
-    }
-
-    function bindEventHandlers($locationDetails, submitCallback) {
-      var $form = $locationDetails.find('form')
-
-      $form.submit(function (event) {
-        event.preventDefault()
-
-        var specialFields = {
-          emailAddresses: _.pluck($form.find('input[name=emailAddresses]').select2('data'), 'text'),
-          providingType: _.pluck($form.find('input[name=providingType]').select2('data'), 'id')
-        }
-
-        submitCallback(_.merge(createDataObjectFromForm($form), specialFields))
-      })
-
-      setCommonValidators($form)
-
-      $form.find('input[name=isPayer]').on('change', function() {
-        $form.find('.required-if-payer').prop('required', this.checked)
-      })
+    if ($(this).attr('type') === 'checkbox') {
+      $(this).prop('checked', property || false)
+    } else {
+      if (property !== undefined) $(this).val(property)
     }
   }
 
@@ -304,5 +228,105 @@ function providerPage() {
     })
 
     return object
+  }
+
+  function renderProviderLocations($providerDetails, provider) {
+    var $locations = $('<div>', { class: 'locations' })
+
+    if (provider.locations) {
+      provider.locations.forEach(function(location) {
+        $locations.append(renderLocation(location))
+      })
+    }
+
+    $providerDetails.find('button[name=new-location]').on('click', function() {
+      closeLocationDetails()
+
+      var $locationDetails = renderLocationDetails()
+      $locationDetails.find('.modify-only').remove()
+
+      bindEventHandlers(provider, $locationDetails, function(locationData) {
+        $.post('/providerlocations/', JSON.stringify(locationData), function(location) {
+          $locations.find('.location-details').slideUp(function() {
+            $locations.prepend(renderLocation(location))
+          })
+        })
+      })
+
+      $locations.prepend($locationDetails)
+      $locationDetails.slideDown()
+    })
+
+    $locations.on('click', '.location-row', function() {
+      var $this = $(this)
+      var wasSelected = $this.hasClass('selected')
+
+      closeLocationDetails()
+      if (!wasSelected) {
+        var location = $this.data('location')
+        var $locationDetails = renderLocationDetails(location)
+
+        $locationDetails.find('.new-only').remove()
+
+        bindEventHandlers(provider, $locationDetails, function(locationData) {
+          $.ajax('/providerlocations/' + location._id, { type: 'PUT', data: JSON.stringify(locationData) })
+            .done(function(location) {
+              var $selected = $locations.find('.selected').removeClass('selected')
+              $locations.find('.location-details').slideUp(function() {
+                $(this).remove()
+                $selected.replaceWith(renderLocation(location))
+              })
+            })
+        })
+
+        $this.addClass('selected').after($locationDetails)
+        $locationDetails.slideDown()
+      }
+    })
+
+    return $locations
+
+    function closeLocationDetails() {
+      $locations.find('.selected').removeClass('selected')
+      $locations.find('.location-details').slideUp(function() { $(this).remove() })
+    }
+
+    function renderLocationDetails(location) {
+      var $locationDetails = $('#templates').find('.location-details').clone()
+      $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, location))
+      $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
+        .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
+
+      return $locationDetails
+    }
+
+    function renderLocation(location) {
+      return $('<div>', { 'data-id': location._id, class: 'location-row' })
+        .data('location', location)
+        .append($('<i>', { class: 'rotating fa fa-play' }))
+        .append($('<span>').text(location.name))
+    }
+
+    function bindEventHandlers(provider, $locationDetails, submitCallback) {
+      var $form = $locationDetails.find('form')
+
+      $form.submit(function (event) {
+        event.preventDefault()
+
+        var specialFields = {
+          emailAddresses: _.pluck($form.find('input[name=emailAddresses]').select2('data'), 'text'),
+          providingType: _.pluck($form.find('input[name=providingType]').select2('data'), 'id'),
+          provider: provider._id
+        }
+
+        submitCallback(_.merge(createDataObjectFromForm($form), specialFields))
+      })
+
+      setCommonValidators($form)
+
+      $form.find('input[name=isPayer]').on('change', function() {
+        $form.find('.required-if-payer').prop('required', this.checked)
+      })
+    }
   }
 }

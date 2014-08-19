@@ -464,6 +464,14 @@ app.put('/providerlocations/:id', requireRole('kavi'), function(req, res, next) 
   })
 })
 
+app.post('/providerlocations', requireRole('kavi'), function(req, res, next) {
+  new ProviderLocation(req.body).save(function(err, providerlocation) {
+    if (err) return next(err)
+    logCreateOperation(req.user, providerlocation)
+    res.send(providerlocation)
+  })
+})
+
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }, deleted: { $ne: true }}

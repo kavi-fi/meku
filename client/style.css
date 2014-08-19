@@ -665,6 +665,7 @@ textarea.invalid:disabled,
 #provider-page .location-details .emails { margin-right: 24px; }
 #provider-page .provider-details .activity { margin-bottom: 10px; }
 #provider-page .provider-details .buttons { margin-top: -45px; float: right; }
+#provider-page button[name=new-location] { margin-bottom: 10px; }
 
 .rotating.fa-play {
     margin-right: 5px;

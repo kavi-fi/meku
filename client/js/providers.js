@@ -266,6 +266,8 @@ function providerPage() {
         var location = $this.data('location')
         var $locationDetails = renderLocationDetails(location)
 
+        if (hasRole('root')) $locationDetails.append(changeLog(location).render())
+
         $locationDetails.find('.new-only').remove()
 
         bindEventHandlers(provider, $locationDetails, function(locationData) {

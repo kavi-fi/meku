@@ -61,37 +61,51 @@
         <span class="current-duration"></span>
       </div>
     </div>
-    <div class="column" style="margin: 0 0 0 28px;">
-      <h3>Luokittelu</h3>
-      <div class="drafts"></div>
-      <label>Luokittelu rekisteröity</label>
-      <div class="classifications"></div>
-      <label>Ikäraja</label>
-      <div class="warning-summary">
-        <img class="agelimit" src="images/empty.png" /><div class="warnings"></div>
-      </div>
-      <div class="criteria"></div>
-      <label>Uudelleenluokittelun peruste</label>
-      <span class="reason"></span>
-      <label>Luokittelija</label>
-      <span class="authorOrganization"></span>
-      <label>Formaatti</label>
-      <span class="format"></span>
-      <label>Kesto</label>
-      <span class="duration"></span>
-      <label>Luokittelijan nimi</label>
-      <span class="author"></span>
-      <label>Luokittelun tilaaja</label>
-      <span class="buyer"></span>
-      <label>Rekisteröinnistä laskutetaan</label>
-      <span class="billing"></span>
+    <div class="column classification-container" style="margin: 0 0 0 28px;">
     </div>
   </div>
-  <div>
+  <div class="comment-container">
     <h3 class="commentHeader">Kommentit</h3>
     <span class="publicComments"></span>
     <label>KAVI:n sisäiset kommentit</label>
     <span class="comments"></span>
+  </div>
+  <div class="episode-container">
+    <h3><i class="fa fa-play"></i>Sarjan jaksot</h3>
+    <div class="episodes"></div>
+  </div>
+</div>
+
+<div class="program-box-normal-classification-details">
+  <h3>Luokittelu</h3>
+  <div class="drafts"></div>
+  <label>Luokittelu rekisteröity</label>
+  <div class="classifications"></div>
+  <label>Ikäraja</label>
+  <div class="warning-summary">
+    <img class="agelimit" src="images/empty.png" /><div class="warnings"></div>
+  </div>
+  <div class="criteria"></div>
+  <label>Uudelleenluokittelun peruste</label>
+  <span class="reason"></span>
+  <label>Luokittelija</label>
+  <span class="authorOrganization"></span>
+  <label>Formaatti</label>
+  <span class="format"></span>
+  <label>Kesto</label>
+  <span class="duration"></span>
+  <label>Luokittelijan nimi</label>
+  <span class="author"></span>
+  <label>Luokittelun tilaaja</label>
+  <span class="buyer"></span>
+  <label>Rekisteröinnistä laskutetaan</label>
+  <span class="billing"></span>
+</div>
+
+<div class="program-box-tv-series-classification-details">
+  <h3>Luokittelu</h3>
+  <div class="warning-summary">
+    <img class="agelimit" src="images/empty.png" /><div class="warnings"></div>
   </div>
 </div>
 
@@ -152,12 +166,15 @@
       <label class="search-label">Nimi</label>
       <input class="query" type="text" /><button class="button search">Hae</button>
       <div class="filters">
-        <label><input type="checkbox" data-id="a" data-type="1"/>Elokuvat</label>
-        <label><input type="checkbox" data-id="b" data-type="2,3,4"/>TV</label>
-        <label><input type="checkbox" data-id="c" data-type="5"/>Extrat</label>
-        <label><input type="checkbox" data-id="d" data-type="6"/>Trailerit</label>
-        <label><input type="checkbox" data-id="e" data-type="7,8"/>Pelit</label>
-        <label><input type="checkbox" data-id="f" data-type="0"/>Kategorisoimattomat</label>
+        <label class="first"><input type="checkbox" data-id="a" data-type="1"/>Elokuvat</label>
+        <label><input type="checkbox" data-id="b" data-type="2"/>TV-sarjan nimi</label>
+        <label><input type="checkbox" data-id="c" data-type="3"/>TV-sarjan jakso</label>
+        <label><input type="checkbox" data-id="d" data-type="4"/>Muu TV-ohjelma</label>
+        <br/>
+        <label class="first"><input type="checkbox" data-id="e" data-type="5"/>Extrat</label>
+        <label><input type="checkbox" data-id="f" data-type="6"/>Trailerit</label>
+        <label><input type="checkbox" data-id="g" data-type="7"/>Pelit</label>
+        <label><input type="checkbox" data-id="h" data-type="0"/>Kategorisoimattomat</label>
       </div>
     </div>
   </div>

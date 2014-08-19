@@ -1,5 +1,5 @@
 function publicSearchPage() {
-  searchPage('/public/search/')
+  searchPage()
 
   var $page = $('#search-page')
   $page.find('.new-classification').remove()
@@ -7,7 +7,7 @@ function publicSearchPage() {
   $page.find('.recent').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program._id+']')
+    var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program.sequenceId+']')
     var subject = encodeURIComponent('Kuvaohjelman uudelleenluokittelupyyntö')
     var q = '?subject='+subject+'&body='+body
     $(this).find('.request-reclassification').attr('href', 'mailto:kavi@kavi.fi'+q).show()
@@ -15,7 +15,7 @@ function publicSearchPage() {
 }
 
 function internalSearchPage() {
-  var searchPageApi = searchPage('/programs/search/')
+  var searchPageApi = searchPage()
 
   var $page = $('#search-page')
   var $results = $page.find('.results').add($page.find('.recent'))
@@ -23,7 +23,6 @@ function internalSearchPage() {
   var $newClassificationButton = $page.find('.new-classification button')
   var $drafts = $page.find('.drafts')
   var $recent = $page.find('.recent')
-  var detailRenderer = programBox()
 
   var programTypesSelect2 = {
     data: [
@@ -51,14 +50,14 @@ function internalSearchPage() {
     e.stopPropagation()
     var $draft = $(this).parents('.draft')
     $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function(p) {
-      var programId = $draft.data('id')
       $draft.remove()
       $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
-      searchPageApi.programDataUpdated($page.find('.result[data-id=' + programId + ']').data('program', p))
+      searchPageApi.programDataUpdated(p)
     })
   })
 
   $page.on('showDetails', '.program-box', function(e, program) {
+    e.stopPropagation()
     toggleDetailButtons($(this), program)
   })
 
@@ -70,41 +69,46 @@ function internalSearchPage() {
   })
 
   $results.on('click', 'button.reclassify', function(e) {
-    var id = $(this).parents('.program-box').data('id')
+    var id = $(this).closest('.program-box').data('id')
     $.post('/programs/' + id + '/reclassification').done(function(program) {
       showClassificationPage(program._id)
     })
   })
 
   $results.on('click', 'button.continue-classification', function(e) {
-    var id = $(this).parents('.program-box').data('id')
+    var id = $(this).closest('.program-box').data('id')
     showClassificationPage(id)
   })
 
   $results.on('click', 'button.categorize', function(e) {
-    showCategorizationForm($(this).parents('.program-box').data('id'))
+    showCategorizationForm($(this).closest('.program-box'))
     $(this).hide()
   })
 
   $results.on('click', 'button.edit', function() {
-    var $programBox = $(this).parents('.program-box')
+    var $programBox = $(this).closest('.program-box')
     showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('classification')._id)
   })
 
   $results.on('click', 'button.remove', function() {
-    var $selected = $('.result.selected')
-    var program = $selected.data('program')
+    var $programBox = $(this).closest('.program-box')
+    var $row = $programBox.prev('.result')
+    var program = $row.data('program')
     showDialog($('#templates').find('.remove-program-dialog').clone()
       .find('.program-name').text(program.name).end()
       .find('button[name=remove]').click(removeProgram).end()
       .find('button[name=cancel]').click(closeDialog).end())
 
     function removeProgram() {
-      $.ajax('/programs/' + program._id, { type: 'DELETE' }).done(function() {
+      $.ajax('/programs/' + program._id, { type: 'delete' }).done(function() {
         closeDialog()
-        searchPageApi.closeDetail()
-        $selected.slideUp(function() {
+        $programBox.slideUp(function() { $(this).remove() })
+        $row.slideUp(function() {
           if (!_.isEmpty($(this).parents('.recent'))) { loadRecent() }
+          if (!_.isEmpty($(this).parents('.episodes'))) {
+            var $parentRow = $row.closest('.program-box').prev('.result')
+            $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
+          }
           $(this).remove()
         })
       })
@@ -115,7 +119,7 @@ function internalSearchPage() {
     $drafts.find('.draft').remove()
     $.get('/programs/drafts', function(drafts) {
       drafts.forEach(function(draft) {
-        var $date = $('<span>', {class: 'creationDate'}).text(utils.asDate(draft.creationDate))
+        var $date = $('<span>', {class: 'creationDate'}).text(utils.asDateTime(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
         var $remove = $('<div>', {class: 'remove'}).append($('<button>', { class: 'button' }).text('Poista'))
         var $draft = $('<div>', {class: 'result draft'})
@@ -133,7 +137,7 @@ function internalSearchPage() {
     $.get('/programs/recent', function(recents) {
       recents.forEach(function(p) {
         var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
-          .append($('<span>', { class: 'registrationDate' }).text(utils.asDate(p.classifications[0].registrationDate)))
+          .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
           .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
           .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
@@ -167,9 +171,8 @@ function internalSearchPage() {
       $detail.find('button.reclassify').toggle(!!canReclassify)
       $detail.find('button.categorize').hide()
     }
-
     $detail.find('button.edit').toggle(hasRole('root'))
-    $detail.find('button.remove').toggle(hasRole('root'))
+    $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))
   }
 
   function showClassificationPage(programId) {
@@ -182,8 +185,9 @@ function internalSearchPage() {
     $('#classification-page').trigger('show', [programId, 'edit', classificationId]).show()
   }
 
-  function showCategorizationForm(id) {
-    var $categorizationForm = $page.find('.categorization-form')
+  function showCategorizationForm($programBox) {
+    var id = $programBox.data('id')
+    var $categorizationForm = $programBox.find('.categorization-form')
     var $categorySelection = $categorizationForm.find('input[name=category-select]')
     var $categorySaveButton = $categorizationForm.find('.save-category')
 
@@ -240,19 +244,14 @@ function internalSearchPage() {
         categoryData.season = $season.val()
       }
 
-      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData))
-        .done(function(program) {
-          toggleDetailButtons($('.program-box'), program)
-          $categorizationForm.hide()
-          $results.find('.selected .program-type').text(enums.util.programTypeName(program.programType))
-          var $row = $results.find('.result[data-id=' + program._id + ']').data('program', program)
-          searchPageApi.programDataUpdated($row)
-        })
+      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
+        searchPageApi.programDataUpdated(program)
+      })
     })
   }
 }
 
-function searchPage(baseUrl) {
+function searchPage() {
   var $page = $('#search-page').html($('#templates .search-page').clone())
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
@@ -300,7 +299,7 @@ function searchPage(baseUrl) {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, closeDetail: closeDetail }
+  return { programDataUpdated: programDataUpdated }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -327,7 +326,7 @@ function searchPage(baseUrl) {
 
   function load(callback) {
     $loading.show()
-    var url = baseUrl+encodeURIComponent(state.q)
+    var url = '/programs/search/'+encodeURIComponent(state.q)
     var data = $.param({ page: state.page, filters: currentFilters() })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
@@ -352,9 +351,10 @@ function searchPage(baseUrl) {
     })
   }
 
-  function programDataUpdated($row) {
+  function programDataUpdated(program) {
+    var $row = $page.find('.result[data-id=' + program._id + ']')
     if (_.isEmpty($row)) return
-    var $newRow = render($row.data('program'), state.q)
+    var $newRow = render(program, state.q)
     $row.next('.program-box').remove()
     $row.replaceWith($newRow)
     if ($row.is('.selected')) {
@@ -402,8 +402,6 @@ function searchPage(baseUrl) {
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
         .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
-
-
   }
 }
 

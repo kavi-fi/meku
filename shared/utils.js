@@ -65,9 +65,13 @@ utils.hasRole = function (user, role) {
   return roles[role].order >= roles[user.role].order
 }
 
-utils.asDate = function (date) {
+utils.asDateTime = function(date) {
   var df = 'D.M.YYYY [klo] H:mm'
   return date ? moment(date).format(df) : ''
+}
+
+utils.asDate = function(date) {
+  return date ? moment(date).format(utils.dateFormat) : ''
 }
 
 utils.getProperty = function(obj, prop) {

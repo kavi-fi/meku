@@ -112,7 +112,7 @@ function providerPage() {
     var $selected = $providers.find('.result.selected')
     var provider = $selected.data('provider')
     $.ajax('/providers/' + provider._id, { type: 'PUT', data: JSON.stringify({ active: newState === 'on' })}).done(function(updatedProvider) {
-      $selected.replaceWith(renderProvider(updatedProvider))
+      $selected.replaceWith(renderProvider(updatedProvider).addClass('selected'))
     })
   }
 
@@ -273,7 +273,7 @@ function providerPage() {
         bindEventHandlers(provider, $locationDetails, function(locationData) {
           $.ajax('/providerlocations/' + location._id, { type: 'PUT', data: JSON.stringify(locationData) })
             .done(function(location) {
-              var $selected = $locations.find('.selected').removeClass('selected')
+              var $selected = $locations.find('.location-row.selected').removeClass('selected')
               $locations.find('.location-details').slideUp(function() {
                 $(this).remove()
                 $selected.replaceWith(renderLocation(location))
@@ -315,13 +315,25 @@ function providerPage() {
       $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, location))
       $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
         .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
+        .find('input[name=location-active][value=' + (location && location.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
+
+      $locationDetails.find('input[name=location-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
 
       return $locationDetails
     }
 
+    function toggleActiveButton(newState) {
+      var $selected = $locations.find('.location-row.selected')
+      var location = $selected.data('location')
+      var data = JSON.stringify({ active: newState === 'on' })
+      $.ajax('/providerlocations/' + location._id, { type: 'PUT', data: data}).done(function(updatedLocation) {
+        $selected.replaceWith(renderLocation(updatedLocation).addClass('selected'))
+      })
+    }
+
     function renderLocation(location) {
       return $('<div>', { 'data-id': location._id, class: 'location-row' })
-        .data('location', location)
+        .data('location', location).toggleClass('inactive', !location.active)
         .append($('<i>', { class: 'rotating fa fa-play' }))
         .append($('<span>').text(location.name))
     }

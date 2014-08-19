@@ -266,6 +266,7 @@ function classificationFormUtils() {
       $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
     }
     $form.find('button[name=save]').show()
+    $form.find('button[name=register]').hide()
   }
 
   function updateWarningOrdering($form, classification) {
@@ -277,27 +278,23 @@ function classificationFormUtils() {
   }
 
   function registrationEmails($form, saveFn) {
-    var $emails = $form.find('.classification-email .emails')
     var $preview = $form.find('.classification-email .email-preview')
     var $input = $form.find('input[name="classification.registrationEmailAddresses"]')
     var currentBuyerId = null
 
-    $input.select2({tags: [], formatNoMatches: ''}).on('change', function() {
-      var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).pluck('id').value()
-      saveFn($(this).attr('name'), manual)
-    })
-
-
     function render(program, classification, rootEditMode) {
+      $input.select2({tags: [], formatNoMatches: ''}).on('change', function() {
+        var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).pluck('id').value()
+        saveFn($(this).attr('name'), manual)
+      })
       if (rootEditMode) {
-        $form.find('button[name=register]').remove()
         $input.select2('enable', false)
       }
       update(program, classification, rootEditMode)
       return this
     }
 
-    function update(program, classification, rootEditMode) {
+    function update(program, classification) {
       if (shouldUpdateBuyer(classification)) {
         currentBuyerId = classification.buyer._id
         $.get('/accounts/' + currentBuyerId).done(function(account) {
@@ -311,13 +308,17 @@ function classificationFormUtils() {
       updateEmails('manual', classification.registrationEmailAddresses)
 
       function updateEmails(source, emails) {
-        var current = $input.select2('data')
+        var current = getCurrentEmailSelection()
         var bySource = _.curry(function(source, e) { return e.source == source })
         var toOption = _.curry(function(source, locked, e) { return {id: e, text: e, locked: locked, source: source } })
         var sent = source == 'sent' ? emails.map(toOption('sent', true)) : current.filter(bySource('sent'))
         var buyer = source == 'buyer' ? emails.map(toOption('buyer', true)) : current.filter(bySource('buyer'))
         var manual = source == 'manual' ? emails.map(toOption('manual', false)) : current.filter(bySource('manual'))
         $input.select2('data', sent.concat(buyer).concat(manual)).trigger('validate')
+      }
+
+      function getCurrentEmailSelection() {
+        return $input.length > 0 ? $input.select2('data') : []
       }
 
       $preview.find('.subject').text(email.subject)

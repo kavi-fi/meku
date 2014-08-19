@@ -144,7 +144,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     })
     $form.find('input[name="classification.safe"]').change(function() {
       var safe = $(this).is(':checked')
-      $form.find('.category-container').slideToggle(!safe)
+      $form.find('.category-container').slideToggle()
       save($(this).attr('name'), safe)
     })
     $form.find('.safe-container span').click(function() {

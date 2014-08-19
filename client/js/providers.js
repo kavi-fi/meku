@@ -151,7 +151,7 @@ function providerPage() {
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
-      .find('.locations').html(renderProviderLocations($providerDetails, provider))
+      .find('.locations').replaceWith(renderProviderLocations($providerDetails, provider))
 
     $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
 

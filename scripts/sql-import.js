@@ -238,17 +238,37 @@ function classifications(callback) {
     schema.Account.find({}, function(err, accounts) {
       if (err) return callback(err)
       var accountMap = _.indexBy(accounts, 'emekuId')
-      _.values(result.classifications).forEach(function(c) {
-        if (!c.provider_id || c.provider_id == '0') return
-        // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
-        if (c.provider_id == '38d427ff-a829-14ce-9950-4fcf065ceb64') return
+      schema.Provider.find({}, function(err, providers) {
+        if (err) return callback(err)
+        var providerMap = _.indexBy(providers, 'emekuId')
+        async.each(_.values(result.classifications), findBuyer, function(err) { callback(err, result) })
 
-        var a = accountMap[c.provider_id]
-        var obj = { _id: a._id, name: a.name }
-        c.buyer = obj
-        c.billing = obj
+        function findBuyer(c, callback) {
+          if (!c.provider_id || c.provider_id == '0') return callback()
+          // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
+          if (c.provider_id == '38d427ff-a829-14ce-9950-4fcf065ceb64') return callback()
+
+          var account = accountMap[c.provider_id]
+          if (account === undefined) {
+            var provider = providerMap[c.provider_id]
+
+            account = _(provider.toObject()).omit('sequenceId', '_id').merge({ roles: ['Subscriber'] }).valueOf()
+            new schema.Account(account).save(function(err, newAccount) {
+              if (err) return callback(err)
+              return setBuyerAndBilling(newAccount)
+            })
+          } else {
+            return setBuyerAndBilling(account)
+          }
+
+          function setBuyerAndBilling(account) {
+            var obj = { _id: account._id, name: account.name }
+            c.buyer = obj
+            c.billing = obj
+            return callback()
+          }
+        }
       })
-      callback(null, result)
     })
   }
 
@@ -287,7 +307,7 @@ function accounts(callback) {
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate' +
-      ' from accounts where customer_type != "^Location_of_providing^" and customer_type != "^Provider^" and customer_type != "^Distributor^" and deleted != "1"'
+      ' from accounts where customer_type != "^Location_of_providing^" and customer_type != "Location_of_providing" and customer_type != "^Provider^" and customer_type != "^Distributor^" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var billingAddress = row.billing_address_street
@@ -328,7 +348,7 @@ function accounts(callback) {
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate, provider_status' +
-      ' from accounts where customer_type LIKE "%Provider%" and deleted != "1"'
+      ' from accounts where (customer_type LIKE "%Provider%" or customer_type = "^Distributor^") and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var billingAddress = row.billing_address_street

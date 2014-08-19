@@ -172,7 +172,7 @@ function internalSearchPage() {
       $detail.find('button.categorize').hide()
     }
     $detail.find('button.edit').toggle(hasRole('root'))
-    $detail.find('button.remove').toggle(hasRole('root'))
+    $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))
   }
 
   function showClassificationPage(programId) {

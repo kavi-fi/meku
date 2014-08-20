@@ -473,7 +473,14 @@ app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
 app.put('/providerlocations/:id', requireRole('kavi'), function(req, res, next) {
   ProviderLocation.findById(req.params.id, function(err, location) {
     if (err) return next(err)
-    updateAndLogChanges(location, req.body, req.user, respond(res, next))
+
+    var params = {}
+
+    if (_.isEmpty(location.registrationDate) && req.body.active === true) {
+      _.merge(params, { registrationDate: new Date() })
+    }
+
+    updateAndLogChanges(location, _.merge({}, req.body, params), req.user, respond(res, next))
   })
 })
 

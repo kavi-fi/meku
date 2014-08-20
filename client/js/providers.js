@@ -332,10 +332,16 @@ function providerPage() {
     }
 
     function renderLocation(location) {
-      return $('<div>', { 'data-id': location._id, class: 'location-row' })
+      var $location = $('<div>', { 'data-id': location._id, class: 'location-row' })
         .data('location', location).toggleClass('inactive', !location.active)
         .append($('<i>', { class: 'rotating fa fa-play' }))
         .append($('<span>').text(location.name))
+
+      if (location.isPayer) {
+        $location.append($('<span>', { class: 'right' }).text('Tarjoamispaikka maksaa laskun'))
+      }
+
+      return $location
     }
 
     function bindEventHandlers(provider, $locationDetails, submitCallback) {

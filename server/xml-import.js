@@ -55,10 +55,14 @@ var validateProgram = map(compose([
   }),
   map(childrenByNameTo('TUOTANTOYHTIO', 'productionCompanies'), function(p) { return { productionCompanies: p.productionCompanies.map(text) } }),
   required('SYNOPSIS', 'synopsis'),
-  optional('TUOTANTOKAUSI', 'season'),
-  optional('OSA', 'episode'),
   flatMap(requiredAttr('TYPE', 'type'), function(p) {
-    return p.type == '03' ? required('ISANTAOHJELMA', 'parentTvSeriesName') : optional('ISANTAOHJELMA', 'parentTvSeriesName')
+    return p.type == '03' ? and(optional('TUOTANTOKAUSI', 'season'), testOptional('TUOTANTOKAUSI', isInt, "Virheellinen TUOTANTOKAUSI", 'season')) : ret({})
+  }),
+  flatMap(requiredAttr('TYPE', 'type'), function(p) {
+    return p.type == '03' ? and(required('OSA'), test('OSA', isInt, "Virheellinen OSA", 'episode')) : ret({})
+  }),
+  flatMap(requiredAttr('TYPE', 'type'), function(p) {
+    return p.type == '03' ? required('ISANTAOHJELMA', 'parentTvSeriesName') : ret({})
   }),
   map(compose([
     valuesInEnum('LAJIT', enums.legacyGenres),
@@ -251,6 +255,16 @@ function test(field, f, msg, toField) {
     else return error(msg + " " + text)
   }
 }
+
+function testOptional(field, f, msg, toField) {
+  return function(xml) {
+    if (!xml[field]) return ok({})
+    var text = xml[field].$text
+    if (f(text)) return ok(utils.keyValue(toField || field, text))
+    else return error(msg + " " + text)
+  }
+}
+
 function text(node) {
   return node.$text
 }
@@ -260,6 +274,8 @@ function fullname(node) {
 function childrenByName(root, name) {
   return root.$children.filter(function(e) { return e.$name == name })
 }
+
+function isInt(val) { return val == parseInt(val) }
 
 function optionListToArray(field, sep) {
   sep = sep || ' '

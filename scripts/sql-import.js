@@ -594,18 +594,25 @@ function linkTvSeries(callback) {
 
   function linkEpisodesToSeries(callback) {
     var tick = progressMonitor()
-    conn.query('select program.id as programId, program.season, program.episode, parent.id as parentId from meku_audiovisualprograms program join meku_audiovisualprograms parent on (program.parent_id = parent.id) where program.deleted != "1" and parent.deleted != "1" and program.program_type = "03" and parent.program_type = "05"')
-      .stream()
-      .pipe(consumer(onRow, callback))
+    schema.Program.find({ programType: 2 }, { emekuId:1, name:1 }).lean().exec(function(err, parents) {
+      var parentMap = _.indexBy(parents, 'emekuId')
+      conn.query('select program.id as programId, program.season, program.episode, parent.id as parentId from meku_audiovisualprograms program join meku_audiovisualprograms parent on (program.parent_id = parent.id) where program.deleted != "1" and parent.deleted != "1" and program.program_type = "03" and parent.program_type = "05"')
+        .stream()
+        .pipe(consumer(onRow, callback))
 
-    function onRow(row, callback) {
-      tick()
-      schema.Program.findOne({ emekuId: row.parentId }, { name:1 }, function(err, parent) {
-        var update = { season: trimPeriod(row.season), episode: trimPeriod(row.episode), series: { _id: parent._id, name: parent.name[0] } }
+      function onRow(row, callback) {
+        tick()
+        var parent = parentMap[row.parentId]
+        var update = { series: { _id: parent._id, name: parent.name[0] } }
+        toInt('season', row, update)
+        toInt('episode', row, update)
         schema.Program.update({ emekuId: row.programId }, update, callback)
-      })
-    }
-    function trimPeriod(s) { return s && s.replace(/\.$/, '') || s }
+      }
+      function toInt(key, source, dest) {
+        var i = parseInt(source[key])
+        if (!isNaN(i)) dest[key] = i
+      }
+    })
   }
 
   function calculateParentClassifications(callback) {

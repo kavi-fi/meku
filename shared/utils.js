@@ -95,11 +95,11 @@ utils.setValueForPath = function(path, property, value) {
   }
 }
 
-// Flattens object like { a: 1, b: { c: 2, d: 4 }} to { a: 1, b.c: 2, b.d: 4 }
+// Flattens object like { a: 1, b: { c: 2, d: 4 }} to { a: 1, b.c: 2, b.d: 4 }. Only flattens plain objects.
 utils.flattenObject = function flattenObject(deepObject) {
   var resultObject = {}
   _.forEach(deepObject, function(val, key) {
-    if (_.isObject(val) && !_.isArray(val)) {
+    if (_.isPlainObject(val)) {
       var flatInnerObject = flattenObject(val)
       _.forEach(flatInnerObject, function(innerVal, innerKey) {
         var flatKey = key + '.' + innerKey

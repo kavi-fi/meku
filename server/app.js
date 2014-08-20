@@ -225,7 +225,7 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-  var p = new Program({ programType: programType, createdBy: {_id: req.user._id, username: req.user.username, name: req.user.user, role: req.user.role}})
+  var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.user, role: req.user.role}})
   p.newDraftClassification(req.user)
   p.save(function(err, program) {
     if (err) return next(err)
@@ -250,25 +250,50 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    verifyTvSeriesExistsOrCreate(program, function(err) {
+    populateSentRegistrationEmailAddresses(newClassification, program, function(err, program) {
       if (err) return next(err)
-      program.save(function(err) {
+      verifyTvSeriesExistsOrCreate(program, function(err) {
         if (err) return next(err)
-        updateTvSeriesClassification(program, function(err) {
+        program.save(function(err) {
           if (err) return next(err)
-          addInvoicerows(newClassification, function(err) {
+          updateTvSeriesClassification(program, function(err) {
             if (err) return next(err)
-            sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user), function(err) {
+            addInvoicerows(newClassification, function(err) {
               if (err) return next(err)
-              updateMetadataIndexes(program, function() {
-                logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
-                return res.send(program)
+              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user), function(err) {
+                if (err) return next(err)
+                updateMetadataIndexes(program, function() {
+                  logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
+                  return res.send(program)
+                })
               })
             })
           })
         })
       })
     })
+
+    function populateSentRegistrationEmailAddresses(classification, program, callback) {
+      if (classification.buyer) {
+        Account.findById(classification.buyer._id, 'emailAddresses', function(err, buyer) { 
+          if (err) return callback(err)
+          populate(buyer.emailAddresses, callback)
+        })
+      } else {
+        populate([], callback)
+      }
+
+      function populate(buyerEmails, callback) {
+        var classifier = req.user.email
+        var manual = classification.registrationEmailAddresses
+        var newEmails = _.uniq(program.sentRegistrationEmailAddresses
+          .concat(manual)
+          .concat(buyerEmails)
+          .concat([classifier]))
+        program.sentRegistrationEmailAddresses = newEmails
+        callback(null, program)
+      }
+    }
 
     function addInvoicerows(currentClassification, callback) {
       var seconds = durationToSeconds(currentClassification.duration)
@@ -300,19 +325,8 @@ app.post('/programs/:id/register', function(req, res, next) {
 app.post('/programs/:id/reclassification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
-    getRegistrationEmailsFromPreviousClassification(program, function(err, emails) {
-      if (err) return next(err)
-      var draft = program.newDraftClassification(req.user)
-      draft.registrationEmailAddresses = emails
-      program.save(respond(res, next))
-    })
-  })
-})
-
-app.get('/programs/:id/registrationEmails', requireRole('root'), function(req, res, next) {
-  Program.findById(req.params.id, function(err, program) {
-    if (err) next(err)
-    getRegistrationEmailsFromPreviousClassification(program, respond(res, next))
+    var draft = program.newDraftClassification(req.user)
+    program.save(respond(res, next))
   })
 })
 
@@ -899,23 +913,6 @@ function verifyTvSeriesExistsOrCreate(program, callback) {
 
 function logError(err) {
   if (err) console.error(err)
-}
-
-function getRegistrationEmailsFromPreviousClassification(program, callback) {
-  var ids = _.uniq(_.reduce(program.classifications, function(acc, c) {
-    return acc.concat(c.buyer && c.buyer._id ? [c.buyer._id] : []).concat(c.billing && c.billing._id ? [c.billing._id] : [])
-  }, []))
-
-  if (ids.length > 0) {
-    Account.find({_id: {$in: ids}}).select('emailAddresses').exec(function(err, accounts) {
-      if (err) return callback(err)
-      var emails = _(accounts).map(function(a) { return a.emailAddresses }).flatten()
-        .map(function(e) { return {email: e, manual: false}}).value()
-      callback(null, emails)
-    })
-  } else {
-    callback(null, [])
-  }
 }
 
 function updateAndLogChanges(document, updates, user, callback) {

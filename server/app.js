@@ -259,7 +259,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     populateSentRegistrationEmailAddresses(newClassification, program, function(err, program) {
       if (err) return next(err)
-      verifyTvSeriesExistsOrCreate(program, function(err) {
+      verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)
         program.save(function(err) {
           if (err) return next(err)
@@ -343,7 +343,7 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
     watcher.applyUpdates(updates)
-    verifyTvSeriesExistsOrCreate(program, function(err) {
+    verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
         if (err) return next(err)
@@ -365,7 +365,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
     var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     watcher.applyUpdates(req.body)
-    verifyTvSeriesExistsOrCreate(program, function(err) {
+    verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
         if (err) return next(err)
@@ -680,10 +680,11 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       var username = program.classifications[0].author.name
       var user = _.find(req.account.users, { username: username })
       if (user) {
-        program.classifications[0].author._id = user._id
-        User.findOne({ username: username, active: true }, { _id: 1 }).lean().exec(function(err, doc) {
+        User.findOne({ username: username, active: true }, { _id: 1, username: 1, name: 1, role: 1 }).lean().exec(function(err, doc) {
           if (err) return callback(err)
           if (doc) {
+            program.classifications[0].author = { _id: doc._id, username: doc.username, name: doc.name }
+            program.createdBy = { _id: doc._id, username: doc.username, name: doc.name, role: doc.role }
             return callback()
           } else {
             return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
@@ -700,7 +701,8 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       Program.findOne({ programType: 2, name: parentName }, function(err, parent) {
         if (err) return callback(err)
         if (!parent) {
-          createParentProgram(program, { name:[parentName] }, callback)
+          var user = _.merge({ ip: req.user.ip }, program.createdBy)
+          createParentProgram(program, { name:[parentName] }, user, callback)
         } else {
           program.series = { _id: parent._id, name: parent.name[0] }
           callback()
@@ -732,12 +734,13 @@ app.use(function(err, req, res, next) {
   res.send({ message: err.message || err })
 })
 
-function createParentProgram(program, data, callback) {
-  var parent = new Program(_.merge({ programType: 2 }, data))
+function createParentProgram(program, data, user, callback) {
+  var parent = new Program(_.merge({ programType: 2, createdBy: {_id: user._id, username: user.username, name: user.name, role: user.role} }, data))
   parent.populateAllNames(function(err) {
     if (err) return callback(err)
     parent.save(function(err, saved) {
       if (err) return callback(err)
+      logCreateOperation(user, parent)
       program.series = { _id: saved._id, name: saved.name[0] }
       callback()
     })
@@ -930,7 +933,7 @@ function updateTvSeriesClassification(program, callback) {
   Program.updateTvSeriesClassification(seriesId, callback)
 }
 
-function verifyTvSeriesExistsOrCreate(program, callback) {
+function verifyTvSeriesExistsOrCreate(program, user, callback) {
   if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
     var draft = program.series.draft || {}
     var data = {
@@ -939,7 +942,7 @@ function verifyTvSeriesExistsOrCreate(program, callback) {
       nameSv: draft.nameSv ? [draft.nameSv] : [],
       nameOther: draft.nameOther ? [draft.nameOther] : []
     }
-    createParentProgram(program, data, callback)
+    createParentProgram(program, data, user, callback)
   } else {
     if (program.series) program.series.draft = {}
     return callback()

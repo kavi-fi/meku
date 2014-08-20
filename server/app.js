@@ -153,21 +153,21 @@ app.post('/reset-password', function(req, res, next) {
 app.get('/programs/search/:q?', function(req, res, next) {
   if (req.user) {
     var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
-    search(fields, req, res, next)
+    search({}, fields, req, res, next)
   } else {
-    search(Program.publicFields, req, res, next)
+    search({ $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }, Program.publicFields, req, res, next)
   }
 })
 
-function search(responseFields, req, res, next) {
+function search(extraQueryTerms, responseFields, req, res, next) {
   var page = req.query.page || 0
   var filters = req.query.filters || []
-  Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
+  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
-  function query() {
+  function query(extraQueryTerms) {
     var ObjectId = mongoose.Types.ObjectId
     var terms = req.params.q
-    var q = { deleted: { $ne:true } }
+    var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
     var and = []
     if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
     var nameQuery = toMongoArrayQuery(terms)

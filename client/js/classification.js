@@ -292,7 +292,9 @@ function classificationFormUtils() {
     $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     if (_.isEmpty(p.classifications)) {
       $form.find('.classification-details, .classification-summary, .classification-criteria, .classification-email').remove()
-      $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
+      if (!enums.util.isTvSeriesName(p)) {
+        $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
+      }
     }
     $form.find('button[name=save]').show()
     $form.find('button[name=register]').hide()

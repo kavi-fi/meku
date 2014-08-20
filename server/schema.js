@@ -141,6 +141,8 @@ AccountSchema.pre('save', ensureSequenceId('Account'))
 
 var Provider = exports.Provider = mongoose.model('providers', {
   emekuId: String,
+  creationDate: Date,
+  registrationDate: Date,
   yTunnus: String,
   name: String,
   address: { street: String, city: String, zip: String, country: String },

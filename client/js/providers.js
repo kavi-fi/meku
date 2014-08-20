@@ -2,6 +2,7 @@ function providerPage() {
   var $page = $('#provider-page')
   var $providers = $page.find('.providers-list')
   var $providerNameQuery = $page.find('#provider-name-query')
+  var $unapproved = $page.find('.unapproved .results')
 
   $page.on('show', function(event, providerId) {
     updateLocationHash(providerId || '')
@@ -12,26 +13,37 @@ function providerPage() {
       $providerNameQuery.trigger('input')
 
       if (providerId) {
-        var $selected = $providers.find('.result[data-id=' + providerId + ']')
+        var $selected = $providers.add($unapproved).find('.result[data-id=' + providerId + ']')
         openDetails($selected)
         var top = $selected.offset().top - 25
         $('body,html').animate({ scrollTop: top })
       }
+    })
+
+    $.get('/providers/unapproved', function(providers) {
+      $unapproved.empty()
+      $page.find('.unapproved').toggle(providers.length > 0)
+      _(providers).sortBy('name')
+        .map(renderUnapproved)
+        .forEach(function(p) {
+          $unapproved.append(p)
+        })
     })
   })
 
   $page.on('click', 'button[name=new-provider]', function() {
     var $providerDetails = renderProviderDetails()
     $providerDetails.find('.modify-only').remove()
-    bindEventHandlers($providerDetails, function(provider) {
+    var $selected = $providers.find('.selected')
+    bindEventHandlers($selected, $providerDetails, function(provider) {
       $.post('/providers', JSON.stringify(_.merge(provider, { deleted: false })), function(newProvider) {
         var $providerRow = renderProvider(newProvider)
         $providers.prepend($providerRow)
         $providerRow.slideDown()
-        closeDetails()
+        closeDetails($providers.find('.provider-details'))
       })
     })
-    closeDetails()
+    closeDetails($selected)
     $providers.prepend($providerDetails)
     $providerDetails.slideDown()
   })
@@ -42,13 +54,14 @@ function providerPage() {
       var name = $(this).children('.name').text().toLowerCase()
       $(this).toggle(_.contains(name, searchString))
     })
-    closeDetails()
+    closeDetails($providers.find('.provider-details'))
   })
 
-  $providers.on('click', '.result', function() {
+  $providers.add($unapproved).on('click', '.result', function() {
+    console.log('click')
     var $this = $(this)
     var wasSelected = $this.hasClass('selected')
-    closeDetails()
+    closeDetails($this)
     if (!wasSelected) {
       openDetails($this)
     }
@@ -60,11 +73,13 @@ function providerPage() {
 
       if (hasRole('root')) $providerDetails.append(changeLog(provider).render())
 
-      bindEventHandlers($providerDetails, function(providerData) {
+      bindEventHandlers($row, $providerDetails, function(providerData) {
         $.ajax('/providers/' + provider._id, { type: 'PUT', data: JSON.stringify(providerData) })
           .done(function(provider) {
-            $providers.find('.result.selected').replaceWith(renderProvider(provider))
-            closeDetails()
+            var $parent = $row.parent()
+            $row.replaceWith(renderProvider(provider))
+            console.log($parent)
+            closeDetails($parent.find('.provider-details'))
         })
       })
 
@@ -74,8 +89,11 @@ function providerPage() {
     })
   }
 
-  function bindEventHandlers($providerDetails, submitCallback) {
+  function bindEventHandlers($selected, $providerDetails, submitCallback) {
     var $form = $providerDetails.find('form')
+    var toggle = _.curry(toggleActiveButton)($selected)
+
+    $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggle })
 
     $form.submit(function(event) {
       event.preventDefault()
@@ -102,24 +120,23 @@ function providerPage() {
       function removeProvider() {
         $.ajax('/providers/' + provider._id, { type: 'DELETE' }).done(function() {
           closeDialog()
-          closeDetails()
+          closeDetails($providers.find('.selected'))
           $selected.slideUp(function() { $(this).remove() })
         })
       }
     })
   }
 
-  function toggleActiveButton(newState) {
-    var $selected = $providers.find('.result.selected')
+  function toggleActiveButton($selected, newState) {
     var provider = $selected.data('provider')
-    $.ajax('/providers/' + provider._id, { type: 'PUT', data: JSON.stringify({ active: newState === 'on' })}).done(function(updatedProvider) {
+    $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(updatedProvider) {
       $selected.replaceWith(renderProvider(updatedProvider).addClass('selected'))
     })
   }
 
-  function closeDetails() {
-    $providers.find('.result.selected').removeClass('selected')
-    $providers.find('.provider-details').slideUp(function() { $(this).remove() })
+  function closeDetails($selected) {
+    $selected.removeClass('selected')
+    $selected.parent().find('.provider-details').slideUp(function() { $(this).remove() })
     updateLocationHash('')
   }
 
@@ -139,6 +156,13 @@ function providerPage() {
       .append($('<span>', { class: 'name' }).text(provider.name))
   }
 
+  function renderUnapproved(provider) {
+    return $('<div>', { class: 'result', 'data-id': provider._id })
+      .data('provider', provider)
+      .append($('<span>', { class: 'date' }).text(utils.asDate(provider.creationDate)))
+      .append($('<span>', { class: 'name' }).text(provider.name))
+  }
+
   function renderProviderDetails(provider) {
     var $providerDetails = $('#templates').find('.provider-details').clone()
     $providerDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, provider))
@@ -154,7 +178,6 @@ function providerPage() {
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
       .find('.locations').replaceWith(renderProviderLocations($providerDetails, provider))
 
-    $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
 
     toggleBillingExtra($providerDetails)
 

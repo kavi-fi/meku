@@ -433,8 +433,12 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
   Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
 })
 
+app.get('/providers/unapproved', requireRole('kavi'), function(req, res, next) {
+  Provider.find({deleted: false, active: false, registrationDate: { $exists: false }}, '', respond(res, next))
+})
+
 app.get('/providers', requireRole('kavi'), function(req, res, next) {
-  Provider.find({deleted: false}, '', respond(res, next))
+  Provider.find({deleted: false, registrationDate: { $exists: true }}, '', respond(res, next))
 })
 
 app.post('/providers', requireRole('kavi'), function(req, res, next) {
@@ -442,6 +446,14 @@ app.post('/providers', requireRole('kavi'), function(req, res, next) {
     if (err) return next(err)
     logCreateOperation(req.user, provider)
     res.send(provider)
+  })
+})
+
+app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, function(err, provider) {
+    if (err) return next(err)
+    var updates = _.merge({}, {active: !provider.active}, provider.registrationDate ? {} : {registrationDate: new Date()})
+    updateAndLogChanges(provider, updates, req.user, respond(res, next))
   })
 })
 

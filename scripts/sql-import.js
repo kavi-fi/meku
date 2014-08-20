@@ -361,9 +361,12 @@ function accounts(callback) {
         : undefined
 
       var phoneNumber = row.phone_office || row.phone_alternate || undefined
+      var active = row.provider_status === 'Approved' || row.provider_status === 'Changed'
 
       return {
         emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        creationDate: new Date(),
+        registrationDate: active ? new Date(0) : undefined,
         address: address,
         language: langCode(trim(row.customer_lang)),
         billing: { address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text) },
@@ -372,7 +375,7 @@ function accounts(callback) {
         contactName: row.ownership,
         phoneNumber: phoneNumber,
         deleted: false,
-        active: row.provider_status === 'Approved' || row.provider_status === 'Changed',
+        active: active,
         locations: []
       }
     }

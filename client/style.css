@@ -691,6 +691,9 @@ textarea.invalid:disabled,
 #provider-page .buttons { margin-top: -45px; float: right; }
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 
+#provider-page .unapproved { margin-bottom: 30px; }
+#provider-page .unapproved .result .date { display: inline-block; width: 90px; }
+
 .rotating.fa-play {
     margin-right: 5px;
     -webkit-transition: .3s linear;

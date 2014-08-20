@@ -157,6 +157,11 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('input[name="series"]').on('change', function() { onSeriesChanged(false) })
     onSeriesChanged(true)
 
+    $form.find('input[name="series.draft.name"]').on('input', function() {
+      var val = $(this).val()
+      $form.find('input[name="series"]').select2('data', { id: val, text: val, isNew: true })
+    })
+
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')

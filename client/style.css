@@ -244,6 +244,9 @@ label.top { vertical-align: top; }
 .program-box .categorization-form .category-select-container .select2-container { width: 222px; margin-bottom: 15px; }
 .program-box .categorization-form .categorization-form-tv-episode { display: inline-block; }
 .program-box .categorization-form .categorization-form-tv-episode > div { margin-left: 5px; display: inline-block; vertical-align: top; }
+.program-box .categorization-form .categorization-form-tv-new-series { display: none; }
+.program-box .categorization-form .categorization-form-tv-new-series > div { display: inline-block; vertical-align: top; }
+.program-box .categorization-form .categorization-form-tv-new-series input { width: 190px; }
 .program-box .categorization-form input[type=number] { width: 80px; display: inline-block; }
 
 .program-box .episode-container > h3 { cursor: pointer; border-bottom: none; }

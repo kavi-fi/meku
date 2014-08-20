@@ -674,7 +674,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       Program.findOne({ programType: 2, name: parentName }, function(err, parent) {
         if (err) return callback(err)
         if (!parent) {
-          createParentProgram(program, parentName, callback)
+          createParentProgram(program, { name:[parentName] }, callback)
         } else {
           program.series = { _id: parent._id, name: parent.name[0] }
           callback()
@@ -706,8 +706,8 @@ app.use(function(err, req, res, next) {
   res.send({ message: err.message || err })
 })
 
-function createParentProgram(program, parentName, callback) {
-  var parent = new Program({ programType: 2, name: [parentName] })
+function createParentProgram(program, data, callback) {
+  var parent = new Program(_.merge({ programType: 2 }, data))
   parent.populateAllNames(function(err) {
     if (err) return callback(err)
     parent.save(function(err, saved) {
@@ -907,7 +907,7 @@ function updateTvSeriesClassification(program, callback) {
 
 function verifyTvSeriesExistsOrCreate(program, callback) {
   if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
-    createParentProgram(program, program.series.name.trim(), callback)
+    createParentProgram(program, { name: [program.series.name.trim()] }, callback)
   } else return callback()
 }
 

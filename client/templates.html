@@ -302,10 +302,8 @@
   </div>
 
   <form class="form">
-    <div class="buttons">
-      <button name="save" type="submit" disabled class="button">Tallenna</button>
-      <button name="remove" type="button" class="button modify-only">Poista</button>
-    </div>
+    <button name="save" type="submit" disabled class="button">Tallenna</button>
+    <button name="remove" type="button" class="button modify-only">Poista</button>
 
     <label>Toiminimi <input type="text" name="name" required></label>
     <label>Y-tunnus <input type="text" name="yTunnus" required></label>
@@ -347,9 +345,11 @@
     <label class="double">Laskulle haluttava teksti <textarea name="billing.invoiceText"></textarea></label>
   </form>
 
-  <h2>Tarjoamispaikat</h2>
-  <button name="new-location" class="button">Luo uusi tarjoamispaikka</button>
-  <div class="locations"></div>
+  <div class="modify-only">
+    <h2>Tarjoamispaikat</h2>
+    <button name="new-location" class="button">Luo uusi tarjoamispaikka</button>
+    <div class="locations"></div>
+  </div>
 </div>
 
 <div class="location-details detail-box clearfix">

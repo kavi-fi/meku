@@ -22,6 +22,7 @@ function providerPage() {
 
   $page.on('click', 'button[name=new-provider]', function() {
     var $providerDetails = renderProviderDetails()
+    $providerDetails.find('.modify-only').remove()
     bindEventHandlers($providerDetails, function(provider) {
       $.post('/providers', JSON.stringify(_.merge(provider, { deleted: false })), function(newProvider) {
         var $providerRow = renderProvider(newProvider)

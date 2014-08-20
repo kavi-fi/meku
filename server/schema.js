@@ -54,7 +54,7 @@ var ProgramSchema = new Schema({
   programType: Number, // enums.programType
   gameFormat: String, // in programType == game(7)
   season: Number, episode: Number, // in programType == episode(3)
-  series: { _id: { type: ObjectId, index:true }, name: String }, // in programType == episode(3)
+  series: { _id: { type: ObjectId, index:true }, name: String, draft: { name: String, nameFi: String, nameSv: String, nameOther: String } }, // in programType == episode(3)
   episodes: { count: Number, criteria: [Number], legacyAgeLimit: Number }, // in programType == series(2)
   sentRegistrationEmailAddresses: [String],
   createdBy: { _id: ObjectId, name: String, username: String, role: String }

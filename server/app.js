@@ -906,8 +906,18 @@ function updateTvSeriesClassification(program, callback) {
 
 function verifyTvSeriesExistsOrCreate(program, callback) {
   if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
-    createParentProgram(program, { name: [program.series.name.trim()] }, callback)
-  } else return callback()
+    var draft = program.series.draft || {}
+    var data = {
+      name: [draft.name || program.series.name],
+      nameFi: draft.nameFi ? [draft.nameFi] : [],
+      nameSv: draft.nameSv ? [draft.nameSv] : [],
+      nameOther: draft.nameOther ? [draft.nameOther] : []
+    }
+    createParentProgram(program, data, callback)
+  } else {
+    if (program.series) program.series.draft = {}
+    return callback()
+  }
 }
 
 function logError(err) {

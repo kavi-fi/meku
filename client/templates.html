@@ -318,7 +318,15 @@
       <h2 class="main">Uusi kuvaohjelma - ?</h2>
 
       <div class="left">
-        <div class="tv-episode-field"><label class="select2-label">TV-sarjan nimi</label><input name="series" class="required" type="hidden" /></div>
+        <div class="tv-episode-field">
+          <label class="select2-label">TV-sarjan nimi</label><input name="series" class="required" type="hidden" />
+          <div class="new-series-fields">
+            <label>TV-sarjan alkuperäinen nimi</label><input name="series.draft.name" disabled class="throttledInput required" type="text" />
+            <label>TV-sarjan suomalainen nimi</label><input name="series.draft.nameFi" disabled class="throttledInput required" type="text" />
+            <label>TV-sarjan ruotsinkielinen nimi</label><input name="series.draft.nameSv" disabled class="throttledInput" type="text" />
+            <label>TV-sarjan muu nimi</label><input name="series.draft.nameOther" disabled class="throttledInput" type="text" />
+          </div>
+        </div>
         <label>Alkuperäinen nimi</label><input name="name.0" class="required throttledInput" type="text" />
         <label>Suomalainen nimi</label><input name="nameFi.0" class="required throttledInput" type="text" />
         <label>Ruotsinkielinen nimi</label><input name="nameSv.0" class="throttledInput" type="text" />

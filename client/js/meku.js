@@ -336,7 +336,7 @@ function select2EnumAutocomplete(opts, onChangeFn) {
 
 function idNamePairToSelect2Option(x) {
   if (!x) return null
-  return {id: x._id === null ? x.name : x._id, text: x.name}
+  return {id: x._id === null ? x.name : x._id, text: x.name, isNew: x._id === null }
 }
 
 function select2OptionToIdNamePair(x) {

@@ -444,6 +444,7 @@ textarea.invalid:disabled,
 .program-details-form .private-comments .field-hint { padding-right: 3px; }
 .program-details-form .season-episode-fields input + label { width: 50px; }
 .program-details-form .season-episode-fields input { width: 92px; }
+.program-details-form .new-series-fields { display: none; padding-top: 9px; margin-bottom: 32px; border-radius: 4px; background-color: #eeeeee; }
 
 .program-details-form .comments { margin-top: 13px; }
 .program-details-form .comments textarea { width: 750px; height: 60px }

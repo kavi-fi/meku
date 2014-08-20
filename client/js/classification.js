@@ -53,6 +53,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('input[name=season]').val(p.season).end()
       .find('input[name=episode]').val(p.episode).end()
       .find('textarea[name=synopsis]').val(p.synopsis).end()
+      .find('input[name="series.draft.name"]').val(utils.getProperty(p, 'series.draft.name') || '').end()
+      .find('input[name="series.draft.nameFi"]').val(utils.getProperty(p, 'series.draft.nameFi') || '').end()
+      .find('input[name="series.draft.nameSv"]').val(utils.getProperty(p, 'series.draft.nameSv') || '').end()
+      .find('input[name="series.draft.nameOther"]').val(utils.getProperty(p, 'series.draft.nameOther') || '').end()
 
     select2Autocomplete(select2Opts.series, save).trigger('setVal', p.series)
     select2EnumAutocomplete(select2Opts.countries, save).trigger('setVal', p.country)
@@ -150,12 +154,14 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('.safe-container span').click(function() {
       $(this).prev().click()
     })
+    $form.find('input[name="series"]').on('change', function() { onSeriesChanged(false) })
+    onSeriesChanged(true)
+
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
       $buyerAndBilling.removeClass('touched').select2('enable', enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
     })
-
     $form.on('click', '.category .criteria', function() {
       $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
       var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
@@ -167,6 +173,23 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $(this).parents('.criteria').toggleClass('has-comment', isNotEmpty($(this).val()))
     })
     cfu.warningDragOrder($form.find('.classification-criteria .warning-order'), save)
+
+    function onSeriesChanged(isInitial) {
+      var data = $form.find('input[name="series"]').select2('data')
+      if (!data) return
+      var $container = $form.find('.new-series-fields')
+      var $inputs = $container.find('input')
+      if (data.isNew) {
+        $inputs.prop('disabled', false)
+        if (!isInitial) {
+          $container.find('input[name="series.draft.name"]').val(data.text).trigger('input')
+        }
+        $container[isInitial ? 'show' : 'slideDown']()
+      } else {
+        $inputs.prop('disabled', true).removeClass('touched').val('').trigger('validate')
+        $container[isInitial ? 'hide' : 'slideUp']()
+      }
+    }
   }
 
   function save(field, value) {

@@ -58,7 +58,6 @@ function providerPage() {
   })
 
   $providers.add($unapproved).on('click', '.result', function() {
-    console.log('click')
     var $this = $(this)
     var wasSelected = $this.hasClass('selected')
     closeDetails($this)
@@ -78,7 +77,6 @@ function providerPage() {
           .done(function(provider) {
             var $parent = $row.parent()
             $row.replaceWith(renderProvider(provider))
-            console.log($parent)
             closeDetails($parent.find('.provider-details'))
         })
       })

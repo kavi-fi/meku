@@ -901,7 +901,6 @@ function updateTvSeriesClassification(program, callback) {
   if (!enums.util.isTvEpisode(program)) return callback()
   var seriesId = program.series && program.series._id
   if (!seriesId) return callback()
-  console.log('Program.updateTvSeriesClassification '+seriesId)
   Program.updateTvSeriesClassification(seriesId, callback)
 }
 

@@ -87,7 +87,7 @@ function internalSearchPage() {
 
   $results.on('click', 'button.edit', function() {
     var $programBox = $(this).closest('.program-box')
-    showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('classification')._id)
+    showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('id'))
   })
 
   $results.on('click', 'button.remove', function() {

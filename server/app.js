@@ -352,7 +352,7 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
   })
 })
 
-app.post('/programs/:id', function(req, res, next) {
+app.post('/programs/:id', requireRole('root'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
     var oldSeries = program.toObject().series

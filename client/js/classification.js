@@ -236,9 +236,9 @@ function classificationFormUtils() {
     $form.find('.classification-details h2.main').text(classificationTitle)
 
     if (isTvEpisode) {
-      $form.find('input[name="name.0"]').prev().text('Jakson alkuperäinen nimi').end()
-        .find('input[name="nameFi.0"]').prev().text('Jakson suomalainen nimi').end()
-        .find('input[name="nameSv.0"]').prev().text('Jakson ruotsinkielinen nimi').end()
+      $form.find('input[name="name.0"]').prev().text('Jakson alkuperäinen nimi')
+      $form.find('input[name="nameFi.0"]').prev().text('Jakson suomalainen nimi')
+      $form.find('input[name="nameSv.0"]').prev().text('Jakson ruotsinkielinen nimi')
     }
     if (!isTvEpisode) $form.find('.tv-episode-field').remove()
     if (isGame) $form.find('.non-game-field').remove()

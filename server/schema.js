@@ -86,10 +86,11 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
   })
 }
 
-ProgramSchema.methods.populateAllNames = function(callback) {
+ProgramSchema.methods.populateAllNames = function(series, callback) {
+  if (!callback) { callback = series; series = undefined }
   var program = this
   if (program.series._id) {
-    Program.findById(program.series._id, { name:1, nameFi:1, nameSv: 1, nameOther: 1 }, function(err, parent) {
+    loadSeries(function(err, parent) {
       if (err) return callback(err)
       populate(program, concatNames(parent))
       callback()
@@ -97,6 +98,11 @@ ProgramSchema.methods.populateAllNames = function(callback) {
   } else {
     populate(program, [])
     process.nextTick(callback)
+  }
+
+  function loadSeries(callback) {
+    if (series) return callback(undefined, series)
+    Program.findById(program.series._id, { name:1, nameFi:1, nameSv: 1, nameOther: 1 }, callback)
   }
 
   function populate(p, extraNames) {

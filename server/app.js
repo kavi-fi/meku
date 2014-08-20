@@ -362,23 +362,38 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
         if (err) return next(err)
-        watcher.saveAndLogChanges(function(err, program) {
+        updateTvEpisodeAllNamesOnParentNameChange(program, function(err) {
           if (err) return next(err)
-          updateMetadataIndexes(program, function() {
+          watcher.saveAndLogChanges(function(err, program) {
             if (err) return next(err)
-            updateTvSeriesClassification(program, function(err) {
-              if (err) return next(err)
-              if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
-                Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
-              } else {
-                res.send(program)
-              }
+            updateMetadataIndexes(program, function() {
+              updateTvSeriesClassification(program, function(err) {
+                if (err) return next(err)
+                if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
+                  Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
+                } else {
+                  res.send(program)
+                }
+              })
             })
           })
         })
       })
     })
   })
+
+  function updateTvEpisodeAllNamesOnParentNameChange(parent, callback) {
+    if (!enums.util.isTvSeriesName(parent)) return callback()
+    var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
+    var nameChanges = _.any(parent.modifiedPaths(), function(p) { return _.contains(namePaths, p) })
+    if (!nameChanges) return callback()
+    Program.find({ 'series._id': parent._id }).exec(function(err, episodes) {
+      if (err) return callback(err)
+      async.forEach(episodes, function(e, callback) { e.populateAllNames(parent, callback) }, function() {
+        async.forEach(episodes, function(e, callback) { e.save(callback) }, callback)
+      })
+    })
+  }
 })
 
 app.post('/programs/autosave/:id', function(req, res, next) {

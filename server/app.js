@@ -333,14 +333,19 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
 app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
+    var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
-    updateAndLogChanges(program, updates, req.user, function(err, program) {
+    watcher.applyUpdates(updates)
+    verifyTvSeriesExistsOrCreate(program, function(err) {
       if (err) return next(err)
-      verifyTvSeriesExistsOrCreate(program, function(err) {
+      program.populateAllNames(function(err) {
         if (err) return next(err)
-        updateTvSeriesClassification(program, function(err) {
+        watcher.saveAndLogChanges(function(err, program) {
           if (err) return next(err)
-          res.send(program)
+          updateTvSeriesClassification(program, function(err) {
+            if (err) return next(err)
+            res.send(program)
+          })
         })
       })
     })
@@ -351,24 +356,23 @@ app.post('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
     var oldSeries = program.toObject().series
-    updateAndLogChanges(program, req.body, req.user, function(err, program) {
+    var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
+    watcher.applyUpdates(req.body)
+    verifyTvSeriesExistsOrCreate(program, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
         if (err) return next(err)
-        updateMetadataIndexes(program, function() {
+        watcher.saveAndLogChanges(function(err, program) {
           if (err) return next(err)
-          verifyTvSeriesExistsOrCreate(program, function(err) {
+          updateMetadataIndexes(program, function() {
             if (err) return next(err)
-            program.save(function(err, program) {
+            updateTvSeriesClassification(program, function(err) {
               if (err) return next(err)
-              updateTvSeriesClassification(program, function(err) {
-                if (err) return next(err)
-                if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
-                  Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
-                } else {
-                  res.send(program)
-                }
-              })
+              if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
+                Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
+              } else {
+                res.send(program)
+              }
             })
           })
         })
@@ -924,28 +928,46 @@ function logError(err) {
   if (err) console.error(err)
 }
 
-function updateAndLogChanges(document, updates, user, callback) {
+function watchChanges(document, user, excludedLogPaths) {
   var oldObject = document.toObject()
-  updates = utils.flattenObject(updates)
-  _.forEach(updates, function(value, key) {
-    document.set(key, value)
-  })
-  document.save(function(err, updatedDocument) {
-    if (err) return callback(err)
-    var newObject = updatedDocument.toObject()
-    var changes = _(updates).keys().map(function(path) {
-      var newValue = utils.getProperty(newObject, path)
-      var oldValue = utils.getProperty(oldObject, path)
+  return { applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges }
 
-      if (_.isEqual(newValue, oldValue) || (oldValue == null && newValue === "")) return []
-      return [
-        path.replace(/\./g, ','),
-        { new: newValue, old: oldValue }
-      ]
-    }).zipObject().valueOf()
+  function applyUpdates(updates) {
+    var flatUpdates = utils.flattenObject(updates)
+    _.forEach(flatUpdates, function(value, key) { document.set(key, value) })
+  }
+
+  function saveAndLogChanges(callback) {
+    var changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
+    document.save(function(err, saved) {
+      if (err) return callback(err)
+      log(changedPaths, oldObject, saved, callback)
+    })
+  }
+
+  function isIncludedLogPath(p) {
+    return document.isDirectModified(p) && document.schema.pathType(p) != 'nested' && !_.contains(excludedLogPaths, p)
+  }
+
+  function log(changedPaths, oldObject, updatedDocument, callback) {
+    var newObject = updatedDocument.toObject()
+    var changes = _(changedPaths).map(asChange).zipObject().valueOf()
     logUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
-  })
+
+    function asChange(path) {
+      var newValue = utils.getProperty(newObject, path)
+      var oldValue = utils.getProperty(oldObject, path)
+      if (_.isEqual(newValue, oldValue) || (oldValue == null && newValue === "")) return []
+      return [ path.replace(/\./g, ','), { new: newValue, old: oldValue } ]
+    }
+  }
+}
+
+function updateAndLogChanges(document, updates, user, callback) {
+  var watcher = watchChanges(document, user)
+  watcher.applyUpdates(updates)
+  watcher.saveAndLogChanges(callback)
 }
 
 function softDeleteAndLog(document, user, callback) {

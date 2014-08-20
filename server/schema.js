@@ -111,6 +111,8 @@ ProgramSchema.methods.populateAllNames = function(callback) {
 
 var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 
+Program.excludedChangeLogPaths = ['allNames']
+
 Program.publicFields = {
   emekuId:0, customersId:0, allNames:0, draftsBy: 0, draftClassifications:0,
   'classifications.emekuId':0, 'classifications.author':0,

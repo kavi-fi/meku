@@ -232,7 +232,7 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-  var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.user, role: req.user.role}})
+  var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.name, role: req.user.role}})
   p.newDraftClassification(req.user)
   p.save(function(err, program) {
     if (err) return next(err)

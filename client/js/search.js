@@ -52,7 +52,7 @@ function internalSearchPage() {
     $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function(p) {
       $draft.remove()
       $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
-      searchPageApi.programDataUpdated(p)
+      p.deleted ? searchPageApi.programDeleted(p) : searchPageApi.programDataUpdated(p)
     })
   })
 
@@ -328,7 +328,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -389,6 +389,12 @@ function searchPage() {
     if ($row.is('.selected')) {
       openDetail($newRow, false)
     }
+  }
+
+  function programDeleted(program) {
+    var $row = $page.find('.result[data-id=' + program._id + ']')
+    if (_.isEmpty($row)) return
+    $row.next('.program-box').add($row).slideUp(function() { $(this).remove() })
   }
 
   function openDetail($row, animate) {

@@ -215,7 +215,14 @@ app.get('/programs/recent', function(req, res, next) {
 app.delete('/programs/drafts/:id', function(req, res, next) {
   var pull = { draftsBy: req.user._id }
   var unset = utils.keyValue('draftClassifications.' + req.user._id, "")
-  Program.findByIdAndUpdate(req.params.id, { $pull: pull, $unset: unset }, respond(res, next))
+  Program.findByIdAndUpdate(req.params.id, { $pull: pull, $unset: unset }, function(err, p) {
+    if (err) return next(err)
+    if (p.classifications.length == 0 && p.draftsBy.length == 0) {
+      softDeleteAndLog(p, req.user, respond(res, next))
+    } else {
+      res.send(p)
+    }
+  })
 })
 
 app.get('/programs/:id', function(req, res, next) {

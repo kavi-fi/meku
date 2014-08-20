@@ -77,8 +77,9 @@ textarea { resize: vertical; }
 .detail-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 
 .filters { font-size: 14px; color: #444444; }
-.filters label { padding-right: 12px; font-weight: normal; }
-.filters input { margin-right: 10px; }
+.filters label { padding-right: 12px; font-weight: normal; min-width: 118px; }
+.filters label.first { min-width: 80px; }
+.filters input { margin-right: 7px; margin-bottom: 10px; }
 
 .warning-summary { display: inline-block; }
 .warning-summary img { width: 40px; height: 40px;}
@@ -214,7 +215,7 @@ label.top { vertical-align: top; }
 #search-page .highlight { color: #00BB88; }
 
 .program-box .header { border-bottom: 4px solid #efefef; margin: 15px 0; padding-bottom: 20px; }
-.program-box .warning-summary { vertical-align: middle; margin-right: 14px; }
+.program-box .warning-summary { vertical-align: middle; }
 .program-box .agelimit, .program-box .warning { margin-right: 8px; }
 .program-box .classifications { display: inline-block; font-size: 14px; white-space: nowrap; }
 .program-box .classifications span { display: block; }
@@ -244,6 +245,29 @@ label.top { vertical-align: top; }
 .program-box .categorization-form .categorization-form-tv-episode { display: inline-block; }
 .program-box .categorization-form .categorization-form-tv-episode > div { margin-left: 5px; display: inline-block; vertical-align: top; }
 .program-box .categorization-form input[type=number] { width: 80px; display: inline-block; }
+
+.program-box .episode-container > h3 { cursor: pointer; border-bottom: none; }
+.program-box .episode-container > h3.disabled { cursor: default; }
+.program-box .episode-container > h3 .spinner span { background-color: #00BB88; }
+.program-box .episode-container > h3 .fa-play { margin-right: 5px; -webkit-transition: .3s linear; -moz-transition: .3s linear; -o-transition: .3s linear; transition: .3s linear; }
+.program-box .episode-container > h3.open .fa-play { -webkit-transform: rotate(90deg); -moz-transform: rotate(90deg); -o-transform: rotate(90deg); -ms-transform: rotate(90deg); transform: rotate(90deg); }
+.program-box .episode-container .episodes { display: none; }
+.program-box .episode-container .program-box { margin: 0 -40px; box-shadow: 0px 0 5px 2px rgba(0,0,0,.10); }
+.program-box .episodes .result { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
+.program-box .episodes .result > span:nth-child(1) { min-width: 50px; font-size: 13px; padding-right: 12px; color: #bbb; }
+.program-box .episodes .result > span:nth-child(2) { flex-shrink: 800; font-weight: bold; padding: 0 14px 0 0; margin-right: auto; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.program-box .episodes .result > span:nth-child(3) { flex: 0 0 auto; text-align: right; padding: 0 20px 0 10px; font-size: 13px; }
+.program-box .episodes .result > span:nth-child(4) { flex: 0 0 auto; text-align: right; width: 140px; margin-right: 0; }
+.program-box .episodes .season-header { border-bottom: 2px solid #e8e8e8; padding: 10px 0;  cursor: default; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
+.program-box .episodes .season-header > span:nth-child(1) { flex-shrink: 800; margin-right: auto; font-size: 13px; color: #bbb; }
+.program-box .episodes .season-header > span:nth-child(2) { flex: 0 0 auto; text-align: right; width: 140px; margin-right: 0; }
+.program-box .episodes .season-header .agelimit, .program-box .episodes .season-header .warning {
+  vertical-align: middle;
+  margin-right: 3px;
+  width: 25px;
+  height: 25px;
+  background-size: 25px;
+}
 
 .program-details-form input[type=text],
 .program-details-form input[type=number] {

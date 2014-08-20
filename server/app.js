@@ -150,12 +150,13 @@ app.post('/reset-password', function(req, res, next) {
   }
 })
 
-app.get('/public/search/:q?', function(req, res, next) {
-  search(Program.publicFields, req, res, next)
-})
 app.get('/programs/search/:q?', function(req, res, next) {
-  var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
-  search(fields, req, res, next)
+  if (req.user) {
+    var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
+    search(fields, req, res, next)
+  } else {
+    search(Program.publicFields, req, res, next)
+  }
 })
 
 function search(responseFields, req, res, next) {
@@ -182,6 +183,10 @@ function search(responseFields, req, res, next) {
     return q
   }
 }
+
+app.get('/episodes/:seriesId', function(req, res, next) {
+  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).exec(respond(res, next))
+})
 
 app.get('/programs/drafts', function(req, res, next) {
   Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }, function(err, programs) {
@@ -345,6 +350,7 @@ app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res,
 app.post('/programs/:id', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
+    var oldSeries = program.toObject().series
     updateAndLogChanges(program, req.body, req.user, function(err, program) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
@@ -357,7 +363,11 @@ app.post('/programs/:id', function(req, res, next) {
               if (err) return next(err)
               updateTvSeriesClassification(program, function(err) {
                 if (err) return next(err)
-                res.send(program)
+                if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
+                  Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
+                } else {
+                  res.send(program)
+                }
               })
             })
           })
@@ -381,7 +391,10 @@ app.post('/programs/autosave/:id', function(req, res, next) {
 app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
-    softDeleteAndLog(program, req.user, respond(res, next))
+    softDeleteAndLog(program, req.user, function(err, program) {
+      if (err) return next(err)
+      updateTvSeriesClassification(program, respond(res, next, program))
+    })
   })
 })
 
@@ -774,22 +787,28 @@ function nocache(req, res, next) {
 
 function authenticate(req, res, next) {
   var whitelist = [
-    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html', 'GET:/public/search/',
+    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash'
   ]
+  var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
+
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
   if (isWhitelistedPath) return next()
+  var isOptional =  _.any(optionalList, function(p) { return url.indexOf(p) == 0 })
   var cookie = req.signedCookies.user
   if (cookie) {
     req.user = cookie
     req.user.ip = getIpAddress(req)
     return next()
+  } else if (isOptional) {
+    return next()
+  } else {
+    return res.send(403)
   }
-  return res.send(403)
 }
 
 function authenticateXmlApi(req, res, next) {
@@ -880,11 +899,14 @@ function respond(res, next, overrideData) {
 
 function updateTvSeriesClassification(program, callback) {
   if (!enums.util.isTvEpisode(program)) return callback()
-  Program.updateTvSeriesClassification(program.series._id, callback)
+  var seriesId = program.series && program.series._id
+  if (!seriesId) return callback()
+  console.log('Program.updateTvSeriesClassification '+seriesId)
+  Program.updateTvSeriesClassification(seriesId, callback)
 }
 
 function verifyTvSeriesExistsOrCreate(program, callback) {
-  if (enums.util.isTvEpisode(program) && program.series._id == null) {
+  if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
     createParentProgram(program, program.series.name.trim(), callback)
   } else return callback()
 }

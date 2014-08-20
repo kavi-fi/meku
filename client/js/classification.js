@@ -119,7 +119,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         showDialog($('<div>', {class: 'registration-confirmation dialog'})
           .append($('<span>', {class: 'name'}).text(savedProgram.name))
           .append(renderWarningSummary(classificationUtils.fullSummary(savedProgram)))
-          .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDate(savedProgram.classifications[0].registrationDate)))
+          .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDateTime(savedProgram.classifications[0].registrationDate)))
           .append($('<p>', {class: 'buttons'}).html($('<button>', { click: closeDialog, class: 'button' }).text('Sulje'))))
         $(window).scrollTop(0)
       })
@@ -188,6 +188,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     cfu.updateWarningOrdering($form, updatedClassification)
     $form.find('.program-box-container').html(detailRenderer.render(cfu.cloneForProgramBox(updatedProgram, classificationFinder, rootEditMode)).show())
     $form.find('.program-box-container .buttons').remove()
+    if (rootEditMode) $form.find('.program-box-container .classifications .classification[data-id="'+updatedClassification._id+'"]').click()
     emailRenderer.update(updatedProgram, updatedClassification, rootEditMode)
   }
 }

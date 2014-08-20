@@ -1,6 +1,7 @@
 var _ = require('lodash')
 var async = require('async')
 var utils = require('../shared/utils')
+var classificationUtils = require('../shared/classification-utils')
 var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
 var ObjectId = mongoose.Schema.Types.ObjectId
@@ -51,11 +52,10 @@ var ProgramSchema = new Schema({
   draftsBy: { type: [ObjectId], index: true },
   draftClassifications: {}, // { userId:classification, userId:classification2 }
   programType: Number, // enums.programType
-  gameFormat: String,
-  season: String, episode: String,
-  series: { _id: { type: ObjectId, index:true }, name: String },
-  tvSeriesCriteria: [Number],
-  tvSeriesLegacyAgeLimit: Number,
+  gameFormat: String, // in programType == game(7)
+  season: Number, episode: Number, // in programType == episode(3)
+  series: { _id: { type: ObjectId, index:true }, name: String }, // in programType == episode(3)
+  episodes: { count: Number, criteria: [Number], legacyAgeLimit: Number }, // in programType == series(2)
   sentRegistrationEmailAddresses: [String],
   createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
@@ -77,14 +77,12 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   return draft
 }
 ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
+  var query = { 'series._id': seriesId, deleted: { $ne: true } }
   var fields = { classifications: { $slice: 1 } }
-  Program.find({ 'series._id': seriesId, 'classifications.0': { $exists: true } }, fields).lean().exec(function(err, programs) {
+  Program.find(query, fields).lean().exec(function(err, programs) {
     if (err) return callback(err)
-    var classifications = programs.map(function(p) { return p.classifications[0] })
-    var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
-    var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
-    if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
-    Program.update({ _id: seriesId }, { tvSeriesCriteria: criteria, tvSeriesLegacyAgeLimit: legacyAgeLimit }, callback)
+    var data = classificationUtils.aggregateClassification(programs)
+    Program.update({ _id: seriesId }, { episodes: { count: programs.length, criteria: data.criteria, legacyAgeLimit: data.legacyAgeLimit } }, callback)
   })
 }
 

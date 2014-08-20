@@ -65,16 +65,21 @@ utils.hasRole = function (user, role) {
   return roles[role].order >= roles[user.role].order
 }
 
-utils.asDate = function (date) {
+utils.asDateTime = function(date) {
   var df = 'D.M.YYYY [klo] H:mm'
   return date ? moment(date).format(df) : ''
+}
+
+utils.asDate = function(date) {
+  return date ? moment(date).format(utils.dateFormat) : ''
 }
 
 utils.getProperty = function(obj, prop) {
   var path = prop.split('.')
   // Retrieve nested properties like object.billing.address
   return _.reduce(path, function(res, pathElement) {
-    return _.has(res, pathElement) ? res[pathElement] : undefined
+    if (res == null) return undefined
+    return res[pathElement]
   }, obj)
 }
 
@@ -90,11 +95,11 @@ utils.setValueForPath = function(path, property, value) {
   }
 }
 
-// Flattens object like { a: 1, b: { c: 2, d: 4 }} to { a: 1, b.c: 2, b.d: 4 }
+// Flattens object like { a: 1, b: { c: 2, d: 4 }} to { a: 1, b.c: 2, b.d: 4 }. Only flattens plain objects.
 utils.flattenObject = function flattenObject(deepObject) {
   var resultObject = {}
   _.forEach(deepObject, function(val, key) {
-    if (_.isObject(val) && !_.isArray(val)) {
+    if (_.isPlainObject(val)) {
       var flatInnerObject = flattenObject(val)
       _.forEach(flatInnerObject, function(innerVal, innerKey) {
         var flatKey = key + '.' + innerKey

@@ -253,10 +253,6 @@ function parseUserCookie() {
   return JSON.parse(cookie.substring(4, cookie.lastIndexOf('.')))
 }
 
-function spinner() {
-  return $('<div>', { class:'spinner' }).html('<span/><span/><span/>')
-}
-
 function select2Autocomplete(opts, onChangeFn) {
   var defaults = {
     toOption: function(x) { return {id: x.replace(/,/g, '&#44;'), text: x} },

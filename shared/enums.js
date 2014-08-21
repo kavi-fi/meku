@@ -93,6 +93,14 @@ enums.providingType = {
   'Subscription_of_program': 'Tilausohjelmapalvelu'
 }
 
+enums.providingTypePrices = {
+  'Recordings_provide': 100,
+  'Public_presentation': 200,
+  'National_TV': 600,
+  'Regional_TV': 100,
+  'Transmitted_abroad_program': 400,
+  'Subscription_of_program': 400
+}
 
 enums.programType = {
   0: { type: 'unknown', fi: '?' },

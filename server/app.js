@@ -12,6 +12,7 @@ var InvoiceRow = schema.InvoiceRow
 var ChangeLog = schema.ChangeLog
 var Provider = schema.Provider
 var ProviderLocation = schema.ProviderLocation
+var ProviderMetadata = schema.ProviderMetadata
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
@@ -468,6 +469,29 @@ app.delete('/providers/:id', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function (err, provider) {
     if (err) return next(err)
     softDeleteAndLog(provider, req.user, respond(res, next))
+  })
+})
+
+app.get('/providers/metadata', requireRole('kavi'), function(req, res, next) {
+  ProviderMetadata.getAll(respond(res, next))
+})
+
+app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res, next) {
+  ProviderMetadata.setYearlyBillingProeCreated(new Date(), function() {
+    res.send({ ok: false })
+  })
+})
+
+app.get('/providers/yearlyBilling/count', requireRole('kavi'), function(req, res, next) {
+  ProviderLocation.getActiveProviderLocations(function(err, locs) {
+    if (err) return next(err)
+    res.send({ count: locs.length })
+  })
+})
+
+app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function(req, res, next) {
+  ProviderMetadata.setYearlyBillingReminderSent(new Date(), function(err) {
+    res.send({ ok: false })
   })
 })
 

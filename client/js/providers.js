@@ -3,6 +3,7 @@ function providerPage() {
   var $providers = $page.find('.providers-list')
   var $providerNameQuery = $page.find('#provider-name-query')
   var $unapproved = $page.find('.unapproved .results')
+  var $yearlyBilling = $page.find('.yearly-billing')
   var $billing = $page.find('.billing')
   var $datePicker = $billing.find('.datepicker')
   var format = 'DD.MM.YYYY'
@@ -48,6 +49,8 @@ function providerPage() {
     var begin = moment().subtract('months', 1).startOf('month')
     var end = moment().endOf('month')
     $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
+
+    updateMetadata()
   })
 
   $page.on('click', 'button[name=new-provider]', function() {
@@ -121,6 +124,32 @@ function providerPage() {
       })
     })
   }
+
+  $yearlyBilling.on('click', 'button.yearly-billing-reminder', function() {
+    var $button = $(this)
+    $button.prop('disabled', true)
+    $.get('/providers/yearlyBilling/count', function(res) {
+      showDialog($('#templates').find('.yearly-billing-reminder-dialog').clone()
+        .find('.count').text(res.count).end()
+        .find('.send').click(sendYearlyBillingReminderMail).end()
+        .find('.cancel').click(closeDialog).end())
+      $button.prop('disabled', false)
+
+      function sendYearlyBillingReminderMail() {
+        closeDialog()
+        $.post('/providers/yearlyBilling/sendReminders', updateMetadata)
+      }
+    })
+  })
+
+  $yearlyBilling.on('click', 'button.yearly-billing-proe', function() {
+    var $button = $(this)
+    $button.prop('disabled', true)
+    $.post('/providers/yearlyBilling/proe', function() {
+      $button.prop('disabled', false)
+      updateMetadata()
+    })
+  })
 
   function openDetails($row) {
     $.get('/providers/' + $row.data('id'), function(provider) {
@@ -196,6 +225,13 @@ function providerPage() {
 
   function updateLocationHash(providerId) {
     setLocation('#tarjoajat/' + providerId)
+  }
+
+  function updateMetadata() {
+    $.get('/providers/metadata', function(metadata) {
+      $page.find('.most-recent .sent').text(metadata.yearlyBillingReminderSent ? utils.asDateTime(metadata.yearlyBillingReminderSent) : undefined)
+      $page.find('.most-recent .created').text(metadata.yearlyBillingProeCreated ? utils.asDateTime(metadata.yearlyBillingProeCreated) : undefined)
+    })
   }
 
   function renderProviders(providers) {

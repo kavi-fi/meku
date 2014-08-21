@@ -690,6 +690,9 @@ textarea.invalid:disabled,
 #provider-page .activity { margin-bottom: 10px; }
 #provider-page .buttons { margin-top: -45px; float: right; }
 #provider-page button[name=new-location] { margin-bottom: 10px; }
+#provider-page .most-recent { margin-top: 10px; }
+#provider-page .most-recent .sent { margin-right: 15px; }
+#provider-page .yearly-billing { margin-bottom: 30px; }
 
 #provider-page .unapproved { margin-bottom: 30px; }
 #provider-page .unapproved .result .date { display: inline-block; width: 90px; }

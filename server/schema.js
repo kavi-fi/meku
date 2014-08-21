@@ -157,7 +157,7 @@ var Provider = exports.Provider = mongoose.model('providers', {
   active: Boolean
 })
 
-var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocations', {
+var ProviderLocationSchema = new Schema({
   emekuId: String,
   provider: {type: ObjectId, index: true},
   name: String,
@@ -174,6 +174,47 @@ var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocati
   adultContent: Boolean,
   gamesWithoutPegi: Boolean
 })
+ProviderLocationSchema.statics.getActiveProviderLocations = function(callback) {
+  Provider.find({ active: true }).lean().exec(function(err, activeProviders) {
+    if (err) return callback(err)
+    var providers = _.indexBy(activeProviders, '_id')
+    ProviderLocation.find({ active: true, provider: { $in: _.keys(providers) }}).lean().exec(function(err, locs) {
+      if (err) return callback(err)
+      locs.forEach(function(l) {
+        l.provider = providers[l.provider.valueOf()]
+      })
+      callback(undefined, locs)
+    })
+  })
+}
+var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocations', ProviderLocationSchema)
+
+var ProviderMetadataSchema = new Schema({
+  yearlyBillingReminderSent: Date,
+  yearlyBillingProeCreated: Date
+})
+ProviderMetadataSchema.statics.getAll = function(callback) {
+  ProviderMetadata.findOne(function(err, metadata) {
+    if (err) return callback(err)
+    if (!metadata) new ProviderMetadata().save(callback)
+    else callback(undefined, metadata)
+  })
+}
+ProviderMetadataSchema.statics.setYearlyBillingReminderSent = function(date, callback) {
+  ProviderMetadata.getAll(function(err, metadata) {
+    if (err) return callback(err)
+    metadata.yearlyBillingReminderSent = date
+    metadata.save(callback)
+  })
+}
+ProviderMetadataSchema.statics.setYearlyBillingProeCreated = function(date, callback) {
+  ProviderMetadata.getAll(function(err, metadata) {
+    if (err) return callback(err)
+    metadata.yearlyBillingProeCreated = date
+    metadata.save(callback)
+  })
+}
+var ProviderMetadata = exports.ProviderMetadata = mongoose.model('providermetadatas', ProviderMetadataSchema)
 
 var UserSchema = new Schema({
   emekuId: String,
@@ -283,7 +324,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, ProviderLocation, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
+var models = exports.models = [Program, Account, Provider, ProviderLocation, ProviderMetadata, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

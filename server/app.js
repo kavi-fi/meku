@@ -22,6 +22,7 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
 var CronJob = require('cron').CronJob
+var providers = require('../shared/providers-utils')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -453,8 +454,18 @@ app.post('/providers', requireRole('kavi'), function(req, res, next) {
 app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, provider) {
     if (err) return next(err)
-    var updates = _.merge({}, {active: !provider.active}, provider.registrationDate ? {} : {registrationDate: new Date()})
-    updateAndLogChanges(provider, updates, req.user, respond(res, next))
+    var isRegistration = !provider.registrationDate
+    var updates = _.merge({}, {active: !provider.active}, isRegistration ? {registrationDate: new Date()} : {})
+    updateAndLogChanges(provider, updates, req.user, function(err, saved) {
+      if (isRegistration) {
+        ProviderLocation.find({provider: provider._id, deleted: false, active: true }).sort('name').lean().exec(function(err, locations) {
+          if (err) return next(err)
+          sendEmail(providers.registrationEmail(_.merge({}, provider.toObject(), {locations: locations})), logError)
+          return res.send(saved)
+        })
+      }
+      res.send(saved)
+    })
   })
 })
 

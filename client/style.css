@@ -694,7 +694,7 @@ textarea.invalid:disabled,
 #provider-page .most-recent .sent { margin-right: 15px; }
 #provider-page .yearly-billing { margin-bottom: 30px; }
 
-#provider-page .unapproved { margin-bottom: 30px; }
+#provider-page .unapproved .results { margin-bottom: 30px; }
 #provider-page .unapproved .result .date { display: inline-block; width: 90px; }
 
 .billing .datepicker {

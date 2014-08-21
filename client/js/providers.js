@@ -212,8 +212,19 @@ function providerPage() {
 
   function toggleActiveButton($selected, newState) {
     var provider = $selected.data('provider')
+    function isUnapproved(provider) { return !provider.registrationDate }
     $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(updatedProvider) {
-      $selected.replaceWith(renderProvider(updatedProvider).addClass('selected'))
+      if (isUnapproved(provider) && updatedProvider.active) {
+        var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
+        $dialog.find('.email').text(updatedProvider.emailAddresses.join(', '))
+        $dialog.find('.ok').on('click', function() {
+          $page.trigger('show', null)
+          closeDialog()
+        })
+        showDialog($dialog)
+      } else {
+        $selected.replaceWith(renderProvider(updatedProvider).addClass('selected'))
+      }
     })
   }
 
@@ -247,7 +258,7 @@ function providerPage() {
   }
 
   function renderUnapproved(provider) {
-    return $('<div>', { class: 'result', 'data-id': provider._id })
+    return $('<div>', { class: 'result unapproved', 'data-id': provider._id })
       .data('provider', provider)
       .append($('<span>', { class: 'date' }).text(utils.asDate(provider.creationDate)))
       .append($('<span>', { class: 'name' }).text(provider.name))

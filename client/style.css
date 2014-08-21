@@ -694,6 +694,22 @@ textarea.invalid:disabled,
 #provider-page .unapproved { margin-bottom: 30px; }
 #provider-page .unapproved .result .date { display: inline-block; width: 90px; }
 
+.billing .datepicker {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #e1e1e1;
+    color: #777;
+    padding: 4px 5px;
+    text-decoration: none;
+}
+
+.billing { font-size: 14px; padding: 10px; }
+.billing th { padding: 10px; }
+.billing td { padding: 5px 5px 5px 10px; }
+.billing .left-margin { margin-left: 10px; }
+.billing td.empty-row { padding-bottom: 20px; }
+
 .rotating.fa-play {
     margin-right: 5px;
     -webkit-transition: .3s linear;

@@ -471,6 +471,32 @@ app.delete('/providers/:id', requireRole('kavi'), function(req, res, next) {
   })
 })
 
+app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res, next) {
+  var format = 'DD.MM.YYYY'
+
+  var terms = {
+    active: true, deleted: false,
+    registrationDate: {
+      $gte: moment(req.params.begin, format),
+      $lte: moment(req.params.end, format)
+    }
+  }
+
+  Provider.find(terms).lean().exec(function(err, providers) {
+    if (err) return next(err)
+    async.forEach(providers, function(provider, callback) {
+      ProviderLocation.find({ provider: provider._id, deleted: false, active: true }).sort('name').exec(function(err, locations) {
+        if (err) return next(err)
+        provider.locations = locations
+        callback()
+      })
+    }, function(err) {
+      if (err) return next(err)
+      res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
+    })
+  })
+})
+
 app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id).lean().exec(function(err, provider) {
     if (err) return next(err)

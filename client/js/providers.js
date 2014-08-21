@@ -3,6 +3,21 @@ function providerPage() {
   var $providers = $page.find('.providers-list')
   var $providerNameQuery = $page.find('#provider-name-query')
   var $unapproved = $page.find('.unapproved .results')
+  var $billing = $page.find('.billing')
+  var $datePicker = $billing.find('.datepicker')
+  var format = 'DD.MM.YYYY'
+
+  $datePicker.dateRangePicker({
+    language: 'fi',
+    format: format,
+    separator: ' - ',
+    startOfWeek: 'monday',
+    shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']},
+    getValue: function() { return $datePicker.find('span').text() },
+    setValue: function(s) { $datePicker.find('span').text(s) }
+  }).bind('datepicker-change', function(event, obj) {
+    fetchNewProviders(obj.date1, obj.date2)
+  })
 
   $page.on('show', function(event, providerId) {
     updateLocationHash(providerId || '')
@@ -29,6 +44,10 @@ function providerPage() {
           $unapproved.append(p)
         })
     })
+
+    var begin = moment().subtract('months', 1).startOf('month')
+    var end = moment().endOf('month')
+    $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
   })
 
   $page.on('click', 'button[name=new-provider]', function() {
@@ -65,6 +84,43 @@ function providerPage() {
       openDetails($this)
     }
   })
+
+  function fetchNewProviders(begin, end) {
+    begin = moment(begin).format(format)
+    end = moment(end).format(format)
+
+    var $list = $billing.find('.new-providers-list').empty()
+
+    $.get('/providers/billing/'+ begin + '/' + end, function(providers) {
+      var $template = $('#templates').find('.invoice-provider').clone()
+      _.forEach(providers, function(provider) {
+        var $provider = $template.find('.invoice-provider-row').clone()
+
+        $provider.find('.name').text(provider.name)
+        $provider.find('.registrationDate').text(moment(provider.registrationDate).format(format))
+
+        $list.append($provider)
+        _.forEach(provider.locations, function(location) {
+          var $location = $template.find('.invoice-location-row').clone()
+
+          $location.find('.name').text(location.name)
+          $location.find('.registrationDate').text(moment(location.registrationDate).format(format))
+
+          $list.append($location)
+          _.forEach(location.providingType, function(providingType) {
+            var $providingType = $template.find('.invoice-providing-type-row').clone()
+
+            $providingType.find('.name').text(' - ' + enums.providingType[providingType])
+            $providingType.find('.price').text(enums.providingTypePrices[providingType] + '€')
+
+            $list.append($providingType)
+          })
+        })
+
+        $list.append($('<tr>').append($('<td>', { class: 'empty-row' })))
+      })
+    })
+  }
 
   function openDetails($row) {
     $.get('/providers/' + $row.data('id'), function(provider) {

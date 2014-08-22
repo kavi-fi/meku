@@ -17,7 +17,7 @@ var summary = exports.summary = function(classification) {
   var maxAgeLimit = ageLimit(classification)
   var warnings = _(classification.criteria)
     .map(function(id) { return enums.classificationCriteria[id - 1] })
-    .filter(function(c) { return c.age == maxAgeLimit })
+    .filter(function(c) { return c.age > 0 && c.age == maxAgeLimit })
     .map(function(c) { return {id: c.id, category: c.category} })
     .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
   if (classification.warningOrder.length > 0) {

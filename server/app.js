@@ -1129,7 +1129,8 @@ function authenticate(req, res, next) {
     'GET:/index.html', 'GET:/public.html', 'GET:/templates.html',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
-    'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/xlsx'
+    'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
+    'GET:/register-provider.html'
   ]
   var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
 

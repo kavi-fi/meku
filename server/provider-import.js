@@ -5,33 +5,46 @@ var _ = require('lodash')
 var xlsx = require('xlsx')
 var xls = require('xlsjs')
 var async = require('async')
+var enums = require('../shared/enums')
 
 var providerFieldMap = {
-  'Y-tunnus': 'yTunnus',
-  'Yritys/Toiminimi': 'name',
-  'Lähiosoite': 'address.street', Postitoimipaikka: 'address.city', Postinro: 'address.zip', Maa: 'address.country',
-  'Laskutus.Postiosoite': 'billing.address.street', 'Laskutus.Postitoimipaikka': 'billing.address.city',
-  'Laskutus.Postinro': 'billing.address.zip', 'Laskutus.Maa': 'billing.address.country',
-  'Laskutus.Laskutuskieli': 'billing.language', 'Laskutus.Laskulle haluttava teksti': 'billing.invoiceText',
-  'Tarjoajan yht.hlö': 'contactName',
-  'Puh.nro': 'phoneNumber',
-  'Sähköposti': 'emailAddresses',
-  'Asiointikieli': 'language'
+  'address.city':    'Postitoimipaikka',
+  'address.country': 'Maa',
+  'address.street':  'Lähiosoite',
+  'address.zip':     'Postinro',
+  'contactName':     'Tarjoajan yht.hlö',
+  'emailAddresses':  'Sähköposti',
+  'language':        'Asiointikieli',
+  'name':            'Yritys/Toiminimi',
+  'phoneNumber':     'Puh.nro',
+  'yTunnus':         'Y-tunnus'
+}
+
+var billingFieldMap = {
+  'billing.address.city':    'Postitoimipaikka',
+  'billing.address.country': 'Maa',
+  'billing.address.street':  'Postiosoite',
+  'billing.address.zip':     'Postinro',
+  'billing.invoiceText':     'Laskulle haluttava teksti',
+  'billing.language':        'Laskutuskieli', // TODO: remove from schema!
+  'eInvoice.address':        'Verkkolaskuosoite (OVT/IBAN)',
+  'eInvoice.operator':       'Välittäjätunnus'
 }
 
 var locationFieldMap = {
-  'Tarjoamispaikan nimi': 'name',
-  'Laskutusosoite': 'address.street',
-  'Postitoimipaikka': 'address.city',
-  'Postinro': 'address.zip',
-  'Yht.hlö': 'contactName',
-  'Puh.nro': 'phoneNumber',
-  'Sähköpostiosoite': 'emailAddresses',
-  'Laskutuskieli': 'language',
-  'Tarjoamistapa': 'providingType',
-  'Lasku pääorganisaatiolle': 'isPayer',
-  'K18 ohjelmia': 'adultContent',
-  'Pelejä (ei PEGI)': 'gamesWithoutPegi'
+  'address.city':     'Postitoimipaikka',
+  'address.street':   'Käyntiosoite',
+  'address.zip':      'Postinro',
+  'adultContent':     'K18 ohjelmia',
+  'contactName':      'Yht.hlö',
+  'emailAddresses':   'Sähköpostiosoite',
+  'gamesWithoutPegi': 'Pelejä (ei PEGI)',
+  'isPayer':          'Lasku pääorganisaatiolle',
+  'language':         'Laskutuskieli', // TODO: remove from schema!
+  'name':             'Tarjoamispaikan nimi',
+  'phoneNumber':      'Puh.nro',
+  'providingType':    'Tarjoamistapa',
+  'url':              'www-osoite'
 }
 
 exports.import = function(file, callback) {
@@ -48,6 +61,26 @@ exports.import = function(file, callback) {
   }
 
   var provider = createObjectAndSetValuesWithMap(providerAndLocations.provider, providerFieldMap)
+  provider.deleted = false
+  provider.active = false
+  provider.address.country = enums.getCountryCode(provider.address.country) || provider.address.country
+
+  var billing = createObjectAndSetValuesWithMap(providerAndLocations.billing, billingFieldMap)
+
+  provider = _.merge({}, provider, billing)
+
+  provider.billing.language = billing.language === 'Swedish' ? 'SV' : 'FI'
+
+  var address = provider.billing.address
+
+  if (address) {
+    provider.billing.address.country = enums.getCountryCode(address.country) || address.country
+    provider.billingPreference = 'address'
+  }
+
+  if (provider.eInvoice) {
+    provider.billingPreference = 'eInvoice'
+  }
 
   new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
     if (err) return callback(err)
@@ -58,6 +91,12 @@ exports.import = function(file, callback) {
       location = createObjectAndSetValuesWithMap(location, locationFieldMap)
       location.providingType = location.providingType.split(',')
       location.provider = provider._id
+      location.deleted = false
+      location.active = true
+      location.providingType = _.map(location.providingType, function(providingTypeNumber) {
+        return enums.getProvidingType(providingTypeNumber)
+      })
+
       new schema.ProviderLocation(location).save(function(err, location) {
         if (err) return callback(err)
         locations.push(location)
@@ -83,6 +122,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
     ]
   }
 
+  // There are duplicate field names in Excel, maybe there shouldn't be?
   var requiredBillingFields = {
     name: 'Tarjoajan laskutustiedot',
     values: [
@@ -95,7 +135,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
     name: 'Tarj.paikan yht.tiedot ja tapa',
     values: [
       'Tarjoamispaikan nimi', 'Tarjoamistapa', 'K18 ohjelmia', 'Pelejä (ei PEGI)', 'Yht.hlö', 'Käyntiosoite',
-      'Postinro', 'Postitoimipaikka', 'Puh.nro', 'Lasku pääorganisaatiolle', 'Asiointikieli',
+      'Postinro', 'Postitoimipaikka', 'Puh.nro', 'Lasku pääorganisaatiolle', 'Asiointikieli'
     ]
   }
 
@@ -111,7 +151,8 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
   if (errors.length > 0) throw { message: errors.join(', ') }
 
   return {
-    provider: _.merge(providerData, { Laskutus: billingData }),
+    provider: providerData,
+    billing: billingData,
     locations: locationsData
   }
 
@@ -194,6 +235,8 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
 
 function createObjectAndSetValuesWithMap(object, map) {
   var newObject = {}
+
+  map = _.invert(map)
 
   _.forEach(utils.flattenObject(object), function(value, key) {
     var path = map[key] ? map[key].split('.') : ['other', key]

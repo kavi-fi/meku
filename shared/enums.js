@@ -97,6 +97,10 @@ enums.providingTypeName = function(type) {
   return enums.providingType[type] || 'Tuntematon'
 }
 
+enums.getProvidingType = function(num) {
+  return _.keys(enums.providingType)[num - 1]
+}
+
 enums.providingTypePrices = {
   'Recordings_provide': 100,
   'Public_presentation': 200,
@@ -353,6 +357,14 @@ enums.countries = {
   'ZM': 'Sambia',
   'ZW': 'Zimbabwe',
   '-': 'Muu maa'
+}
+
+enums.getCountryCode = function(country) {
+  if (_.isEmpty(country)) return
+
+  return _(enums.countries).mapValues(function(country) {
+    return country.toLowerCase()
+  }).invert().value()[country.toLowerCase()]
 }
 
 enums.util.toCountry = function(code) { return enums.countries[code] || '-' }

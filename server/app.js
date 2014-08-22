@@ -516,7 +516,7 @@ app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res
     active: true, deleted: false,
     registrationDate: {
       $gte: moment(req.params.begin, format),
-      $lte: moment(req.params.end, format)
+      $lt: moment(req.params.end, format).add('days', 1)
     }
   }
 

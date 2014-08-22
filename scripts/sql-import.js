@@ -159,7 +159,7 @@ function classifications(callback) {
   // TODO: add c.no_items (== safe?)
   // TODO: verify that reg_date order is the valid ordering
 
-  async.waterfall([base, criteria, mapUsers, mapBuyers, harmonize, save], callback)
+  async.waterfall([base, criteria, mapUsers, mapBuyers, harmonize, resolveSentEmails, save], callback)
 
   function base(callback) {
     var tick = progressMonitor()
@@ -264,11 +264,29 @@ function classifications(callback) {
     callback(null, result)
   }
 
+  function resolveSentEmails(result, callback) {
+    documentMap('User', '_id', function(err, userMap) {
+      if (err) return callback(err)
+      documentMap('Account', '_id', function(err, accountMap) {
+        if (err) return callback(err)
+        result.sentEmails = {}
+        Object.keys(result.programs).forEach(function(programId) {
+          var classifications = result.programs[programId]
+          var authors = classifications.map(function(c) { return c.author ? userMap[c.author._id].emails : [] })
+          var buyers = classifications.map(function(c) { return c.buyer ? accountMap[c.buyer._id].emailAddresses : [] })
+          result.sentEmails[programId] = _(authors.concat(buyers)).flatten().compact().uniq().value()
+        })
+        callback(null, result)
+      })
+    })
+  }
+
   function save(result, callback) {
     var tick = progressMonitor(100)
     async.eachLimit(Object.keys(result.programs), 5, function(key, cb) {
       tick('*')
-      schema.Program.update({ emekuId: key }, { 'classifications': result.programs[key] }, cb)
+      var update = { 'classifications': result.programs[key], sentRegistrationEmailAddresses: result.sentEmails[key] }
+      schema.Program.update({ emekuId: key }, update, cb)
     }, callback)
   }
 }

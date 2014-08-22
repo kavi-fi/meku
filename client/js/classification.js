@@ -131,10 +131,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('button[name=save]').on('click', function(e) {
       e.preventDefault()
       $.post('/programs/' + program._id, JSON.stringify(rootModifiedFields)).done(function(program) {
-        onProgramUpdated(program)
+        $('#classification-page').trigger('show', [program._id, 'edit', selectedClassification._id]).show()
         showDialog($('#templates').find('.modify-success-dialog').clone().find('button.ok').click(closeDialog).end())
-        rootModifiedFields = {}
-        $form.find('button[name=save]').prop('disabled', true)
       })
     })
     $form.on('click', '.back-to-search', function(e) {

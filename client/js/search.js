@@ -297,7 +297,9 @@ function searchPage() {
     if (q) $input.val(q).trigger('reset')
     setFilters(filters)
     queryChanged($input.val().trim())
-    loadUntil(programId, function() { $input.focus() })
+    loadUntil(programId, function() {
+      if ($('#login').is(':hidden')) $input.focus()
+    })
   })
 
   $button.click(function() { $input.trigger('fire') })

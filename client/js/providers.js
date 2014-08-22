@@ -6,7 +6,11 @@ function providerPage() {
   var $yearlyBilling = $page.find('.yearly-billing')
   var $billing = $page.find('.billing')
   var $datePicker = $billing.find('.datepicker')
+  var $billingContainer = $billing.find('.billing-container')
   var format = 'DD.MM.YYYY'
+
+  var $spinner = spinner().appendTo($page.find('.date-selection'))
+  var latestAjax = switchLatestDeferred()
 
   $datePicker.dateRangePicker({
     language: 'fi',
@@ -48,7 +52,9 @@ function providerPage() {
 
     var begin = moment().subtract('months', 1).startOf('month')
     var end = moment().endOf('month')
+
     $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
+    fetchNewProviders(begin, end)
 
     updateMetadata()
   })
@@ -120,8 +126,11 @@ function providerPage() {
 
     var $list = $billing.find('.new-providers-list').empty()
 
-    $.get('/providers/billing/'+ begin + '/' + end, function(providers) {
+    latestAjax($.get('/providers/billing/'+ begin + '/' + end), $spinner).done(function(providers) {
       var $template = $('#templates').find('.invoice-provider').clone()
+
+      $billingContainer.toggle(providers.length > 0)
+
       _.forEach(providers, function(provider) {
         var $provider = $template.find('.invoice-provider-row').clone()
 
@@ -145,7 +154,6 @@ function providerPage() {
             $list.append($providingType)
           })
         })
-
         $list.append($('<tr>').append($('<td>', { class: 'empty-row' })))
       })
     })

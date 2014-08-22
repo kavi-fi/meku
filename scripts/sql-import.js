@@ -386,7 +386,7 @@ function accounts(callback) {
   }
 
   function locations(callback) {
-    var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, bills_lang, bills_text, providing_type, ' +
+    var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, website, bills_lang, bills_text, providing_type, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate, pegi, k18, date_entered' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
@@ -409,7 +409,8 @@ function accounts(callback) {
         deleted: false,
         language: langCode(trim(row.customer_lang)),
         adultContent: row.k18,
-        gamesWithoutPegi: row.pegi
+        gamesWithoutPegi: row.pegi,
+        url: row.website || undefined
       }
     }
     

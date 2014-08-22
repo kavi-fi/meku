@@ -172,7 +172,8 @@ var ProviderLocationSchema = new Schema({
   active: Boolean,
   isPayer: Boolean,
   adultContent: Boolean,
-  gamesWithoutPegi: Boolean
+  gamesWithoutPegi: Boolean,
+  url: String
 })
 ProviderLocationSchema.statics.getActiveProviderLocations = function(callback) {
   Provider.find({ active: true }).lean().exec(function(err, activeProviders) {

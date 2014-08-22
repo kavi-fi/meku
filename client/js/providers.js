@@ -44,7 +44,7 @@ function providerPage() {
       $unapproved.empty()
       $page.find('.unapproved').toggle(providers.length > 0)
       _(providers).sortBy('name')
-        .map(renderUnapproved)
+        .map(renderProvider)
         .forEach(function(p) {
           $unapproved.append(p)
         })
@@ -259,10 +259,18 @@ function providerPage() {
   }
 
   function renderProvider(provider) {
-    return $('<div>', { class: 'result', 'data-id': provider._id })
-      .data('provider', provider)
-      .toggleClass('inactive', !provider.active)
-      .append($('<span>', { class: 'name' }).text(provider.name))
+    if (!provider.registrationDate) {
+      return renderUnapproved(provider)
+    } else {
+      return renderApproved(provider)
+    }
+  }
+
+  function renderApproved(provider) {
+      return $('<div>', { class: 'result', 'data-id': provider._id })
+        .data('provider', provider)
+        .toggleClass('inactive', !provider.active)
+        .append($('<span>', { class: 'name' }).text(provider.name))
   }
 
   function renderUnapproved(provider) {

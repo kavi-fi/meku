@@ -262,7 +262,7 @@ function internalSearchPage() {
         var series = select2OptionToIdNamePair(seriesData)
         categoryData.series = series
         categoryData.episode = $episode.val()
-        categoryData.season = $season.val()
+        categoryData.season = $season.val() == '' ? undefined : $season.val()
         if (seriesData.isNew) {
           categoryData.series.draft = {
             name: $newSeriesForm.find('input[name="series.draft.name"]').val(),

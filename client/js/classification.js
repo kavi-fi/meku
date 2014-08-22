@@ -160,6 +160,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $form.find('input[name="series"]').select2('data', { id: val, text: val, isNew: true })
     })
 
+    $form.find('input[name="classification.buyer"]').on('change', function() {
+      var $billing = $form.find('input[name="classification.billing"]')
+      if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate')
+    })
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')

@@ -70,8 +70,8 @@ function run(job, callback) {
 function programs(callback) {
   var seq = 1
   var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format, created_by FROM meku_audiovisualprograms where (program_type != "11" or program_type is null) and deleted != "1"'
-  schema.User.find({}, function(err, users) {
-    var userMap = _.indexBy(users, 'emekuId')
+  documentMap('User', 'emekuId', function(err, userMap) {
+    if (err) return callback(err)
     batchInserter(q, programMapper, 'Program', callback)
 
     function programMapper(row) {
@@ -221,9 +221,8 @@ function classifications(callback) {
   }
 
   function mapUsers(result, callback) {
-    schema.User.find({}, function(err, users) {
+    documentMap('User', 'emekuId', function(err, userMap) {
       if (err) return callback(err)
-      var userMap = _.indexBy(users, 'emekuId')
       _.values(result.classifications).forEach(function(c) {
         if (c.assigned_user_id) {
           var u = userMap[c.assigned_user_id]
@@ -235,9 +234,8 @@ function classifications(callback) {
   }
 
   function mapBuyers(result, callback) {
-    schema.Account.find({}, function(err, accounts) {
+    documentMap('Account', 'emekuId', function(err, accountMap) {
       if (err) return callback(err)
-      var accountMap = _.indexBy(accounts, 'emekuId')
       _.values(result.classifications).forEach(function(c) {
         if (!c.provider_id || c.provider_id == '0') return
         // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
@@ -623,6 +621,13 @@ function singleFieldUpdater(schemaName, fieldName) {
   return function(key, obj, callback) {
     schema[schemaName].update({ emekuId: key }, utils.keyValue(fieldName, obj), callback)
   }
+}
+
+function documentMap(schemaName, indexField, callback) {
+  schema[schemaName].find({}).lean().exec(function(err, docs) {
+    if (err) return callback(err)
+    callback(null, _.indexBy(docs, indexField))
+  })
 }
 
 function optionListToArray(string) {

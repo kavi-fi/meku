@@ -267,10 +267,10 @@ function providerPage() {
   }
 
   function renderApproved(provider) {
-      return $('<div>', { class: 'result', 'data-id': provider._id })
-        .data('provider', provider)
-        .toggleClass('inactive', !provider.active)
-        .append($('<span>', { class: 'name' }).text(provider.name))
+    return $('<div>', { class: 'result', 'data-id': provider._id })
+      .data('provider', provider)
+      .toggleClass('inactive', !provider.active)
+      .append($('<span>', { class: 'name' }).text(provider.name))
   }
 
   function renderUnapproved(provider) {

@@ -88,6 +88,32 @@ function providerPage() {
     }
   })
 
+  $yearlyBilling.on('click', 'button.yearly-billing-reminder', function() {
+    var $button = $(this)
+    $button.prop('disabled', true)
+    $.get('/providers/yearlyBilling/count', function(res) {
+      showDialog($('#templates').find('.yearly-billing-reminder-dialog').clone()
+        .find('.count').text(res.count).end()
+        .find('.send').click(sendYearlyBillingReminderMail).end()
+        .find('.cancel').click(closeDialog).end())
+      $button.prop('disabled', false)
+
+      function sendYearlyBillingReminderMail() {
+        closeDialog()
+        $.post('/providers/yearlyBilling/sendReminders', updateMetadata)
+      }
+    })
+  })
+
+  $yearlyBilling.on('click', 'button.yearly-billing-proe', function() {
+    var $button = $(this)
+    $button.prop('disabled', true)
+    $.post('/providers/yearlyBilling/proe', function() {
+      $button.prop('disabled', false)
+      updateMetadata()
+    })
+  })
+
   function fetchNewProviders(begin, end) {
     begin = moment(begin).format(format)
     end = moment(end).format(format)
@@ -124,32 +150,6 @@ function providerPage() {
       })
     })
   }
-
-  $yearlyBilling.on('click', 'button.yearly-billing-reminder', function() {
-    var $button = $(this)
-    $button.prop('disabled', true)
-    $.get('/providers/yearlyBilling/count', function(res) {
-      showDialog($('#templates').find('.yearly-billing-reminder-dialog').clone()
-        .find('.count').text(res.count).end()
-        .find('.send').click(sendYearlyBillingReminderMail).end()
-        .find('.cancel').click(closeDialog).end())
-      $button.prop('disabled', false)
-
-      function sendYearlyBillingReminderMail() {
-        closeDialog()
-        $.post('/providers/yearlyBilling/sendReminders', updateMetadata)
-      }
-    })
-  })
-
-  $yearlyBilling.on('click', 'button.yearly-billing-proe', function() {
-    var $button = $(this)
-    $button.prop('disabled', true)
-    $.post('/providers/yearlyBilling/proe', function() {
-      $button.prop('disabled', false)
-      updateMetadata()
-    })
-  })
 
   function openDetails($row) {
     $.get('/providers/' + $row.data('id'), function(provider) {

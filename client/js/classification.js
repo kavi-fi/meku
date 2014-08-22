@@ -312,7 +312,22 @@ function classificationFormUtils() {
     var currentBuyerId = null
 
     function render(program, classification, rootEditMode) {
-      $input.select2({tags: [], formatNoMatches: ''}).on('change', function() {
+      var opts = {
+        tags: [],
+        minimumInputLength: 1,
+        formatInputTooShort: '',
+        formatNoMatches: '',
+        formatResult: formatSelect2Item,
+        formatSelection: formatSelect2Item,
+        createSearchChoice: function(term) { return { id: term.replace(/,/g, '&#44;'), text: term, isNew: true } },
+        initSelection: function(e, callback) { callback([]) },
+        query: function(query) {
+          return $.get('/emails/search?q='+encodeURIComponent(query.term)).done(function(data) {
+            return query.callback({ results: data })
+          })
+        }
+      }
+      $input.select2(opts).on('change', function() {
         var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).pluck('id').value()
         saveFn($(this).attr('name'), manual)
       })
@@ -321,6 +336,15 @@ function classificationFormUtils() {
       }
       update(program, classification, rootEditMode)
       return this
+    }
+
+    function formatSelect2Item(item) {
+      if (item.role) {
+        var icon = 'select2-dropdown-result-icon ' + (item.role == 'user' ? 'fa fa-male' : 'fa fa-university')
+        return $('<div>').text(item.name+' <'+item.id+'>').prepend($('<i>').addClass(icon))
+      } else {
+        return item.id
+      }
     }
 
     function update(program, classification) {

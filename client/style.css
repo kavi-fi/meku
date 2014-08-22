@@ -609,6 +609,8 @@ textarea.invalid:disabled,
 .classification-email dl .recipients { margin-top: 10px; }
 .classification-email dl .select2-container { width: 760px; }
 
+.select2-dropdown-result-icon { text-align: center; width: 20px; margin-right: 10px; }
+
 #classification-page .register { padding: 25px 0; }
 #classification-page .register button { font-size: 25px; width: 100%; }
 

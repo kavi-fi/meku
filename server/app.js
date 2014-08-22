@@ -562,6 +562,37 @@ app.get('/actors/search', queryNameIndex('Actor'))
 app.get('/directors/search', queryNameIndex('Director'))
 app.get('/productionCompanies/search', queryNameIndex('ProductionCompany'))
 
+app.get('/emails/search', function(req, res, next) {
+  var terms = asTerms(req.query.q)
+  async.parallel([loadUsers, loadAccounts], function(err, results) {
+    if (err) return next(err)
+    res.send(_(results).flatten().sortBy('name').value())
+  })
+
+  function loadUsers(callback) {
+    var q = { $or: [ { name: terms }, { 'emails.0': terms } ], 'emails.0': { $exists: true } }
+    User.find(q, { name: 1, emails:1 }).sort('name').limit(25).lean().exec(function(err, res) {
+      if (err) return callback(err)
+      callback(null, res.map(function(u) { return { id: u.emails[0], name: u.name, role: 'user' } }))
+    })
+  }
+  function loadAccounts(callback) {
+    var q = { $or: [ { name: terms }, { 'emailAddresses.0': terms } ], 'emailAddresses.0': { $exists: true }, roles: 'Subscriber' }
+    Account.find(q, { name: 1, emailAddresses: 1 }).sort('name').limit(25).lean().exec(function(err, res) {
+      if (err) return callback(err)
+      callback(null, res.map(function(a) { return { id: a.emailAddresses[0], name: a.name, role: 'account' } }))
+    })
+  }
+
+  function asTerms(q) {
+    var words = (q || '').trim().toLowerCase()
+    return words ? { $all: words.split(/\s+/).map(asRegex) } : undefined
+  }
+  function asRegex(s) {
+    return new RegExp('(^|\\s|\\.|@)' + utils.escapeRegExp(s), 'i')
+  }
+})
+
 app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next) {
   var format = "DD.MM.YYYY"
   var begin = moment(req.params.begin, format)

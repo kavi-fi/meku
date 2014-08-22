@@ -53,6 +53,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('input[name=season]').val(p.season).end()
       .find('input[name=episode]').val(p.episode).end()
       .find('textarea[name=synopsis]').val(p.synopsis).end()
+      .find('input[name="series.draft.name"]').val(utils.getProperty(p, 'series.draft.name') || '').end()
+      .find('input[name="series.draft.nameFi"]').val(utils.getProperty(p, 'series.draft.nameFi') || '').end()
+      .find('input[name="series.draft.nameSv"]').val(utils.getProperty(p, 'series.draft.nameSv') || '').end()
+      .find('input[name="series.draft.nameOther"]').val(utils.getProperty(p, 'series.draft.nameOther') || '').end()
 
     select2Autocomplete(select2Opts.series, save).trigger('setVal', p.series)
     select2EnumAutocomplete(select2Opts.countries, save).trigger('setVal', p.country)
@@ -127,10 +131,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('button[name=save]').on('click', function(e) {
       e.preventDefault()
       $.post('/programs/' + program._id, JSON.stringify(rootModifiedFields)).done(function(program) {
-        onProgramUpdated(program)
+        $('#classification-page').trigger('show', [program._id, 'edit', selectedClassification._id]).show()
         showDialog($('#templates').find('.modify-success-dialog').clone().find('button.ok').click(closeDialog).end())
-        rootModifiedFields = {}
-        $form.find('button[name=save]').prop('disabled', true)
       })
     })
     $form.on('click', '.back-to-search', function(e) {
@@ -144,18 +146,25 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     })
     $form.find('input[name="classification.safe"]').change(function() {
       var safe = $(this).is(':checked')
-      $form.find('.category-container').slideToggle(!safe)
+      $form.find('.category-container').slideToggle()
       save($(this).attr('name'), safe)
     })
     $form.find('.safe-container span').click(function() {
       $(this).prev().click()
     })
+    $form.find('input[name="series"]').on('change', function() { onSeriesChanged(false) })
+    onSeriesChanged(true)
+
+    $form.find('input[name="series.draft.name"]').on('input', function() {
+      var val = $(this).val()
+      $form.find('input[name="series"]').select2('data', { id: val, text: val, isNew: true })
+    })
+
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
       $buyerAndBilling.removeClass('touched').select2('enable', enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
     })
-
     $form.on('click', '.category .criteria', function() {
       $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
       var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
@@ -167,6 +176,23 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $(this).parents('.criteria').toggleClass('has-comment', isNotEmpty($(this).val()))
     })
     cfu.warningDragOrder($form.find('.classification-criteria .warning-order'), save)
+
+    function onSeriesChanged(isInitial) {
+      var data = $form.find('input[name="series"]').select2('data')
+      if (!data) return
+      var $container = $form.find('.new-series-fields')
+      var $inputs = $container.find('input')
+      if (data.isNew) {
+        $inputs.prop('disabled', false)
+        if (!isInitial) {
+          $container.find('input[name="series.draft.name"]').val(data.text).trigger('input')
+        }
+        $container[isInitial ? 'show' : 'slideDown']()
+      } else {
+        $inputs.prop('disabled', true).removeClass('touched').val('').trigger('validate')
+        $container[isInitial ? 'hide' : 'slideUp']()
+      }
+    }
   }
 
   function save(field, value) {
@@ -236,9 +262,9 @@ function classificationFormUtils() {
     $form.find('.classification-details h2.main').text(classificationTitle)
 
     if (isTvEpisode) {
-      $form.find('input[name="name.0"]').prev().text('Jakson alkuperäinen nimi').end()
-        .find('input[name="nameFi.0"]').prev().text('Jakson suomalainen nimi').end()
-        .find('input[name="nameSv.0"]').prev().text('Jakson ruotsinkielinen nimi').end()
+      $form.find('input[name="name.0"]').prev().text('Jakson alkuperäinen nimi')
+      $form.find('input[name="nameFi.0"]').prev().text('Jakson suomalainen nimi')
+      $form.find('input[name="nameSv.0"]').prev().text('Jakson ruotsinkielinen nimi')
     }
     if (!isTvEpisode) $form.find('.tv-episode-field').remove()
     if (isGame) $form.find('.non-game-field').remove()
@@ -264,7 +290,9 @@ function classificationFormUtils() {
     $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     if (_.isEmpty(p.classifications)) {
       $form.find('.classification-details, .classification-summary, .classification-criteria, .classification-email').remove()
-      $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
+      if (!enums.util.isTvSeriesName(p)) {
+        $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
+      }
     }
     $form.find('button[name=save]').show()
     $form.find('button[name=register]').hide()

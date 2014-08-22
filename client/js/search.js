@@ -52,7 +52,7 @@ function internalSearchPage() {
     $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function(p) {
       $draft.remove()
       $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
-      searchPageApi.programDataUpdated(p)
+      p.deleted ? searchPageApi.programDeleted(p) : searchPageApi.programDataUpdated(p)
     })
   })
 
@@ -195,6 +195,7 @@ function internalSearchPage() {
     var $episode = $tvEpisodeForm.find('input[name=episode]')
     var $season = $tvEpisodeForm.find('input[name=season]')
     var $series = $tvEpisodeForm.find('input[name=series]')
+    var $newSeriesForm = $categorizationForm.find('.categorization-form-tv-new-series')
 
     select2Autocomplete({
       $el: $series,
@@ -234,14 +235,42 @@ function internalSearchPage() {
       $tvEpisodeForm.toggleClass('hide', !isTvEpisode()).find('input').trigger('validate')
     })
 
+    $series.change(function() {
+      var data = $(this).select2('data')
+      if (!data) return
+      var $inputs = $newSeriesForm.find('input')
+      if (data.isNew) {
+        $newSeriesForm.find('input[name="series.draft.name"]').val(data.text)
+        $newSeriesForm.slideDown()
+        $inputs.trigger('validate')
+      } else {
+        $inputs.val('').removeClass('touched')
+        $newSeriesForm.slideUp(function() { $inputs.trigger('validate') })
+      }
+    })
+
+    $newSeriesForm.find('input[name="series.draft.name"]').on('input', function() {
+      var val = $(this).val()
+      $series.select2('data', { id: val, text: val, isNew: true })
+    })
+
     $categorySaveButton.click(function() {
       var categoryData = { programType: $categorySelection.select2('val') }
 
       if (isTvEpisode()) {
-        var series = select2OptionToIdNamePair($series.select2('data'))
+        var seriesData = $series.select2('data')
+        var series = select2OptionToIdNamePair(seriesData)
         categoryData.series = series
         categoryData.episode = $episode.val()
-        categoryData.season = $season.val()
+        categoryData.season = $season.val() == '' ? undefined : $season.val()
+        if (seriesData.isNew) {
+          categoryData.series.draft = {
+            name: $newSeriesForm.find('input[name="series.draft.name"]').val(),
+            nameFi: $newSeriesForm.find('input[name="series.draft.nameFi"]').val(),
+            nameSv: $newSeriesForm.find('input[name="series.draft.nameSv"]').val(),
+            nameOther: $newSeriesForm.find('input[name="series.draft.nameOther"]').val()
+          }
+        }
       }
 
       $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
@@ -299,7 +328,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -360,6 +389,12 @@ function searchPage() {
     if ($row.is('.selected')) {
       openDetail($newRow, false)
     }
+  }
+
+  function programDeleted(program) {
+    var $row = $page.find('.result[data-id=' + program._id + ']')
+    if (_.isEmpty($row)) return
+    $row.next('.program-box').add($row).slideUp(function() { $(this).remove() })
   }
 
   function openDetail($row, animate) {

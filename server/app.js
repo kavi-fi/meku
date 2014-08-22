@@ -153,21 +153,21 @@ app.post('/reset-password', function(req, res, next) {
 app.get('/programs/search/:q?', function(req, res, next) {
   if (req.user) {
     var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
-    search(fields, req, res, next)
+    search({}, fields, req, res, next)
   } else {
-    search(Program.publicFields, req, res, next)
+    search({ $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }, Program.publicFields, req, res, next)
   }
 })
 
-function search(responseFields, req, res, next) {
+function search(extraQueryTerms, responseFields, req, res, next) {
   var page = req.query.page || 0
   var filters = req.query.filters || []
-  Program.find(query(), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
+  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
 
-  function query() {
+  function query(extraQueryTerms) {
     var ObjectId = mongoose.Types.ObjectId
     var terms = req.params.q
-    var q = { deleted: { $ne:true } }
+    var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
     var and = []
     if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
     var nameQuery = toMongoArrayQuery(terms)
@@ -215,7 +215,14 @@ app.get('/programs/recent', function(req, res, next) {
 app.delete('/programs/drafts/:id', function(req, res, next) {
   var pull = { draftsBy: req.user._id }
   var unset = utils.keyValue('draftClassifications.' + req.user._id, "")
-  Program.findByIdAndUpdate(req.params.id, { $pull: pull, $unset: unset }, respond(res, next))
+  Program.findByIdAndUpdate(req.params.id, { $pull: pull, $unset: unset }, function(err, p) {
+    if (err) return next(err)
+    if (p.classifications.length == 0 && p.draftsBy.length == 0) {
+      softDeleteAndLog(p, req.user, respond(res, next))
+    } else {
+      res.send(p)
+    }
+  })
 })
 
 app.get('/programs/:id', function(req, res, next) {
@@ -225,7 +232,7 @@ app.get('/programs/:id', function(req, res, next) {
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
-  var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.user, role: req.user.role}})
+  var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.name, role: req.user.role}})
   p.newDraftClassification(req.user)
   p.save(function(err, program) {
     if (err) return next(err)
@@ -252,7 +259,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     populateSentRegistrationEmailAddresses(newClassification, program, function(err, program) {
       if (err) return next(err)
-      verifyTvSeriesExistsOrCreate(program, function(err) {
+      verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)
         program.save(function(err) {
           if (err) return next(err)
@@ -333,34 +340,40 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
 app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
+    var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
-    updateAndLogChanges(program, updates, req.user, function(err, program) {
+    watcher.applyUpdates(updates)
+    verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
-      verifyTvSeriesExistsOrCreate(program, function(err) {
+      program.populateAllNames(function(err) {
         if (err) return next(err)
-        updateTvSeriesClassification(program, function(err) {
+        watcher.saveAndLogChanges(function(err, program) {
           if (err) return next(err)
-          res.send(program)
+          updateTvSeriesClassification(program, function(err) {
+            if (err) return next(err)
+            res.send(program)
+          })
         })
       })
     })
   })
 })
 
-app.post('/programs/:id', function(req, res, next) {
+app.post('/programs/:id', requireRole('root'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
     var oldSeries = program.toObject().series
-    updateAndLogChanges(program, req.body, req.user, function(err, program) {
+    var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
+    watcher.applyUpdates(req.body)
+    verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
         if (err) return next(err)
-        updateMetadataIndexes(program, function() {
+        updateTvEpisodeAllNamesOnParentNameChange(program, function(err) {
           if (err) return next(err)
-          verifyTvSeriesExistsOrCreate(program, function(err) {
+          watcher.saveAndLogChanges(function(err, program) {
             if (err) return next(err)
-            program.save(function(err, program) {
-              if (err) return next(err)
+            updateMetadataIndexes(program, function() {
               updateTvSeriesClassification(program, function(err) {
                 if (err) return next(err)
                 if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
@@ -375,6 +388,19 @@ app.post('/programs/:id', function(req, res, next) {
       })
     })
   })
+
+  function updateTvEpisodeAllNamesOnParentNameChange(parent, callback) {
+    if (!enums.util.isTvSeriesName(parent)) return callback()
+    var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
+    var nameChanges = _.any(parent.modifiedPaths(), function(p) { return _.contains(namePaths, p) })
+    if (!nameChanges) return callback()
+    Program.find({ 'series._id': parent._id }).exec(function(err, episodes) {
+      if (err) return callback(err)
+      async.forEach(episodes, function(e, callback) { e.populateAllNames(parent, callback) }, function() {
+        async.forEach(episodes, function(e, callback) { e.save(callback) }, callback)
+      })
+    })
+  }
 })
 
 app.post('/programs/autosave/:id', function(req, res, next) {
@@ -654,10 +680,11 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       var username = program.classifications[0].author.name
       var user = _.find(req.account.users, { username: username })
       if (user) {
-        program.classifications[0].author._id = user._id
-        User.findOne({ username: username, active: true }, { _id: 1 }).lean().exec(function(err, doc) {
+        User.findOne({ username: username, active: true }, { _id: 1, username: 1, name: 1, role: 1 }).lean().exec(function(err, doc) {
           if (err) return callback(err)
           if (doc) {
+            program.classifications[0].author = { _id: doc._id, username: doc.username, name: doc.name }
+            program.createdBy = { _id: doc._id, username: doc.username, name: doc.name, role: doc.role }
             return callback()
           } else {
             return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
@@ -674,7 +701,8 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       Program.findOne({ programType: 2, name: parentName }, function(err, parent) {
         if (err) return callback(err)
         if (!parent) {
-          createParentProgram(program, parentName, callback)
+          var user = _.merge({ ip: req.user.ip }, program.createdBy)
+          createParentProgram(program, { name:[parentName] }, user, callback)
         } else {
           program.series = { _id: parent._id, name: parent.name[0] }
           callback()
@@ -706,12 +734,13 @@ app.use(function(err, req, res, next) {
   res.send({ message: err.message || err })
 })
 
-function createParentProgram(program, parentName, callback) {
-  var parent = new Program({ programType: 2, name: [parentName] })
+function createParentProgram(program, data, user, callback) {
+  var parent = new Program(_.merge({ programType: 2, createdBy: {_id: user._id, username: user.username, name: user.name, role: user.role} }, data))
   parent.populateAllNames(function(err) {
     if (err) return callback(err)
     parent.save(function(err, saved) {
       if (err) return callback(err)
+      logCreateOperation(user, parent)
       program.series = { _id: saved._id, name: saved.name[0] }
       callback()
     })
@@ -901,42 +930,69 @@ function updateTvSeriesClassification(program, callback) {
   if (!enums.util.isTvEpisode(program)) return callback()
   var seriesId = program.series && program.series._id
   if (!seriesId) return callback()
-  console.log('Program.updateTvSeriesClassification '+seriesId)
   Program.updateTvSeriesClassification(seriesId, callback)
 }
 
-function verifyTvSeriesExistsOrCreate(program, callback) {
+function verifyTvSeriesExistsOrCreate(program, user, callback) {
   if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
-    createParentProgram(program, program.series.name.trim(), callback)
-  } else return callback()
+    var draft = program.series.draft || {}
+    var data = {
+      name: [draft.name || program.series.name],
+      nameFi: draft.nameFi ? [draft.nameFi] : [],
+      nameSv: draft.nameSv ? [draft.nameSv] : [],
+      nameOther: draft.nameOther ? [draft.nameOther] : []
+    }
+    createParentProgram(program, data, user, callback)
+  } else {
+    if (program.series) program.series.draft = {}
+    return callback()
+  }
 }
 
 function logError(err) {
   if (err) console.error(err)
 }
 
-function updateAndLogChanges(document, updates, user, callback) {
+function watchChanges(document, user, excludedLogPaths) {
   var oldObject = document.toObject()
-  updates = utils.flattenObject(updates)
-  _.forEach(updates, function(value, key) {
-    document.set(key, value)
-  })
-  document.save(function(err, updatedDocument) {
-    if (err) return callback(err)
-    var newObject = updatedDocument.toObject()
-    var changes = _(updates).keys().map(function(path) {
-      var newValue = utils.getProperty(newObject, path)
-      var oldValue = utils.getProperty(oldObject, path)
+  return { applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges }
 
-      if (_.isEqual(newValue, oldValue) || (oldValue == null && newValue === "")) return []
-      return [
-        path.replace(/\./g, ','),
-        { new: newValue, old: oldValue }
-      ]
-    }).zipObject().valueOf()
+  function applyUpdates(updates) {
+    var flatUpdates = utils.flattenObject(updates)
+    _.forEach(flatUpdates, function(value, key) { document.set(key, value) })
+  }
+
+  function saveAndLogChanges(callback) {
+    var changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
+    document.save(function(err, saved) {
+      if (err) return callback(err)
+      log(changedPaths, oldObject, saved, callback)
+    })
+  }
+
+  function isIncludedLogPath(p) {
+    return document.isDirectModified(p) && document.schema.pathType(p) != 'nested' && !_.contains(excludedLogPaths, p)
+  }
+
+  function log(changedPaths, oldObject, updatedDocument, callback) {
+    var newObject = updatedDocument.toObject()
+    var changes = _(changedPaths).map(asChange).zipObject().valueOf()
     logUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
-  })
+
+    function asChange(path) {
+      var newValue = utils.getProperty(newObject, path)
+      var oldValue = utils.getProperty(oldObject, path)
+      if (_.isEqual(newValue, oldValue) || (oldValue == null && newValue === "")) return []
+      return [ path.replace(/\./g, ','), { new: newValue, old: oldValue } ]
+    }
+  }
+}
+
+function updateAndLogChanges(document, updates, user, callback) {
+  var watcher = watchChanges(document, user)
+  watcher.applyUpdates(updates)
+  watcher.saveAndLogChanges(callback)
 }
 
 function softDeleteAndLog(document, user, callback) {

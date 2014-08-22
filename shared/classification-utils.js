@@ -70,7 +70,7 @@ var criteriaAgeLimit = function(classification) {
   return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
 }
 
-var criteriaText = exports.criteriaText = function(warnings) {
+var criteriaText = function(warnings) {
   return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
 }
 
@@ -123,7 +123,7 @@ exports.registrationEmail = function(program, classification, user) {
       var date = new Date(previous.registrationDate)
       return {
         criteriaText: previousClassificationText(summary(previous)),
-        date: date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear(),
+        date: date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear()
       }
     } else return {}
   }

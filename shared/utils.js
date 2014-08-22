@@ -13,6 +13,11 @@ utils.keyValue = function(key, value) {
   return data
 }
 
+utils.showBoolean = function(b) {
+  if (b) return "Kyllä"
+  else return "Ei"
+}
+
 utils.escapeRegExp = function(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
 }

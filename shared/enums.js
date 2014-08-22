@@ -93,6 +93,10 @@ enums.providingType = {
   'Subscription_of_program': 'Tilausohjelmapalvelu'
 }
 
+enums.providingTypeName = function(type) {
+  return enums.providingType[type] || 'Tuntematon'
+}
+
 enums.providingTypePrices = {
   'Recordings_provide': 100,
   'Public_presentation': 200,
@@ -502,6 +506,8 @@ enums.billingLanguages = {
   'SV': 'Ruotsi',
   'EN': 'Englanti'
 }
+
+enums.billingLanguage = function(k) { return enums.billingLanguage[k] }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = enums

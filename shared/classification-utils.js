@@ -146,6 +146,8 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function classificationText(summary) {
     if (summary.age == 0) {
       return 'Kuvaohjelma on sallittu.'
+    } else if (summary.warnings.length == 0) {
+      return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age) + '.'
     } else {
       return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age)
         + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '

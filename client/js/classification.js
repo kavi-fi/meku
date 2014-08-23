@@ -298,6 +298,7 @@ function classificationFormUtils() {
         $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
       }
     }
+    $form.find('.classification-email h3.main').text('Luokittelupäätös')
     $form.find('button[name=save]').show()
     $form.find('button[name=register]').hide()
   }

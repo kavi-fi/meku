@@ -112,18 +112,13 @@ exports.registrationEmail = function(program, classification, user) {
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
     'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
 
-  var now = new Date()
-  var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
-  var buyer = classification.buyer ? classification.buyer.name : ''
-  var classificationSummary = summary(classification)
-
   function previousClassification() {
     if (reclassification) {
       var previous = program.classifications[0]
       var date = new Date(previous.registrationDate)
       return {
         criteriaText: previousClassificationText(summary(previous)),
-        date: date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear()
+        date: dateFormat(date)
       }
     } else return {}
   }
@@ -137,9 +132,12 @@ exports.registrationEmail = function(program, classification, user) {
     }
   }
 
+  function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }
+
+  var classificationSummary = summary(classification)
   var data = {
-    date: dateString,
-    buyer: buyer,
+    date: dateFormat(classification.registrationDate || new Date()),
+    buyer: classification.buyer ? classification.buyer.name : '',
     name: programName(),
     year: program.year || '',
     classification: classificationText(classificationSummary),

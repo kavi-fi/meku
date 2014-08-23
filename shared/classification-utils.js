@@ -91,7 +91,7 @@ exports.registrationEmail = function(program, classification, user) {
       classification: classificationText(classificationSummary),
       classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
       link: (user.role == 'kavi') ? linkKavi : linkOther,
-      publicComments: classification.publicComments,
+      publicComments: classification.publicComments || 'ei määritelty.',
       authorEmail: user.email,
       classifier: utils.hasRole(user, 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name,
       reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',

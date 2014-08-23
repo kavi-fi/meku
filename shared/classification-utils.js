@@ -58,9 +58,10 @@ var classificationText = function(summary) {
 var previousClassificationText = function(summary) {
   if (summary.age == 0) {
     return 'sallituksi.'
+  } else if (summary.warnings.length == 0) {
+    return 'ikärajaksi ' + ageAsText(summary.age) + '.'
   } else {
-    return 'ikärajaksi ' + ageAsText(summary.age)
-         + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
+    return 'ikärajaksi ' + ageAsText(summary.age) + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
          + criteriaText(summary.warnings) + '.'
   }
 }

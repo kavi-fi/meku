@@ -112,9 +112,9 @@ exports.registrationEmail = function(program, classification, user) {
     '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
     'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
 
-  function previousClassification() {
+  function previous() {
     if (reclassification) {
-      var previous = program.classifications[0]
+      var previous = previousClassification(program, classification)
       var date = new Date(previous.registrationDate)
       return {
         criteriaText: previousClassificationText(summary(previous)),
@@ -147,7 +147,7 @@ exports.registrationEmail = function(program, classification, user) {
     authorEmail: user.email,
     classifier: utils.hasRole(user, 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name,
     reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
-    previous: previousClassification()
+    previous: previous()
   }
 
   return {
@@ -156,6 +156,17 @@ exports.registrationEmail = function(program, classification, user) {
     subject: _.template(subject, data),
     body: _.template(text, data)
   }
+
+  function previousClassification(program, classification) {
+    if (program.classifications.length == 0) return
+    var index = _.findIndex(program.classifications, { _id: classification._id })
+    if (index == -1) {
+      return program.classifications[0]
+    } else {
+      return program.classifications[index + 1]
+    }
+  }
+
 }
 
 exports.price = function(program, duration) {

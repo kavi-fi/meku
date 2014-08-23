@@ -11,13 +11,15 @@ body {
 .hide { display: none !important; }
 
 .clearfix:after { content:''; display:table; clear:both; }
-.dialog { width: 300px; margin: 0 auto; border: 1px solid #D3D3D3; background-color: #fff; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); padding: 20px 40px 40px 40px; }
+.dialog { border-radius: 5px; border: 5px solid #00BB88; background-color: #f8f8f8; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); padding: 20px 40px 40px 40px; max-width: 700px; }
 .dialog .buttons { display: -webkit-flex; display: flex; width: 100%; -webkit-justify-content: space-around; justify-content: space-around; }
 
+#reset-password > div { margin: 0 auto; width: 350px; padding: 20px; }
+
 #login-overlay, #error-overlay, #conflict-overlay { z-index: 2; }
-#login, #error-dialog, #conflict-dialog, #reset-password { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
-#login > div, #error-dialog > div, #conflict-dialog > div, #reset-password > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
-#login label, #reset-password label { text-align: left; }
+#login, #error-dialog, #conflict-dialog { z-index: 3; display: none; position: fixed; top:0;bottom:0;left:0;right:0; box-sizing: border-box; align-items: center; justify-content: center; }
+#login > div, #error-dialog > div, #conflict-dialog > div { background-color: #f8f8f8; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
+#login label, #reset-password label { text-align: left; font-weight: normal; }
 #login input, #reset-password input { width: 330px; font-weight: normal; margin: 10px 0; }
 #login input.invalid, #reset-password input.invalid { background-color: #fff; }
 #login button, #reset-password button { margin-top: 10px; }
@@ -33,9 +35,6 @@ body {
   margin: 1px 0;
   padding: 10px 50px;
 }
-
-#reset-password > div { border: 0; }
-#reset-password .feedback { text-align: left; }
 
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;
@@ -96,9 +95,8 @@ textarea { resize: vertical; }
 #dialog {
   display: none;
   position: fixed;
-  top: 300px;
-  left: 0;
-  right: 0;
+  left: 0; right: 0; top: 0; bottom: 0;
+  align-items: center; justify-content: center;
   z-index: 1000;
 }
 #overlay, #login-overlay, #error-overlay, #conflict-overlay { display: none; position: fixed; top:0; bottom:0; left:0; right:0; background: #222; opacity: 0.6; }
@@ -453,7 +451,6 @@ textarea.invalid:disabled,
 .program-details-form .comments { margin-top: 13px; }
 .program-details-form .comments textarea { width: 750px; height: 60px }
 
-.registration-confirmation { width: 860px; }
 .registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
 .registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
 .registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }

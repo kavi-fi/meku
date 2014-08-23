@@ -113,14 +113,12 @@ exports.registrationEmail = function(program, classification, user) {
     'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
 
   function previous() {
-    if (reclassification) {
-      var previous = previousClassification(program, classification)
-      var date = new Date(previous.registrationDate)
-      return {
-        criteriaText: previousClassificationText(summary(previous)),
-        date: dateFormat(date)
-      }
-    } else return {}
+    var previous = previousClassification(program, classification)
+    if (!previous) return {}
+    return {
+      criteriaText: previousClassificationText(summary(previous)),
+      date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : 'aiemmin'
+    }
   }
 
   function programName() {

@@ -84,7 +84,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
     var classificationSummary = summary(classification)
     return {
-      date: dateFormat(classification.registrationDate || new Date()),
+      date: dateFormat(classification.registrationDate ? new Date(classification.registrationDate) : new Date()),
       buyer: classification.buyer ? classification.buyer.name : '',
       name: programName(),
       year: program.year || '',

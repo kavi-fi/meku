@@ -267,7 +267,7 @@ app.post('/programs/:id/register', function(req, res, next) {
             if (err) return next(err)
             addInvoicerows(newClassification, function(err) {
               if (err) return next(err)
-              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user), function(err) {
+              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, getHostname()), function(err) {
                 if (err) return next(err)
                 updateMetadataIndexes(program, function() {
                   logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })

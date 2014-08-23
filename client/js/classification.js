@@ -359,7 +359,7 @@ function classificationFormUtils() {
         })
       }
 
-      var email = classificationUtils.registrationEmail(program, classification, user)
+      var email = classificationUtils.registrationEmail(program, classification, user, location.protocol + '//' + location.host)
 
       updateEmails('sent', email.recipients)
       updateEmails('manual', classification.registrationEmailAddresses)

@@ -70,7 +70,7 @@ var ageLimit = exports.ageLimit = function(classification) {
   return Math.max(criteria, legacy)
 }
 
-exports.registrationEmail = function(program, classification, user) {
+exports.registrationEmail = function(program, classification, user, hostName) {
   var data = generateData()
   return {
     recipients: _.filter(program.sentRegistrationEmailAddresses, function(x) { return x != user.email }),
@@ -95,15 +95,18 @@ exports.registrationEmail = function(program, classification, user) {
       authorEmail: user.email,
       classifier: utils.hasRole(user, 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name,
       reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
-      previous: previous()
+      previous: previous(),
+      icons: iconHtml(classificationSummary, hostName)
     }
   }
 
   function generateText() {
     var reclassification = isReclassification(program, classification)
-    return "<p><%- date %><br/><%- buyer %></p><p>" +
+    return '<div style="text-align: right; margin-top: 8px;"><img src="'+hostName+'/images/logo.png" /></div>' +
+      "<p><%- date %><br/><%- buyer %></p><p>" +
       (reclassification ? "Ilmoitus kuvaohjelman uudelleen luokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
       '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : '') + ' luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
+      '<%= icons %>' +
       (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
       ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleen luokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
       ((utils.hasRole(user, 'kavi')) ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
@@ -167,6 +170,12 @@ exports.registrationEmail = function(program, classification, user) {
 
   function criteriaText(warnings) {
     return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
+  }
+
+  function iconHtml(summary) {
+    var warningHtml = summary.warnings.map(function(w) { return img(w.category) }).join('')
+    return '<div style="margin: 10px 0;">'+img('agelimit-'+summary.age) + warningHtml+'</div>'
+    function img(fileName) { return '<img src="'+hostName+'/images/'+fileName+'.png" style="width: 40px; height: 40px; padding-right: 8px;"/>' }
   }
 }
 

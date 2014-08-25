@@ -24,6 +24,7 @@ express.static.mime.define({ 'text/xml': ['xsd'] })
 
 var app = express()
 
+app.use(express.compress())
 app.use(express.json())
 app.use(nocache)
 app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))

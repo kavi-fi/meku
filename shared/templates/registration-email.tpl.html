@@ -8,13 +8,12 @@
 
   <p>Mirja Kosonen, puh. 0295 338&nbsp;003 tai <a href="mailto:mirja.kosonen@kavi.fi">mirja.kosonen@kavi.fi</a></p>
   <p>Tarjoamistavat ja niistä perittävät maksut:</p>
-  <blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding:
-  0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><p class="MsoNormal">Tallenteiden tarjoaminen (100 euroa/vuosi)</p></blockquote></blockquote></blockquote></blockquote></blockquote><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><p class="MsoNormal">Julkinen esittäminen (200
-  euroa/vuosi)</p></blockquote></blockquote></blockquote></blockquote></blockquote><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><p class="MsoNormal"><span style="text-indent: 65.2pt">Valtakunnallinen televisio-ohjelmisto (600 euroa/vuosi)</span></p><p class="MsoNormal"><span style="text-indent: 65.2pt">Alueellinen televisio ohjelmisto (100
-  euroa/vuosi)</span></p><p class="MsoNormal"><span style="text-indent: 65.2pt">Ulkomailta välitetty ohjelmistokokonaisuus (400 euroa/vuosi)</span></p></blockquote></blockquote></blockquote></blockquote></blockquote>  <blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><blockquote style="margin: 0px 0px 0px 40px; border-style: none; padding: 0px"><p class="MsoNormal"><span style="text-indent: 65.2pt">Tilausohjelmapalvelu (400
-  euroa/vuosi)</span></p></blockquote></blockquote></blockquote></blockquote></blockquote>
+  <ul><% providingTypePrices.forEach(function(type) { %>
+    <li><%- type.name %> (<%- type.price %> euroa/vuosi)</li>
+  <% }) %></ul>
 
   <p>&nbsp;</p>
+
   <p>Olemme vastaanottaneet seuraavat tiedot:&nbsp; </p>
   <table border="0">
     <tbody>

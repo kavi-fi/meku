@@ -3,7 +3,7 @@ var _ = require('lodash')
 var enums = require('./enums')
 var utils = require('./utils')
 
-var registrationEmail = exports.registrationEmail = function (data) {
+exports.registrationEmail = function (data) {
   function emailHtml(data) {
     var allLocations = data.locations.map(function(l) {
       return {
@@ -29,7 +29,8 @@ var registrationEmail = exports.registrationEmail = function (data) {
       invoiceText: data.billing.invoiceText,
       payerLocations: payerLocations,
       totalProvider: total(locations),
-      totalLocations: total(payerLocations)
+      totalLocations: total(payerLocations),
+      providingTypePrices: providingTypes()
     })
 
     var tpl = readTemplateSync('registration-email.tpl.html')
@@ -52,6 +53,7 @@ exports.registrationEmailProviderLocation = function (data) {
     var vars = _.merge({}, data, {
       emailAddress: data.emailAddresses.join(', '),
       providingTypes: data.providingType.map(enums.providingTypeName),
+      providingTypePrices: providingTypes(),
       total: providingTypeTotalPrice(data.providingType)
     })
 
@@ -68,6 +70,12 @@ exports.registrationEmailProviderLocation = function (data) {
     replyto: 'mirja.kosonen@kavi.fi',
     body: emailHtml(data)
   }
+}
+
+function providingTypes() {
+  return _(enums.providingType).keys().map(function(key) {
+    return {name: enums.providingType[key], price: enums.providingTypePrices[key]}
+  }).value()
 }
 
 function readTemplateSync(file) {

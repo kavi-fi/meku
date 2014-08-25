@@ -162,7 +162,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
 
     $form.find('input[name="classification.buyer"]').on('change', function() {
       var $billing = $form.find('input[name="classification.billing"]')
-      if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate')
+      if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate').trigger('change')
     })
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return

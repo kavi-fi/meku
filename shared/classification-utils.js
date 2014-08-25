@@ -50,6 +50,15 @@ var criteriaAgeLimit = function(classification) {
   return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
 }
 
+exports.canReclassify = function(program, user) {
+  if (!program) return false
+  if (enums.util.isUnknown(program) || enums.util.isTvSeriesName(program)) return false
+  if (program.draftClassifications && program.draftClassifications[user._id]) return false
+  var head = program.classifications[0]
+  if (!head) return false
+  return !enums.authorOrganizationIsKHO(head) && (utils.hasRole(user, 'kavi') || (head.status != 'registered'))
+}
+
 var isReclassification = exports.isReclassification = function(program, classification) {
   if (program.classifications.length == 0) return false
   var index = _.findIndex(program.classifications, { _id: classification._id })

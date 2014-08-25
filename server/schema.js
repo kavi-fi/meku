@@ -148,27 +148,8 @@ var AccountSchema = new Schema({
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))
 
-var Provider = exports.Provider = mongoose.model('providers', {
+var providerLocation = {
   emekuId: String,
-  creationDate: Date,
-  registrationDate: Date,
-  yTunnus: String,
-  name: String,
-  address: { street: String, city: String, zip: String, country: String },
-  billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
-  eInvoice: { address:String, operator:String },
-  billingPreference: String, // '' || 'address' || 'eInvoice'
-  contactName: String,
-  phoneNumber: String,
-  emailAddresses: [String],
-  language: String,
-  deleted: Boolean,
-  active: Boolean
-})
-
-var ProviderLocationSchema = new Schema({
-  emekuId: String,
-  provider: {type: ObjectId, index: true},
   name: String,
   address: { street: String, city: String, zip: String, country: String },
   contactName: String,
@@ -183,21 +164,28 @@ var ProviderLocationSchema = new Schema({
   adultContent: Boolean,
   gamesWithoutPegi: Boolean,
   url: String
-})
-ProviderLocationSchema.statics.getActiveProviderLocations = function(callback) {
-  Provider.find({ active: true }).lean().exec(function(err, activeProviders) {
-    if (err) return callback(err)
-    var providers = _.indexBy(activeProviders, '_id')
-    ProviderLocation.find({ active: true, provider: { $in: _.keys(providers) }}).lean().exec(function(err, locs) {
-      if (err) return callback(err)
-      locs.forEach(function(l) {
-        l.provider = providers[l.provider.valueOf()]
-      })
-      callback(undefined, locs)
-    })
-  })
 }
-var ProviderLocation = exports.ProviderLocation = mongoose.model('providerlocations', ProviderLocationSchema)
+
+var ProviderSchema = new Schema({
+  emekuId: String,
+  creationDate: Date,
+  registrationDate: Date,
+  yTunnus: String,
+  name: String,
+  address: { street: String, city: String, zip: String, country: String },
+  billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
+  eInvoice: { address:String, operator:String },
+  billingPreference: String, // '' || 'address' || 'eInvoice'
+  contactName: String,
+  phoneNumber: String,
+  emailAddresses: [String],
+  language: String,
+  deleted: Boolean,
+  active: Boolean,
+  locations: [providerLocation]
+})
+
+var Provider = exports.Provider = mongoose.model('providers', ProviderSchema)
 
 var ProviderMetadataSchema = new Schema({
   yearlyBillingReminderSent: Date,
@@ -334,7 +322,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, ProviderLocation, ProviderMetadata, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
+var models = exports.models = [Program, Account, Provider, ProviderMetadata, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

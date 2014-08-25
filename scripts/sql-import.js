@@ -312,7 +312,7 @@ function classifications(callback) {
 
 function accounts(callback) {
   async.applyEachSeries([
-    accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, linkProviderLocations, locationEmailAddresses,
+    accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, locationEmailAddresses,
     userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts
   ], callback)
 
@@ -405,12 +405,12 @@ function accounts(callback) {
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate, pegi, k18, date_entered' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
-    function onRow(row) {
+    batchUpdater(q, function(row, result) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var phoneNumber = row.phone_office || row.phone_alternate || undefined
       var active = row.provider_status === 'Approved' || row.provider_status === 'Changed'
       var registrationDate = active ? (row.date_entered ? readAsUTCDate(row.date_entered) : new Date(0)) : undefined
-      return {
+      var location = {
         emekuId: row.id,
         name: trim(row.name),
         yTunnus: trim(row.sic_code),
@@ -427,22 +427,15 @@ function accounts(callback) {
         gamesWithoutPegi: row.pegi,
         url: row.website || undefined
       }
-    }
-    
-    batchInserter(q, onRow, 'ProviderLocation', callback)
-  }
+      if (result[row.parent_id]) {
+        result[row.parent_id].push(location)
+      } else {
+        result[row.parent_id] = [location]
+      }
 
-  function linkProviderLocations(callback) {
-    var q = 'select id, parent_id from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
-    conn.query(q)
-      .stream()
-      .pipe(consumer(function(row, callback) {
-        schema.Provider.findOne({emekuId: row.parent_id}, function(err, parent) {
-          if (err) return callback(err)
-          if (!parent) return callback() // parent has been deleted
-          schema.ProviderLocation.update({emekuId: row.id}, { provider: parent._id }, callback)
-        })
-      }, callback))
+    }, function(parentId, locations, callback) {
+      schema.Provider.findOneAndUpdate({ emekuId: parentId }, { $set: { locations: locations }}, callback)
+    }, callback)
   }
 
   function providerEmailAddresses(callback) {
@@ -450,7 +443,30 @@ function accounts(callback) {
   }
 
   function locationEmailAddresses(callback) {
-    accountEmailsTo('ProviderLocation', 'Location_of_providing', callback)
+    var q = 'select a.id, a.parent_id, e.email_address, j.primary_address' +
+      ' from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id)' +
+      ' where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts" and a.customer_type LIKE "%Location_of_providing%"'
+
+    batchUpdater(q, function(row, result) {
+      if (!result[row.parent_id]) result[row.parent_id] = {}
+      if (!result[row.parent_id][row.id]) result[row.parent_id][row.id] = []
+      if (row.primary_address == '1') {
+        result[row.parent_id][row.id].unshift(row.email_address)
+      } else {
+        result[row.parent_id][row.id].push(row.email_address)
+      }
+
+    }, function(parentId, emailsByLoc, callback) {
+      schema.Provider.findOne({ emekuId: parentId }, function(err, provider) {
+        if (err) return callback(err)
+        var locsById = _.indexBy(provider.locations, 'emekuId')
+        _.forEach(emailsByLoc, function(emails, locId) {
+          var location = locsById[locId]
+          location.emailAddresses = emails
+        })
+        provider.save(callback)
+      })
+    }, callback)
   }
 
   function accountEmailsTo(coll, customerType, callback) {
@@ -811,7 +827,7 @@ function wipe(callback) {
 }
 function wipeAccounts(callback) {
   connectMongoose(function() {
-    async.each(['accounts', 'providers', 'providerlocations', 'users'], dropCollection, callback)
+    async.each(['accounts', 'providers', 'users'], dropCollection, callback)
   })
 }
 function wipeMetadataIndex(callback) {

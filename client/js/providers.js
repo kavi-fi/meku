@@ -390,9 +390,11 @@ function providerPage() {
       $locationDetails.find('.modify-only').remove()
 
       bindEventHandlers(provider, $locationDetails, function(locationData) {
-        $.post('/providerlocations/', JSON.stringify(locationData), function(location) {
+        $.post('/providers/' + provider._id + '/locations', JSON.stringify(locationData), function(l) {
+          provider.locations.push(l)
+          $providers.find('[data-id='+provider._id+']').data('provider', provider)
           $locations.find('.location-details').slideUp(function() {
-            $locations.prepend(renderLocation(location))
+            $locations.prepend(renderLocation(l))
           })
         })
       })
@@ -408,6 +410,7 @@ function providerPage() {
       closeLocationDetails()
       if (!wasSelected) {
         var location = $this.data('location')
+        var provider = $providers.find('.result.selected').data('provider')
         var $locationDetails = renderLocationDetails(location)
 
         if (hasRole('root')) $locationDetails.append(changeLog(location).render())
@@ -415,12 +418,13 @@ function providerPage() {
         $locationDetails.find('.new-only').remove()
 
         bindEventHandlers(provider, $locationDetails, function(locationData) {
-          $.ajax('/providerlocations/' + location._id, { type: 'PUT', data: JSON.stringify(locationData) })
-            .done(function(location) {
+          $.ajax('/providers/' + provider._id + '/locations/' + location._id, { type: 'PUT', data: JSON.stringify(locationData) })
+            .done(function(p) {
+              $providers.find('[data-id='+provider._id+']').data('provider', p)
               var $selected = $locations.find('.location-row.selected').removeClass('selected')
               $locations.find('.location-details').slideUp(function() {
                 $(this).remove()
-                $selected.replaceWith(renderLocation(location))
+                $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })))
               })
             })
         })
@@ -433,15 +437,17 @@ function providerPage() {
     $locations.on('click', 'button[name=remove]', function() {
       var $selected = $locations.find('.selected')
       var location = $selected.data('location')
+      var provider = $providers.find('.result.selected').data('provider')
       showDialog($('#templates').find('.remove-location-dialog').clone()
         .find('.location-name').text(location.name).end()
         .find('button[name=remove]').click(removeLocation).end()
         .find('button[name=cancel]').click(closeDialog).end())
 
       function removeLocation() {
-        $.ajax('/providerlocations/' + location._id, { type: 'DELETE' }).done(function() {
+        $.ajax('/providers/' + provider._id + '/locations/' + location._id, { type: 'delete' }).done(function(p) {
           closeDialog()
           closeLocationDetails()
+          $providers.find('[data-id='+provider._id+']').data('provider', p)
           $selected.slideUp(function() { $(this).remove() })
         })
       }
@@ -469,9 +475,11 @@ function providerPage() {
     function toggleActiveButton(newState) {
       var $selected = $locations.find('.location-row.selected')
       var location = $selected.data('location')
+      var provider = $providers.find('.result.selected').data('provider')
       var data = JSON.stringify({ active: newState === 'on' })
-      $.ajax('/providerlocations/' + location._id, { type: 'PUT', data: data}).done(function(updatedLocation) {
-        $selected.replaceWith(renderLocation(updatedLocation).addClass('selected'))
+      $.ajax('/providers/' + provider._id + '/locations/' + location._id, { type: 'PUT', data: data}).done(function(p) {
+        $providers.find('[data-id='+provider._id+']').data('provider', p)
+        $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })).addClass('selected'))
       })
     }
 
@@ -496,8 +504,7 @@ function providerPage() {
 
         var specialFields = {
           emailAddresses: _.pluck($form.find('input[name=emailAddresses]').select2('data'), 'text'),
-          providingType: _.pluck($form.find('input[name=providingType]').select2('data'), 'id'),
-          provider: provider._id
+          providingType: _.pluck($form.find('input[name=providingType]').select2('data'), 'id')
         }
 
         submitCallback(_.merge(createDataObjectFromForm($form), specialFields))

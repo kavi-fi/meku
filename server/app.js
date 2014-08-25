@@ -543,10 +543,7 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
 })
 
 app.get('/providers/yearlyBilling/count', requireRole('kavi'), function(req, res, next) {
-  ProviderLocation.getActiveProviderLocations(function(err, locs) {
-    if (err) return next(err)
-    res.send({ count: locs.length })
-  })
+
 })
 
 app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function(req, res, next) {
@@ -568,56 +565,47 @@ app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res
 
   Provider.find(terms).lean().exec(function(err, providers) {
     if (err) return next(err)
-    async.forEach(providers, function(provider, callback) {
-      ProviderLocation.find({ provider: provider._id, deleted: false, active: true }).sort('name').exec(function(err, locations) {
-        if (err) return next(err)
-        provider.locations = locations
-        callback()
-      })
-    }, function(err) {
-      if (err) return next(err)
-      res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
+    _.forEach(providers, function(provider) {
+      provider.locations = _(provider.locations).filter({ active: true, deleted: false }).sortBy('name').value()
     })
+    res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
   })
 })
 
 app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id).lean().exec(function(err, provider) {
     if (err) return next(err)
-    ProviderLocation.find({provider: provider._id, deleted: false }).sort('name').exec(function(err, locations) {
-      if (err) return next(err)
-      provider.locations = locations
-      res.send(provider)
-    })
+    provider.locations = _(provider.locations).filter({ deleted: false }).sortBy('name').value()
+    res.send(provider)
   })
 })
 
-app.put('/providerlocations/:id', requireRole('kavi'), function(req, res, next) {
-  ProviderLocation.findById(req.params.id, function(err, location) {
-    if (err) return next(err)
-
-    var params = {}
-
-    if (_.isEmpty(location.registrationDate) && req.body.active === true) {
-      _.merge(params, { registrationDate: new Date() })
-    }
-
-    updateAndLogChanges(location, _.merge({}, req.body, params), req.user, respond(res, next))
+app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.pid, function(err, provider) {
+    // TODO: Change log
+    var location = provider.locations.id(req.params.lid)
+    var flatUpdates = utils.flattenObject(req.body)
+    _.forEach(flatUpdates, function(value, key) { location.set(key, value) })
+    provider.save(respond(res, next))
   })
 })
 
-app.post('/providerlocations', requireRole('kavi'), function(req, res, next) {
-  new ProviderLocation(_.merge({}, req.body, { deleted: false })).save(function(err, location) {
+app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, next) {
+  var newLocation = _.merge({}, req.body, { deleted: false, active: true })
+  Provider.findByIdAndUpdate(req.params.id, { $push: { locations: newLocation }}, function(err, p) {
     if (err) return next(err)
-    logCreateOperation(req.user, location)
-    res.send(location)
+    logCreateOperation(req.user, _.last(p.locations))
+    res.send(_.last(p.locations))
   })
 })
 
-app.delete('/providerlocations/:id', requireRole('kavi'), function(req, res, next) {
-  ProviderLocation.findById(req.params.id, function (err, location) {
+app.delete('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.pid, function(err, provider) {
     if (err) return next(err)
-    softDeleteAndLog(location, req.user, respond(res, next))
+    var location = provider.locations.id(req.params.lid)
+    location.deleted = true
+    saveChangeLogEntry(req.user, location, 'delete')
+    provider.save(respond(res, next))
   })
 })
 

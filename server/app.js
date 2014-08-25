@@ -540,15 +540,12 @@ app.post('/users/:id', requireRole('root'), function(req, res, next) {
   })
 })
 
-app.get('/users/names/:names', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'kavi')) return res.send([])
+app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
   User.find({username: {$in: req.params.names.split(',')}}, 'name username', function(err, names) {
     if (err) return next(err)
-
     var usernamesAsKeys = _.reduce(names, function(acc, user) {
       return _.merge(acc, utils.keyValue(user.username, user.name))
     }, {})
-
     res.send(usernamesAsKeys)
   })
 })

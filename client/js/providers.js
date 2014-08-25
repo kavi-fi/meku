@@ -1,8 +1,9 @@
 function providerPage() {
   var $page = $('#provider-page')
   var $providers = $page.find('.providers-list')
-  var $providerNameQuery = $page.find('#provider-name-query')
   var $unapproved = $page.find('.unapproved .results')
+  var $allProviders = $providers.add($unapproved)
+  var $providerNameQuery = $page.find('#provider-name-query')
   var $yearlyBilling = $page.find('.yearly-billing')
   var $billing = $page.find('.billing')
   var $datePicker = $billing.find('.datepicker')
@@ -68,10 +69,10 @@ function providerPage() {
         var $providerRow = renderProvider(newProvider)
         $providers.prepend($providerRow)
         $providerRow.slideDown()
-        closeDetails($providers.find('.provider-details'))
+        closeDetails()
       })
     })
-    closeDetails($selected)
+    closeDetails()
     $providers.prepend($providerDetails)
     $providerDetails.slideDown()
   })
@@ -82,13 +83,13 @@ function providerPage() {
       var name = $(this).children('.name').text().toLowerCase()
       $(this).toggle(_.contains(name, searchString))
     })
-    closeDetails($providers.find('.provider-details'))
+    closeDetails()
   })
 
-  $providers.add($unapproved).on('click', '.result', function() {
+  $allProviders.on('click', '.result', function() {
     var $this = $(this)
     var wasSelected = $this.hasClass('selected')
-    closeDetails($this)
+    closeDetails()
     if (!wasSelected) {
       openDetails($this)
     }
@@ -183,9 +184,8 @@ function providerPage() {
 
   function bindEventHandlers($selected, $providerDetails, submitCallback) {
     var $form = $providerDetails.find('form')
-    var toggle = _.curry(toggleActiveButton)($selected)
 
-    $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggle })
+    $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
 
     $form.submit(function(event) {
       event.preventDefault()
@@ -219,11 +219,12 @@ function providerPage() {
     })
   }
 
-  function toggleActiveButton($selected, newState) {
+  function toggleActiveButton(newState) {
+    var $selected = $allProviders.find('.selected')
     var provider = $selected.data('provider')
     function isUnapproved(provider) { return !provider.registrationDate }
     $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(updatedProvider) {
-      if (isUnapproved(updatedProvider) && updatedProvider.active) {
+      if (isUnapproved(provider) && updatedProvider.active) {
         var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
         $dialog.find('.email').text(updatedProvider.emailAddresses.join(', '))
         $dialog.find('.ok').on('click', function() {
@@ -237,9 +238,9 @@ function providerPage() {
     })
   }
 
-  function closeDetails($selected) {
-    $selected.removeClass('selected')
-    $selected.parent().find('.provider-details').slideUp(function() { $(this).remove() })
+  function closeDetails() {
+    $allProviders.find('.result.selected').removeClass('selected')
+    $allProviders.find('.provider-details').slideUp(function() { $(this).remove() })
     updateLocationHash('')
   }
 

@@ -93,7 +93,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       link: (user.role == 'kavi') ? linkKavi : linkOther,
       publicComments: classification.publicComments || 'ei määritelty.',
       authorEmail: user.email,
-      classifier: utils.hasRole(user, 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name,
+      classifier: classifierName(),
       reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
       previous: previous(),
       icons: iconHtml(classificationSummary, hostName)
@@ -113,6 +113,11 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
       '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
       'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
+  }
+
+  function classifierName() {
+    if (utils.hasRole(user, 'kavi')) return "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö "
+    return _([user.employerName, user.name]).compact().join(', ')
   }
 
   function programName() {

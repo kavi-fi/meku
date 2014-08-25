@@ -61,7 +61,8 @@ function logUserIn(req, res, user) {
     username: user.username,
     name: user.name,
     role: user.role,
-    email: _.first(user.emails)
+    email: _.first(user.emails),
+    employerName: utils.getProperty(user, 'employers.0.name')
   }, { maxAge: weekInMs, signed: true })
   saveChangeLogEntry(_.merge(user, { ip: getIpAddress(req) }), null, 'login')
 }

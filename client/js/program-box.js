@@ -5,7 +5,7 @@ function programBox() {
     tvSeries: $('#templates > .program-box-tv-series-classification-details').clone(),
     empty: $('#templates > .program-box-empty-classification-details').clone()
   }
-  var $draftTemplate = $('<div>').html('Luokittelusta on käyttäjän <b></b> <span></span> tallentama luonnos.')
+  var $draftTemplate = $('<div>').html('Luokittelu kesken käyttäjällä <b></b>. Luonnos tallennettu <span></span>.')
 
   return { render: render }
 
@@ -132,7 +132,9 @@ function programBox() {
     }
     function drafts() {
       return _.values(p.draftClassifications || {}).map(function(draft) {
-        return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDateTime(draft.creationDate)).end()
+        return $draftTemplate.clone().attr('data-userId', draft.author._id)
+          .find('b').text(draft.author.name + ' ('+draft.author.username+')').end()
+          .find('span').text(utils.asDateTime(draft.creationDate)).end()
       })
     }
   }

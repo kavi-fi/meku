@@ -87,6 +87,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       date: dateFormat(classification.registrationDate ? new Date(classification.registrationDate) : new Date()),
       buyer: classification.buyer ? classification.buyer.name : '',
       name: programName(),
+      nameLink: programLink(),
       year: program.year || '',
       classification: classificationText(classificationSummary),
       classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
@@ -105,7 +106,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     return '<div style="text-align: right; margin-top: 8px;"><img src="'+hostName+'/images/logo.png" /></div>' +
       "<p><%- date %><br/><%- buyer %></p><p>" +
       (reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
-      '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
+      '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%= nameLink %>. <%- classification %>' +
       '<%= icons %>' +
       (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
       ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
@@ -118,6 +119,11 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function classifierName() {
     if (utils.hasRole(user, 'kavi')) return "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö "
     return _([user.employerName, user.name]).compact().join(', ')
+  }
+
+  function programLink() {
+    var link = hostName + '/public.html#haku/'+program.sequenceId+'//'+program._id
+    return '<a href="'+link+'">'+programName()+'</a>'
   }
 
   function programName() {

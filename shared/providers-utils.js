@@ -34,7 +34,7 @@ var registrationEmail = exports.registrationEmail = function (data) {
 
     var tpl = readTemplateSync('registration-email.tpl.html')
     var html =  _.template(tpl, vars)
-    //fs.writeFileSync('./tmp/registration-email.html', html)
+    fs.writeFileSync('./tmp/registration-email.html', html)
     return html
   }
 
@@ -57,7 +57,7 @@ exports.registrationEmailProviderLocation = function (data) {
 
     var tpl = readTemplateSync('provider-location-registration-email.tpl.html')
     var html =  _.template(tpl, vars, {enums: enums, utils: utils})
-    //fs.writeFileSync('./tmp/registration-email-location.html', html)
+    fs.writeFileSync('./tmp/registration-email-location.html', html)
     return html
   }
 

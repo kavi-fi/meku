@@ -461,15 +461,19 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
         ProviderLocation.find({provider: provider._id, deleted: false, active: true }).sort('name').lean().exec(function(err, locations) {
           if (err) return next(err)
           sendEmail(providers.registrationEmail(_.merge({}, provider.toObject(), {locations: locations})), logError)
-          _.select(locations, function(l) { return l.isPayer }).forEach(function(l) {
-            sendEmail(providers.registrationEmailProviderLocation(_.merge({}, l, {provider: provider.toObject()})), logError)
-          })
+          sendProviderLocationEmails(locations, provider.toObject())
           return res.send(saved)
         })
       }
       res.send(saved)
     })
   })
+
+  function sendProviderLocationEmails(locations, provider) {
+    _.select(locations, function(l) { return l.isPayer && l.emailAddresses.length > 0 }).forEach(function(l) {
+      sendEmail(providers.registrationEmailProviderLocation(_.merge({}, l, {provider: provider})), logError)
+    })
+  }
 })
 
 app.put('/providers/:id', requireRole('kavi'), function(req, res, next) {

@@ -120,7 +120,7 @@ function createAndSaveHash(user, callback) {
 }
 
 app.get('/check-reset-hash/:hash', function(req, res, next) {
-  User.findOne({ resetHash: req.params.hash, active: true }, function(err, user) {
+  User.findOne({ resetHash: req.params.hash, active: true }).lean().exec(function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.password) return res.send({ name: user.name })
@@ -159,7 +159,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 function search(extraQueryTerms, responseFields, req, res, next) {
   var page = req.query.page || 0
   var filters = req.query.filters || []
-  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
+  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').lean().exec(respond(res, next))
 
   function query(extraQueryTerms) {
     var ObjectId = mongoose.Types.ObjectId
@@ -182,11 +182,11 @@ function search(extraQueryTerms, responseFields, req, res, next) {
 }
 
 app.get('/episodes/:seriesId', function(req, res, next) {
-  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).exec(respond(res, next))
+  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).lean().exec(respond(res, next))
 })
 
 app.get('/programs/drafts', function(req, res, next) {
-  Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }, function(err, programs) {
+  Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {
       return {_id: p._id, name: p.name, creationDate: p.draftClassifications[req.user._id].creationDate}
@@ -223,7 +223,7 @@ app.delete('/programs/drafts/:id', function(req, res, next) {
 })
 
 app.get('/programs/:id', function(req, res, next) {
-  Program.findById(req.params.id, respond(res, next))
+  Program.findById(req.params.id).lean().exec(respond(res, next))
 })
 
 app.post('/programs/new', function(req, res, next) {
@@ -457,7 +457,7 @@ app.delete('/accounts/:id', requireRole('root'), function(req, res, next) {
 app.get('/accounts', requireRole('kavi'), function(req, res, next) {
   var selectedRoles = req.query.roles
   var query = selectedRoles ? { roles: { $all: selectedRoles }} : {}
-  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
+  Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
 })
 
 app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
@@ -465,7 +465,7 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
   var query = _.isEmpty(selectedRoles)
     ? { roles: { $in: ['Classifier', 'Subscriber'] }}
     : { roles: { $all: selectedRoles }}
-  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
+  Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
 })
 
 app.get('/accounts/search', function(req, res, next) {
@@ -475,11 +475,11 @@ app.get('/accounts/search', function(req, res, next) {
     q['users._id'] = req.user._id
   }
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
-  Account.find(q).sort('name').limit(50).exec(respond(res, next))
+  Account.find(q).sort('name').limit(50).lean().exec(respond(res, next))
 })
 
 app.get('/accounts/:id', function(req, res, next) {
-  Account.findById(req.params.id, function(err, account) {
+  Account.findById(req.params.id).exec(function(err, account) {
     if (err) return next(err)
     if (!account) return res.send(404)
     if (!utils.hasRole(req.user, 'kavi') && !account.users.id(req.user._id)) return res.send(400)
@@ -491,12 +491,12 @@ app.get('/users', requireRole('root'), function(req, res, next) {
   var roleFilters = req.query.roles
   var activeFilter = req.query.active ? req.query.active === 'true' : false
   var filters = _.merge({}, roleFilters ? { role: { $in: roleFilters }} : {}, activeFilter ? {active: true} : {})
-  User.find(filters, respond(res, next))
+  User.find(filters).lean().exec(respond(res, next))
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
   var q = { name: new RegExp("^" + utils.escapeRegExp(req.query.q), 'i') }
-  User.find(q).exec(respond(res, next))
+  User.find(q).lean().exec(respond(res, next))
 })
 
 app.delete('/users/:id', requireRole('root'), function(req, res, next) {
@@ -504,7 +504,7 @@ app.delete('/users/:id', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/exists/:username', requireRole('root'), function(req, res, next) {
-  User.findOne({ username: req.params.username }, function(err, user) {
+  User.findOne({ username: req.params.username }, { _id:1 }).lean().exec(function(err, user) {
     if (err) return next(err)
     res.send({ exists: !!user })
   })
@@ -541,7 +541,7 @@ app.post('/users/:id', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
-  User.find({username: {$in: req.params.names.split(',')}}, 'name username', function(err, names) {
+  User.find({username: {$in: req.params.names.split(',')}}, 'name username').lean().exec(function(err, names) {
     if (err) return next(err)
     var usernamesAsKeys = _.reduce(names, function(acc, user) {
       return _.merge(acc, utils.keyValue(user.username, user.name))
@@ -589,7 +589,7 @@ app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next
   var format = "DD.MM.YYYY"
   var begin = moment(req.params.begin, format)
   var end = moment(req.params.end, format).add('days', 1)
-  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').exec(respond(res, next))
+  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').lean().exec(respond(res, next))
 })
 
 app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {
@@ -743,7 +743,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
 })
 
 app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next) {
-  ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).exec(respond(res, next))
+  ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).lean().exec(respond(res, next))
 })
 
 app.get('/environment', function(req, res, next) {
@@ -922,7 +922,7 @@ function queryNameIndex(schemaName) {
     var q = {}
     var parts = toMongoArrayQuery(req.query.q)
     if (parts) q.parts = parts
-    schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').exec(function(err, docs) {
+    schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').lean().exec(function(err, docs) {
       if (err) return next(err)
       res.send(_.pluck(docs || [], 'name'))
     })
@@ -1035,11 +1035,9 @@ function saveChangeLogEntry(user, document, operation, operationData) {
     targetCollection: document ? document.constructor.modelName : undefined,
     documentId: document ? document._id : undefined
   }
-
   if (operationData) {
     _.merge(data, operationData)
   }
-
   new ChangeLog(data).save(logError)
 }
 

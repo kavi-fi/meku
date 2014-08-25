@@ -59,6 +59,25 @@ utils.secondsToDuration = function(seconds) {
   return time
 }
 
+utils.programDurationAsText = function(program) {
+  var c = program.classifications[0]
+  if (!c || !c.duration) return ''
+  var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
+  if (!match) return c.duration
+  match.shift()
+  return _(match).map(suffixify).compact().join(' ')
+
+  function suffixify(x, ii) {
+    if (!x) return x
+    var int = parseInt(x)
+    if (!int) return ''
+    if (ii == 0) return int + '\u200At'
+    if (ii == 1) return int + '\u200Amin'
+    if (ii == 2) return int + '\u200As'
+    return x
+  }
+}
+
 utils.hasRole = function (user, role) {
   var roles = enums.userRoles
   if (!user) return false

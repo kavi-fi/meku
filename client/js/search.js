@@ -139,7 +139,7 @@ function internalSearchPage() {
         var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
           .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
-          .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
+          .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
           .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
           .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
         $recent.show().append($result)
@@ -435,33 +435,15 @@ function searchPage() {
       return $('<div>').addClass('items')
         .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
         .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
-        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
         .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
   }
-}
 
-function countryAndYear(p) {
-  var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
-  return s == '' ? s : '('+s+')'
-}
-
-function duration(p) {
-  var c = p.classifications[0]
-  if (!c || !c.duration) return ''
-  var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
-  if (!match) return c.duration
-  match.shift()
-  return _.chain(match).map(suffixify).compact().join(' ')
-
-  function suffixify(x, ii) {
-    if (!x) return x
-    var int = parseInt(x)
-    if (!int) return ''
-    if (ii == 0) return int + ' h'
-    if (ii == 1) return int + ' min'
-    if (ii == 2) return int + ' s'
-    return x
+  function countryAndYear(p) {
+    var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
+    return s == '' ? s : '('+s+')'
   }
+
 }

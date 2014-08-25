@@ -74,18 +74,14 @@ app.post('/logout', function(req, res, next) {
 
 app.post('/forgot-password', function(req, res, next) {
   var username = req.body.username
-
   if (!username) return res.send(403)
-
   User.findOne({ username: username, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
-
-    if (!user.emails) {
+    if (_.isEmpty(user.emails)) {
       console.log(user.username + ' has no email address')
       return res.send(500)
     }
-
     var subject = 'Salasanan uusiminen'
     var text = '<p>Hei,<br/>' +
       'uusiaksesi salasanasi seuraa oheista linkkiä <a href="<%- link %>"><%- link %></a>, ' +
@@ -113,7 +109,6 @@ function sendHashLinkViaEmail(user, subject, text, callback) {
     body: _.template(text, { link: url }),
     sendInTraining: true
   }
-
   sendEmail(emailData, callback)
 }
 

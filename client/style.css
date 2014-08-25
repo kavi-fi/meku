@@ -688,16 +688,17 @@ textarea.invalid:disabled,
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
 #provider-page .location-details .emails { margin-right: 24px; }
-#provider-page .activity { margin-bottom: 10px; }
-#provider-page .buttons { margin-top: -45px; float: right; }
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 #provider-page .most-recent { margin-top: 10px; }
 #provider-page .most-recent .sent { margin-right: 15px; }
 #provider-page .yearly-billing { margin-bottom: 30px; }
 
+#provider-page .provider-details .save button { float: none; }
+#provider-page .buttons { height: 40px; margin-bottom: 20px; }
+#provider-page .activity { float: left; }
+#provider-page .activity .iit-container { margin: 0; }
 #provider-page .provider-details .buttons .save-success {
-  line-height: 25px;
-  float: left;
+  float: right;
   margin-right: 30px;
   background-color: #00BB77;
   color: white;

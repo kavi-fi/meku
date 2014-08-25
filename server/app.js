@@ -400,14 +400,41 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
 })
 
 app.post('/programs/autosave/:id', function(req, res, next) {
-  Program.findOneAndUpdate({ _id: req.params.id, draftsBy: req.user._id }, req.body, function(err, program) {
+  Program.findOne({ _id: req.params.id, draftsBy: req.user._id }, function(err, program) {
     if (err) return next(err)
     if (!program) return res.send(409)
-    program.populateAllNames(function(err) {
+    if (!isValidUpdate(req.body, program, req.user)) return res.send(400)
+    watchChanges(program, req.user).applyUpdates(req.body)
+    program.verifyAllNamesUpToDate(function(err) {
       if (err) return next(err)
       program.save(respond(res, next))
     })
   })
+
+  function isValidUpdate(update, p, user) {
+    var allowedFields = allowedAutosaveFields(p, user)
+    return _.every(Object.keys(update), function(updateField) {
+      return _.any(allowedFields, function(allowedField) {
+        return allowedField[allowedField.length-1] == '*'
+          ? updateField.indexOf(allowedField.substring(0, allowedField.length-1)) == 0
+          : updateField == allowedField
+      })
+    })
+  }
+
+  function allowedAutosaveFields(p, user) {
+    var programFields = ['name.0', 'nameFi.0', 'nameSv.0', 'nameOther.0', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
+    var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationEmailAddresses', 'comments', 'criteriaComments*']
+    var kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
+    if (p.classifications.length == 0) {
+      return programFields.concat(classificationFields.map(asDraftField))
+    } else {
+      return utils.hasRole(user, 'kavi')
+        ? classificationFields.concat(kaviReclassificationFields).map(asDraftField)
+        : classificationFields.map(asDraftField)
+    }
+    function asDraftField(s) { return 'draftClassifications.'+user._id+'.'+s }
+  }
 })
 
 app.delete('/programs/:id', requireRole('root'), function(req, res, next) {

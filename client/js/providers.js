@@ -222,7 +222,6 @@ function providerPage() {
   function toggleActiveButton(newState) {
     var $selected = $allProviders.find('.selected')
     var provider = $selected.data('provider')
-    function isUnapproved(provider) { return !provider.registrationDate }
     $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(updatedProvider) {
       if (isUnapproved(provider) && updatedProvider.active) {
         var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
@@ -237,6 +236,8 @@ function providerPage() {
       }
     })
   }
+
+  function isUnapproved(provider) { return !provider.registrationDate }
 
   function closeDetails() {
     $allProviders.find('.result.selected').removeClass('selected')
@@ -261,7 +262,7 @@ function providerPage() {
   }
 
   function renderProvider(provider) {
-    if (!provider.registrationDate) {
+    if (isUnapproved(provider)) {
       return renderUnapproved(provider)
     } else {
       return renderApproved(provider)

@@ -104,11 +104,11 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     var reclassification = isReclassification(program, classification)
     return '<div style="text-align: right; margin-top: 8px;"><img src="'+hostName+'/images/logo.png" /></div>' +
       "<p><%- date %><br/><%- buyer %></p><p>" +
-      (reclassification ? "Ilmoitus kuvaohjelman uudelleen luokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
-      '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : '') + ' luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
+      (reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
+      '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
       '<%= icons %>' +
       (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
-      ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleen luokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
+      ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
       ((utils.hasRole(user, 'kavi')) ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
       '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
       '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +

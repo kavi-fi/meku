@@ -699,9 +699,10 @@ textarea.invalid:disabled,
   line-height: 25px;
   float: left;
   margin-right: 30px;
-  background-color: green;
+  background-color: #00BB77;
   color: white;
   padding: 6px 15px;
+  border-radius: 4px;
 }
 
 #provider-page .unapproved .results { margin-bottom: 30px; }

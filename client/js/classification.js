@@ -160,6 +160,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $form.find('input[name="series"]').select2('data', { id: val, text: val, isNew: true })
     })
 
+    $form.find('input[name="classification.buyer"]').on('change', function() {
+      var $billing = $form.find('input[name="classification.billing"]')
+      if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate')
+    })
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
@@ -294,6 +298,7 @@ function classificationFormUtils() {
         $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
       }
     }
+    $form.find('.classification-email h3.main').text('Luokittelupäätös')
     $form.find('button[name=save]').show()
     $form.find('button[name=register]').hide()
   }
@@ -312,7 +317,22 @@ function classificationFormUtils() {
     var currentBuyerId = null
 
     function render(program, classification, rootEditMode) {
-      $input.select2({tags: [], formatNoMatches: ''}).on('change', function() {
+      var opts = {
+        tags: [],
+        minimumInputLength: 1,
+        formatInputTooShort: '',
+        formatNoMatches: '',
+        formatResult: formatSelect2Item,
+        formatSelection: formatSelect2Item,
+        createSearchChoice: function(term) { return { id: term.replace(/,/g, '&#44;'), text: term, isNew: true } },
+        initSelection: function(e, callback) { callback([]) },
+        query: function(query) {
+          return $.get('/emails/search?q='+encodeURIComponent(query.term)).done(function(data) {
+            return query.callback({ results: data })
+          })
+        }
+      }
+      $input.select2(opts).on('change', function() {
         var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).pluck('id').value()
         saveFn($(this).attr('name'), manual)
       })
@@ -323,6 +343,15 @@ function classificationFormUtils() {
       return this
     }
 
+    function formatSelect2Item(item) {
+      if (item.role) {
+        var icon = 'select2-dropdown-result-icon ' + (item.role == 'user' ? 'fa fa-male' : 'fa fa-university')
+        return $('<div>').text(item.name+' <'+item.id+'>').prepend($('<i>').addClass(icon))
+      } else {
+        return item.id
+      }
+    }
+
     function update(program, classification) {
       if (shouldUpdateBuyer(classification)) {
         currentBuyerId = classification.buyer._id
@@ -331,7 +360,7 @@ function classificationFormUtils() {
         })
       }
 
-      var email = classificationUtils.registrationEmail(program, classification, user)
+      var email = classificationUtils.registrationEmail(program, classification, user, location.protocol + '//' + location.host)
 
       updateEmails('sent', email.recipients)
       updateEmails('manual', classification.registrationEmailAddresses)

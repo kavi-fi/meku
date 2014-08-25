@@ -70,8 +70,8 @@ function run(job, callback) {
 function programs(callback) {
   var seq = 1
   var q = 'SELECT id, program_type, publish_year, year, countries, description, genre, tv_program_genre, game_genre, game_format, created_by FROM meku_audiovisualprograms where (program_type != "11" or program_type is null) and deleted != "1"'
-  schema.User.find({}, function(err, users) {
-    var userMap = _.indexBy(users, 'emekuId')
+  documentMap('User', 'emekuId', function(err, userMap) {
+    if (err) return callback(err)
     batchInserter(q, programMapper, 'Program', callback)
 
     function programMapper(row) {
@@ -159,7 +159,7 @@ function classifications(callback) {
   // TODO: add c.no_items (== safe?)
   // TODO: verify that reg_date order is the valid ordering
 
-  async.waterfall([base, criteria, mapUsers, mapBuyers, harmonize, save], callback)
+  async.waterfall([base, criteria, mapUsers, mapBuyers, harmonize, resolveSentEmails, save], callback)
 
   function base(callback) {
     var tick = progressMonitor()
@@ -221,9 +221,8 @@ function classifications(callback) {
   }
 
   function mapUsers(result, callback) {
-    schema.User.find({}, function(err, users) {
+    documentMap('User', 'emekuId', function(err, userMap) {
       if (err) return callback(err)
-      var userMap = _.indexBy(users, 'emekuId')
       _.values(result.classifications).forEach(function(c) {
         if (c.assigned_user_id) {
           var u = userMap[c.assigned_user_id]
@@ -235,9 +234,8 @@ function classifications(callback) {
   }
 
   function mapBuyers(result, callback) {
-    schema.Account.find({}, function(err, accounts) {
+    documentMap('Account', 'emekuId', function(err, accountMap) {
       if (err) return callback(err)
-      var accountMap = _.indexBy(accounts, 'emekuId')
       _.values(result.classifications).forEach(function(c) {
         if (!c.provider_id || c.provider_id == '0') return
         // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
@@ -266,11 +264,29 @@ function classifications(callback) {
     callback(null, result)
   }
 
+  function resolveSentEmails(result, callback) {
+    documentMap('User', '_id', function(err, userMap) {
+      if (err) return callback(err)
+      documentMap('Account', '_id', function(err, accountMap) {
+        if (err) return callback(err)
+        result.sentEmails = {}
+        Object.keys(result.programs).forEach(function(programId) {
+          var classifications = result.programs[programId]
+          var authors = classifications.map(function(c) { return c.author ? userMap[c.author._id].emails : [] })
+          var buyers = classifications.map(function(c) { return c.buyer ? accountMap[c.buyer._id].emailAddresses : [] })
+          result.sentEmails[programId] = _(authors.concat(buyers)).flatten().compact().uniq().value()
+        })
+        callback(null, result)
+      })
+    })
+  }
+
   function save(result, callback) {
     var tick = progressMonitor(100)
     async.eachLimit(Object.keys(result.programs), 5, function(key, cb) {
       tick('*')
-      schema.Program.update({ emekuId: key }, { 'classifications': result.programs[key] }, cb)
+      var update = { 'classifications': result.programs[key], sentRegistrationEmailAddresses: result.sentEmails[key] }
+      schema.Program.update({ emekuId: key }, update, cb)
     }, callback)
   }
 }
@@ -623,6 +639,13 @@ function singleFieldUpdater(schemaName, fieldName) {
   return function(key, obj, callback) {
     schema[schemaName].update({ emekuId: key }, utils.keyValue(fieldName, obj), callback)
   }
+}
+
+function documentMap(schemaName, indexField, callback) {
+  schema[schemaName].find({}).lean().exec(function(err, docs) {
+    if (err) return callback(err)
+    callback(null, _.indexBy(docs, indexField))
+  })
 }
 
 function optionListToArray(string) {

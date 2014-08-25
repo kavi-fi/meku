@@ -45,33 +45,9 @@ exports.aggregateSummary = function(programs) {
   return summary(aggregateClassification(programs))
 }
 
-var classificationText = function(summary) {
-  if (summary.age == 0) {
-    return 'Kuvaohjelma on sallittu.'
-  } else {
-    return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age)
-         + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
-         + criteriaText(summary.warnings) + '.'
-  }
-}
-
-var previousClassificationText = function(summary) {
-  if (summary.age == 0) {
-    return 'sallituksi.'
-  } else {
-    return 'ikärajaksi ' + ageAsText(summary.age)
-         + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
-         + criteriaText(summary.warnings) + '.'
-  }
-}
-
 var criteriaAgeLimit = function(classification) {
   if (classification.criteria.length == 0) return 0
   return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
-}
-
-var criteriaText = function(warnings) {
-  return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
 }
 
 var isReclassification = exports.isReclassification = function(program, classification) {
@@ -86,8 +62,6 @@ var isReclassification = exports.isReclassification = function(program, classifi
   }
 }
 
-var ageAsText = function(age) { return age && age.toString() || 'S' }
-
 var ageLimit = exports.ageLimit = function(classification) {
   if (!classification) return undefined
   if (classification.safe) return 0
@@ -96,36 +70,49 @@ var ageLimit = exports.ageLimit = function(classification) {
   return Math.max(criteria, legacy)
 }
 
-exports.registrationEmail = function(program, classification, user) {
-  var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
-  var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
-  var subject = "Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>"
-  var reclassification = isReclassification(program, classification)
-  var text =
-    "<p><%- date %><br/><%- buyer %></p><p>" +
-    (reclassification ? "Ilmoitus kuvaohjelman uudelleen luokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
-    '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : '') + ' luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
-    (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
-    ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleen luokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
-    ((utils.hasRole(user, 'kavi')) ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
-    '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
-    '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
-    'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
+exports.registrationEmail = function(program, classification, user, hostName) {
+  var data = generateData()
+  return {
+    recipients: _.filter(program.sentRegistrationEmailAddresses, function(x) { return x != user.email }),
+    from: "no-reply@kavi.fi",
+    subject: _.template("Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>", data),
+    body: _.template(generateText(), data)
+  }
 
-  var now = new Date()
-  var dateString = now.getDate() + '.' + (now.getMonth() + 1) + '.' + now.getFullYear()
-  var buyer = classification.buyer ? classification.buyer.name : ''
-  var classificationSummary = summary(classification)
+  function generateData() {
+    var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
+    var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
+    var classificationSummary = summary(classification)
+    return {
+      date: dateFormat(classification.registrationDate ? new Date(classification.registrationDate) : new Date()),
+      buyer: classification.buyer ? classification.buyer.name : '',
+      name: programName(),
+      year: program.year || '',
+      classification: classificationText(classificationSummary),
+      classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
+      link: (user.role == 'kavi') ? linkKavi : linkOther,
+      publicComments: classification.publicComments || 'ei määritelty.',
+      authorEmail: user.email,
+      classifier: utils.hasRole(user, 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name,
+      reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
+      previous: previous(),
+      icons: iconHtml(classificationSummary, hostName)
+    }
+  }
 
-  function previousClassification() {
-    if (reclassification) {
-      var previous = program.classifications[0]
-      var date = new Date(previous.registrationDate)
-      return {
-        criteriaText: previousClassificationText(summary(previous)),
-        date: date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear()
-      }
-    } else return {}
+  function generateText() {
+    var reclassification = isReclassification(program, classification)
+    return '<div style="text-align: right; margin-top: 8px;"><img src="'+hostName+'/images/logo.png" /></div>' +
+      "<p><%- date %><br/><%- buyer %></p><p>" +
+      (reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
+      '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%- name %>. <%- classification %>' +
+      '<%= icons %>' +
+      (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
+      ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
+      ((utils.hasRole(user, 'kavi')) ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
+      '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
+      '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
+      'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
   }
 
   function programName() {
@@ -137,26 +124,60 @@ exports.registrationEmail = function(program, classification, user) {
     }
   }
 
-  var data = {
-    date: dateString,
-    buyer: buyer,
-    name: programName(),
-    year: program.year || '',
-    classification: classificationText(classificationSummary),
-    classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
-    link: (user.role == 'kavi') ? linkKavi : linkOther,
-    publicComments: classification.publicComments,
-    authorEmail: user.email,
-    classifier: utils.hasRole(user, 'kavi') ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö " : user.name,
-    reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
-    previous: previousClassification()
+  function previous() {
+    var previous = previousClassification()
+    if (!previous) return {}
+    return {
+      criteriaText: previousClassificationText(summary(previous)),
+      date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : 'aiemmin'
+    }
   }
 
-  return {
-    recipients: _.filter(program.sentRegistrationEmailAddresses, function(x) { return x != user.email }),
-    from: "no-reply@kavi.fi",
-    subject: _.template(subject, data),
-    body: _.template(text, data)
+  function previousClassification() {
+    if (program.classifications.length == 0) return
+    var index = _.findIndex(program.classifications, { _id: classification._id })
+    if (index == -1) {
+      return program.classifications[0]
+    } else {
+      return program.classifications[index + 1]
+    }
+  }
+
+  function classificationText(summary) {
+    if (summary.age == 0) {
+      return 'Kuvaohjelma on sallittu.'
+    } else if (summary.warnings.length == 0) {
+      return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age) + '.'
+    } else {
+      return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age)
+        + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+        + criteriaText(summary.warnings) + '.'
+    }
+  }
+
+  function previousClassificationText(summary) {
+    if (summary.age == 0) {
+      return 'sallituksi.'
+    } else if (summary.warnings.length == 0) {
+      return 'ikärajaksi ' + ageAsText(summary.age) + '.'
+    } else {
+      return 'ikärajaksi ' + ageAsText(summary.age) + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
+        + criteriaText(summary.warnings) + '.'
+    }
+  }
+
+  function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }
+
+  function ageAsText(age) { return age && age.toString() || 'S' }
+
+  function criteriaText(warnings) {
+    return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
+  }
+
+  function iconHtml(summary) {
+    var warningHtml = summary.warnings.map(function(w) { return img(w.category) }).join('')
+    return '<div style="margin: 10px 0;">'+img('agelimit-'+summary.age) + warningHtml+'</div>'
+    function img(fileName) { return '<img src="'+hostName+'/images/'+fileName+'.png" style="width: 40px; height: 40px; padding-right: 8px;"/>' }
   }
 }
 

@@ -95,13 +95,13 @@ function errorDialog() {
   var $overlay = $('#error-overlay')
   var $dialog = $('#error-dialog')
   $dialog.find('a').click(function(e) { e.preventDefault(); location.reload() })
-  return { show: function() { $dialog.add($overlay).show() }}
+  return { show: function() { $dialog.css('display', 'flex'); $overlay.show() }}
 }
 
 function conflictDialog() {
   var $overlay = $('#conflict-overlay')
   var $dialog = $('#conflict-dialog')
-  return { show: function() { $dialog.add($overlay).show() }}
+  return { show: function() { $dialog.css('display', 'flex'); $overlay.show() }}
 }
 
 function loginPage() {
@@ -153,7 +153,8 @@ function loginPage() {
   return { show: show }
 
   function show() {
-    $form.add($overlay).show()
+    $form.css('display', 'flex')
+    $overlay.show()
     $username.focus()
   }
 
@@ -223,7 +224,7 @@ function validateTextChange($el, validatorFn) {
 
 function showDialog($html) {
   $('#overlay').show()
-  $('#dialog').show().append($html)
+  $('#dialog').css('display', 'flex').append($html)
 }
 
 function closeDialog() {

@@ -64,3 +64,7 @@ function parseLocationHash() {
   if (!location.hash) return undefined
   return location.hash.split('/').map(decodeURIComponent)
 }
+
+function spinner() {
+  return $('<div>', { class:'spinner' }).html('<span/><span/><span/>')
+}

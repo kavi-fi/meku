@@ -23,7 +23,7 @@ var classification = {
   legacyAgeLimit: Number,
   creationDate: Date,
   registrationDate: Date,
-  registrationEmailAddresses: [{email: String, manual: Boolean}],
+  registrationEmailAddresses: [String],
   comments: String,
   publicComments: String,
   reason: Number,
@@ -54,8 +54,9 @@ var ProgramSchema = new Schema({
   programType: Number, // enums.programType
   gameFormat: String, // in programType == game(7)
   season: Number, episode: Number, // in programType == episode(3)
-  series: { _id: { type: ObjectId, index:true }, name: String }, // in programType == episode(3)
+  series: { _id: { type: ObjectId, index:true }, name: String, draft: { name: String, nameFi: String, nameSv: String, nameOther: String } }, // in programType == episode(3)
   episodes: { count: Number, criteria: [Number], legacyAgeLimit: Number }, // in programType == series(2)
+  sentRegistrationEmailAddresses: [String],
   createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
@@ -85,10 +86,11 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
   })
 }
 
-ProgramSchema.methods.populateAllNames = function(callback) {
+ProgramSchema.methods.populateAllNames = function(series, callback) {
+  if (!callback) { callback = series; series = undefined }
   var program = this
   if (program.series._id) {
-    Program.findById(program.series._id, { name:1, nameFi:1, nameSv: 1, nameOther: 1 }, function(err, parent) {
+    loadSeries(function(err, parent) {
       if (err) return callback(err)
       populate(program, concatNames(parent))
       callback()
@@ -96,6 +98,11 @@ ProgramSchema.methods.populateAllNames = function(callback) {
   } else {
     populate(program, [])
     process.nextTick(callback)
+  }
+
+  function loadSeries(callback) {
+    if (series) return callback(undefined, series)
+    Program.findById(program.series._id, { name:1, nameFi:1, nameSv: 1, nameOther: 1 }, callback)
   }
 
   function populate(p, extraNames) {
@@ -109,6 +116,8 @@ ProgramSchema.methods.populateAllNames = function(callback) {
 }
 
 var Program = exports.Program = mongoose.model('programs', ProgramSchema)
+
+Program.excludedChangeLogPaths = ['allNames']
 
 Program.publicFields = {
   emekuId:0, customersId:0, allNames:0, draftsBy: 0, draftClassifications:0,

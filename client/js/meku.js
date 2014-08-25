@@ -96,13 +96,13 @@ function errorDialog() {
   var $overlay = $('#error-overlay')
   var $dialog = $('#error-dialog')
   $dialog.find('a').click(function(e) { e.preventDefault(); location.reload() })
-  return { show: function() { $dialog.add($overlay).show() }}
+  return { show: function() { $dialog.css('display', 'flex'); $overlay.show() }}
 }
 
 function conflictDialog() {
   var $overlay = $('#conflict-overlay')
   var $dialog = $('#conflict-dialog')
-  return { show: function() { $dialog.add($overlay).show() }}
+  return { show: function() { $dialog.css('display', 'flex'); $overlay.show() }}
 }
 
 function loginPage() {
@@ -154,7 +154,8 @@ function loginPage() {
   return { show: show }
 
   function show() {
-    $form.add($overlay).show()
+    $form.css('display', 'flex')
+    $overlay.show()
     $username.focus()
   }
 
@@ -207,6 +208,10 @@ function isEmail(txt) {
   return regexp.test(txt)
 }
 
+function isMultiEmail(xs) {
+  return _.all(xs.split(','), isEmail)
+}
+
 function validate(f) {
   return function() {
     $(this).toggleClass('invalid', !f($(this).val())).trigger('validation')
@@ -218,17 +223,9 @@ function validateTextChange($el, validatorFn) {
   $el.on('input change validate', validator).on('blur', function() { $(this).addClass('touched') })
 }
 
-function requiredCheckboxGroup($el) {
-  function validate() {
-    $el.toggleClass('invalid', $el.find('input:checkbox:checked').length == 0).trigger('validation')
-  }
-  $el.on('validate', validate)
-  $el.on('change validate', 'input:checkbox', validate)
-}
-
 function showDialog($html) {
   $('#overlay').show()
-  $('#dialog').show().append($html)
+  $('#dialog').css('display', 'flex').append($html)
 }
 
 function closeDialog() {
@@ -256,10 +253,6 @@ function parseUserCookie() {
   var cookie = $.cookie('user')
   if (!cookie) return null
   return JSON.parse(cookie.substring(4, cookie.lastIndexOf('.')))
-}
-
-function spinner() {
-  return $('<div>', { class:'spinner' }).html('<span/><span/><span/>')
 }
 
 function select2Autocomplete(opts, onChangeFn) {
@@ -341,7 +334,7 @@ function select2EnumAutocomplete(opts, onChangeFn) {
 
 function idNamePairToSelect2Option(x) {
   if (!x) return null
-  return {id: x._id === null ? x.name : x._id, text: x.name}
+  return {id: x._id === null ? x.name : x._id, text: x.name, isNew: x._id === null }
 }
 
 function select2OptionToIdNamePair(x) {

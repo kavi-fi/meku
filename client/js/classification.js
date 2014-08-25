@@ -53,6 +53,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('input[name=season]').val(p.season).end()
       .find('input[name=episode]').val(p.episode).end()
       .find('textarea[name=synopsis]').val(p.synopsis).end()
+      .find('input[name="series.draft.name"]').val(utils.getProperty(p, 'series.draft.name') || '').end()
+      .find('input[name="series.draft.nameFi"]').val(utils.getProperty(p, 'series.draft.nameFi') || '').end()
+      .find('input[name="series.draft.nameSv"]').val(utils.getProperty(p, 'series.draft.nameSv') || '').end()
+      .find('input[name="series.draft.nameOther"]').val(utils.getProperty(p, 'series.draft.nameOther') || '').end()
 
     select2Autocomplete(select2Opts.series, save).trigger('setVal', p.series)
     select2EnumAutocomplete(select2Opts.countries, save).trigger('setVal', p.country)
@@ -93,17 +97,18 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function configureValidation() {
     $form.on('validation', function() {
       // For select2's, we only care about the original element from which the invalid class has been removed
-      var required = $form.find('.required.invalid, .required-pseudo.invalid')
+      var required = $form.find('.required.invalid')
         .not('.select2-container.required.invalid')
         .not('.select2-drop.required.invalid')
         .not('input:disabled, textarea:disabled')
       // Enable to log validation:
-      // required.length == 0 ? console.log('valid.') : console.log('invalid: ', required.map(function() { return $(this).prop('name') || this.classList[0] }).toArray())
+      // required.length == 0 ? console.log('valid.') : console.log('invalid: ', required.map(function() { return $(this).prop('name') }).toArray())
       $form.find('button[name=register]').prop('disabled', required.length > 0)
     })
     validateTextChange($form.find('.required'), isNotEmpty)
     validateTextChange($form.find('input[name=year]'), utils.isValidYear)
     validateTextChange($form.find('.duration'), utils.isValidDuration)
+    validateTextChange($form.find('input[name="classification.registrationEmailAddresses"]'), isMultiEmail)
     $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
     $form.find('.required').trigger('validate')
   }
@@ -126,10 +131,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('button[name=save]').on('click', function(e) {
       e.preventDefault()
       $.post('/programs/' + program._id, JSON.stringify(rootModifiedFields)).done(function(program) {
-        onProgramUpdated(program)
+        $('#classification-page').trigger('show', [program._id, 'edit', selectedClassification._id]).show()
         showDialog($('#templates').find('.modify-success-dialog').clone().find('button.ok').click(closeDialog).end())
-        rootModifiedFields = {}
-        $form.find('button[name=save]').prop('disabled', true)
       })
     })
     $form.on('click', '.back-to-search', function(e) {
@@ -143,18 +146,29 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     })
     $form.find('input[name="classification.safe"]').change(function() {
       var safe = $(this).is(':checked')
-      $form.find('.category-container').slideToggle(!safe)
+      $form.find('.category-container').slideToggle()
       save($(this).attr('name'), safe)
     })
     $form.find('.safe-container span').click(function() {
       $(this).prev().click()
+    })
+    $form.find('input[name="series"]').on('change', function() { onSeriesChanged(false) })
+    onSeriesChanged(true)
+
+    $form.find('input[name="series.draft.name"]').on('input', function() {
+      var val = $(this).val()
+      $form.find('input[name="series"]').select2('data', { id: val, text: val, isNew: true })
+    })
+
+    $form.find('input[name="classification.buyer"]').on('change', function() {
+      var $billing = $form.find('input[name="classification.billing"]')
+      if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate').trigger('change')
     })
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
       $buyerAndBilling.removeClass('touched').select2('enable', enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
     })
-
     $form.on('click', '.category .criteria', function() {
       $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
       var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
@@ -166,6 +180,23 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $(this).parents('.criteria').toggleClass('has-comment', isNotEmpty($(this).val()))
     })
     cfu.warningDragOrder($form.find('.classification-criteria .warning-order'), save)
+
+    function onSeriesChanged(isInitial) {
+      var data = $form.find('input[name="series"]').select2('data')
+      if (!data) return
+      var $container = $form.find('.new-series-fields')
+      var $inputs = $container.find('input')
+      if (data.isNew) {
+        $inputs.prop('disabled', false)
+        if (!isInitial) {
+          $container.find('input[name="series.draft.name"]').val(data.text).trigger('input')
+        }
+        $container[isInitial ? 'show' : 'slideDown']()
+      } else {
+        $inputs.prop('disabled', true).removeClass('touched').val('').trigger('validate')
+        $container[isInitial ? 'hide' : 'slideUp']()
+      }
+    }
   }
 
   function save(field, value) {
@@ -235,9 +266,9 @@ function classificationFormUtils() {
     $form.find('.classification-details h2.main').text(classificationTitle)
 
     if (isTvEpisode) {
-      $form.find('input[name="name.0"]').prev().text('Jakson alkuperäinen nimi').end()
-        .find('input[name="nameFi.0"]').prev().text('Jakson suomalainen nimi').end()
-        .find('input[name="nameSv.0"]').prev().text('Jakson ruotsinkielinen nimi').end()
+      $form.find('input[name="name.0"]').prev().text('Jakson alkuperäinen nimi')
+      $form.find('input[name="nameFi.0"]').prev().text('Jakson suomalainen nimi')
+      $form.find('input[name="nameSv.0"]').prev().text('Jakson ruotsinkielinen nimi')
     }
     if (!isTvEpisode) $form.find('.tv-episode-field').remove()
     if (isGame) $form.find('.non-game-field').remove()
@@ -263,9 +294,13 @@ function classificationFormUtils() {
     $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     if (_.isEmpty(p.classifications)) {
       $form.find('.classification-details, .classification-summary, .classification-criteria, .classification-email').remove()
-      $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
+      if (!enums.util.isTvSeriesName(p)) {
+        $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
+      }
     }
+    $form.find('.classification-email h3.main').text('Luokittelupäätös')
     $form.find('button[name=save]').show()
+    $form.find('button[name=register]').hide()
   }
 
   function updateWarningOrdering($form, classification) {
@@ -277,114 +312,80 @@ function classificationFormUtils() {
   }
 
   function registrationEmails($form, saveFn) {
-    var $emails = $form.find('.classification-email .emails')
     var $preview = $form.find('.classification-email .email-preview')
-    var $input = $emails.find('input[name=registration-email]')
+    var $input = $form.find('input[name="classification.registrationEmailAddresses"]')
     var currentBuyerId = null
 
-    validateTextChange($input, isEmail)
-    requiredCheckboxGroup($emails)
-    $input.trigger('validate')
-
-    $emails.find('ul').on('change', 'input', saveEmailState)
-
-    $input.keypress(function(e) {
-      if (e.which == 13) {
-        e.preventDefault()
-        addEmail()
-      }
-    })
-
-    $emails.find('button.add-registration-email').on('click', function(e) {
-      e.preventDefault()
-      addEmail()
-    })
-
     function render(program, classification, rootEditMode) {
-      classification.registrationEmailAddresses
-        .filter(function(e) { return !e.manual })
-        .map(function(e) { return e.email })
-        .forEach(addBuyerEmailCheckbox(true))
+      var opts = {
+        tags: [],
+        minimumInputLength: 1,
+        formatInputTooShort: '',
+        formatNoMatches: '',
+        formatResult: formatSelect2Item,
+        formatSelection: formatSelect2Item,
+        createSearchChoice: function(term) { return { id: term.replace(/,/g, '&#44;'), text: term, isNew: true } },
+        initSelection: function(e, callback) { callback([]) },
+        query: function(query) {
+          return $.get('/emails/search?q='+encodeURIComponent(query.term)).done(function(data) {
+            return query.callback({ results: data })
+          })
+        }
+      }
+      $input.select2(opts).on('change', function() {
+        var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).pluck('id').value()
+        saveFn($(this).attr('name'), manual)
+      })
       if (rootEditMode) {
-        $emails.remove()
-        $preview.parent().removeClass('right')
+        $input.select2('enable', false)
       }
       update(program, classification, rootEditMode)
       return this
     }
 
-    function update(program, classification, rootEditMode) {
-      var buyerEmails = classification.registrationEmailAddresses
-        .filter(function(email) { return !email.manual }).map(function(e) { return e.email })
-      var manualEmails = classification.registrationEmailAddresses
-        .filter(function(email) { return email.manual }).map(function(e) { return e.email })
-
-      var manualInDom = $emails.find('ul.manual li input').map(function() { return $(this).val() }).get()
-      manualEmails.filter(function(email) { return notIn(manualInDom, email) })
-        .forEach(addManualEmailCheckbox(true))
-
-      var email = classificationUtils.registrationEmail(program, classification, user)
-
-      if (rootEditMode) {
-        $.get('/programs/'+program._id+'/registrationEmails', function(emails) {
-          $preview.find('.recipients').text(_.pluck(emails, 'email').join(', '))
-        })
+    function formatSelect2Item(item) {
+      if (item.role) {
+        var icon = 'select2-dropdown-result-icon ' + (item.role == 'user' ? 'fa fa-male' : 'fa fa-university')
+        return $('<div>').text(item.name+' <'+item.id+'>').prepend($('<i>').addClass(icon))
       } else {
-        $preview.find('.recipients').text(email.recipients.join(', '))
+        return item.id
+      }
+    }
+
+    function update(program, classification) {
+      if (shouldUpdateBuyer(classification)) {
+        currentBuyerId = classification.buyer._id
+        $.get('/accounts/' + currentBuyerId).done(function(account) {
+          updateEmails('buyer', account.emailAddresses)
+        })
+      }
+
+      var email = classificationUtils.registrationEmail(program, classification, user, location.protocol + '//' + location.host)
+
+      updateEmails('sent', email.recipients)
+      updateEmails('manual', classification.registrationEmailAddresses)
+
+      function updateEmails(source, emails) {
+        var current = getCurrentEmailSelection()
+        var bySource = _.curry(function(source, e) { return e.source == source })
+        var toOption = _.curry(function(source, locked, e) { return {id: e, text: e, locked: locked, source: source } })
+        var sent = source == 'sent' ? emails.map(toOption('sent', true)) : current.filter(bySource('sent'))
+        var buyer = source == 'buyer' ? emails.map(toOption('buyer', true)) : current.filter(bySource('buyer'))
+        var manual = source == 'manual' ? emails.map(toOption('manual', false)) : current.filter(bySource('manual'))
+        $input.select2('data', sent.concat(buyer).concat(manual)).trigger('validate')
+      }
+
+      function getCurrentEmailSelection() {
+        return $input.length > 0 ? $input.select2('data') : []
       }
 
       $preview.find('.subject').text(email.subject)
       $preview.find('.body').html(email.body)
-
-      if (shouldUpdateBuyer(classification)) {
-        currentBuyerId = classification.buyer._id
-        $.get('/accounts/' + currentBuyerId).done(function(data) {
-          // Remove all email addresses linked to the selected buyer
-          $emails.find('ul.buyer li').remove()
-          data.emailAddresses.forEach(function(email) {
-            if (notIn(buyerEmails, email)) {
-              addBuyerEmailCheckbox(false, email)
-            } else {
-              addBuyerEmailCheckbox(true, email)
-            }
-          })
-          $emails.find('ul li input:checkbox').trigger('validate')
-        })
-      } else {
-        $emails.find('ul li input:checkbox').trigger('validate')
-      }
-    }
-
-    function addEmail() {
-      if ($input.hasClass('invalid')) return
-      addManualEmailCheckbox(true, $input.val())
-      $input.val('')
-      saveEmailState()
-    }
-
-    function saveEmailState() {
-      var buyerEmails = $emails.find('ul.buyer input:checked')
-        .map(function() { return $(this).val() }).get()
-        .map(function(email) { return {email: email, manual: false}})
-
-      var manualEmails = $emails.find('ul.manual input:checked')
-        .map(function() { return $(this).val() }).get()
-        .map(function(email) { return {email: email, manual: true}})
-
-      saveFn($emails.find('ul li input:first').attr('name'), buyerEmails.concat(manualEmails))
     }
 
     function shouldUpdateBuyer(cl) {
       return cl && cl.buyer && cl.buyer._id != currentBuyerId
     }
-
-    function addEmailCheckbox($el, checked, email) {
-      var $input = $('<input>', { type: 'checkbox', checked: !!checked, name: 'classification.registrationEmailAddresses', value: email })
-      $el.append($('<li>').append($('<label>').append($input).append($('<span>').text(email))))
-    }
-
-    var addBuyerEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.buyer'))
-    var addManualEmailCheckbox = _.curry(addEmailCheckbox)($emails.find('ul.manual'))
 
     return { render: render, update: update}
   }

@@ -12,13 +12,15 @@ body {
 .hidden { display: none; }
 
 .clearfix:after { content:''; display:table; clear:both; }
-.dialog { width: 300px; margin: 0 auto; border: 1px solid #D3D3D3; background-color: #fff; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); padding: 20px 40px 40px 40px; }
+.dialog { border-radius: 5px; border: 5px solid #00BB88; background-color: #f8f8f8; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); padding: 20px 40px 40px 40px; max-width: 700px; }
 .dialog .buttons { display: -webkit-flex; display: flex; width: 100%; -webkit-justify-content: space-around; justify-content: space-around; }
 
+#reset-password > div { margin: 0 auto; width: 350px; padding: 20px; }
+
 #login-overlay, #error-overlay, #conflict-overlay { z-index: 2; }
-#login, #error-dialog, #conflict-dialog, #reset-password { z-index: 3; display: none; position: fixed; width: 100%; box-sizing: border-box; }
-#login > div, #error-dialog > div, #conflict-dialog > div, #reset-password > div { background-color: #f8f8f8; margin: 0 auto; margin-top: 100px; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
-#login label, #reset-password label { text-align: left; }
+#login, #error-dialog, #conflict-dialog { z-index: 3; display: none; position: fixed; top:0;bottom:0;left:0;right:0; box-sizing: border-box; align-items: center; justify-content: center; }
+#login > div, #error-dialog > div, #conflict-dialog > div { background-color: #f8f8f8; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
+#login label, #reset-password label { text-align: left; font-weight: normal; }
 #login input, #reset-password input { width: 330px; font-weight: normal; margin: 10px 0; }
 #login input.invalid, #reset-password input.invalid { background-color: #fff; }
 #login button, #reset-password button { margin-top: 10px; }
@@ -34,9 +36,6 @@ body {
   margin: 1px 0;
   padding: 10px 50px;
 }
-
-#reset-password > div { border: 0; }
-#reset-password .feedback { text-align: left; }
 
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;
@@ -97,9 +96,8 @@ textarea { resize: vertical; }
 #dialog {
   display: none;
   position: fixed;
-  top: 300px;
-  left: 0;
-  right: 0;
+  left: 0; right: 0; top: 0; bottom: 0;
+  align-items: center; justify-content: center;
   z-index: 1000;
 }
 #overlay, #login-overlay, #error-overlay, #conflict-overlay { display: none; position: fixed; top:0; bottom:0; left:0; right:0; background: #222; opacity: 0.6; }
@@ -245,6 +243,9 @@ label.top { vertical-align: top; }
 .program-box .categorization-form .category-select-container .select2-container { width: 222px; margin-bottom: 15px; }
 .program-box .categorization-form .categorization-form-tv-episode { display: inline-block; }
 .program-box .categorization-form .categorization-form-tv-episode > div { margin-left: 5px; display: inline-block; vertical-align: top; }
+.program-box .categorization-form .categorization-form-tv-new-series { display: none; }
+.program-box .categorization-form .categorization-form-tv-new-series > div { display: inline-block; vertical-align: top; }
+.program-box .categorization-form .categorization-form-tv-new-series input { width: 190px; }
 .program-box .categorization-form input[type=number] { width: 80px; display: inline-block; }
 
 .program-box .episode-container > h3 { cursor: pointer; border-bottom: none; }
@@ -254,6 +255,7 @@ label.top { vertical-align: top; }
 .program-box .episode-container > h3.open .fa-play { -webkit-transform: rotate(90deg); -moz-transform: rotate(90deg); -o-transform: rotate(90deg); -ms-transform: rotate(90deg); transform: rotate(90deg); }
 .program-box .episode-container .episodes { display: none; }
 .program-box .episode-container .program-box { margin: 0 -40px; box-shadow: 0px 0 5px 2px rgba(0,0,0,.10); }
+.program-box .episodes .result .agelimit, .program-box .episodes .result .warning { vertical-align: middle; margin-right: 3px; width: 25px; height: 25px; background-size: 25px; }
 .program-box .episodes .result { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 .program-box .episodes .result > span:nth-child(1) { min-width: 50px; font-size: 13px; padding-right: 12px; color: #bbb; }
 .program-box .episodes .result > span:nth-child(2) { flex-shrink: 800; font-weight: bold; padding: 0 14px 0 0; margin-right: auto; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
@@ -333,6 +335,10 @@ textarea,
   color: #666666;
   margin: 4px 0 3px 5px;
   line-height: 14px;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice.select2-locked {
+  padding: 6px 8px 6px 8px !important;
 }
 
 .select2-container-multi .select2-search-choice-close {
@@ -441,11 +447,11 @@ textarea.invalid:disabled,
 .program-details-form .private-comments .field-hint { padding-right: 3px; }
 .program-details-form .season-episode-fields input + label { width: 50px; }
 .program-details-form .season-episode-fields input { width: 92px; }
+.program-details-form .new-series-fields { display: none; padding-top: 9px; margin-bottom: 32px; border-radius: 4px; background-color: #eeeeee; }
 
 .program-details-form .comments { margin-top: 13px; }
 .program-details-form .comments textarea { width: 750px; height: 60px }
 
-.registration-confirmation { width: 860px; }
 .registration-confirmation .name { float: left; line-height: 40px; margin-right: 10px; font-size: 20px; font-weight: bold; }
 .registration-confirmation .registration-date { float: left; line-height: 40px; margin: 0 0 0 30px; padding: 0; color: #666; font-size: 14px; }
 .registration-confirmation .buttons { clear: both; padding: 34px 0 0 0; margin: 0; text-align: right; }
@@ -592,23 +598,20 @@ textarea.invalid:disabled,
 .classification-criteria .category-criteria small { margin-left: 65px; display: block; }
 .classification-criteria .category-criteria textarea { float: right; }
 
-.classification-email .emails label { text-align: left; width: 200px;}
-.classification-email .emails input[name=registration-email] { font-weight: normal; margin-top: 5px; width: 93%; }
-
-.classification-email .left { width: 300px; }
-.classification-email .right { width: 620px; }
-
 .classification-email dl, .classification-email .email-preview .body { line-height: 17px; color: #666666; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
 .classification-email dl { margin: 0; padding: 0 0 10px 0; border-bottom: 1px solid #D3D3D3; }
 .classification-email .email-preview pre { white-space: pre-line; }
 .classification-email dl dt { display: inline-block; text-align: left; float: left; width: 135px; padding: 0 0 10px 0;}
 .classification-email dl dd { padding: 0 0 10px 0; min-height: 18px; }
 .classification-email dl dt { font-weight: bold;}
+.classification-email dl .recipients { margin-top: 10px; }
+.classification-email dl .select2-container { width: 760px; }
+.classification-email .email-preview .body a { pointer-events: none; opacity: 0.7; cursor: default; }
 
-.classification-email .emails ul { list-style: none; padding: 0; margin: 0 0; }
-.classification-email .emails ul input { margin-right: 10px; }
-.classification-email .emails li label { width: auto; color: #444444; font-weight: normal; font-size: 16px; cursor: pointer; }
-.classification-email .emails input.email.invalid.touched { background-color: #F0FFF0; }
+.select2-dropdown-result-icon { text-align: center; width: 20px; margin-right: 10px; }
+
+#classification-page .register { padding: 25px 0; }
+#classification-page .register button { font-size: 25px; width: 100%; }
 
 #billing-page .datepicker {
   cursor: pointer;

@@ -2,9 +2,10 @@ function programBox() {
   var $detailTemplate = $('#templates > .program-box').clone()
   var $classificationTemplates = {
     normal: $('#templates > .program-box-normal-classification-details').clone(),
-    tvSeries: $('#templates > .program-box-tv-series-classification-details').clone()
+    tvSeries: $('#templates > .program-box-tv-series-classification-details').clone(),
+    empty: $('#templates > .program-box-empty-classification-details').clone()
   }
-  var $draftTemplate = $('<div>').html('Luokittelusta on käyttäjän <b></b> <span></span> tallentama luonnos.')
+  var $draftTemplate = $('<div>').html('Luokittelu kesken käyttäjällä <b></b>. Luonnos tallennettu <span></span>.')
 
   return { render: render }
 
@@ -102,29 +103,40 @@ function programBox() {
   }
 
   function renderClassifications($e, p) {
-    var classificationLinks = p.classifications.map(function(c, index) {
-      var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
-      return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
-    })
-    var drafts = _.values(p.draftClassifications || {}).map(function(draft) {
-      return $draftTemplate.clone().attr('data-userId', draft.author._id).find('b').text(draft.author.name).end().find('span').text(utils.asDateTime(draft.creationDate)).end()
-    })
-
-    $e.find('.classification-container').html($classificationTemplates.normal.clone()).end()
-      .find('.classifications').html(classificationLinks).end()
-      .find('.drafts').html(drafts).end()
-      .find('.episode-container').remove().end()
-
     if (p.classifications[0]) {
       var c = p.classifications[0]
-      renderClassification($e, p, c)
-      $e.find('.current-format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
+      $e.find('.classification-container').html($classificationTemplates.normal.clone()).end()
+        .find('.current-format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
         .find('.current-duration').labeledText(c.duration).end()
+        .find('.classifications').html(classificationLinks()).end()
+      renderClassification($e, p, c)
+    } else {
+      $e.find('.classification-container').html($classificationTemplates.empty.clone()).end()
+        .find('.current-format, .current-duration').labeledText().end()
+        .find('.comment-container').remove().end()
     }
+
+    $e.find('.drafts').html(drafts()).end()
+      .find('.episode-container').remove().end()
+
     $e.on('click', '.classification', function() {
       $(this).addClass('selected').siblings('.selected').removeClass('selected')
       renderClassification($e, p, $(this).data('classification'))
     })
+
+    function classificationLinks() {
+      return p.classifications.map(function(c, index) {
+        var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
+        return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
+      })
+    }
+    function drafts() {
+      return _.values(p.draftClassifications || {}).map(function(draft) {
+        return $draftTemplate.clone().attr('data-userId', draft.author._id)
+          .find('b').text(draft.author.name + ' ('+draft.author.username+')').end()
+          .find('span').text(utils.asDateTime(draft.creationDate)).end()
+      })
+    }
   }
 
   function renderClassification($e, p, c) {

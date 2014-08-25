@@ -52,7 +52,7 @@ function internalSearchPage() {
     $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function(p) {
       $draft.remove()
       $drafts.toggleClass('hide', $drafts.find('.draft').length === 0)
-      searchPageApi.programDataUpdated(p)
+      p.deleted ? searchPageApi.programDeleted(p) : searchPageApi.programDataUpdated(p)
     })
   })
 
@@ -87,7 +87,7 @@ function internalSearchPage() {
 
   $results.on('click', 'button.edit', function() {
     var $programBox = $(this).closest('.program-box')
-    showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('classification')._id)
+    showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('id'))
   })
 
   $results.on('click', 'button.remove', function() {
@@ -139,7 +139,7 @@ function internalSearchPage() {
         var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
           .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
           .append($('<span>', { class: 'name' }).text(p.name[0]))
-          .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
+          .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
           .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
           .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
         $recent.show().append($result)
@@ -195,6 +195,7 @@ function internalSearchPage() {
     var $episode = $tvEpisodeForm.find('input[name=episode]')
     var $season = $tvEpisodeForm.find('input[name=season]')
     var $series = $tvEpisodeForm.find('input[name=series]')
+    var $newSeriesForm = $categorizationForm.find('.categorization-form-tv-new-series')
 
     select2Autocomplete({
       $el: $series,
@@ -234,14 +235,42 @@ function internalSearchPage() {
       $tvEpisodeForm.toggleClass('hide', !isTvEpisode()).find('input').trigger('validate')
     })
 
+    $series.change(function() {
+      var data = $(this).select2('data')
+      if (!data) return
+      var $inputs = $newSeriesForm.find('input')
+      if (data.isNew) {
+        $newSeriesForm.find('input[name="series.draft.name"]').val(data.text)
+        $newSeriesForm.slideDown()
+        $inputs.trigger('validate')
+      } else {
+        $inputs.val('').removeClass('touched')
+        $newSeriesForm.slideUp(function() { $inputs.trigger('validate') })
+      }
+    })
+
+    $newSeriesForm.find('input[name="series.draft.name"]').on('input', function() {
+      var val = $(this).val()
+      $series.select2('data', { id: val, text: val, isNew: true })
+    })
+
     $categorySaveButton.click(function() {
       var categoryData = { programType: $categorySelection.select2('val') }
 
       if (isTvEpisode()) {
-        var series = select2OptionToIdNamePair($series.select2('data'))
+        var seriesData = $series.select2('data')
+        var series = select2OptionToIdNamePair(seriesData)
         categoryData.series = series
         categoryData.episode = $episode.val()
-        categoryData.season = $season.val()
+        categoryData.season = $season.val() == '' ? undefined : $season.val()
+        if (seriesData.isNew) {
+          categoryData.series.draft = {
+            name: $newSeriesForm.find('input[name="series.draft.name"]').val(),
+            nameFi: $newSeriesForm.find('input[name="series.draft.nameFi"]').val(),
+            nameSv: $newSeriesForm.find('input[name="series.draft.nameSv"]').val(),
+            nameOther: $newSeriesForm.find('input[name="series.draft.nameOther"]').val()
+          }
+        }
       }
 
       $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
@@ -268,7 +297,9 @@ function searchPage() {
     if (q) $input.val(q).trigger('reset')
     setFilters(filters)
     queryChanged($input.val().trim())
-    loadUntil(programId, function() { $input.focus() })
+    loadUntil(programId, function() {
+      if ($('#login').is(':hidden')) $input.focus()
+    })
   })
 
   $button.click(function() { $input.trigger('fire') })
@@ -299,7 +330,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -362,6 +393,12 @@ function searchPage() {
     }
   }
 
+  function programDeleted(program) {
+    var $row = $page.find('.result[data-id=' + program._id + ']')
+    if (_.isEmpty($row)) return
+    $row.next('.program-box').add($row).slideUp(function() { $(this).remove() })
+  }
+
   function openDetail($row, animate) {
     var p = $row.data('program')
     updateLocationHash(p._id)
@@ -398,33 +435,15 @@ function searchPage() {
       return $('<div>').addClass('items')
         .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
         .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
-        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': duration(p)))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
         .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
   }
-}
 
-function countryAndYear(p) {
-  var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
-  return s == '' ? s : '('+s+')'
-}
-
-function duration(p) {
-  var c = p.classifications[0]
-  if (!c || !c.duration) return ''
-  var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
-  if (!match) return c.duration
-  match.shift()
-  return _.chain(match).map(suffixify).compact().join(' ')
-
-  function suffixify(x, ii) {
-    if (!x) return x
-    var int = parseInt(x)
-    if (!int) return ''
-    if (ii == 0) return int + ' h'
-    if (ii == 1) return int + ' min'
-    if (ii == 2) return int + ' s'
-    return x
+  function countryAndYear(p) {
+    var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
+    return s == '' ? s : '('+s+')'
   }
+
 }

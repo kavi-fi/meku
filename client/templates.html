@@ -22,6 +22,12 @@
       <div><label>Kausi</label><input name="season" type="number" min="0" /></div>
       <div><label>Jakso</label><input name="episode" type="number" min="0" class="required" /></div>
     </div>
+    <div class="categorization-form-tv-new-series">
+      <div><label>TV-sarjan alkuperäinen nimi</label><input name="series.draft.name" class="required" type="text" /></div>
+      <div><label>TV-sarjan suomalainen nimi</label><input name="series.draft.nameFi" class="required" type="text" /></div>
+      <div><label>TV-sarjan ruotsinkielinen nimi</label><input name="series.draft.nameSv" type="text" /></div>
+      <div><label>TV-sarjan muu nimi</label><input name="series.draft.nameOther" type="text" /></div>
+    </div>
   </div>
   <div>
     <div style="display: inline-block; margin-right: 4px;">
@@ -100,6 +106,11 @@
   <span class="buyer"></span>
   <label>Rekisteröinnistä laskutetaan</label>
   <span class="billing"></span>
+</div>
+
+<div class="program-box-empty-classification-details">
+  <h3>Luokittelu</h3>
+  <div class="drafts"></div>
 </div>
 
 <div class="program-box-tv-series-classification-details">
@@ -241,13 +252,6 @@
   <div class="entries-container">
     <div class="entries">
     </div>
-  </div>
-</div>
-
-<div class="remove-user-dialog remove-dialog dialog">
-  <p>Haluatko varmasti poistaa käyttäjän <span class="user-name"></span>?</p>
-  <div class="buttons">
-    <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
   </div>
 </div>
 
@@ -434,7 +438,7 @@
 </div>
 
 <div class="modify-success-dialog dialog">
-  <p>Muutokset tallennettu onnistuneesti.</p>
+  <p>Muutokset tallennettu.</p>
   <div class="buttons">
     <button class="ok button">Ok</button>
   </div>
@@ -458,7 +462,15 @@
       <h2 class="main">Uusi kuvaohjelma - ?</h2>
 
       <div class="left">
-        <div class="tv-episode-field"><label class="select2-label">TV-sarjan nimi</label><input name="series" class="required" type="hidden" /></div>
+        <div class="tv-episode-field">
+          <label class="select2-label">TV-sarjan nimi</label><input name="series" class="required" type="hidden" />
+          <div class="new-series-fields">
+            <label>TV-sarjan alkuperäinen nimi</label><input name="series.draft.name" disabled class="throttledInput required" type="text" />
+            <label>TV-sarjan suomalainen nimi</label><input name="series.draft.nameFi" disabled class="throttledInput required" type="text" />
+            <label>TV-sarjan ruotsinkielinen nimi</label><input name="series.draft.nameSv" disabled class="throttledInput" type="text" />
+            <label>TV-sarjan muu nimi</label><input name="series.draft.nameOther" disabled class="throttledInput" type="text" />
+          </div>
+        </div>
         <label>Alkuperäinen nimi</label><input name="name.0" class="required throttledInput" type="text" />
         <label>Suomalainen nimi</label><input name="nameFi.0" class="required throttledInput" type="text" />
         <label>Ruotsinkielinen nimi</label><input name="nameSv.0" class="throttledInput" type="text" />
@@ -510,7 +522,7 @@
       </div>
       <div class="form comments">
         <div class="public-comments">
-          <label class="text-area-label">Julkiset kommentit</label><textarea placeholder="Perusteet uudelleenluokittelulle" name="classification.publicComments" class="required throttledInput"></textarea>
+          <label class="text-area-label">Julkiset kommentit</label><textarea placeholder="Perusteet uudelleenluokittelulle" name="classification.publicComments" class="throttledInput"></textarea>
         </div>
         <div class="private-comments">
           <label class="text-area-label">KAVI:n sisäiset kommentit</label><textarea placeholder="KAVIN sisäiset kommentit" name="classification.comments" class="throttledInput"></textarea>
@@ -551,28 +563,17 @@
       <div class="program-box-container"></div>
     </div>
     <div class="classification-email row">
-      <div class="content">
-        <h2 class="main">Luokittelupäätös</h2>
-        <div class="emails left required-pseudo">
-          <h3 class="main">Lähetä luokittelupäätös</h3>
-          <ul class="buyer"></ul>
-          <ul class="manual"></ul>
-          <div>
-            <label>Lisää sähköpostiosoite: <input type="text" class="email" name="registration-email"/></label><button class="button add-registration-email">Lisää</button>
-          </div>
-          <button name="register" disabled class="button">Rekisteröi</button>
-        </div>
-        <div class="preview right">
-          <h3 class="main">Luokittelupäätöksen esikatselu</h3>
-          <div class="email-preview box">
-            <dl>
-              <dt>Vastaanottajat</dt><dd class="recipients"></dd>
-              <dt>Aihe</dt><dd class="subject"></dd>
-            </dl>
-            <div class="body"></div>
-          </div>
+      <div class="content preview">
+        <h3 class="main">Lähetä luokittelupäätös</h3>
+        <div class="email-preview box">
+          <dl>
+            <dt class="recipients">Vastaanottajat</dt><dd><input name="classification.registrationEmailAddresses" class="required" type="hidden" /></dd>
+            <dt>Aihe</dt><dd class="subject"></dd>
+          </dl>
+          <div class="body"></div>
         </div>
       </div>
+      <div class="register"><button name="register" disabled class="button">Rekisteröi</button></div>
     </div>
   </form>
 </div>

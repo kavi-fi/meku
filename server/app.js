@@ -457,7 +457,6 @@ app.delete('/accounts/:id', requireRole('root'), function(req, res, next) {
 app.get('/accounts', requireRole('kavi'), function(req, res, next) {
   var selectedRoles = req.query.roles
   var query = selectedRoles ? { roles: { $all: selectedRoles }} : {}
-
   Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
 })
 
@@ -475,13 +474,17 @@ app.get('/accounts/search', function(req, res, next) {
   if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
   }
-
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
   Account.find(q).sort('name').limit(50).exec(respond(res, next))
 })
 
 app.get('/accounts/:id', function(req, res, next) {
-  Account.findById(req.params.id, respond(res, next))
+  Account.findById(req.params.id, function(err, account) {
+    if (err) return next(err)
+    if (!account) return res.send(404)
+    if (!utils.hasRole(req.user, 'kavi') && !account.users.id(req.user._id)) return res.send(400)
+    res.send(account)
+  })
 })
 
 app.get('/users', requireRole('root'), function(req, res, next) {

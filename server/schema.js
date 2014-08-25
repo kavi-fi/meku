@@ -86,6 +86,16 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
   })
 }
 
+ProgramSchema.methods.hasNameChanges = function() {
+  var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
+  return _.any(this.modifiedPaths(), function(path) { return _.contains(namePaths, path) })
+}
+
+ProgramSchema.methods.verifyAllNamesUpToDate = function(callback) {
+  if (!this.hasNameChanges()) return callback()
+  this.populateAllNames(callback)
+}
+
 ProgramSchema.methods.populateAllNames = function(series, callback) {
   if (!callback) { callback = series; series = undefined }
   var program = this

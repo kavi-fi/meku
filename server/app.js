@@ -389,9 +389,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
 
   function updateTvEpisodeAllNamesOnParentNameChange(parent, callback) {
     if (!enums.util.isTvSeriesName(parent)) return callback()
-    var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
-    var nameChanges = _.any(parent.modifiedPaths(), function(p) { return _.contains(namePaths, p) })
-    if (!nameChanges) return callback()
+    if (!parent.hasNameChanges()) return callback()
     Program.find({ 'series._id': parent._id }).exec(function(err, episodes) {
       if (err) return callback(err)
       async.forEach(episodes, function(e, callback) { e.populateAllNames(parent, callback) }, function() {

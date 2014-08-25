@@ -169,8 +169,9 @@ function providerPage() {
         $.ajax('/providers/' + provider._id, { type: 'PUT', data: JSON.stringify(providerData) })
           .done(function(provider) {
             var $parent = $row.parent()
-            $row.replaceWith(renderProvider(provider))
-            closeDetails($parent.find('.provider-details'))
+            $row.replaceWith(renderProvider(provider).addClass('selected'))
+            $providerDetails.find('.touched').removeClass('touched')
+            $providerDetails.find('.buttons .save-success').fadeIn(500).delay(5000).fadeOut()
         })
       })
 
@@ -211,7 +212,7 @@ function providerPage() {
       function removeProvider() {
         $.ajax('/providers/' + provider._id, { type: 'DELETE' }).done(function() {
           closeDialog()
-          closeDetails($providers.find('.selected'))
+          closeDetails()
           $selected.slideUp(function() { $(this).remove() })
         })
       }
@@ -222,12 +223,12 @@ function providerPage() {
     var provider = $selected.data('provider')
     function isUnapproved(provider) { return !provider.registrationDate }
     $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(updatedProvider) {
-      if (isUnapproved(provider) && updatedProvider.active) {
+      if (isUnapproved(updatedProvider) && updatedProvider.active) {
         var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
         $dialog.find('.email').text(updatedProvider.emailAddresses.join(', '))
         $dialog.find('.ok').on('click', function() {
           $page.trigger('show', null)
-          closeDialog()
+          closeDialog($selected)
         })
         showDialog($dialog)
       } else {

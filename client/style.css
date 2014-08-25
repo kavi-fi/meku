@@ -9,6 +9,7 @@ body {
 .pika-lendar { width: 248px; }
 
 .hide { display: none !important; }
+.hidden { display: none; }
 
 .clearfix:after { content:''; display:table; clear:both; }
 .dialog { width: 300px; margin: 0 auto; border: 1px solid #D3D3D3; background-color: #fff; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); padding: 20px 40px 40px 40px; }
@@ -693,6 +694,15 @@ textarea.invalid:disabled,
 #provider-page .most-recent { margin-top: 10px; }
 #provider-page .most-recent .sent { margin-right: 15px; }
 #provider-page .yearly-billing { margin-bottom: 30px; }
+
+#provider-page .provider-details .buttons .save-success {
+  line-height: 25px;
+  float: left;
+  margin-right: 30px;
+  background-color: green;
+  color: white;
+  padding: 6px 15px;
+}
 
 #provider-page .unapproved .results { margin-bottom: 30px; }
 #provider-page .unapproved .result .date { display: inline-block; width: 90px; }

@@ -22,7 +22,7 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
 var CronJob = require('cron').CronJob
-var providers = require('../shared/providers-utils')
+var providers = require('./provider-utils')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 

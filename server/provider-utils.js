@@ -1,7 +1,7 @@
 var fs = require('fs')
 var _ = require('lodash')
-var enums = require('./enums')
-var utils = require('./utils')
+var enums = require('../shared/enums')
+var utils = require('../shared/utils')
 
 exports.registrationEmail = function (data) {
   function emailHtml(data) {
@@ -35,7 +35,7 @@ exports.registrationEmail = function (data) {
 
     var tpl = readTemplateSync('registration-email.tpl.html')
     var html =  _.template(tpl, vars)
-    fs.writeFileSync('./tmp/registration-email.html', html)
+    //fs.writeFileSync('./tmp/registration-email.html', html)
     return html
   }
 
@@ -59,7 +59,7 @@ exports.registrationEmailProviderLocation = function (data) {
 
     var tpl = readTemplateSync('provider-location-registration-email.tpl.html')
     var html =  _.template(tpl, vars, {enums: enums, utils: utils})
-    fs.writeFileSync('./tmp/registration-email-location.html', html)
+    //fs.writeFileSync('./tmp/registration-email-location.html', html)
     return html
   }
 
@@ -79,7 +79,7 @@ function providingTypes() {
 }
 
 function readTemplateSync(file) {
-  return fs.readFileSync('./shared/templates/' + file, 'utf-8')
+  return fs.readFileSync('./server/templates/' + file, 'utf-8')
 }
 
 function providingTypeTotalPrice(types) {

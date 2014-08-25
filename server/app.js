@@ -510,34 +510,28 @@ app.get('/users/exists/:username', requireRole('root'), function(req, res, next)
   })
 })
 
-function userHasRequiredFields(user) {
-  return (user.username != '' && user.emails[0].length > 0 && user.name != '')
-}
-
 app.post('/users/new', requireRole('root'), function(req, res, next) {
-  if (userHasRequiredFields(req.body)) {
-    new User(req.body).save(function(err, user) {
+  var hasRequiredFields = (req.body.username != '' && req.body.emails[0].length > 0 && req.body.name != '')
+  if (!hasRequiredFields) return res.send(400)
+  new User(req.body).save(function(err, user) {
+    if (err) return next(err)
+    createAndSaveHash(user, function(err) {
       if (err) return next(err)
-      createAndSaveHash(user, function(err) {
-        if (err) return next(err)
-        logCreateOperation(req.user, user)
-        var subject = 'Käyttäjätunnuksen aktivointi'
-        var text = '<p>Hei,<br/>' +
-          'Olet saanut käyttäjätunnuksen Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
-          '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
-          'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
-          'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +
-          '<p>Jos unohdat salasanasi, voit uusia sen sisäänkirjautumisikkunan kautta:<br/>' +
-          'Anna käyttäjätunnus ja paina "unohdin salasanani" -painiketta.</p>' +
-          '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
-          'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
-          '<p>Terveisin,<br/>KAVI</p>'
-        sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
-      })
+      logCreateOperation(req.user, user)
+      var subject = 'Käyttäjätunnuksen aktivointi'
+      var text = '<p>Hei,<br/>' +
+        'Olet saanut käyttäjätunnuksen Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
+        '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
+        'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
+        'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +
+        '<p>Jos unohdat salasanasi, voit uusia sen sisäänkirjautumisikkunan kautta:<br/>' +
+        'Anna käyttäjätunnus ja paina "unohdin salasanani" -painiketta.</p>' +
+        '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
+        'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+        '<p>Terveisin,<br/>KAVI</p>'
+      sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
     })
-  } else {
-    return res.send(500)
-  }
+  })
 })
 
 app.post('/users/:id', requireRole('root'), function(req, res, next) {

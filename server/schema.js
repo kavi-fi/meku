@@ -185,6 +185,36 @@ var ProviderSchema = new Schema({
   locations: [providerLocation]
 })
 
+ProviderSchema.statics.getForYearlyBilling = function(callback) {
+  Provider.find({ active: true, deleted: false }).lean().exec(function(err, providers) {
+    if (err) return callback(err)
+
+    _.forEach(providers, function(provider) {
+      provider.locations = _.filter(provider.locations, { active: true, deleted: false })
+    })
+
+    var providersForBilling = [], locationsForBilling = []
+    providers.forEach(function(p) {
+      var providerClone = _.cloneDeep(p)
+      delete providerClone.locations
+      _(p.locations).filter({ isPayer: true }).forEach(function(l) {
+        l.provider = providerClone
+        locationsForBilling.push(l)
+      })
+
+      if (_.any(p.locations, { isPayer: false })) {
+        p.locations = _.filter(p.locations, { isPayer: false })
+        providersForBilling.push(p)
+      }
+    })
+
+    callback(null, {
+      providers: providersForBilling,
+      locations: locationsForBilling
+    })
+  })
+}
+
 var Provider = exports.Provider = mongoose.model('providers', ProviderSchema)
 
 var ProviderMetadataSchema = new Schema({

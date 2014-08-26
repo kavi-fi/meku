@@ -98,12 +98,27 @@ function providerPage() {
   $yearlyBilling.on('click', 'button.yearly-billing-reminder', function() {
     var $button = $(this)
     $button.prop('disabled', true)
-    $.get('/providers/yearlyBilling/count', function(res) {
+    $.get('/providers/yearlyBilling/info', function(info) {
       showDialog($('#templates').find('.yearly-billing-reminder-dialog').clone()
-        .find('.count').text(res.count).end()
+        .find('.provider-count').text(info.providerCount).end()
+        .find('.location-count').text(info.locationCount).end()
+        .find('.providers-without-mail').html(renderProvidersWithoutMail(info.providersWithoutMail)).end()
+        .find('.locations-without-mail').html(renderLocationsWithoutMail(info.locationsWithoutMail)).end()
         .find('.send').click(sendYearlyBillingReminderMail).end()
         .find('.cancel').click(closeDialog).end())
       $button.prop('disabled', false)
+
+      function renderProvidersWithoutMail(providers) {
+        return _.map(providers, function(p) {
+          return $('<div>').text(p.name)
+        })
+      }
+
+      function renderLocationsWithoutMail(locations) {
+        return _.map(locations, function(l) {
+          return $('<div>').text(l.provider.name + ': ' + l.name)
+        })
+      }
 
       function sendYearlyBillingReminderMail() {
         closeDialog()

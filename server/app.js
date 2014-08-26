@@ -542,8 +542,20 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
   })
 })
 
-app.get('/providers/yearlyBilling/count', requireRole('kavi'), function(req, res, next) {
+app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res, next) {
+  Provider.getForYearlyBilling(function(err, data) {
+    if (err) return next(err)
 
+    var providers = _.groupBy(data.providers, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
+    var locations = _.groupBy(data.locations, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
+
+    res.json({
+      providerCount: providers.withMail.length,
+      locationCount: locations.withMail.length,
+      providersWithoutMail: providers.noMail,
+      locationsWithoutMail: locations.noMail
+    })
+  })
 })
 
 app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function(req, res, next) {

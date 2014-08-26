@@ -249,7 +249,7 @@ function classifications(callback) {
           if (account === undefined) {
             var provider = providerMap[c.provider_id]
 
-            account = _(provider.toObject()).omit('sequenceId', '_id').merge({ roles: ['Subscriber'] }).valueOf()
+            account = _(provider).omit('sequenceId', '_id').merge({ roles: ['Subscriber'] }).valueOf()
             new schema.Account(account).save(function(err, newAccount) {
               if (err) return callback(err)
               return setBuyerAndBilling(newAccount)

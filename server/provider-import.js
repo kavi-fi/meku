@@ -26,7 +26,6 @@ var billingFieldMap = {
   'billing.address.street':  'Postiosoite',
   'billing.address.zip':     'Postinro',
   'billing.invoiceText':     'Laskulle haluttava teksti',
-  'billing.language':        'Laskutuskieli', // TODO: remove from schema!
   'eInvoice.address':        'Verkkolaskuosoite (OVT/IBAN)',
   'eInvoice.operator':       'Välittäjätunnus'
 }
@@ -40,7 +39,6 @@ var locationFieldMap = {
   'emailAddresses':   'Sähköpostiosoite',
   'gamesWithoutPegi': 'Pelejä (ei PEGI)',
   'isPayer':          'Lasku pääorganisaatiolle',
-  'language':         'Laskutuskieli', // TODO: remove from schema!
   'name':             'Tarjoamispaikan nimi',
   'phoneNumber':      'Puh.nro',
   'providingType':    'Tarjoamistapa',
@@ -63,17 +61,16 @@ exports.import = function(file, callback) {
   var provider = createObjectAndSetValuesWithMap(providerAndLocations.provider, providerFieldMap)
   provider.deleted = false
   provider.active = false
+  provider.creationDate = new Date()
+  provider.language = provider.language === 'Swedish' ? 'SV' : 'FI'
   provider.address.country = enums.getCountryCode(provider.address.country) || provider.address.country
 
   var billing = createObjectAndSetValuesWithMap(providerAndLocations.billing, billingFieldMap)
 
   provider = _.merge({}, provider, billing)
 
-  provider.billing.language = billing.language === 'Swedish' ? 'SV' : 'FI'
-
-  var address = provider.billing.address
-
-  if (address) {
+  if (provider.billing && provider.billing.address) {
+    var address = provider.billing.address
     provider.billing.address.country = enums.getCountryCode(address.country) || address.country
     provider.billingPreference = 'address'
   }
@@ -82,30 +79,26 @@ exports.import = function(file, callback) {
     provider.billingPreference = 'eInvoice'
   }
 
-  new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
+  provider.locations = []
+
+  async.forEach(providerAndLocations.locations, function(location, callback) {
+    location = createObjectAndSetValuesWithMap(location, locationFieldMap)
+    location.providingType = location.providingType.split(',')
+    location.deleted = false
+    location.active = true
+    location.providingType = _.map(location.providingType, function(providingTypeNumber) {
+      return enums.getProvidingType(providingTypeNumber)
+    })
+
+    provider.locations.push(location)
+    callback()
+  }, function(err) {
     if (err) return callback(err)
 
-    var locations = []
-
-    async.forEach(providerAndLocations.locations, function(location, callback) {
-      location = createObjectAndSetValuesWithMap(location, locationFieldMap)
-      location.providingType = location.providingType.split(',')
-      location.provider = provider._id
-      location.deleted = false
-      location.active = true
-      location.providingType = _.map(location.providingType, function(providingTypeNumber) {
-        return enums.getProvidingType(providingTypeNumber)
-      })
-
-      new schema.ProviderLocation(location).save(function(err, location) {
-        if (err) return callback(err)
-        locations.push(location)
-        callback()
-      })
-    }, function(err) {
+    new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
       return callback(err, {
         provider: provider,
-        locations: locations
+        locations: provider.locations
       })
     })
   })
@@ -116,33 +109,23 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
 
   var requiredProviderFields = {
     name: 'Tarjoajan yhteystiedot',
-    values: [
-      'Yritys/Toiminimi', 'Y-tunnus', 'Tarjoajan yht.hlö', 'Lähiosoite', 'Postinro', 'Postitoimipaikka',
-      'Puh.nro', 'Kotipaikka', 'Asiointikieli'
-    ]
-  }
-
-  // There are duplicate field names in Excel, maybe there shouldn't be?
-  var requiredBillingFields = {
-    name: 'Tarjoajan laskutustiedot',
-    values: [
-      'Yritys / toiminimi', 'Yht.hlö', 'Postiosoite', 'Postinro', 'Postitoimipaikka', 'Maa', 'Puh.nro',
-      'Asiointikieli', 'Laskutuskieli'
-    ]
+    values: ['name', 'yTunnus', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber', 'language'],
+    fieldMap: providerFieldMap
   }
 
   var requiredLocationFields = {
     name: 'Tarj.paikan yht.tiedot ja tapa',
     values: [
-      'Tarjoamispaikan nimi', 'Tarjoamistapa', 'K18 ohjelmia', 'Pelejä (ei PEGI)', 'Yht.hlö', 'Käyntiosoite',
-      'Postinro', 'Postitoimipaikka', 'Puh.nro', 'Lasku pääorganisaatiolle', 'Asiointikieli'
-    ]
+      'name', 'providingType', 'adultContent', 'gamesWithoutPegi', 'contactName', 'address.street',
+      'address.zip', 'address.city', 'phoneNumber', 'isPayer'
+    ],
+    fieldMap: locationFieldMap
   }
 
   var errors = []
 
   var providerData = parseFieldRowAndValueRowAfterColumn(providerSheet, 'Tarjoaja', requiredProviderFields)
-  var billingData = parseFieldRowAndValueRowAfterColumn(providerSheet, 'Laskutustiedot', requiredBillingFields)
+  var billingData = parseFieldRowAndValueRowAfterColumn(providerSheet, 'Laskutustiedot')
   var locationsData = parseFieldRowAndValueRows(providerSpreadSheet.Sheets['Tarj.paikan yht.tiedot ja tapa'],
     requiredLocationFields)
 
@@ -185,8 +168,12 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
     }, {})
 
     if (requiredFields) {
+      var reqFields = _.map(requiredFields.values, function(value) {
+        return requiredFields.fieldMap[value]
+      })
+
       _.forEach(fields, function (field) {
-        if (_.contains(requiredFields.values, field)) {
+        if (_.contains(reqFields, field)) {
           var errorString = '<%- name %> pakollinen kenttä "<%- field %>" puuttuu'
           if (requiredFields.row) errorString = 'Rivillä <%- row %>. ' + errorString
 

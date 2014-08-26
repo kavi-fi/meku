@@ -1,6 +1,6 @@
 <div style="background-color: #ffffff;padding: 5px">
   <p><img src="http://meku.fi/images/kavi_email.png" alt="MEKU/KAVI" title="undefined" width="306" height="60" style="padding: 20px 0 15px 20px;"></p>
-  <p><strong><span style="font-size: 14pt; line-height: 21px">Ilmoittautuminen tarjoajaksi</span></strong></p>
+  <p><strong><span style="font-size: 14pt; line-height: 21px"><%- header %></span></strong></p>
   <p><font face="arial, helvetica, sans-serif" size="3"><strong>Ilmoitetun tarjoamispaikan tiedot</strong></font><strong>&nbsp;</strong></p>
   <p>Olette rekisteröityneet Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön kuvaohjelmien tarjoajarekisteriin.</p>
   <p><strong>Olkaa hyvä ja tarkistakaa tiedot</strong>. Jos tiedot ovat väärin tai niissä on korjattavaa, ottakaa yhteys Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön yhteyshenkilöihin <strong><em>viikon kuluessa</em></strong>. Valvontamaksu peritään ilmoitettujen tietojen perusteella vuosittain. Valvontamaksuvelvollisuus syntyy vain, jos kuvaohjelmia tarjotaan taloudellisessa tarkoituksessa ja tarjoaminen on säännöllistä. Tarjoamistietojen muuttuessa ilmoittakaa muutoksista viipymättä Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikölle.</p>
@@ -17,8 +17,8 @@
   <table border="0">
     <tbody>
       <tr><td><font face="arial, helvetica, sans-serif" size="4"><strong>TARJOAJA</strong></font></td><td>&nbsp;</td></tr>
-      <tr><td>Tarjoaja Yritys /<br>toiminimi:</td><td><%- provider.name %></td></tr>
-      <tr><td>Tarjoajan Y-tunnus:</td><td><%- provider.yTunnus %><br></td></tr>
+      <tr><td>Tarjoaja Yritys /<br>toiminimi:</td><td><%- location.provider.name %></td></tr>
+      <tr><td>Tarjoajan Y-tunnus:</td><td><%- location.provider.yTunnus %><br></td></tr>
     </tbody>
   </table>
 
@@ -27,13 +27,13 @@
   <table border="0">
     <tbody>
       <tr><td><font face="arial, helvetica, sans-serif" size="4"><strong>TARJOAMISPAIKKA</strong></font></td><td>&nbsp;</td></tr>
-      <tr><td>Tarjoamispaikan nimi:</td><td><%- name %></td></tr>
-      <tr><td>Tarjoamispaikan yhteyshenkilö:</td><td><%- contactName %></td></tr>
-      <tr><td>Käyntiosoite:</td><td><%- address.street %></td></tr>
-      <tr><td>Postinumero:</td><td><%- address.zip %><br></td></tr>
-      <tr><td>Postitoimipaikka:</td><td><%- address.city %><br></td></tr>
-      <tr><td>Sähköpostiosoite:</td><td><%- emailAddress %><br></td></tr>
-      <tr><td>Puhelinnumero:</td><td><%- phoneNumber %></td></tr>
+      <tr><td>Tarjoamispaikan nimi:</td><td><%- location.name %></td></tr>
+      <tr><td>Tarjoamispaikan yhteyshenkilö:</td><td><%- location.contactName %></td></tr>
+      <tr><td>Käyntiosoite:</td><td><%- location.address.street %></td></tr>
+      <tr><td>Postinumero:</td><td><%- location.address.zip %><br></td></tr>
+      <tr><td>Postitoimipaikka:</td><td><%- location.address.city %><br></td></tr>
+      <tr><td>Sähköpostiosoite:</td><td><%- location.emailAddress %><br></td></tr>
+      <tr><td>Puhelinnumero:</td><td><%- location.phoneNumber %></td></tr>
       <tr>
         <td>Tarjoamistavat:</td>
         <td><ul><% providingTypes.forEach(function(type) { %>
@@ -47,9 +47,9 @@
 
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
 
-      <tr><td>Tilausohjelmapalvelun/verkkokaupan www-osoite:</td><td><a href="<%- url %>"><%- url %></a></td></tr>
-      <tr><td>Tarjolla myös LUOKITTELEMATTOMIA K-18 ohjelmia:</td><td><%- utils.showBoolean(adultContent) %></td></tr>
-      <tr><td>Tarjolla muita kuin PEGI-luokiteltuja pelejä</td><td><%- utils.showBoolean(gamesWithoutPegi) %></td></tr>
+      <tr><td>Tilausohjelmapalvelun/verkkokaupan www-osoite:</td><td><a href="<%- location.url %>"><%- location.url %></a></td></tr>
+      <tr><td>Tarjolla myös LUOKITTELEMATTOMIA K-18 ohjelmia:</td><td><%- utils.showBoolean(location.adultContent) %></td></tr>
+      <tr><td>Tarjolla muita kuin PEGI-luokiteltuja pelejä</td><td><%- utils.showBoolean(location.gamesWithoutPegi) %></td></tr>
     </tbody>
   </table>
   <p>&nbsp;</p>

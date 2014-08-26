@@ -22,7 +22,7 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
 var CronJob = require('cron').CronJob
-var providers = require('./provider-utils')
+var providerUtils = require('./provider-utils')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -509,7 +509,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     provider.save(function(err, saved) {
       if (isRegistration) {
         var provider = saved.toObject()
-        sendEmail(providers.registrationEmail(provider), logError)
+        sendEmail(providerUtils.registrationEmail(provider), logError)
         sendProviderLocationEmails(provider)
         return res.send(saved)
       }
@@ -521,7 +521,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     _.select(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
-      sendEmail(providers.registrationEmailProviderLocation(_.merge({}, l, {provider: provider})), logError)
+      sendEmail(providerUtils.registrationEmailProviderLocation(_.merge({}, l, {provider: provider})), logError)
     })
   }
 })
@@ -567,8 +567,17 @@ app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res,
 })
 
 app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function(req, res, next) {
-  ProviderMetadata.setYearlyBillingReminderSent(new Date(), function(err) {
-    res.send({ ok: false })
+  Provider.getForYearlyBilling(function(err, data) {
+    if (err) return next(err)
+
+    _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
+      sendEmail(providerUtils.yearlyBillingProviderEmail(p), logError)
+    })
+    _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
+      sendEmail(providerUtils.yearlyBillingProviderLocationEmail(l), logError)
+    })
+
+    ProviderMetadata.setYearlyBillingReminderSent(new Date(), respond(res, next))
   })
 })
 

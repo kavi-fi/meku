@@ -13,14 +13,10 @@ exports.registrationEmail = function (data) {
         providingTypes: l.providingType.map(enums.providingTypeName).join(', ')
       }
     })
-    function total(xs) {
-      return _.reduce(xs, function(acc, l) {
-        return acc + l.price
-      }, 0)
-    }
     var locations = _.select(allLocations, function(l) { return !l.isPayer })
     var payerLocations = _.select(allLocations, function(l) { return l.isPayer })
     var vars = _.merge({}, data, {
+      header: 'Ilmoittautuminen tarjoajaksi',
       emailAddress: data.emailAddresses.join(', '),
       locations: locations,
       useEInvoice: data.billingPreference == 'eInvoice',
@@ -28,8 +24,8 @@ exports.registrationEmail = function (data) {
       billing: data.billingPreference == 'address' ? data.billing.address : data.address,
       invoiceText: data.billing.invoiceText,
       payerLocations: payerLocations,
-      totalProvider: total(locations),
-      totalLocations: total(payerLocations),
+      totalProvider: totalPrice(locations),
+      totalLocations: totalPrice(payerLocations),
       providingTypePrices: providingTypes()
     })
 
@@ -50,12 +46,14 @@ exports.registrationEmail = function (data) {
 
 exports.registrationEmailProviderLocation = function (data) {
   function emailHtml(data) {
-    var vars = _.merge({}, data, {
+    var vars = {
+      header: 'Ilmoittautuminen tarjoajaksi',
       emailAddress: data.emailAddresses.join(', '),
       providingTypes: data.providingType.map(enums.providingTypeName),
       providingTypePrices: providingTypes(),
-      total: providingTypeTotalPrice(data.providingType)
-    })
+      total: providingTypeTotalPrice(data.providingType),
+      provider: data
+    }
 
     var tpl = readTemplateSync('provider-location-registration-email.tpl.html')
     var html =  _.template(tpl, vars, {enums: enums, utils: utils})
@@ -70,6 +68,72 @@ exports.registrationEmailProviderLocation = function (data) {
     replyto: 'mirja.kosonen@kavi.fi',
     body: emailHtml(data)
   }
+}
+
+exports.yearlyBillingProviderEmail = function(provider) {
+  return {
+    recipients: provider.emailAddresses,
+    subject: 'Tarjoajan vuosilaskutuksen vahvistus (' + provider.name + ')',
+    from: 'noreply@kavi.fi',
+    replyto: 'mirja.kosonen@kavi.fi',
+    body: emailHtml(provider)
+  }
+
+  function emailHtml(provider) {
+    var locations = _(provider.locations)
+      .map(function(l) { return {
+        name: l.name,
+        isPayer: l.isPayer,
+        price: providingTypeTotalPrice(l.providingType),
+        providingTypes: l.providingType.map(enums.providingTypeName).join(', ')}})
+      .groupBy(function(l) { return l.isPayer ? 'payer' : 'notPayer'}).value()
+    var vars = {
+      header: 'Tarjoajan vuosilaskutuksen vahvistus',
+      emailAddress: provider.emailAddresses.join(', '),
+      locations: locations.notPayer,
+      useEInvoice: provider.billingPreference == 'eInvoice',
+      eInvoice: provider.eInvoice,
+      billing: provider.billingPreference == 'address' ? provider.billing.address : provider.address,
+      invoiceText: provider.billing.invoiceText,
+      payerLocations: locations.payer || [],
+      totalProvider: totalPrice(locations.notPayer),
+      totalLocations: totalPrice(locations.payer),
+      providingTypePrices: providingTypes(),
+      provider: provider
+    }
+    var tpl = readTemplateSync('registration-email.tpl.html')
+    return _.template(tpl, vars, { enums: enums, utils: utils })
+  }
+}
+
+exports.yearlyBillingProviderLocationEmail = function(location) {
+  return {
+    recipients: location.emailAddresses,
+    subject: 'Tarjoamispaikan vuosilaskutuksen vahvistus (' + location.name + ')',
+    from: 'noreply@kavi.fi',
+    replyto: 'mirja.kosonen@kavi.fi',
+    body: emailHtml(location)
+  }
+
+  function emailHtml(location) {
+    var vars = {
+      header: 'Tarjoamispaikan vuosilaskutuksen vahvistus',
+      emailAddress: location.emailAddresses.join(', '),
+      providingTypes: location.providingType.map(enums.providingTypeName),
+      providingTypePrices: providingTypes(),
+      total: providingTypeTotalPrice(location.providingType),
+      location: location
+    }
+
+    var tpl = readTemplateSync('provider-location-registration-email.tpl.html')
+    return _.template(tpl, vars, {enums: enums, utils: utils})
+  }
+}
+
+function totalPrice(xs) {
+  return _.reduce(xs, function(acc, l) {
+    return acc + l.price
+  }, 0)
 }
 
 function providingTypes() {

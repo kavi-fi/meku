@@ -1,6 +1,6 @@
 <div style="background-color: #ffffff;padding: 5px">
   <p><img src="http://meku.fi/images/kavi_email.png" alt="MEKU/KAVI" title="undefined" width="306" height="60" style="padding: 20px 0 15px 20px;"></p>
-  <p><strong><span style="font-size: 14pt; line-height: 21px">Tarjoajan vuositilauksen vahvistus<br></span></strong></p>
+  <p><strong><span style="font-size: 14pt; line-height: 21px"><%- header %><br></span></strong></p>
   <p><font face="arial, helvetica, sans-serif" size="3"><strong>Ilmoitetun tarjoajan tiedot</strong></font><strong>&nbsp;</strong></p>
   <p>Olette rekisteröityneet Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön kuvaohjelmien tarjoajarekisteriin vuodelle 2014. </p>
   <p><strong>Olkaa hyvä ja tarkistakaa tiedot</strong>. Jos tiedot ovat väärin tai niissä on korjattavaa, ottakaa yhteys Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön yhteyshenkilöihin <strong><em>viikon kuluessa</em></strong>. Valvontamaksu peritään ilmoitettujen tietojen perusteella vuosittain. Valvontamaksuvelvollisuus syntyy vain, jos kuvaohjelmia tarjotaan taloudellisessa tarkoituksessa ja tarjoaminen on säännöllistä. Tarjoamistietojen muuttuessa ilmoittakaa muutoksista viipymättä Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikölle.</p>
@@ -18,16 +18,16 @@
   <table border="0">
     <tbody>
       <tr><td><font face="arial, helvetica, sans-serif" size="4"><strong>TARJOAJA</strong></font></td><td>&nbsp;</td></tr>
-      <tr><td>Tarjoaja Yritys / toiminimi:</td><td><%- name %></td></tr>
-      <tr><td>Tarjoajan Y-tunnus:</td><td><%- yTunnus %><br></td></tr>
-      <tr><td>Tarjoajan yhteyshenkilö:</td><td><%- contactName %></td></tr>
-      <tr><td>Käyntiosoite:</td><td><%- address.street %></td></tr>
-      <tr><td>Postinumero:</td><td><%- address.zip %><br></td></tr>
-      <tr><td>Postitoimipaikka:</td><td><%- address.city %><br></td></tr>
-      <tr><td>Sähköpostiosoite:</td><td><%- emailAddress %><br></td></tr>
-      <tr><td>Puhelinnumero:</td><td><%- phoneNumber %></td></tr>
-      <tr><td>Asiointikieli:</td><td><%- language %></td></tr>
-      <tr><td>Maa:</td><td><%- address.country %></td></tr>
+      <tr><td>Tarjoaja Yritys / toiminimi:</td><td><%- provider.name %></td></tr>
+      <tr><td>Tarjoajan Y-tunnus:</td><td><%- provider.yTunnus %><br></td></tr>
+      <tr><td>Tarjoajan yhteyshenkilö:</td><td><%- provider.contactName %></td></tr>
+      <tr><td>Käyntiosoite:</td><td><%- provider.address.street %></td></tr>
+      <tr><td>Postinumero:</td><td><%- provider.address.zip %><br></td></tr>
+      <tr><td>Postitoimipaikka:</td><td><%- provider.address.city %><br></td></tr>
+      <tr><td>Sähköpostiosoite:</td><td><%- provider.emailAddress %><br></td></tr>
+      <tr><td>Puhelinnumero:</td><td><%- provider.phoneNumber %></td></tr>
+      <tr><td>Asiointikieli:</td><td><%- provider.language %></td></tr>
+      <tr><td>Maa:</td><td><%- provider.address.country %></td></tr>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
       <tr>
         <td>Tarjoajan maksamat paikat ja tavat:</td>
@@ -47,13 +47,13 @@
       </tr>
       <tr><td>&nbsp;</td><td>&nbsp;<%- totalLocations %> €</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr>
       <% if (useEInvoice) { %>
-        <tr><td>Verkkolaskuosoite: </td><td><%- eInvoice.address %><br></td></tr>
-        <tr><td>Välittäjätunnus: </td><td><%- eInvoice.operator %><br></td></tr>
+        <tr><td>Verkkolaskuosoite: </td><td><%- provider.eInvoice.address %><br></td></tr>
+        <tr><td>Välittäjätunnus: </td><td><%- provider.eInvoice.operator %><br></td></tr>
       <% } else { %>
-        <tr><td>Laskutusosoite:</td><td><%- billing.street %><br> <br></td></tr>
-        <tr><td>Postinumero:</td><td><%- billing.zip %><br></td></tr>
-        <tr><td>Postitoimipaikka:</td><td><%- billing.city %><br></td></tr>
-        <tr><td>Laskulle haluttava teksti: </td><td><%- invoiceText %></td></tr>
+        <tr><td>Laskutusosoite:</td><td><%- provider.billing.street %><br> <br></td></tr>
+        <tr><td>Postinumero:</td><td><%- provider.billing.zip %><br></td></tr>
+        <tr><td>Postitoimipaikka:</td><td><%- provider.billing.city %><br></td></tr>
+        <tr><td>Laskulle haluttava teksti: </td><td><%- provider.invoiceText %></td></tr>
       <% } %>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
     </tbody>

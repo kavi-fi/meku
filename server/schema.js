@@ -202,7 +202,6 @@ ProviderSchema.statics.getForYearlyBilling = function(callback) {
       })
 
       if (_.any(p.locations, { isPayer: false })) {
-        p.locations = _.filter(p.locations, { isPayer: false })
         providersForBilling.push(p)
       }
     })

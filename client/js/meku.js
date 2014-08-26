@@ -244,10 +244,6 @@ function switchLatestDeferred() {
   }
 }
 
-function notIn(arr, el) {
-  return _.indexOf(arr, el) === -1
-}
-
 function parseUserCookie() {
   var cookie = $.cookie('user')
   if (!cookie) return null

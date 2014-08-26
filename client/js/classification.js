@@ -324,8 +324,8 @@ function classificationFormUtils() {
         minimumInputLength: 1,
         formatInputTooShort: '',
         formatNoMatches: '',
-        formatResult: formatSelect2Item,
-        formatSelection: formatSelect2Item,
+        formatResult: formatDropdownItem,
+        formatSelection: function(item) { return item.id },
         createSearchChoice: function(term) { return { id: term.replace(/,/g, '&#44;'), text: term, isNew: true } },
         initSelection: function(e, callback) { callback([]) },
         query: function(query) {
@@ -345,13 +345,10 @@ function classificationFormUtils() {
       return this
     }
 
-    function formatSelect2Item(item) {
-      if (item.role) {
-        var icon = 'select2-dropdown-result-icon ' + (item.role == 'user' ? 'fa fa-male' : 'fa fa-university')
-        return $('<div>').text(item.name+' <'+item.id+'>').prepend($('<i>').addClass(icon))
-      } else {
-        return item.id
-      }
+    function formatDropdownItem(item) {
+      if (!item.role) return item.id
+      var icon = 'select2-dropdown-result-icon ' + (item.role == 'user' ? 'fa fa-male' : 'fa fa-university')
+      return $('<div>').text(item.name+' <'+item.id+'>').prepend($('<i>').addClass(icon))
     }
 
     function update(program, classification) {

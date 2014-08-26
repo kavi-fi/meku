@@ -587,14 +587,14 @@ app.get('/emails/search', function(req, res, next) {
   })
 
   function loadUsers(callback) {
-    var q = { $or: [ { name: terms }, { 'emails.0': terms } ], 'emails.0': { $exists: true } }
+    var q = { $or: [ { name: terms }, { 'emails.0': terms } ], 'emails.0': { $exists: true }, deleted: { $ne:true } }
     User.find(q, { name: 1, emails:1 }).sort('name').limit(25).lean().exec(function(err, res) {
       if (err) return callback(err)
       callback(null, res.map(function(u) { return { id: u.emails[0], name: u.name, role: 'user' } }))
     })
   }
   function loadAccounts(callback) {
-    var q = { $or: [ { name: terms }, { 'emailAddresses.0': terms } ], 'emailAddresses.0': { $exists: true }, roles: 'Subscriber' }
+    var q = { $or: [ { name: terms }, { 'emailAddresses.0': terms } ], 'emailAddresses.0': { $exists: true }, roles: 'Subscriber', deleted: { $ne:true } }
     Account.find(q, { name: 1, emailAddresses: 1 }).sort('name').limit(25).lean().exec(function(err, res) {
       if (err) return callback(err)
       callback(null, res.map(function(a) { return { id: a.emailAddresses[0], name: a.name, role: 'account' } }))

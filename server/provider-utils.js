@@ -3,9 +3,9 @@ var _ = require('lodash')
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 
-exports.registrationEmail = function (data) {
-  function emailHtml(data) {
-    var allLocations = data.locations.map(function(l) {
+exports.registrationEmail = function (provider) {
+  function emailHtml(provider) {
+    var allLocations = provider.locations.map(function(l) {
       return {
         name: l.name,
         isPayer: l.isPayer,
@@ -15,19 +15,20 @@ exports.registrationEmail = function (data) {
     })
     var locations = _.select(allLocations, function(l) { return !l.isPayer })
     var payerLocations = _.select(allLocations, function(l) { return l.isPayer })
-    var vars = _.merge({}, data, {
+    var vars = {
       header: 'Ilmoittautuminen tarjoajaksi',
-      emailAddress: data.emailAddresses.join(', '),
+      emailAddress: provider.emailAddresses.join(', '),
       locations: locations,
-      useEInvoice: data.billingPreference == 'eInvoice',
-      eInvoice: data.eInvoice,
-      billing: data.billingPreference == 'address' ? data.billing.address : data.address,
-      invoiceText: data.billing.invoiceText,
+      useEInvoice: provider.billingPreference == 'eInvoice',
+      eInvoice: provider.eInvoice,
+      billing: provider.billingPreference == 'address' ? provider.billing.address : provider.address,
+      invoiceText: provider.billing.invoiceText,
       payerLocations: payerLocations,
       totalProvider: totalPrice(locations),
       totalLocations: totalPrice(payerLocations),
-      providingTypePrices: providingTypes()
-    })
+      providingTypePrices: providingTypes(),
+      provider: provider
+    }
 
     var tpl = readTemplateSync('registration-email.tpl.html')
     var html =  _.template(tpl, vars)
@@ -36,23 +37,23 @@ exports.registrationEmail = function (data) {
   }
 
   return {
-    recipients: data.emailAddresses,
-    subject: 'Tarjoajarekisteriin ilmoittautuminen (' + data.name + ')',
+    recipients: provider.emailAddresses,
+    subject: 'Tarjoajarekisteriin ilmoittautuminen (' + provider.name + ')',
     from: 'noreply@kavi.fi',
     replyto: 'mirja.kosonen@kavi.fi',
-    body: emailHtml(data)
+    body: emailHtml(provider)
   }
 }
 
-exports.registrationEmailProviderLocation = function (data) {
-  function emailHtml(data) {
+exports.registrationEmailProviderLocation = function (location) {
+  function emailHtml(location) {
     var vars = {
       header: 'Ilmoittautuminen tarjoajaksi',
-      emailAddress: data.emailAddresses.join(', '),
-      providingTypes: data.providingType.map(enums.providingTypeName),
+      emailAddress: location.emailAddresses.join(', '),
+      providingTypes: location.providingType.map(enums.providingTypeName),
       providingTypePrices: providingTypes(),
-      total: providingTypeTotalPrice(data.providingType),
-      provider: data
+      total: providingTypeTotalPrice(location.providingType),
+      location: location
     }
 
     var tpl = readTemplateSync('provider-location-registration-email.tpl.html')
@@ -62,11 +63,11 @@ exports.registrationEmailProviderLocation = function (data) {
   }
 
   return {
-    recipients: data.emailAddresses,
-    subject: 'Tarjoajarekisteriin ilmoittautuminen (' + data.name + ')',
+    recipients: location.emailAddresses,
+    subject: 'Tarjoajarekisteriin ilmoittautuminen (' + location.name + ')',
     from: 'noreply@kavi.fi',
     replyto: 'mirja.kosonen@kavi.fi',
-    body: emailHtml(data)
+    body: emailHtml(location)
   }
 }
 

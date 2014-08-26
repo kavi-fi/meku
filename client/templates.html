@@ -325,12 +325,13 @@
   <form class="form">
     <div class="buttons">
       <button name="save" type="submit" disabled class="button">Tallenna</button>
-      <button name="remove" type="button" class="button">Poista</button>
+      <button name="remove" type="button" class="button modify-only">Poista</button>
       <span class="save-success hidden">Tiedot tallennettu</span>
     </div>
 
     <label>Toiminimi <input type="text" name="name" required></label>
     <label>Y-tunnus <input type="text" name="yTunnus" required></label>
+    <label class="select2-float-right">Asiointikieli <input type="text" name="language"></label>
 
     <div class="address">
       <label>Lähiosoite <input type="text" name="address.street" required></label>
@@ -343,7 +344,7 @@
 
     <label>Puhelinnumero <input type="text" name="phoneNumber" required></label>
 
-    <label class="emails">Sähköposti <input type="text" name="emailAddresses" class="invalid"></label>
+    <label class="emails select2-float-right">Sähköposti <input type="text" name="emailAddresses" class="invalid"></label>
 
     <div class="billing-extra">
       <label class="full"><input type="checkbox" name="billing-extra"> Laskutus eri osoitteeseen tai verkkolaskulla</label>
@@ -365,7 +366,6 @@
       </div>
     </div>
 
-    <label class="top">Laskutuskieli <input type="text" name="billing.language"></label>
     <label class="double">Laskulle haluttava teksti <textarea name="billing.invoiceText"></textarea></label>
   </form>
 
@@ -406,7 +406,7 @@
 
     <label>Yhteyshenkilö <input type="text" name="contactName"></label>
     <label>Puhelinnumero <input type="text" name="phoneNumber" required></label>
-    <label class="emails">Sähköposti <input type="text" name="emailAddresses" class="invalid"></label>
+    <label class="emails select2-float-right">Sähköposti <input type="text" name="emailAddresses" class="invalid"></label>
 
     <label>WWW-osoite <input type="text" name="url"></label>
     <label>Tarjoamistapa <input type="text" name="providingType" required class="required invalid"></label>

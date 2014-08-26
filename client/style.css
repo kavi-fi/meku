@@ -687,7 +687,7 @@ textarea.invalid:disabled,
 #subscriber-management-page button[name=new-subscriber] { float: right; }
 
 #provider-page .controls button[name=new-provider] { float: right; }
-#provider-page .emails { float: right; margin-right: 34px; }
+#provider-page .select2-float-right { float: right; margin-right: 34px; }
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; }

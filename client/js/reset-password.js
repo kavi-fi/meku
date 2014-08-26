@@ -34,6 +34,7 @@ function resetPassword() {
   })
 
   $button.click(function() {
+    $button.prop('disabled', true)
     $.post('/reset-password', JSON.stringify({ resetHash: resetHash, password: $password.val() }))
       .done(function() {
         window.location = '/'

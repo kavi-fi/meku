@@ -287,8 +287,10 @@ function userManagementPage() {
   function validateUsername($username, $detailTemplate) {
     $username.get(0).setCustomValidity('Checking username')
     $username.addClass('touched')
-    var username = $username.val().trim()
-    if (username) {
+    var username = $username.val()
+    if (!utils.isValidUsername(username)) {
+      $username.get(0).setCustomValidity('Invalid username')
+    } else {
       $username.addClass('pending')
       usernameValidator(username, $username, $detailTemplate)
     }

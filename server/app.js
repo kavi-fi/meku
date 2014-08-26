@@ -537,7 +537,7 @@ app.get('/users/exists/:username', requireRole('root'), function(req, res, next)
 
 app.post('/users/new', requireRole('root'), function(req, res, next) {
   var hasRequiredFields = (req.body.username != '' && req.body.emails[0].length > 0 && req.body.name != '')
-  if (!hasRequiredFields) return res.send(400)
+  if (!hasRequiredFields || !utils.isValidUsername(req.body.username)) return res.send(400)
   new User(req.body).save(function(err, user) {
     if (err) return next(err)
     createAndSaveHash(user, function(err) {

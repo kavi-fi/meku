@@ -32,6 +32,10 @@ utils.seasonEpisodeCode = function(p) {
   function pad(i) { return i < 10 ? '0' + i : ''+i }
 }
 
+utils.isValidUsername = function(txt) {
+  return !!txt && /^[0-9A-Za-z\u00C0-\u017F_]+$/.test(txt)
+}
+
 utils.isValidDuration = function(txt) {
   var m = /(?:(\d+)?:)(\d+):(\d+)$/.exec(txt)
   if (m) {

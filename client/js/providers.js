@@ -121,6 +121,10 @@ function providerPage() {
     })
   })
 
+  function findSelected() {
+    return $allProviders.find('.result.selected')
+  }
+
   function fetchNewProviders(begin, end) {
     begin = moment(begin).format(format)
     end = moment(end).format(format)
@@ -410,7 +414,7 @@ function providerPage() {
       closeLocationDetails()
       if (!wasSelected) {
         var location = $this.data('location')
-        var provider = $providers.find('.result.selected').data('provider')
+        var provider = findSelected().data('provider')
         var $locationDetails = renderLocationDetails(location)
 
         if (hasRole('root')) $locationDetails.append(changeLog(location).render())
@@ -437,7 +441,7 @@ function providerPage() {
     $locations.on('click', 'button[name=remove]', function() {
       var $selected = $locations.find('.selected')
       var location = $selected.data('location')
-      var provider = $providers.find('.result.selected').data('provider')
+      var provider = findSelected().data('provider')
       showDialog($('#templates').find('.remove-location-dialog').clone()
         .find('.location-name').text(location.name).end()
         .find('button[name=remove]').click(removeLocation).end()
@@ -475,7 +479,7 @@ function providerPage() {
     function toggleActiveButton(newState) {
       var $selected = $locations.find('.location-row.selected')
       var location = $selected.data('location')
-      var provider = $providers.find('.result.selected').data('provider')
+      var provider = findSelected().data('provider')
       var data = JSON.stringify({ active: newState === 'on' })
       $.ajax('/providers/' + provider._id + '/locations/' + location._id, { type: 'PUT', data: data}).done(function(p) {
         $providers.find('[data-id='+provider._id+']').data('provider', p)

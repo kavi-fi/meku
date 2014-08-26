@@ -122,7 +122,9 @@ function subscriberManagementPage() {
         billingPreference: $form.find('input[name=billing-extra]').prop('checked')
           ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
-
+      if (hasRole('root')) {
+        subscriberData.apiToken = findInput('apiToken').val()
+      }
       submitCallback(subscriberData)
 
       function findInput(name) {
@@ -157,6 +159,13 @@ function subscriberManagementPage() {
       function validateEmail(email) {
         return new RegExp('.+@.+\\..+').test(email)
       }
+    })
+
+    $form.find('.apiToken a').click(function(e) {
+      e.preventDefault()
+      $.get('/apiToken').done(function(data) {
+        $form.find('.apiToken input').val(data.apiToken).addClass('touched').trigger('validate').end()
+      })
     })
 
     $subscriberDetails.find('button[name=remove]').click(function() {
@@ -240,8 +249,8 @@ function subscriberManagementPage() {
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
 
     populateClassifiers(subscriber ? subscriber.users : [])
-
-    toggleBillingExtra($subscriberDetails)
+    toggleBillingExtra()
+    apiToken()
 
     return $subscriberDetails
 
@@ -284,6 +293,10 @@ function subscriberManagementPage() {
         $addressInputs.prop('disabled', type === 'eInvoice')
         $eInvoiceInputs.prop('disabled', type === 'address')
       }
+    }
+
+    function apiToken() {
+      if (!hasRole('root')) $subscriberDetails.find('.apiToken').remove()
     }
   }
 

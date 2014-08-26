@@ -458,6 +458,7 @@ app.get('/series/search', function(req, res, next) {
 })
 
 app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
   Account.findById(req.params.id, function(err, account) {
     if (err) return next(err)
     updateAndLogChanges(account, req.body, req.user, respond(res, next))
@@ -465,6 +466,7 @@ app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
 })
 
 app.post('/accounts', requireRole('kavi'), function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
   new Account(req.body).save(function(err, account) {
     if (err) return next(err)
     logCreateOperation(req.user, account)
@@ -572,6 +574,13 @@ app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
       return _.merge(acc, utils.keyValue(user.username, user.name))
     }, {})
     res.send(usernamesAsKeys)
+  })
+})
+
+app.get('/apiToken', requireRole('root'), function(req, res, next) {
+  bcrypt.genSalt(1, function(err, s) {
+    if (err) return next(err)
+    res.send({ apiToken: new Buffer(s, 'base64').toString('hex') })
   })
 })
 

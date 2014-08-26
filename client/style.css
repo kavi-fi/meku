@@ -683,6 +683,8 @@ textarea.invalid:disabled,
 #subscriber-management-page label.full { width: 830px; }
 #subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
 #subscriber-management-page button[name=new-subscriber] { float: right; }
+#subscriber-management-page .apiToken > div { font-weight: normal; }
+#subscriber-management-page .apiToken input { width: 500px; margin-right: 20px; }
 
 .change-log a { color: #00BB88; cursor: pointer; margin-top: 10px; display: inline-block; }
 .change-log span, label, pre { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }

@@ -116,6 +116,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function configureEventBinding() {
     $form.find('textarea').autosize()
     $form.on('submit', function(e) {
+      $form.find('button[name=register]').prop('disabled', true)
       e.preventDefault()
       $.post('/programs/' + program._id + '/register', function(savedProgram) {
         $form.hide()
@@ -129,6 +130,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       })
     })
     $form.find('button[name=save]').on('click', function(e) {
+      $form.find('button[name=save]').prop('disabled', true)
       e.preventDefault()
       $.post('/programs/' + program._id, JSON.stringify(rootModifiedFields)).done(function(program) {
         $('#classification-page').trigger('show', [program._id, 'edit', selectedClassification._id]).show()

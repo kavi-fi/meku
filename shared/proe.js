@@ -18,7 +18,7 @@ function createProe(dateRange, accountRows) {
         return billingRow(id, r)
       })
     ]
-  }).flatten().compact().join('\n')
+  }).flatten().compact().join('\r\n')
 
   function accountHeaderRow(id, account) {
     var address = account.billingPreference == 'address' ? utils.getProperty(account, 'billing.address') : account.address

@@ -48,6 +48,7 @@ function internalSearchPage() {
 
   $drafts.on('click', '.draft button', function(e) {
     e.stopPropagation()
+    $(this).prop('disabled', true)
     var $draft = $(this).parents('.draft')
     $.ajax({url: '/programs/drafts/' + $draft.data('id'), type: 'delete'}).done(function(p) {
       $draft.remove()
@@ -61,31 +62,36 @@ function internalSearchPage() {
     toggleDetailButtons($(this), program)
   })
 
-  $newClassificationButton.click(function () {
+  $newClassificationButton.click(function() {
+    $newClassificationButton.prop('disabled', true)
     var programType = $newClassificationType.select2('val')
     $.post('/programs/new', JSON.stringify({ programType: programType })).done(function(program) {
       showClassificationPage(program._id)
+      $newClassificationButton.prop('disabled', false)
     })
   })
 
-  $results.on('click', 'button.reclassify', function(e) {
+  $results.on('click', 'button.reclassify', function() {
+    $(this).prop('disabled', true)
     var id = $(this).closest('.program-box').data('id')
     $.post('/programs/' + id + '/reclassification').done(function(program) {
       showClassificationPage(program._id)
     })
   })
 
-  $results.on('click', 'button.continue-classification', function(e) {
+  $results.on('click', 'button.continue-classification', function() {
+    $(this).prop('disabled', true)
     var id = $(this).closest('.program-box').data('id')
     showClassificationPage(id)
   })
 
-  $results.on('click', 'button.categorize', function(e) {
+  $results.on('click', 'button.categorize', function() {
+    $(this).prop('disabled', true)
     showCategorizationForm($(this).closest('.program-box'))
-    $(this).hide()
   })
 
   $results.on('click', 'button.edit', function() {
+    $(this).prop('disabled', true)
     var $programBox = $(this).closest('.program-box')
     showClassificationEditPage($programBox.data('id'), $programBox.find('.classification.selected').data('id'))
   })
@@ -96,8 +102,8 @@ function internalSearchPage() {
     var program = $row.data('program')
     showDialog($('#templates').find('.remove-program-dialog').clone()
       .find('.program-name').text(program.name).end()
-      .find('button[name=remove]').click(removeProgram).end()
-      .find('button[name=cancel]').click(closeDialog).end())
+      .find('button[name=remove]').one('click', removeProgram).end()
+      .find('button[name=cancel]').one('click', closeDialog).end())
 
     function removeProgram() {
       $.ajax('/programs/' + program._id, { type: 'delete' }).done(function() {
@@ -122,8 +128,7 @@ function internalSearchPage() {
         var $date = $('<span>', {class: 'creationDate'}).text(utils.asDateTime(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
         var $remove = $('<div>', {class: 'remove'}).append($('<button>', { class: 'button' }).text('Poista'))
-        var $draft = $('<div>', {class: 'result draft'})
-          .data('id', draft._id).append($date).append($link).append($remove)
+        var $draft = $('<div>', {class: 'result draft'}).data('id', draft._id).append($date).append($link).append($remove)
         $drafts.find('> div').append($draft)
       })
       $drafts.toggleClass('hide', drafts.length === 0)
@@ -253,8 +258,8 @@ function internalSearchPage() {
     })
 
     $categorySaveButton.click(function() {
+      $categorySaveButton.prop('disabled', true)
       var categoryData = { programType: $categorySelection.select2('val') }
-
       if (isTvEpisode()) {
         var seriesData = $series.select2('data')
         var series = select2OptionToIdNamePair(seriesData)
@@ -270,7 +275,6 @@ function internalSearchPage() {
           }
         }
       }
-
       $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
         searchPageApi.programDataUpdated(program)
       })

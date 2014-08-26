@@ -7,7 +7,7 @@ var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var stream = require('stream')
 var _ = require('lodash')
-var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
+var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'meku' })
 
 /*
  Dependencies:

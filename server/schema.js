@@ -155,7 +155,6 @@ var providerLocation = {
   contactName: String,
   phoneNumber: String,
   emailAddresses: [String],
-  language: String,
   providingType: [String],
   registrationDate: Date,
   deleted: Boolean,
@@ -173,7 +172,7 @@ var ProviderSchema = new Schema({
   yTunnus: String,
   name: String,
   address: { street: String, city: String, zip: String, country: String },
-  billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
+  billing: { address: address, invoiceText: String },
   eInvoice: { address:String, operator:String },
   billingPreference: String, // '' || 'address' || 'eInvoice'
   contactName: String,

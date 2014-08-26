@@ -363,7 +363,7 @@ function accounts(callback) {
 
   function providers(callback) {
     var q = 'select id, name, customer_type, sic_code,' +
-      ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
+      ' bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate, provider_status, customer_lang' +
       ' from accounts where customer_type LIKE "%Provider%" and deleted != "1"'
@@ -387,7 +387,7 @@ function accounts(callback) {
         registrationDate: active ? new Date(0) : undefined,
         address: address,
         language: langCode(trim(row.customer_lang)),
-        billing: { address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text) },
+        billing: { address: billingAddress, invoiceText: trim(row.bills_text) },
         eInvoice: eInvoice,
         billingPreference: (!!eInvoice && 'eInvoice') || (!!billingAddress && 'address') || '',
         contactName: row.ownership,
@@ -401,7 +401,7 @@ function accounts(callback) {
   }
 
   function locations(callback) {
-    var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, website, bills_lang, bills_text, providing_type, ' +
+    var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, website, bills_text, providing_type, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate, pegi, k18, date_entered' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
@@ -422,7 +422,6 @@ function accounts(callback) {
         active: active,
         registrationDate: registrationDate,
         deleted: false,
-        language: langCode(trim(row.customer_lang)),
         adultContent: row.k18,
         gamesWithoutPegi: row.pegi,
         url: row.website || undefined

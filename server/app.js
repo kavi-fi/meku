@@ -497,30 +497,22 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, provider) {
     if (err) return next(err)
     var isRegistration = !provider.registrationDate
-    provider.active = !provider.active
-    if (isRegistration) {
-      var now = new Date()
-      provider.registrationDate = now
-      _.select(provider.locations, function(l) {
-        return !l.deleted && l.active
-      }).forEach(function(l) { l.registrationDate = now })
-    }
-    saveChangeLogEntry(req.user, provider, 'update')
-    provider.save(function(err, saved) {
+    var updates = _.merge({}, {active: !provider.active}, isRegistration ? {registrationDate: new Date()} : {})
+    updateAndLogChanges(provider, updates, req.user, function(err, saved) {
       if (isRegistration) {
-        var provider = saved.toObject()
-        sendEmail(providers.registrationEmail(provider), logError)
-        sendProviderLocationEmails(provider)
-        return res.send(saved)
+        ProviderLocation.find({provider: provider._id, deleted: false, active: true }).sort('name').lean().exec(function(err, locations) {
+          if (err) return next(err)
+          sendEmail(providers.registrationEmail(_.merge({}, provider.toObject(), {locations: locations})), logError)
+          sendProviderLocationEmails(locations, provider.toObject())
+          return res.send(saved)
+        })
       }
       res.send(saved)
     })
   })
 
-  function sendProviderLocationEmails(provider) {
-    _.select(provider.locations, function(l) {
-      return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
-    }).forEach(function(l) {
+  function sendProviderLocationEmails(locations, provider) {
+    _.select(locations, function(l) { return l.isPayer && l.emailAddresses.length > 0 }).forEach(function(l) {
       sendEmail(providers.registrationEmailProviderLocation(_.merge({}, l, {provider: provider})), logError)
     })
   }

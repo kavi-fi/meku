@@ -609,6 +609,26 @@ app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
   })
 })
 
+app.post('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.pid, function(err, provider) {
+    if (err) return next(err)
+    var location = provider.locations.id(req.params.lid)
+    var isLocationRegistration = provider.registrationDate && !location.active && !location.registrationDate
+    if (isLocationRegistration) {
+      // mark registered and send order confirmation
+      location.registrationDate = new Date()
+    }
+    location.active = true
+    //saveChangeLogEntry(req.user, location, 'upda')
+    provider.save(function(err, saved) {
+      if (isLocationRegistration) {
+        sendEmail(providers.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()})), logError)
+      }
+      res.send(saved)
+    })
+  })
+})
+
 app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.pid, function(err, provider) {
     // TODO: Change log
@@ -627,6 +647,7 @@ app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, nex
     res.send(_.last(p.locations))
   })
 })
+
 
 app.delete('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.pid, function(err, provider) {

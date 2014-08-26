@@ -42,9 +42,7 @@ function subscriberManagementPage() {
 
   $page.find('button[name=new-subscriber]').on('click', function() {
     var $newSubscriberForm = renderSubscriberDetails()
-
     $newSubscriberForm.find('.modify-only').remove()
-
     bindEventHandlers($newSubscriberForm, function(subscriberData) {
       $.post('/accounts/', JSON.stringify(subscriberData), function(subscriber) {
         $subscribers.find('.result.selected').data('subscriber', subscriber)
@@ -90,7 +88,7 @@ function subscriberManagementPage() {
 
     $form.submit(function(event) {
       event.preventDefault()
-
+      $form.find('button[name=save]').prop('disabled', true)
       var subscriberData = {
         roles: findInput('roles').filter(':checked').map(function() {
           return $(this).val()
@@ -166,8 +164,8 @@ function subscriberManagementPage() {
       var subscriber = $selected.data('subscriber')
       showDialog($('#templates').find('.remove-subscriber-dialog').clone()
         .find('.subscriber-name').text(subscriber.name).end()
-        .find('button[name=remove]').click(removeSubscriber).end()
-        .find('button[name=cancel]').click(closeDialog).end())
+        .find('button[name=remove]').one('click', removeSubscriber).end()
+        .find('button[name=cancel]').one('click', closeDialog).end())
 
       function removeSubscriber() {
         $.ajax('/accounts/' + subscriber._id, { type: 'DELETE' }).done(function() {

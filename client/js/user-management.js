@@ -2,7 +2,6 @@ function userManagementPage() {
   var $page = $('#user-management-page')
   var $userList = $page.find('.user-list')
   var $userNameQuery = $page.find('#user-name-query')
-
   var $newUserType = $page.find('.new-user input[name="new-user-type"]')
 
   $.get('/environment', function(data) {
@@ -46,7 +45,6 @@ function userManagementPage() {
 
   $page.find('.new-user button').on('click', function() {
     var $newUserForm = renderNewUserForm($newUserType.select2('val'))
-
     closeDetails()
     $userList.addClass('selected').prepend($newUserForm)
     $newUserForm.slideDown()
@@ -54,7 +52,6 @@ function userManagementPage() {
 
   $userNameQuery.on('input', function() {
     var searchString = $(this).val().toLowerCase()
-
     $userList.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
       if (_.contains(name, searchString)) {
@@ -114,9 +111,9 @@ function userManagementPage() {
 
   function renderNewUserForm(role) {
     var $detailTemplate = renderUserDetails(null, role)
-
     $detailTemplate.submit(function(event) {
       event.preventDefault()
+      $detailTemplate.find('button[type=submit]').prop('disabled', true)
 
       var $this = $(this)
       var userData = getUserData($this)
@@ -135,17 +132,15 @@ function userManagementPage() {
         closeDetails()
       })
     })
-
     return $detailTemplate
   }
 
   function renderExistingUserDetails(selectedUser) {
     var $detailTemplate = renderUserDetails(selectedUser)
-
     $detailTemplate.find('input[name=active]').prop('disabled', selectedUser.username === user.username)
-
     $detailTemplate.submit(function(event) {
       event.preventDefault()
+      $detailTemplate.find('button[type=submit]').prop('disabled', true)
 
       var $this = $(this)
       var userData = getUserData($this)
@@ -159,7 +154,6 @@ function userManagementPage() {
         closeDetails()
       })
     })
-
     return $detailTemplate
   }
 
@@ -194,11 +188,11 @@ function userManagementPage() {
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
       populate($detailTemplate, user)
-
       if (hasRole('root')) $detailTemplate.append(changeLog(user).render())
     }
 
     $detailTemplate.find('.active-toggle').on('click', function() {
+      $detailTemplate.find('.active-toggle').prop('disabled', true)
       var $selected = $userList.find('.result.selected')
       var active = $selected.next().find('.active-toggle').hasClass('inactive')
       $.post('/users/' + user._id, JSON.stringify({active: active}), function(updatedUser) {

@@ -241,12 +241,19 @@ function providerPage() {
   function toggleActiveButton(newState) {
     var $selected = $allProviders.find('.selected')
     var provider = $selected.data('provider')
-    $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(updatedProvider) {
-      if (isUnapproved(provider) && updatedProvider.active) {
+    $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(activation) {
+      if (activation.wasFirstActivation) {
         var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
-        $dialog.find('.email').text(updatedProvider.emailAddresses.join(', '))
+        $dialog.find('.without-email').toggle(activation.locationsWithoutEmail.length > 0)
+          .find('ul').html(activation.locationsWithoutEmail.map(function(l) {
+            return $('<li>').text(l.name)
+          }))
+        $dialog.find('.with-email').toggle(activation.locationsWithEmail.length > 0)
+          .find('ul').html(activation.locationsWithEmail.map(function(l) {
+            return $('<li>').text(l.name)
+          }))
         $dialog.find('.ok').on('click', function() {
-          $page.trigger('show', updatedProvider._id)
+          $page.trigger('show', provider._id)
           closeDialog($selected)
         })
         showDialog($dialog)

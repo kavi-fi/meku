@@ -496,7 +496,7 @@ function providerPage() {
       var location = $selected.data('location')
       var provider = findSelected().data('provider')
       var data = JSON.stringify({ active: newState === 'on' })
-      $.post('/providers/' + provider._id + '/locations/' + location._id + '/active').done(function(p) {
+      $.ajax('/providers/' + provider._id + '/locations/' + location._id + '/active', { type: 'PUT' }).done(function(p) {
         $providers.find('[data-id='+provider._id+']').data('provider', p)
         $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })).addClass('selected'))
       })

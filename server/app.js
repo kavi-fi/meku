@@ -624,7 +624,7 @@ app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
   })
 })
 
-app.post('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(req, res, next) {
+app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.pid, function(err, provider) {
     if (err) return next(err)
     var location = provider.locations.id(req.params.lid)

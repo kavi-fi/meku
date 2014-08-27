@@ -246,7 +246,7 @@ function providerPage() {
         var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
         $dialog.find('.email').text(updatedProvider.emailAddresses.join(', '))
         $dialog.find('.ok').on('click', function() {
-          $page.trigger('show', null)
+          $page.trigger('show', updatedProvider._id)
           closeDialog($selected)
         })
         showDialog($dialog)

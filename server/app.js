@@ -266,7 +266,7 @@ app.post('/programs/:id/register', function(req, res, next) {
               if (err) return next(err)
               sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, getHostname()), function(err) {
                 if (err) return next(err)
-                updateMetadataIndexes(program, function() {
+                updateMetadataIndexesForNewProgram(program, function() {
                   logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
                   return res.send(program)
                 })
@@ -276,6 +276,11 @@ app.post('/programs/:id/register', function(req, res, next) {
         })
       })
     })
+
+    function updateMetadataIndexesForNewProgram(program, callback) {
+      if (program.classifications.length > 1) return callback()
+      updateMetadataIndexes(program, callback)
+    }
 
     function populateSentRegistrationEmailAddresses(classification, program, callback) {
       if (classification.buyer) {

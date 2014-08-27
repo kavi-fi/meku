@@ -166,7 +166,7 @@ function internalSearchPage() {
       $detail.find('button.categorize').hide()
     } else {
       var head = p.classifications[0]
-      var canReclassify = !enums.isKHO(head.authorOrganization) && (hasRole('kavi') || (head.status != 'registered'))
+      var canReclassify = !enums.authorOrganizationIsKHO(head) && (hasRole('kavi') || (head.status != 'registered'))
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(!!canReclassify)
       $detail.find('button.categorize').hide()

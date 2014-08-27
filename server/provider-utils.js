@@ -22,12 +22,14 @@ exports.registrationEmail = function (provider) {
       useEInvoice: provider.billingPreference == 'eInvoice',
       eInvoice: provider.eInvoice,
       billing: provider.billingPreference == 'address' ? provider.billing.address : provider.address,
-      invoiceText: provider.billing.invoiceText,
+      invoiceText: provider.billing ? provider.billing.invoiceText : '',
       payerLocations: payerLocations,
       totalProvider: totalPrice(locations),
       totalLocations: totalPrice(payerLocations),
       providingTypePrices: providingTypes(),
-      provider: provider
+      provider: provider,
+      language: enums.billingLanguages[provider.language],
+      country: enums.countries[provider.address.country]
     }
 
     var tpl = readTemplateSync('registration-email.tpl.html')

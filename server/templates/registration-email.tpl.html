@@ -24,10 +24,10 @@
       <tr><td>Käyntiosoite:</td><td><%- provider.address.street %></td></tr>
       <tr><td>Postinumero:</td><td><%- provider.address.zip %><br></td></tr>
       <tr><td>Postitoimipaikka:</td><td><%- provider.address.city %><br></td></tr>
-      <tr><td>Sähköpostiosoite:</td><td><%- provider.emailAddress %><br></td></tr>
+      <tr><td>Sähköpostiosoite:</td><td><%- emailAddress %><br></td></tr>
       <tr><td>Puhelinnumero:</td><td><%- provider.phoneNumber %></td></tr>
-      <tr><td>Asiointikieli:</td><td><%- provider.language %></td></tr>
-      <tr><td>Maa:</td><td><%- provider.address.country %></td></tr>
+      <tr><td>Asiointikieli:</td><td><%- language %></td></tr>
+      <tr><td>Maa:</td><td><%- country %></td></tr>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
       <tr>
         <td>Tarjoajan maksamat paikat ja tavat:</td>
@@ -50,10 +50,12 @@
         <tr><td>Verkkolaskuosoite: </td><td><%- provider.eInvoice.address %><br></td></tr>
         <tr><td>Välittäjätunnus: </td><td><%- provider.eInvoice.operator %><br></td></tr>
       <% } else { %>
-        <tr><td>Laskutusosoite:</td><td><%- provider.billing.street %><br> <br></td></tr>
-        <tr><td>Postinumero:</td><td><%- provider.billing.zip %><br></td></tr>
-        <tr><td>Postitoimipaikka:</td><td><%- provider.billing.city %><br></td></tr>
-        <tr><td>Laskulle haluttava teksti: </td><td><%- provider.invoiceText %></td></tr>
+        <tr><td>Laskutusosoite:</td><td><%- billing.street %><br> <br></td></tr>
+        <tr><td>Postinumero:</td><td><%- billing.zip %><br></td></tr>
+        <tr><td>Postitoimipaikka:</td><td><%- billing.city %><br></td></tr>
+        <% if (invoiceText != '') { %>
+          <tr><td>Laskulle haluttava teksti: </td><td><%- invoiceText %></td></tr>
+        <% } %>
       <% } %>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
     </tbody>

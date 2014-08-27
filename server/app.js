@@ -507,15 +507,15 @@ app.get('/accounts/search', function(req, res, next) {
     q['users._id'] = req.user._id
   }
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
-  Account.find(q).sort('name').limit(50).lean().exec(respond(res, next))
+  Account.find(q, { _id:1, name:1 }).sort('name').limit(50).lean().exec(respond(res, next))
 })
 
-app.get('/accounts/:id', function(req, res, next) {
-  Account.findById(req.params.id).exec(function(err, account) {
+app.get('/accounts/:id/emailAddresses', function(req, res, next) {
+  Account.findById(req.params.id, { emailAddresses: 1, users: 1 }).exec(function(err, account) {
     if (err) return next(err)
     if (!account) return res.send(404)
     if (!utils.hasRole(req.user, 'kavi') && !account.users.id(req.user._id)) return res.send(400)
-    res.send(account)
+    res.send({ _id: account._id, emailAddresses: account.emailAddresses })
   })
 })
 

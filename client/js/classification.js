@@ -360,7 +360,7 @@ function classificationFormUtils() {
     function update(program, classification) {
       if (shouldUpdateBuyer(classification)) {
         currentBuyerId = classification.buyer._id
-        $.get('/accounts/' + currentBuyerId).done(function(account) {
+        $.get('/accounts/' + currentBuyerId + '/emailAddresses').done(function(account) {
           updateEmails('buyer', account.emailAddresses)
         })
       }

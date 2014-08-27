@@ -251,6 +251,7 @@ function classifications(callback) {
 
             account = _(provider).omit('sequenceId', '_id').merge({ roles: ['Subscriber'] }).valueOf()
             new schema.Account(account).save(function(err, newAccount) {
+              accountMap[c.provider_id] = newAccount.toObject()
               if (err) return callback(err)
               return setBuyerAndBilling(newAccount)
             })

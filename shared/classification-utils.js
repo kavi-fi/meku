@@ -80,8 +80,6 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   }
 
   function generateData() {
-    var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
-    var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
     var classificationSummary = summary(classification)
     return {
       date: dateFormat(classification.registrationDate ? new Date(classification.registrationDate) : new Date()),
@@ -91,11 +89,11 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       year: program.year || '',
       classification: classificationText(classificationSummary),
       classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
-      link: (user.role == 'kavi') ? linkKavi : linkOther,
       publicComments: classification.publicComments || 'ei määritelty.',
-      authorEmail: user.email,
       classifier: classifierName(),
       reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
+      extraInfoLink: extraInfoLink(),
+      appendixLink: appendixLink(),
       previous: previous(),
       icons: iconHtml(classificationSummary, hostName)
     }
@@ -104,26 +102,42 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function generateText() {
     var reclassification = isReclassification(program, classification)
     return '<div style="text-align: right; margin-top: 8px;"><img src="'+hostName+'/images/logo.png" /></div>' +
-      "<p><%- date %><br/><%- buyer %></p><p>" +
-      (reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
-      '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%= nameLink %>. <%- classification %>' +
+      "<p><%- date %><br/><%- buyer %></p>" +
+      '<p>'+(reclassification ? "Ilmoitus kuvaohjelman uudelleenluokittelusta" : "Ilmoitus kuvaohjelman luokittelusta") + "</p>" +
+      '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%= nameLink %>. <%- classification %></p>' +
       '<%= icons %>' +
-      (reclassification ? ' Kuvaohjelmaluokittelija oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
+      '<p>'+(reclassification ? ' <%- previous.author %> oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
       ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
-      ((utils.hasRole(user, 'kavi')) ? '<p>Lisätietoja erityisasiantuntija: <a href="mailto:<%- authorEmail %>"><%- authorEmail %></a></p>' : '') +
-      '<p>Liitteet:<br/><a href="<%- link.url %>"><%- link.name %></a></p>' +
+      '<%= extraInfoLink %>' +
+      '<%= appendixLink %>' +
       '<p>Kansallinen audiovisuaalinen instituutti (KAVI)<br/>' +
       'Mediakasvatus- ja kuvaohjelmayksikkö</p>'
   }
 
   function classifierName() {
-    if (utils.hasRole(user, 'kavi')) return "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö "
+    if (enums.authorOrganizationIsKHO(classification)) return 'Korkein hallinto-oikeus'
+    if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return 'Kuvaohjelmalautakunta'
+    if (utils.hasRole(user, 'kavi')) return "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö"
     return _([user.employerName, user.name]).compact().join(', ')
   }
 
   function programLink() {
     var link = hostName + '/public.html#haku/'+program.sequenceId+'//'+program._id
     return '<a href="'+link+'">'+programName()+'</a>'
+  }
+
+  function extraInfoLink() {
+    if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification) || enums.authorOrganizationIsKHO(classification)) return ''
+    if (utils.hasRole(user, 'kavi')) return '<p>Lisätietoja: <a href="mailto:' + user.email + '">' + user.email + '</a></p>'
+    return ''
+  }
+
+  function appendixLink() {
+    if (enums.authorOrganizationIsKHO(classification)) return ''
+    var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
+    var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
+    var link = (user.role == 'kavi') ? linkKavi : linkOther
+    return '<p>Liitteet:<br/><a href="' + link.url + '">' + link.name + '</a></p>'
   }
 
   function programName() {
@@ -139,6 +153,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     var previous = previousClassification()
     if (!previous) return {}
     return {
+      author: previousClassificationAuthor(previous),
       criteriaText: previousClassificationText(summary(previous)),
       date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : 'aiemmin'
     }
@@ -152,6 +167,13 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     } else {
       return program.classifications[index + 1]
     }
+  }
+
+  function previousClassificationAuthor(classification) {
+    if (enums.authorOrganizationIsKHO(classification)) return 'Korkein hallinto-oikeus'
+    if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return 'Kuvaohjelmalautakunta'
+    return 'Kuvaohjelmaluokittelija'
+
   }
 
   function classificationText(summary) {

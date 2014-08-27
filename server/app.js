@@ -497,10 +497,13 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, provider) {
     if (err) return next(err)
     var isFirstActivation = !provider.registrationDate
-    provider.active = !provider.active
+    var newActive = !provider.active
+    var updates = {active: {old: provider.active, new: newActive}}
+    provider.active = newActive
     if (isFirstActivation) {
       var now = new Date()
       provider.registrationDate = now
+      updates.registrationDate = {old: undefined, new: now}
       _.select(provider.locations, function(l) {
         return !l.deleted && l.active
       }).forEach(function(l) {
@@ -509,7 +512,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
         saveChangeLogEntry(req.user, l, 'update', {targetCollection: 'providerlocations', updates: updates})
       })
     }
-    saveChangeLogEntry(req.user, provider, 'update')
+    saveChangeLogEntry(req.user, provider, 'update', {updates: updates})
     provider.save(function(err, saved) {
       if (isFirstActivation) {
         var provider = saved.toObject()

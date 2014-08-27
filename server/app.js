@@ -496,18 +496,22 @@ app.post('/providers', requireRole('kavi'), function(req, res, next) {
 app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, provider) {
     if (err) return next(err)
-    var isRegistration = !provider.registrationDate
+    var isFirstActivation = !provider.registrationDate
     provider.active = !provider.active
-    if (isRegistration) {
+    if (isFirstActivation) {
       var now = new Date()
       provider.registrationDate = now
       _.select(provider.locations, function(l) {
         return !l.deleted && l.active
-      }).forEach(function(l) { l.registrationDate = now })
+      }).forEach(function(l) {
+        l.registrationDate = now
+        var updates = {registrationDate: {old: undefined, new: now}}
+        saveChangeLogEntry(req.user, l, 'update', {targetCollection: 'providerlocations', updates: updates})
+      })
     }
     saveChangeLogEntry(req.user, provider, 'update')
     provider.save(function(err, saved) {
-      if (isRegistration) {
+      if (isFirstActivation) {
         var provider = saved.toObject()
         providerUtils.registrationEmail(provider, function(err, email) {
           sendEmail(email, logError)
@@ -621,19 +625,19 @@ app.post('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(
   Provider.findById(req.params.pid, function(err, provider) {
     if (err) return next(err)
     var location = provider.locations.id(req.params.lid)
-    var isLocationRegistration = provider.registrationDate && !location.active && !location.registrationDate
-    var updates = {targetCollection: 'providerlocations'}
-    if (isLocationRegistration) {
-      // mark registered and send order confirmation
+    var isFirstActivation = provider.registrationDate && !location.active && !location.registrationDate
+    var updates = {}
+    if (isFirstActivation) {
       location.registrationDate = new Date()
       updates.registrationDate = {old: undefined, new: location.registrationDate}
     }
     location.active = !location.active
-    updates.active = {old: !location.active, new: location.active}
 
-    saveChangeLogEntry(req.user, location, updates)
+    updates.active = {old: !location.active, new: location.active}
+    saveChangeLogEntry(req.user, location, 'update', {targetCollection: 'providerlocations', updates: updates})
+
     provider.save(function(err, saved) {
-      if (isLocationRegistration) {
+      if (isFirstActivation) {
         providerUtils.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()}), function(err, email) {
           sendEmail(email, logError)
         })

@@ -671,11 +671,14 @@ app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res
 })
 
 app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, next) {
-  var newLocation = _.merge({}, req.body, { deleted: false, active: true })
-  Provider.findByIdAndUpdate(req.params.id, { $push: { locations: newLocation }}, function(err, p) {
+  Provider.findById(req.params.id, function(err, p) {
     if (err) return next(err)
-    logCreateOperation(req.user, _.last(p.locations))
-    res.send(_.last(p.locations))
+    p.locations.push(_.merge({}, req.body, { deleted: false, active: true }))
+    p.save(function(err, p) {
+      if (err) return next(err)
+      logCreateOperation(req.user, _.last(p.locations))
+      res.send(_.last(p.locations))
+    })
   })
 })
 

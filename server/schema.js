@@ -148,9 +148,10 @@ var AccountSchema = new Schema({
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))
 
-var providerLocation = {
+var ProviderLocationSchema = new Schema({
   emekuId: String,
   name: String,
+  sequenceId: Number,
   address: { street: String, city: String, zip: String, country: String },
   contactName: String,
   phoneNumber: String,
@@ -163,11 +164,14 @@ var providerLocation = {
   adultContent: Boolean,
   gamesWithoutPegi: Boolean,
   url: String
-}
+})
+
+ProviderLocationSchema.pre('save', ensureSequenceId('Provider'))
 
 var ProviderSchema = new Schema({
   emekuId: String,
   creationDate: Date,
+  sequenceId: Number,
   registrationDate: Date,
   yTunnus: String,
   name: String,
@@ -181,8 +185,10 @@ var ProviderSchema = new Schema({
   language: String,
   deleted: Boolean,
   active: Boolean,
-  locations: [providerLocation]
+  locations: [ProviderLocationSchema]
 })
+
+ProviderSchema.pre('save', ensureSequenceId('Provider'))
 
 ProviderSchema.statics.getForYearlyBilling = function(callback) {
   Provider.find({ active: true, deleted: false }).lean().exec(function(err, providers) {

@@ -316,6 +316,7 @@ function accounts(callback) {
     accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, locationEmailAddresses,
     userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts
   ], callback)
+  var providerSeq = 1
 
   function accountBase(callback) {
     var seq = 1
@@ -395,7 +396,8 @@ function accounts(callback) {
         phoneNumber: phoneNumber,
         deleted: false,
         active: active,
-        locations: []
+        locations: [],
+        sequenceId: providerSeq++
       }
     }
     batchInserter(q, onRow, 'Provider', callback)
@@ -425,7 +427,8 @@ function accounts(callback) {
         deleted: false,
         adultContent: row.k18,
         gamesWithoutPegi: row.pegi,
-        url: row.website || undefined
+        url: row.website || undefined,
+        sequenceId: providerSeq++
       }
       if (result[row.parent_id]) {
         result[row.parent_id].push(location)
@@ -688,7 +691,7 @@ function linkCustomersIds(callback) {
 }
 
 function sequences(callback) {
-  async.forEach([[500, 'Account'], [200000, 'Program']], createSequence, callback)
+  async.forEach([[500, 'Account'], [200000, 'Program'], [5000, 'Provider']], createSequence, callback)
 
   function createSequence(t, callback) { new schema.Sequence({ _id: t[1], seq: t[0] }).save(callback) }
 }

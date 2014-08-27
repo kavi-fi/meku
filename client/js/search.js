@@ -373,9 +373,7 @@ function searchPage() {
   }
 
   function currentFilters() {
-    return $filters.filter(':checked')
-      .map(function() { return $(this).data('type') })
-      .toArray().join(',').split(',')
+    return $filters.filter(':checked').map(function() { return $(this).data('type') }).toArray()
   }
 
   function setFilters(filterString) {

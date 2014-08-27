@@ -166,11 +166,11 @@ function userManagementPage() {
       $detailTemplate.find('form .classifier').append($('#templates').find('.classifier-details').clone())
 
       var $endDate = $detailTemplate.find('input[name=certificateEndDate]')
-        .pikaday(_.defaults({ defaultDate: moment().add('years', 5).toDate() }, pikadayDefaults))
+        .pikaday(_.defaults({ defaultDate: moment().add(5, 'years').toDate() }, pikadayDefaults))
 
       $detailTemplate.find('input[name=certificateStartDate]')
         .pikaday(_.defaults({ onSelect: function(date) {
-          $endDate.pikaday('setMoment', moment(date).add('years', 5))
+          $endDate.pikaday('setMoment', moment(date).add(5, 'years'))
       }}, pikadayDefaults))
 
       select2Autocomplete({

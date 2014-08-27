@@ -115,8 +115,8 @@ function billingPage() {
       begin = moment(begin, format)
       end = moment(end, format)
     } else {
-      begin = moment().subtract('months', 1).startOf('month')
-      end = moment().subtract('months', 1).endOf('month')
+      begin = moment().subtract(1, 'months').startOf('month')
+      end = moment().subtract(1, 'months').endOf('month')
     }
     $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
     fetchInvoiceRows(begin, end)

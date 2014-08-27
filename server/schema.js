@@ -45,8 +45,8 @@ var ProgramSchema = new Schema({
   productionCompanies: [String],
   genre: [String],
   legacyGenre: [String],
-  directors: {type: [String], index: true},
-  actors: {type: [String], index: true},
+  directors: [String],
+  actors: [String],
   synopsis: String,
   classifications: [classification],
   draftsBy: { type: [ObjectId], index: true },
@@ -86,6 +86,16 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
   })
 }
 
+ProgramSchema.methods.hasNameChanges = function() {
+  var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
+  return _.any(this.modifiedPaths(), function(path) { return _.contains(namePaths, path) })
+}
+
+ProgramSchema.methods.verifyAllNamesUpToDate = function(callback) {
+  if (!this.hasNameChanges()) return callback()
+  this.populateAllNames(callback)
+}
+
 ProgramSchema.methods.populateAllNames = function(series, callback) {
   if (!callback) { callback = series; series = undefined }
   var program = this
@@ -121,6 +131,7 @@ Program.excludedChangeLogPaths = ['allNames']
 
 Program.publicFields = {
   emekuId:0, customersId:0, allNames:0, draftsBy: 0, draftClassifications:0,
+  createdBy:0, sentRegistrationEmailAddresses:0,
   'classifications.emekuId':0, 'classifications.author':0,
   'classifications.billing': 0, 'classifications.buyer': 0, 'classifications.registrationEmailAddresses':0,
   'classifications.authorOrganization': 0, 'classifications.reason': 0,

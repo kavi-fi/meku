@@ -94,7 +94,7 @@ function setup() {
 function errorDialog() {
   var $overlay = $('#error-overlay')
   var $dialog = $('#error-dialog')
-  $dialog.find('a').click(function(e) { e.preventDefault(); location.reload() })
+  $dialog.find('a').one('click', function(e) { e.preventDefault(); location.reload() })
   return { show: function() { $dialog.css('display', 'flex'); $overlay.show() }}
 }
 
@@ -113,9 +113,9 @@ function loginPage() {
   var $loginButton = $form.find('button.login')
   var $forgotPasswordButton = $form.find('button.forgot-password')
   var $info = $('#header .user-info').toggle(!!user)
-  $info.find('.name').text(user ? user.name : '')
 
-  $info.find('.logout').click(function() {
+  $info.find('.name').text(user ? user.name : '')
+  $info.find('.logout').one('click', function() {
     $.post('/logout').done(function() { location.reload() })
   })
 
@@ -127,6 +127,7 @@ function loginPage() {
   })
 
   $loginButton.click(function() {
+    $loginButton.prop('disabled', true)
     $.post('/login', JSON.stringify({ username: $username.val(), password: $password.val() }))
       .done(function() { location.reload() })
       .fail(function(jqXHR) {
@@ -138,16 +139,16 @@ function loginPage() {
   })
 
   $forgotPasswordButton.click(function() {
+    $password.val('').trigger('input')
+    $forgotPasswordButton.prop('disabled', true)
     $.post('/forgot-password', JSON.stringify({ username: $username.val() }))
       .done(function() {
         $feedback.text('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.').slideDown()
         $username.val('')
-        $forgotPasswordButton.prop('disabled', true)
       })
       .fail(function() {
         $feedback.text('Käyttäjätunnusta ei ole olemassa.').slideDown()
       })
-    $password.val('').trigger('input').focus()
   })
 
   return { show: show }
@@ -242,10 +243,6 @@ function switchLatestDeferred() {
     if (current && current.state() == 'pending') current.abort()
     return current = deferred
   }
-}
-
-function notIn(arr, el) {
-  return _.indexOf(arr, el) === -1
 }
 
 function parseUserCookie() {

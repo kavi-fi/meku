@@ -35,6 +35,11 @@ function billingPage() {
     }
   })
 
+  $page.find('form').submit(function() {
+    $proeButton.prop('disabled', true)
+    setTimeout(function() { $proeButton.prop('disabled', false) }, 4000)
+  })
+
   $datePicker.dateRangePicker({
     language: 'fi',
     format: format,
@@ -44,6 +49,7 @@ function billingPage() {
     getValue: function() { return $datePicker.find('span').text() },
     setValue: function(s) { $datePicker.find('span').text(s) }
   }).bind('datepicker-change',function(event, obj) {
+    $proeButton.prop('disabled', false)
     fetchInvoiceRows(obj.date1, obj.date2)
   })
 

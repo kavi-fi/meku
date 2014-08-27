@@ -116,6 +116,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function configureEventBinding() {
     $form.find('textarea').autosize()
     $form.on('submit', function(e) {
+      $form.find('button[name=register]').prop('disabled', true)
       e.preventDefault()
       $.post('/programs/' + program._id + '/register', function(savedProgram) {
         $form.hide()
@@ -129,6 +130,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       })
     })
     $form.find('button[name=save]').on('click', function(e) {
+      $form.find('button[name=save]').prop('disabled', true)
       e.preventDefault()
       $.post('/programs/' + program._id, JSON.stringify(rootModifiedFields)).done(function(program) {
         $('#classification-page').trigger('show', [program._id, 'edit', selectedClassification._id]).show()
@@ -209,7 +211,13 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $form.find('button[name=save]').prop('disabled', false)
     } else {
       field = field.replace(/^classification/, 'draftClassifications.' + user._id)
-      $.post('/programs/autosave/' + program._id, JSON.stringify(utils.keyValue(field, value))).done(onProgramUpdated)
+      $form.find('button[name=register]').prop('disabled', true)
+      $.post('/programs/autosave/' + program._id, JSON.stringify(utils.keyValue(field, value))).done(function(p) {
+        onProgramUpdated(p)
+        if ($form.find('button[name=register]').is(':enabled') && $.active > 1) {
+          $form.find('button[name=register]').prop('disabled', true)
+        }
+      })
     }
   }
 
@@ -322,8 +330,8 @@ function classificationFormUtils() {
         minimumInputLength: 1,
         formatInputTooShort: '',
         formatNoMatches: '',
-        formatResult: formatSelect2Item,
-        formatSelection: formatSelect2Item,
+        formatResult: formatDropdownItem,
+        formatSelection: function(item) { return item.id },
         createSearchChoice: function(term) { return { id: term.replace(/,/g, '&#44;'), text: term, isNew: true } },
         initSelection: function(e, callback) { callback([]) },
         query: function(query) {
@@ -343,19 +351,16 @@ function classificationFormUtils() {
       return this
     }
 
-    function formatSelect2Item(item) {
-      if (item.role) {
-        var icon = 'select2-dropdown-result-icon ' + (item.role == 'user' ? 'fa fa-male' : 'fa fa-university')
-        return $('<div>').text(item.name+' <'+item.id+'>').prepend($('<i>').addClass(icon))
-      } else {
-        return item.id
-      }
+    function formatDropdownItem(item) {
+      if (!item.role) return item.id
+      var icon = 'select2-dropdown-result-icon ' + (item.role == 'user' ? 'fa fa-male' : 'fa fa-university')
+      return $('<div>').text(item.name+' <'+item.id+'>').prepend($('<i>').addClass(icon))
     }
 
     function update(program, classification) {
       if (shouldUpdateBuyer(classification)) {
         currentBuyerId = classification.buyer._id
-        $.get('/accounts/' + currentBuyerId).done(function(account) {
+        $.get('/accounts/' + currentBuyerId + '/emailAddresses').done(function(account) {
           updateEmails('buyer', account.emailAddresses)
         })
       }

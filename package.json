@@ -9,20 +9,20 @@
     "node": "0.10.x"
   },
   "dependencies": {
-    "async": "0.7.0",
-    "bcrypt": "0.7.8",
+    "async": "0.9.0",
+    "bcrypt": "0.8.0",
     "cron": "1.0.4",
-    "express": "3.5.1",
+    "express": "3.16.7",
     "lodash": "2.4.1",
-    "moment": "2.6.0",
-    "mongoose": "3.8.14",
-    "sendgrid": "1.0.3",
+    "moment": "2.8.2",
+    "mongoose": "3.8.15",
+    "sendgrid": "1.2.0",
     "xml-object-stream": "0.2.0",
-    "xmlbuilder": "2.2.1"
+    "xmlbuilder": "2.4.3"
   },
   "devDependencies": {
     "express-livereload": "~0.0.24",
     "node-dev": "~2.3.0",
-    "mysql": "2.1.1"
+    "mysql": "~2.4.3"
   }
 }

@@ -81,7 +81,7 @@ exports.import = function(file, callback) {
 
   provider.locations = []
 
-  async.forEach(providerAndLocations.locations, function(location, callback) {
+  _.forEach(providerAndLocations.locations, function(location) {
     location = createObjectAndSetValuesWithMap(location, locationFieldMap)
     location.providingType = location.providingType.split(',')
     location.deleted = false
@@ -91,15 +91,12 @@ exports.import = function(file, callback) {
     })
 
     provider.locations.push(location)
-    callback()
-  }, function(err) {
-    if (err) return callback(err)
+  })
 
-    new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
-      return callback(err, {
-        provider: provider,
-        locations: provider.locations
-      })
+  new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
+    return callback(err, {
+      provider: provider,
+      locations: provider.locations
     })
   })
 }

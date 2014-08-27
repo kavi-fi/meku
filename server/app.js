@@ -509,7 +509,9 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     provider.save(function(err, saved) {
       if (isRegistration) {
         var provider = saved.toObject()
-        sendEmail(providerUtils.registrationEmail(provider), logError)
+        providerUtils.registrationEmail(provider, function(err, email) {
+          sendEmail(email, logError)
+        })
         sendProviderLocationEmails(provider)
         return res.send(saved)
       }
@@ -521,7 +523,9 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     _.select(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
-      sendEmail(providerUtils.registrationEmailProviderLocation(_.merge({}, l, {provider: provider})), logError)
+      providerUtils.registrationEmailProviderLocation(_.merge({}, l, {provider: provider}), function(err, email) {
+        sendEmail(email, logError)
+      })
     })
   }
 })
@@ -571,10 +575,14 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
     if (err) return next(err)
 
     _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
-      sendEmail(providerUtils.yearlyBillingProviderEmail(p), logError)
+      providerUtils.yearlyBillingProviderEmail(p, function(err, email) {
+        sendEmail(email, logError)
+      })
     })
     _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
-      sendEmail(providerUtils.yearlyBillingProviderLocationEmail(l), logError)
+      providerUtils.yearlyBillingProviderLocationEmail(l, function(err, email) {
+        sendEmail(email, logError)
+      })
     })
 
     ProviderMetadata.setYearlyBillingReminderSent(new Date(), respond(res, next))
@@ -614,15 +622,21 @@ app.post('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(
     if (err) return next(err)
     var location = provider.locations.id(req.params.lid)
     var isLocationRegistration = provider.registrationDate && !location.active && !location.registrationDate
+    var updates = {targetCollection: 'providerlocations'}
     if (isLocationRegistration) {
       // mark registered and send order confirmation
       location.registrationDate = new Date()
+      updates.registrationDate = {old: undefined, new: location.registrationDate}
     }
-    location.active = true
-    //saveChangeLogEntry(req.user, location, 'upda')
+    location.active = !location.active
+    updates.active = {old: !location.active, new: location.active}
+
+    saveChangeLogEntry(req.user, location, updates)
     provider.save(function(err, saved) {
       if (isLocationRegistration) {
-        sendEmail(providers.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()})), logError)
+        providerUtils.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()}), function(err, email) {
+          sendEmail(email, logError)
+        })
       }
       res.send(saved)
     })

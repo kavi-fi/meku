@@ -3,9 +3,10 @@ var _ = require('lodash')
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 
-exports.registrationEmail = function (provider) {
-  function emailHtml(provider) {
-    var allLocations = provider.locations.map(function(l) {
+exports.registrationEmail = function (provider, callback) {
+  function emailHtml(provider, callback) {
+    var active =_.select(provider.locations, function(l) { return !l.deleted && l.active })
+    var allLocations = active.map(function(l) {
       return {
         name: l.name,
         isPayer: l.isPayer,
@@ -32,57 +33,56 @@ exports.registrationEmail = function (provider) {
       country: enums.countries[provider.address.country]
     }
 
-    var tpl = readTemplateSync('registration-email.tpl.html')
-    var html =  _.template(tpl, vars)
-    //fs.writeFileSync('./tmp/registration-email.html', html)
-    return html
+    readTemplate('registration-email.tpl.html', function(err, tpl) {
+      var html =  _.template(tpl, vars)
+      //fs.writeFileSync('./tmp/registration-email.html', html)
+      callback(null, html)
+    })
   }
 
-  return {
-    recipients: provider.emailAddresses,
-    subject: 'Tarjoajarekisteriin ilmoittautuminen (' + provider.name + ')',
-    from: 'noreply@kavi.fi',
-    replyto: 'mirja.kosonen@kavi.fi',
-    body: emailHtml(provider)
-  }
+  emailHtml(provider, function(err, html) {
+    callback(null, {
+      recipients: provider.emailAddresses,
+      subject: 'Tarjoajarekisteriin ilmoittautuminen (' + provider.name + ')',
+      from: 'noreply@kavi.fi',
+      replyto: 'mirja.kosonen@kavi.fi',
+      body: html
+    })
+  })
 }
 
-exports.registrationEmailProviderLocation = function (location) {
-  function emailHtml(location) {
-    var vars = {
+exports.registrationEmailProviderLocation = function (location, callback) {
+  function emailHtml(location, callback) {
+    var vars = _.merge({}, location, {
       header: 'Ilmoittautuminen tarjoajaksi',
       emailAddress: location.emailAddresses.join(', '),
       providingTypes: location.providingType.map(enums.providingTypeName),
       providingTypePrices: providingTypes(),
       total: providingTypeTotalPrice(location.providingType),
       location: location
-    }
+    })
 
-    var tpl = readTemplateSync('provider-location-registration-email.tpl.html')
-    var html =  _.template(tpl, vars, {enums: enums, utils: utils})
-    //fs.writeFileSync('./tmp/registration-email-location.html', html)
-    return html
+    readTemplate('provider-location-registration-email.tpl.html', function(err, tpl) {
+      if (err) return callback(err)
+      var html =  _.template(tpl, vars, {enums: enums, utils: utils})
+      //fs.writeFileSync('./tmp/registration-email-location.html', html)
+      callback(null, html)
+    })
   }
 
-  return {
-    recipients: location.emailAddresses,
-    subject: 'Tarjoajarekisteriin ilmoittautuminen (' + location.name + ')',
-    from: 'noreply@kavi.fi',
-    replyto: 'mirja.kosonen@kavi.fi',
-    body: emailHtml(location)
-  }
+  emailHtml(location, function(err, html) {
+    callback(null, {
+      recipients: location.emailAddresses,
+      subject: 'Tarjoajarekisteriin ilmoittautuminen (' + location.name + ')',
+      from: 'noreply@kavi.fi',
+      replyto: 'mirja.kosonen@kavi.fi',
+      body: html
+    })
+  })
 }
 
-exports.yearlyBillingProviderEmail = function(provider) {
-  return {
-    recipients: provider.emailAddresses,
-    subject: 'Tarjoajan vuosilaskutuksen vahvistus (' + provider.name + ')',
-    from: 'noreply@kavi.fi',
-    replyto: 'mirja.kosonen@kavi.fi',
-    body: emailHtml(provider)
-  }
-
-  function emailHtml(provider) {
+exports.yearlyBillingProviderEmail = function(provider, callback) {
+  function emailHtml(provider, callback) {
     var locations = _(provider.locations)
       .map(function(l) { return {
         name: l.name,
@@ -102,23 +102,30 @@ exports.yearlyBillingProviderEmail = function(provider) {
       totalProvider: totalPrice(locations.notPayer),
       totalLocations: totalPrice(locations.payer),
       providingTypePrices: providingTypes(),
-      provider: provider
+      provider: provider,
+      language: enums.billingLanguages[provider.language],
+      country: enums.countries[provider.address.country]
     }
-    var tpl = readTemplateSync('registration-email.tpl.html')
-    return _.template(tpl, vars, { enums: enums, utils: utils })
+    readTemplate('registration-email.tpl.html', function(err, tpl) {
+      if (err) return callback(err)
+      callback(null, _.template(tpl, vars, { enums: enums, utils: utils }))
+    })
   }
+
+  emailHtml(provider, function(err, html) {
+    if (err) return callback(err)
+    callback(null, {
+      recipients: provider.emailAddresses,
+      subject: 'Tarjoajan vuosilaskutuksen vahvistus (' + provider.name + ')',
+      from: 'noreply@kavi.fi',
+      replyto: 'mirja.kosonen@kavi.fi',
+      body: html
+    })
+  })
 }
 
-exports.yearlyBillingProviderLocationEmail = function(location) {
-  return {
-    recipients: location.emailAddresses,
-    subject: 'Tarjoamispaikan vuosilaskutuksen vahvistus (' + location.name + ')',
-    from: 'noreply@kavi.fi',
-    replyto: 'mirja.kosonen@kavi.fi',
-    body: emailHtml(location)
-  }
-
-  function emailHtml(location) {
+exports.yearlyBillingProviderLocationEmail = function(location, callback) {
+  function emailHtml(location, callback) {
     var vars = {
       header: 'Tarjoamispaikan vuosilaskutuksen vahvistus',
       emailAddress: location.emailAddresses.join(', '),
@@ -128,9 +135,22 @@ exports.yearlyBillingProviderLocationEmail = function(location) {
       location: location
     }
 
-    var tpl = readTemplateSync('provider-location-registration-email.tpl.html')
-    return _.template(tpl, vars, {enums: enums, utils: utils})
+    var tpl = readTemplate('provider-location-registration-email.tpl.html', function(err, tpl) {
+      if (err) return callback(err)
+      callback(null, _.template(tpl, vars, {enums: enums, utils: utils}))
+    })
   }
+
+  emailHtml(location, function(err, html) {
+    if (err) return callback(err)
+    callback(null, {
+      recipients: location.emailAddresses,
+      subject: 'Tarjoamispaikan vuosilaskutuksen vahvistus (' + location.name + ')',
+      from: 'noreply@kavi.fi',
+      replyto: 'mirja.kosonen@kavi.fi',
+      body: html
+    })
+  })
 }
 
 function totalPrice(xs) {
@@ -145,8 +165,8 @@ function providingTypes() {
   }).value()
 }
 
-function readTemplateSync(file) {
-  return fs.readFileSync('./server/templates/' + file, 'utf-8')
+function readTemplate(file, callback) {
+  return fs.readFile('./server/templates/' + file, 'utf-8', callback)
 }
 
 function providingTypeTotalPrice(types) {

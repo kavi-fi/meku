@@ -309,7 +309,7 @@ function providerPage() {
 
     $providerDetails
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
-      .find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
+      .find('input[name=emailAddresses]').select2({ tags: [], multiple: true, tokenSeparators: [' '] }).end()
       .find('input[name="billing.address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=billing-extra]').prop('checked', provider && !!provider.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
@@ -370,7 +370,7 @@ function providerPage() {
 
     $form.find('input[name=emailAddresses]').on('change', function (event) {
       var emails = event.val
-      if (!_.isEmpty(emails) && _.all(emails, validateEmail)) {
+      if (_.all(emails, validateEmail)) {
         this.setCustomValidity('')
       } else {
         this.setCustomValidity('Invalid email')
@@ -482,7 +482,7 @@ function providerPage() {
     function renderLocationDetails(location) {
       var $locationDetails = $('#templates').find('.location-details').clone()
       $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, location))
-      $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true }).end()
+      $locationDetails.find('input[name=emailAddresses]').select2({ tags: [], multiple: true, tokenSeparators: [' '] }).end()
         .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
         .find('input[name=location-active][value=' + (location && location.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
 

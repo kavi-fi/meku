@@ -131,6 +131,7 @@ Program.excludedChangeLogPaths = ['allNames']
 
 Program.publicFields = {
   emekuId:0, customersId:0, allNames:0, draftsBy: 0, draftClassifications:0,
+  createdBy:0, sentRegistrationEmailAddresses:0,
   'classifications.emekuId':0, 'classifications.author':0,
   'classifications.billing': 0, 'classifications.buyer': 0, 'classifications.registrationEmailAddresses':0,
   'classifications.authorOrganization': 0, 'classifications.reason': 0,

@@ -520,8 +520,8 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
           sendEmail(email, logError)
         })
         sendProviderLocationEmails(provider)
-        var withEmail = payingLocationsWithEmail(provider.locations)
-        var withoutEmail = payingLocationsWithoutEmail(provider.locations)
+        var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
+        var withoutEmail = providerUtils.payingLocationsWithoutEmail(provider.locations)
         return res.send({active: true, wasFirstActivation: true, locationsWithEmail: withEmail, locationsWithoutEmail: withoutEmail})
       }
       res.send({active: saved.active, wasFirstActivation: false})
@@ -536,14 +536,6 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
         sendEmail(email, logError)
       })
     })
-  }
-
-  function payingLocationsWithEmail(locations) {
-    return _.select(locations, function(l) { return !l.deleted && l.isPayer && l.active && !_.isEmpty(l.emailAddresses) })
-  }
-
-  function payingLocationsWithoutEmail(locations) {
-    return _.select(locations, function(l) { return !l.deleted && l.isPayer && l.active && _.isEmpty(l.emailAddresses) })
   }
 })
 

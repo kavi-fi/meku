@@ -153,6 +153,14 @@ exports.yearlyBillingProviderLocationEmail = function(location, callback) {
   })
 }
 
+exports.payingLocationsWithEmail = function(locations) {
+  return _.select(locations, function(l) { return !l.deleted && l.isPayer && l.active && !_.isEmpty(l.emailAddresses) })
+}
+
+exports.payingLocationsWithoutEmail = function(locations) {
+  return _.select(locations, function(l) { return !l.deleted && l.isPayer && l.active && _.isEmpty(l.emailAddresses) })
+}
+
 function totalPrice(xs) {
   return _.reduce(xs, function(acc, l) {
     return acc + l.price

@@ -364,7 +364,7 @@ function accounts(callback) {
   }
 
   function providers(callback) {
-    var q = 'select id, name, customer_type, sic_code,' +
+    var q = 'select id, name, customer_type, sic_code, date_entered, ' +
       ' bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate, provider_status, customer_lang' +
@@ -386,7 +386,7 @@ function accounts(callback) {
       return {
         emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
         creationDate: new Date(),
-        registrationDate: active ? new Date(0) : undefined,
+        registrationDate: active ? (row.date_entered ? readAsUTCDate(row.date_entered) : new Date(0)) : undefined,
         address: address,
         language: langCode(trim(row.customer_lang)),
         billing: { address: billingAddress, invoiceText: trim(row.bills_text) },

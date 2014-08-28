@@ -58,47 +58,53 @@ exports.import = function(file, callback) {
     return callback(err)
   }
 
-  var provider = createObjectAndSetValuesWithMap(providerAndLocations.provider, providerFieldMap)
-  provider.deleted = false
-  provider.active = false
-  provider.creationDate = new Date()
-  provider.language = provider.language === 'Swedish' ? 'SV' : 'FI'
-  provider.address.country = enums.getCountryCode(provider.address.country) || provider.address.country
+  var provider = createProvider(providerAndLocations.provider, providerAndLocations.billing)
+  provider.locations = createLocations(providerAndLocations.locations)
 
-  var billing = createObjectAndSetValuesWithMap(providerAndLocations.billing, billingFieldMap)
+  return new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) { return callback(err, provider) })
 
-  provider = _.merge({}, provider, billing)
+  function createProvider(providerData, billingData) {
+    var provider = createObjectAndSetValuesWithMap(providerData, providerFieldMap)
+    provider.deleted = false
+    provider.active = false
+    provider.creationDate = new Date()
+    provider.language = provider.language === 'Swedish' ? 'SV' : 'FI'
+    provider.address.country = enums.getCountryCode(provider.address.country) || provider.address.country
 
-  if (provider.billing && provider.billing.address) {
-    var address = provider.billing.address
-    provider.billing.address.country = enums.getCountryCode(address.country) || address.country
-    provider.billingPreference = 'address'
+    var billing = createObjectAndSetValuesWithMap(billingData, billingFieldMap)
+
+    provider = _.merge({}, provider, billing)
+
+    if (provider.billing && provider.billing.address) {
+      var address = provider.billing.address
+      provider.billing.address.country = enums.getCountryCode(address.country) || address.country
+      provider.billingPreference = 'address'
+    }
+
+    if (provider.eInvoice) {
+      provider.billingPreference = 'eInvoice'
+    }
+
+    return provider
   }
 
-  if (provider.eInvoice) {
-    provider.billingPreference = 'eInvoice'
+  function createLocations(locationsData) {
+    var locations = []
+
+    _.forEach(locationsData, function(location) {
+      location = createObjectAndSetValuesWithMap(location, locationFieldMap)
+      location.providingType = location.providingType.split(',')
+      location.deleted = false
+      location.active = true
+      location.providingType = _.map(location.providingType, function(providingTypeNumber) {
+        return enums.getProvidingType(providingTypeNumber)
+      })
+
+      locations.push(location)
+    })
+
+    return locations
   }
-
-  provider.locations = []
-
-  _.forEach(providerAndLocations.locations, function(location) {
-    location = createObjectAndSetValuesWithMap(location, locationFieldMap)
-    location.providingType = location.providingType.split(',')
-    location.deleted = false
-    location.active = true
-    location.providingType = _.map(location.providingType, function(providingTypeNumber) {
-      return enums.getProvidingType(providingTypeNumber)
-    })
-
-    provider.locations.push(location)
-  })
-
-  new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
-    return callback(err, {
-      provider: provider,
-      locations: provider.locations
-    })
-  })
 }
 
 function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {

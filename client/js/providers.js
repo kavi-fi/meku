@@ -244,6 +244,7 @@ function providerPage() {
     $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(activation) {
       if (activation.wasFirstActivation) {
         var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
+        $dialog.find('.name').text(provider.name)
         $dialog.find('.without-email').toggle(activation.locationsWithoutEmail.length > 0)
           .find('ul').html(activation.locationsWithoutEmail.map(function(l) {
             return $('<li>').text(l.name)

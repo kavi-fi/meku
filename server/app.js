@@ -671,12 +671,18 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
     saveChangeLogEntry(req.user, location, 'update', {targetCollection: 'providerlocations', updates: updates})
 
     provider.save(function(err, saved) {
-      if (isFirstActivation && location.emailAddresses.length > 0) {
-        providerUtils.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()}), function(err, email) {
-          sendEmail(email, logError)
-        })
+      if (isFirstActivation) {
+        if (location.emailAddresses.length > 0) {
+          providerUtils.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()}), function(err, email) {
+            sendEmail(email, logError)
+          })
+          res.send({active: true, wasFirstActivation: true, emailSent: true})
+        } else {
+          res.send({active: true, wasFirstActivation: true, emailSent: false})
+        }
+      } else {
+        res.send({active: location.active, wasFirstActivation: false})
       }
-      res.send(saved)
     })
   })
 })

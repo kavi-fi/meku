@@ -502,9 +502,20 @@ function providerPage() {
       var location = $selected.data('location')
       var provider = findSelected().data('provider')
       var data = JSON.stringify({ active: newState === 'on' })
-      $.ajax('/providers/' + provider._id + '/locations/' + location._id + '/active', { type: 'PUT' }).done(function(p) {
-        $providers.find('[data-id='+provider._id+']').data('provider', p)
-        $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })).addClass('selected'))
+      $.ajax('/providers/' + provider._id + '/locations/' + location._id + '/active', { type: 'PUT' }).done(function(activation) {
+        if (activation.wasFirstActivation) {
+          var $dialog = $("#templates").find('.location-registration-success-dialog').clone()
+          $dialog.find('.name').text(location.name)
+          $dialog.find('.email').toggle(activation.emailSent)
+          $dialog.find('.no-email').toggle(!activation.emailSent)
+          $dialog.find('.ok').on('click', function() {
+            $page.trigger('show', provider._id)
+            closeDialog($selected)
+          })
+          showDialog($dialog)
+        } else {
+          $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })).addClass('selected'))
+        }
       })
     }
 

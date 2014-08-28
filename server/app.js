@@ -486,7 +486,7 @@ app.get('/providers', requireRole('kavi'), function(req, res, next) {
 })
 
 app.post('/providers', requireRole('kavi'), function(req, res, next) {
-  new Provider(_.merge({}, req.body, { active: false })).save(function(err, provider) {
+  new Provider(_.merge({}, req.body, { deleted: false, active: false, creationDate: new Date() })).save(function(err, provider) {
     if (err) return next(err)
     logCreateOperation(req.user, provider)
     res.send(provider)

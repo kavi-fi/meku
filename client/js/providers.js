@@ -300,14 +300,14 @@ function providerPage() {
       .data('provider', provider)
       .toggleClass('inactive', !provider.active)
       .append($('<span>', { class: 'name' }).text(provider.name))
-      .append($('<span>', { class: 'registrationDate'}).text(utils.asDate(provider.registrationDate)))
+      .append($('<span>', { class: 'date'}).text(utils.asDate(provider.registrationDate)))
   }
 
   function renderUnapproved(provider) {
     return $('<div>', { class: 'result unapproved', 'data-id': provider._id })
       .data('provider', provider)
-      .append($('<span>', { class: 'date' }).text(utils.asDate(provider.creationDate)))
       .append($('<span>', { class: 'name' }).text(provider.name))
+      .append($('<span>', { class: 'date' }).text(utils.asDate(provider.creationDate)))
   }
 
   function renderProviderDetails(provider) {

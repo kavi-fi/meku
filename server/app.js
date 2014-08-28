@@ -659,9 +659,9 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
   Provider.findById(req.params.pid, function(err, provider) {
     if (err) return next(err)
     var location = provider.locations.id(req.params.lid)
-    var isFirstActivation = provider.registrationDate && !location.active && !location.registrationDate
+    var firstActivation = isFirstActivation(provider, location)
     var updates = {}
-    if (isFirstActivation) {
+    if (firstActivation) {
       location.registrationDate = new Date()
       updates.registrationDate = {old: undefined, new: location.registrationDate}
     }
@@ -670,21 +670,38 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
     updates.active = {old: !location.active, new: location.active}
     saveChangeLogEntry(req.user, location, 'update', {targetCollection: 'providerlocations', updates: updates})
 
-    provider.save(function(err) {
-      if (isFirstActivation) {
-        if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
-          providerUtils.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()}), function(err, email) {
-            sendEmail(email, logError)
-          })
-          res.send({active: true, wasFirstActivation: true, emailSent: true})
-        } else {
-          res.send({active: true, wasFirstActivation: true, emailSent: false})
-        }
+    provider.save(function(err, saved) {
+      if (firstActivation) {
+        sendRegistrationEmails(saved.toObject(), location.toObject())
       } else {
         res.send({active: location.active, wasFirstActivation: false})
       }
     })
   })
+
+  function sendRegistrationEmails(provider, location) {
+    if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
+      providerUtils.registrationEmailProviderLocation(_.merge({}, location, {provider: provider}), function(err, email) {
+        sendEmail(email, logError)
+      })
+      res.send({active: true, wasFirstActivation: true, emailSent: true})
+    } else {
+      res.send({active: true, wasFirstActivation: true, emailSent: false})
+    }
+
+    if (!location.isPayer) {
+      var providerData = _.clone(provider)
+      providerData.locations = [location]
+      providerUtils.registrationEmail(providerData, function(err, email) {
+        sendEmail(email, logError)
+      })
+      res.send({active: true, wasFirstActivation: true, emailSent: true})
+    }
+  }
+
+  function isFirstActivation(provider, location) {
+    return provider.registrationDate && !location.active && !location.registrationDate
+  }
 })
 
 app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {

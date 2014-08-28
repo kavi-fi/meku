@@ -514,7 +514,7 @@ function providerPage() {
           })
           showDialog($dialog)
         } else {
-          $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })).addClass('selected'))
+          $selected.toggleClass('inactive', !activation.active)
         }
       })
     }

@@ -199,8 +199,9 @@ function providerPage() {
 
   function bindEventHandlers($selected, $providerDetails, submitCallback) {
     var $form = $providerDetails.find('form')
+    var provider = $selected.data('provider')
 
-    $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
+    $providerDetails.find('input[name=provider-active]').iiToggle({ onLabel: 'Rekisterissä', offLabel: 'Ei rekisterissä', callback: toggleActiveButton })
 
     $form.submit(function(event) {
       event.preventDefault()
@@ -491,7 +492,7 @@ function providerPage() {
         .find('input[name=providingType]').select2({ data: select2DataFromEnumObject(enums.providingType), multiple: true}).end()
         .find('input[name=location-active][value=' + (location && location.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
 
-      $locationDetails.find('input[name=location-active]').iiToggle({ onLabel: 'Aktiivinen', offLabel: 'Inaktiivinen', callback: toggleActiveButton })
+      $locationDetails.find('input[name=location-active]').iiToggle({ onLabel: 'Rekisterissä', offLabel: 'Ei rekisterissä', callback: toggleActiveButton })
 
       return $locationDetails
     }

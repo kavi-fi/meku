@@ -702,7 +702,12 @@ textarea.invalid:disabled,
 #provider-page .provider-details .save button { float: none; }
 #provider-page .buttons { height: 40px; margin-bottom: 20px; }
 #provider-page .activity { float: left; }
-#provider-page .activity .iit-container { margin: 0; }
+#provider-page .activity .iit-container { width: 210px; margin: 0; }
+
+#provider-page .activity .iit-container .iit-on-label,
+#provider-page .activity .iit-container .iit-off-label { width: 105px; }
+#provider-page .activity .iit-container .iit-slider { width: 100px; }
+
 #provider-page .provider-details .buttons .save-success {
   float: right;
   margin-right: 30px;

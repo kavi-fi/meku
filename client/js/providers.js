@@ -446,11 +446,12 @@ function providerPage() {
           $.ajax('/providers/' + provider._id + '/locations/' + location._id, { type: 'PUT', data: JSON.stringify(locationData) })
             .done(function(p) {
               $providers.find('[data-id='+provider._id+']').data('provider', p)
-              var $selected = $locations.find('.location-row.selected').removeClass('selected')
-              $locations.find('.location-details').slideUp(function() {
-                $(this).remove()
-                $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })))
-              })
+
+              $locationDetails.find('.touched').removeClass('touched')
+              $locationDetails.find('.buttons .save-success').fadeIn(500).delay(5000).fadeOut()
+
+              var $selected = $locations.find('.location-row.selected')
+              $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })).addClass('selected'))
             })
         })
 

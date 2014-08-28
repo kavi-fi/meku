@@ -670,9 +670,9 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
     updates.active = {old: !location.active, new: location.active}
     saveChangeLogEntry(req.user, location, 'update', {targetCollection: 'providerlocations', updates: updates})
 
-    provider.save(function(err, saved) {
+    provider.save(function(err) {
       if (isFirstActivation) {
-        if (location.emailAddresses.length > 0) {
+        if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
           providerUtils.registrationEmailProviderLocation(_.merge({}, location.toObject(), {provider: provider.toObject()}), function(err, email) {
             sendEmail(email, logError)
           })

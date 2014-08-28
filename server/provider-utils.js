@@ -177,7 +177,6 @@ function readTemplate(file, callback) {
   return fs.readFile('./server/templates/' + file, 'utf-8', callback)
 }
 
-function providingTypeTotalPrice(types) {
+var providingTypeTotalPrice = exports.providingTypeTotalPrice = function(types) {
   return _.reduce(types, function(a, x) { return a + enums.providingTypePrices[x] }, 0)
 }
-

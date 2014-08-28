@@ -164,7 +164,9 @@
     <div class="yearly-billing">
       <h3>Vuosilaskutus</h3>
       <button class="button yearly-billing-reminder">Vuosilaskutus tilausvahvistuksen lähettäminen</button>
-      <button class="button yearly-billing-proe">Luo vuosilaskutus Proe-tiedosto</button>
+      <form method="post" action="/providers/yearlyBilling/proe" class="yearly-billing-proe-form">
+        <button class="button yearly-billing-proe" type="submit">Luo vuosilaskutus Proe-tiedosto</button>
+      </form>
       <div class="most-recent">
         Viimeksi lähetetty: <span class="sent">Ei koskaan</span>
         Viimeksi luotu: <span class="created">Ei koskaan</span>

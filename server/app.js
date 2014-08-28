@@ -558,8 +558,32 @@ app.get('/providers/metadata', requireRole('kavi'), function(req, res, next) {
 })
 
 app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res, next) {
-  ProviderMetadata.setYearlyBillingProeCreated(new Date(), function() {
-    res.send({ ok: false })
+  Provider.getForYearlyBilling(function(err, data) {
+    var accountRows = []
+
+    data.providers.forEach(function(provider) {
+      var account = _.omit(provider, 'locations')
+      var rows = _(provider.locations).filter({ isPayer: false }).map(function(l) {
+        return _.map(l.providingType, function(p) {
+          return _.merge({}, l, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+        })
+      }).flatten().value()
+      accountRows.push({ account: account, rows: rows })
+    })
+
+    data.locations.forEach(function(location) {
+      var rows = _.map(location.providingType, function(p) {
+        return _.merge({}, location, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+      })
+      accountRows.push({ account: location, rows: rows })
+    })
+
+    var result = proe({ begin: moment() }, accountRows, 'provider')
+    res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.txt')
+    res.setHeader('Content-Type', 'text/plain')
+    ProviderMetadata.setYearlyBillingProeCreated(new Date(), function() {
+      res.send(result)
+    })
   })
 })
 

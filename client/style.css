@@ -697,6 +697,7 @@ textarea.invalid:disabled,
 #provider-page .most-recent { margin-top: 10px; }
 #provider-page .most-recent .sent { margin-right: 15px; }
 #provider-page .yearly-billing { margin-bottom: 30px; }
+#provider-page .yearly-billing-proe-form { display: inline-block; }
 
 #provider-page .provider-details .save button { float: none; }
 #provider-page .buttons { height: 40px; margin-bottom: 20px; }

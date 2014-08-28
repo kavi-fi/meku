@@ -2,11 +2,14 @@ if (isNodeJs()) {
   var _ = require('lodash')
   var moment = require('moment')
   var utils = require('./utils')
+  var enums = require('./enums')
 }
 
 // dateRange: { begin: moment, end: moment }, accountRows: [{ account:Account, rows:[InvoiceRow] }]
-function createProe(dateRange, accountRows) {
+function createProe(dateRange, accountRows, proeType) {
   var dateFormat = 'DD.MM.YYYY'
+
+  var providerBilling = /^provider/.test(proeType)
 
   return _(accountRows).map(function (i) {
     var id = i.account.sequenceId
@@ -52,16 +55,20 @@ function createProe(dateRange, accountRows) {
   }
 
   function textRows(id, dateRange, rows) {
-    var typeString = { classification: 'luokiteltu', reclassification: 'uudelleenluokiteltu', registration: 'rekisteröity' }
-    var rowsPerType = _.groupBy(rows, 'type')
     var arr = []
-    arr.push(textRow('KOONTILASKUTUS ' + dateRange.begin + ' - ' + dateRange.end))
-    _.pairs(rowsPerType).forEach(function(item) {
-      arr.push(textRow(summaryText(item[0], item[1])))
-    })
+    if (providerBilling) {
+      arr.push(textRow('Valvontamaksu vuosi ' + dateRange.begin.year()))
+      arr.push(textRow(rows.length + ' ' + price(rows) + ' EUR'))
+    } else {
+      arr.push(textRow('KOONTILASKUTUS ' + dateRange.begin + ' - ' + dateRange.end))
+      var rowsPerType = _.groupBy(rows, 'type')
+      _.pairs(rowsPerType).forEach(function(item) {
+        arr.push(textRow(summaryText(item[0], item[1])))
+      })
+    }
     arr.push(textRow('Lasku yhteensä ' + price(rows) + ' EUR'))
     arr.push(textRow(' '))
-    arr.push(textRow('Kuvaohjelman tunniste, päätöspvm, nimi'))
+    arr.push(textRow(providerBilling ? 'Rek. pvm, Tarjoamistapa, Tarjoamispaikka' : 'Kuvaohjelman tunniste, päätöspvm, nimi'))
     return arr
 
     function textRow(txt) {
@@ -69,6 +76,7 @@ function createProe(dateRange, accountRows) {
     }
 
     function summaryText(type, rows) {
+      var typeString = { classification: 'luokiteltu', reclassification: 'uudelleenluokiteltu', registration: 'rekisteröity' }
       var plural = rows.length > 1 ? ' kuvaohjelmaa ' : ' kuvaohjelma '
       return rows.length + plural + typeString[type] + ', yhteensä ' + price(rows) + ' EUR'
     }
@@ -81,7 +89,10 @@ function createProe(dateRange, accountRows) {
   }
 
   function billingRow(id, invoice) {
-    var txt = ' ' + [invoice.programSequenceId, moment(invoice.registrationDate).format(dateFormat), invoice.name].join(' ')
+    var txt = providerBilling
+      ? ' ' + [moment(invoice.registrationDate).format(dateFormat), shortProvidingTypeName(invoice.providingType), invoice.name].join(', ')
+      : ' ' + [invoice.programSequenceId, moment(invoice.registrationDate).format(dateFormat), invoice.name].join(' ')
+
     return header(id, '2')
       + '00' // alv-koodi
       + pad(txt, 65)
@@ -89,6 +100,18 @@ function createProe(dateRange, accountRows) {
       + pad(invoice.price.toString(), 11, true)
       + 'N' // brutto-netto
       + ws(180)
+  }
+
+  function shortProvidingTypeName(providingType) {
+    var names = {
+      'Recordings_provide': 'Tallenteiden tarj.',
+      'Public_presentation': 'Julkinen esitt.',
+      'National_TV': 'Valtak. tv-ohjelm.',
+      'Regional_TV': 'Alueell. tv-ohjelm.',
+      'Transmitted_abroad_program': 'Ulk. väl. tv-ohjelm.',
+      'Subscription_of_program': 'Tilausohjelmapalv.'
+    }
+    return names[providingType]
   }
 
   function header(id, code) {
@@ -100,7 +123,7 @@ function createProe(dateRange, accountRows) {
     var fill = length - s.length + 1
     if (fill == 0) return s
     if (fill < 0) {
-      return s.substring(length)
+      return s.substring(0, length)
     } else {
       var padding = new Array(fill).join(asPrice ? '0' : ' ')
       return asPrice ? padding + s : s + padding

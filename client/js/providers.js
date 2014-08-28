@@ -128,12 +128,8 @@ function providerPage() {
   })
 
   $yearlyBilling.on('click', 'button.yearly-billing-proe', function() {
-    var $button = $(this)
-    $button.prop('disabled', true)
-    $.post('/providers/yearlyBilling/proe', function() {
-      $button.prop('disabled', false)
-      updateMetadata()
-    })
+    $page.find('.most-recent .created').text(utils.asDateTime(moment()))
+    setTimeout(function() { updateMetadata() }, 10000)
   })
 
   function findSelected() {

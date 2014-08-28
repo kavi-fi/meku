@@ -601,12 +601,17 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
 app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res, next) {
   var format = 'DD.MM.YYYY'
 
+  var dates = {
+    $gte: moment(req.params.begin, format),
+    $lt: moment(req.params.end, format).add('days', 1)
+  }
+
   var terms = {
     active: true, deleted: false,
-    registrationDate: {
-      $gte: moment(req.params.begin, format),
-      $lt: moment(req.params.end, format).add('days', 1)
-    }
+    $or: [
+      { registrationDate: dates },
+      { 'locations.registrationDate': dates }
+    ]
   }
 
   Provider.find(terms).lean().exec(function(err, providers) {
@@ -665,7 +670,7 @@ app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res
 app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, p) {
     if (err) return next(err)
-    p.locations.push(_.merge({}, req.body, { deleted: false, active: true }))
+    p.locations.push(_.merge({}, req.body, { deleted: false, active: false }))
     p.save(function(err, p) {
       if (err) return next(err)
       logCreateOperation(req.user, _.last(p.locations))

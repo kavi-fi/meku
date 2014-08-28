@@ -691,6 +691,7 @@ textarea.invalid:disabled,
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
+#provider-page .providers-list .result .registrationDate {float: right; }
 #provider-page .location-details .emails { margin-right: 24px; }
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 #provider-page .most-recent { margin-top: 10px; }

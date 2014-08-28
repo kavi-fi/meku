@@ -300,6 +300,7 @@ function providerPage() {
       .data('provider', provider)
       .toggleClass('inactive', !provider.active)
       .append($('<span>', { class: 'name' }).text(provider.name))
+      .append($('<span>', { class: 'registrationDate'}).text(utils.asDate(provider.registrationDate)))
   }
 
   function renderUnapproved(provider) {

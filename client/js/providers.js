@@ -256,7 +256,7 @@ function providerPage() {
         })
         showDialog($dialog)
       } else {
-        $selected.replaceWith(renderProvider(updatedProvider).addClass('selected'))
+        $selected.toggleClass('inactive', !activation.active)
       }
     })
   }

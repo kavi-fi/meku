@@ -97,7 +97,7 @@ exports.yearlyBillingProviderEmail = function(provider, callback) {
       useEInvoice: provider.billingPreference == 'eInvoice',
       eInvoice: provider.eInvoice,
       billing: provider.billingPreference == 'address' ? provider.billing.address : provider.address,
-      invoiceText: provider.billing.invoiceText,
+      invoiceText: provider.billing ? provider.billing.invoiceText : '',
       payerLocations: locations.payer || [],
       totalProvider: totalPrice(locations.notPayer),
       totalLocations: totalPrice(locations.payer),

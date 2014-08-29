@@ -158,7 +158,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
     var columnRowNumber = undefined
 
     _.find(from, function(field, key) {
-      if (field.v.trim().toLowerCase() == value.toLowerCase()) {
+      if (field.v && (field.v.trim().toLowerCase() == value.toLowerCase())) {
         columnRowNumber = parseRowNumber(key)
         return true
       }

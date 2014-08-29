@@ -12,36 +12,37 @@ var providerFieldMap = {
   'address.country': 'Maa',
   'address.street':  'Lähiosoite',
   'address.zip':     'Postinro',
-  'contactName':     'Tarjoajan yht.hlö',
+  'contactName':     'Tarjoajan yhteyshenkilö',
   'emailAddresses':  'Sähköposti',
   'language':        'Asiointikieli',
   'name':            'Yritys/Toiminimi',
-  'phoneNumber':     'Puh.nro',
+  'phoneNumber':     'Puhelinnumero',
   'yTunnus':         'Y-tunnus'
 }
 
 var billingFieldMap = {
   'billing.address.city':    'Postitoimipaikka',
-  'billing.address.country': 'Maa',
-  'billing.address.street':  'Postiosoite',
+  //'billing.address.country': 'Maa', // not imported, though in schema and in UI
+  'billing.address.street':  'Lähiosoite',
   'billing.address.zip':     'Postinro',
   'billing.invoiceText':     'Laskulle haluttava teksti',
   'eInvoice.address':        'Verkkolaskuosoite (OVT/IBAN)',
   'eInvoice.operator':       'Välittäjätunnus'
 }
 
+// Invert
 var locationFieldMap = {
   'address.city':     'Postitoimipaikka',
-  'address.street':   'Käyntiosoite',
+  'address.street':   'Lähiosoite',
   'address.zip':      'Postinro',
   'adultContent':     'K18 ohjelmia',
-  'contactName':      'Yht.hlö',
+  'contactName':      'Tarjoamispaikan yhteyshenkilö',
   'emailAddresses':   'Sähköpostiosoite',
   'gamesWithoutPegi': 'Pelejä (ei PEGI)',
-  'isPayer':          'Lasku pääorganisaatiolle',
+  'isPayer':          'Lasku Tarjoamispaikalle',
   'name':             'Tarjoamispaikan nimi',
-  'phoneNumber':      'Puh.nro',
-  'providingType':    'Tarjoamistapa',
+  'phoneNumber':      'Puhelinnumero',
+  //'providingType':    '', // special case
   'url':              'www-osoite'
 }
 
@@ -53,7 +54,7 @@ exports.import = function(file, callback) {
     else if (file.search(/.xlsx$/) > 1) parser = xlsx
     else return callback({ message: '.xlsx or .xls required' })
 
-    var providerAndLocations = getProviderAndLocationsFromSpreadSheet(parser.readFile(file))
+    var providerAndLocations = getProviderAndLocationsFromSpreadSheet(parser.readFile(file).Sheets['Tarjoajaksi ilmoittautuminen'])
   } catch (err) {
     return callback(err)
   }
@@ -92,45 +93,51 @@ exports.import = function(file, callback) {
     var locations = []
 
     _.forEach(locationsData, function(location) {
-      location = createObjectAndSetValuesWithMap(location, locationFieldMap)
-      location.providingType = location.providingType.split(',')
+      location = createObjectAndSetValuesWithMap(location, locationFieldMap, {
+        providingType: {
+          fields: [
+            'Tallenteiden tarjoaminen', 'Julkinen esittäminen', 'Valtakunnallinen TV-ohjelmisto',
+            'Alueellinen ohjelmisto', 'Ulkomailta välitetty ohjelm.', 'Tilausohjelma-palvelu'
+          ],
+          toValue: enums.getProvidingType
+        }
+      })
       location.deleted = false
       location.active = true
-      location.providingType = _.map(location.providingType, function(providingTypeNumber) {
-        return enums.getProvidingType(providingTypeNumber)
-      })
+      location.isPayer = stringXToBoolean(location.isPayer)
+      location.adultContent = stringXToBoolean(location.adultContent)
+      location.gamesWithoutPegi = stringXToBoolean(location.gamesWithoutPegi)
 
       locations.push(location)
     })
 
     return locations
   }
+
+  function stringXToBoolean(x) { return _.isString(x) ? x.toLowerCase() === 'x' : false }
 }
 
-function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
-  var providerSheet = providerSpreadSheet.Sheets['Tarjoajan yhteystiedot']
-
+function getProviderAndLocationsFromSpreadSheet(providerSheet) {
+  // TODO: check
   var requiredProviderFields = {
-    name: 'Tarjoajan yhteystiedot',
+    name: 'Tarjoaja',
     values: ['name', 'yTunnus', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber', 'language'],
     fieldMap: providerFieldMap
   }
 
+  // TODO: check
   var requiredLocationFields = {
-    name: 'Tarj.paikan yht.tiedot ja tapa',
-    values: [
-      'name', 'providingType', 'adultContent', 'gamesWithoutPegi', 'contactName', 'address.street',
-      'address.zip', 'address.city', 'phoneNumber', 'isPayer'
-    ],
+    name: 'Tarjoamispaikkojen tiedot ja tarjoamistavat',
+    values: ['name', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber'],
     fieldMap: locationFieldMap
   }
 
   var errors = []
 
-  var providerData = parseFieldRowAndValueRowAfterColumn(providerSheet, 'Tarjoaja', requiredProviderFields)
-  var billingData = parseFieldRowAndValueRowAfterColumn(providerSheet, 'Laskutustiedot')
-  var locationsData = parseFieldRowAndValueRows(providerSpreadSheet.Sheets['Tarj.paikan yht.tiedot ja tapa'],
-    requiredLocationFields)
+  var providerData = parseFieldRowAndValueRowAfterColumn('Tarjoaja', requiredProviderFields)
+  var billingData = parseFieldRowAndValueRowAfterColumn('Lasku eri osoitteeseen kuin Tarjoajan osoite')
+  var eInvoiceData = parseFieldRowAndValueRowAfterColumn('TAI verkkolasku')
+  var locationsData = parseFieldRowAndValueRowsAfterColumn('Tarjoamispaikkojen tiedot ja tarjoamistavat', requiredLocationFields)
 
   if (locationsData.length === 0) errors.push('Tarjoamispaikkojen tiedot puuttuvat')
 
@@ -138,20 +145,20 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
 
   return {
     provider: providerData,
-    billing: billingData,
+    billing: _.merge({}, billingData, eInvoiceData),
     locations: locationsData
   }
 
-  function parseFieldRowAndValueRowAfterColumn(sheet, column, requiredFields) {
-    var rowNumber = findColumnRowByValue(sheet, column)
-    return toObject(getFields(sheet, rowNumber + 1), getValues(sheet, rowNumber + 2), requiredFields)
+  function parseFieldRowAndValueRowAfterColumn(column, requiredFields) {
+    var rowNumber = findColumnRowByValue(providerSheet, column)
+    return toObject(getFields(providerSheet, rowNumber + 1), getValues(providerSheet, rowNumber + 2), requiredFields)
   }
 
   function findColumnRowByValue(from, value) {
     var columnRowNumber = undefined
 
     _.find(from, function(field, key) {
-      if (field.v === value) {
+      if (field.v.trim().toLowerCase() == value.toLowerCase()) {
         columnRowNumber = parseRowNumber(key)
         return true
       }
@@ -206,14 +213,15 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
     function parseColumnKey(key) { return key.substring(0, key.search(/\d/)) }
   }
 
-  function parseFieldRowAndValueRows(sheet, requiredFields) {
-    var fields = getFields(sheet, 1)
+  function parseFieldRowAndValueRowsAfterColumn(column, requiredFields) {
+    var rowNumber = findColumnRowByValue(providerSheet, column)
+    var fields = getFields(providerSheet, rowNumber + 1)
 
-    var index = 2
+    var index = rowNumber + 2
     var values = []
 
     while (true) {
-      var currentValues = getValues(sheet, index)
+      var currentValues = getValues(providerSheet, index)
       if (currentValues.length > 0) {
         values.push(toObject(fields, currentValues, _.merge(requiredFields, { row: index })))
         index += 1
@@ -223,15 +231,39 @@ function getProviderAndLocationsFromSpreadSheet(providerSpreadSheet) {
   }
 }
 
-function createObjectAndSetValuesWithMap(object, map) {
+function createObjectAndSetValuesWithMap(object, map, specialFields) {
   var newObject = {}
 
   map = _.invert(map)
 
   _.forEach(utils.flattenObject(object), function(value, key) {
-    var path = map[key] ? map[key].split('.') : ['other', key]
-    utils.setValueForPath(path, newObject, value)
+    if (map[key]) {
+      utils.setValueForPath(map[key].split('.'), newObject, value)
+    } else {
+      var arrayProperty = getArrayPropertyKeyAndValue(key)
+      if (arrayProperty) {
+        if (_.isArray(newObject[arrayProperty[0]])) {
+          newObject[arrayProperty[0]].push(arrayProperty[1])
+        } else {
+          newObject[arrayProperty[0]] = [arrayProperty[1]]
+        }
+      } else {
+        utils.setValueForPath(['other', key], newObject, value)
+      }
+    }
   })
 
   return newObject
+
+  function getArrayPropertyKeyAndValue(key) {
+    var propertyName = _.findKey(specialFields, function(property) { return _.contains(property.fields, key) })
+
+    if (propertyName) {
+      var property = specialFields[propertyName]
+
+      return [ propertyName, property.toValue(_.indexOf(property.fields, key)) ]
+    } else {
+      return undefined
+    }
+  }
 }

@@ -190,8 +190,11 @@ var ProviderSchema = new Schema({
 
 ProviderSchema.pre('save', ensureSequenceId('Provider'))
 
-ProviderSchema.statics.getForYearlyBilling = function(callback) {
-  Provider.find({ active: true, deleted: false }).lean().exec(function(err, providers) {
+ProviderSchema.statics.getForBilling = function(extraFilters, callback) {
+  var filters = { active: true, deleted: false }
+  if (callback) _.merge(filters, extraFilters)
+  else callback = extraFilters
+  Provider.find(filters).lean().exec(function(err, providers) {
     if (err) return callback(err)
 
     _.forEach(providers, function(provider) {

@@ -57,7 +57,11 @@ function createProe(dateRange, accountRows, proeType) {
   function textRows(id, dateRange, rows) {
     var arr = []
     if (providerBilling) {
-      arr.push(textRow('Valvontamaksu vuosi ' + dateRange.begin.year()))
+      if (dateRange.end) {
+        arr.push(textRow('Valvontamaksu ' + dateRange.begin.format(dateFormat) + ' - ' + dateRange.end.format(dateFormat)))
+      } else {
+        arr.push(textRow('Valvontamaksu vuosi ' + dateRange.begin.year()))
+      }
       arr.push(textRow(rows.length + ' ' + price(rows) + ' EUR'))
     } else {
       arr.push(textRow('KOONTILASKUTUS ' + dateRange.begin + ' - ' + dateRange.end))

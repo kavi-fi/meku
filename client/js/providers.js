@@ -143,6 +143,8 @@ function providerPage() {
     var $list = $billing.find('.new-providers-list').empty()
 
     latestAjax($.get('/providers/billing/'+ begin + '/' + end), $spinner).done(function(providers) {
+      $page.find('.billing-container input[name=begin]').val(begin)
+      $page.find('.billing-container input[name=end]').val(end)
       var $template = $('#templates').find('.invoice-provider').clone()
 
       $billingContainer.toggle(providers.length > 0)

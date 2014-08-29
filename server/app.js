@@ -561,26 +561,8 @@ app.get('/providers/metadata', requireRole('kavi'), function(req, res, next) {
 })
 
 app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res, next) {
-  Provider.getForYearlyBilling(function(err, data) {
-    var accountRows = []
-
-    data.providers.forEach(function(provider) {
-      var account = _.omit(provider, 'locations')
-      var rows = _(provider.locations).filter({ isPayer: false }).map(function(l) {
-        return _.map(l.providingType, function(p) {
-          return _.merge({}, l, { providingType: p, price: enums.providingTypePrices[p] * 100 })
-        })
-      }).flatten().value()
-      accountRows.push({ account: account, rows: rows })
-    })
-
-    data.locations.forEach(function(location) {
-      var rows = _.map(location.providingType, function(p) {
-        return _.merge({}, location, { providingType: p, price: enums.providingTypePrices[p] * 100 })
-      })
-      accountRows.push({ account: location, rows: rows })
-    })
-
+  Provider.getForBilling(function(err, data) {
+    var accountRows = getProviderBillingRows(data)
     var result = proe({ begin: moment() }, accountRows, 'provider')
     res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.txt')
     res.setHeader('Content-Type', 'text/plain')
@@ -590,8 +572,27 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
   })
 })
 
+app.post('/providers/billing/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {
+  var dateFormat = 'DD.MM.YYYY'
+  var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat) }
+  var dateRangeQ = { $gte: dates.begin, $lt: dates.end.add(1, 'day') }
+  var registrationDateFilters = { $or: [
+    { registrationDate: dateRangeQ },
+    { 'locations.registrationDate': dateRangeQ }
+  ]}
+  Provider.getForBilling(registrationDateFilters, function(err, data) {
+    if (err) return next(err)
+    var accountRows = getProviderBillingRows(data)
+    var result = proe(dates, accountRows, 'provider')
+    var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.txt'
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    res.setHeader('Content-Type', 'text/plain')
+    res.send(result)
+  })
+})
+
 app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res, next) {
-  Provider.getForYearlyBilling(function(err, data) {
+  Provider.getForBilling(function(err, data) {
     if (err) return next(err)
 
     var providers = _.groupBy(data.providers, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
@@ -607,7 +608,7 @@ app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res,
 })
 
 app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function(req, res, next) {
-  Provider.getForYearlyBilling(function(err, data) {
+  Provider.getForBilling(function(err, data) {
     if (err) return next(err)
 
     _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
@@ -1258,6 +1259,28 @@ function verifyTvSeriesExistsOrCreate(program, user, callback) {
     if (program.series) program.series.draft = {}
     return callback()
   }
+}
+
+function getProviderBillingRows(data) {
+  var accountRows = []
+
+  data.providers.forEach(function(provider) {
+    var account = _.omit(provider, 'locations')
+    var rows = _(provider.locations).filter({ isPayer: false }).map(function(l) {
+      return _.map(l.providingType, function(p) {
+        return _.merge({}, l, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+      })
+    }).flatten().value()
+    accountRows.push({ account: account, rows: rows })
+  })
+
+  data.locations.forEach(function(location) {
+    var rows = _.map(location.providingType, function(p) {
+      return _.merge({}, location, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+    })
+    accountRows.push({ account: location, rows: rows })
+  })
+  return accountRows
 }
 
 function logError(err) {

@@ -547,12 +547,6 @@ function providerPage() {
       })
 
       setCommonValidators($form)
-
-      $form.find('.required-if-payer').prop('required', $form.find('input[name=isPayer]:checked').length !== 0)
-
-      $form.find('input[name=isPayer]').on('change', function() {
-        $form.find('.required-if-payer').prop('required', this.checked)
-      })
     }
   }
 }

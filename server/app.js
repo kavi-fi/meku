@@ -675,21 +675,21 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
 
     provider.save(function(err, saved) {
       if (firstActivation) {
-        sendRegistrationEmails(saved.toObject(), location.toObject())
+        sendRegistrationEmails(saved.toObject(), location.toObject(), respond(res, next))
       } else {
         res.send({active: location.active, wasFirstActivation: false})
       }
     })
   })
 
-  function sendRegistrationEmails(provider, location) {
+  function sendRegistrationEmails(provider, location, callback) {
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       providerUtils.registrationEmailProviderLocation(_.merge({}, location, {provider: provider}), function(err, email) {
         sendEmail(email, logError)
       })
-      res.send({active: true, wasFirstActivation: true, emailSent: true})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else {
-      res.send({active: true, wasFirstActivation: true, emailSent: false})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: false})
     }
 
     if (!location.isPayer) {
@@ -698,7 +698,7 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
       providerUtils.registrationEmail(providerData, function(err, email) {
         sendEmail(email, logError)
       })
-      res.send({active: true, wasFirstActivation: true, emailSent: true})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     }
   }
 

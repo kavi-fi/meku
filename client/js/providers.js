@@ -526,10 +526,8 @@ function providerPage() {
         .data('location', location).toggleClass('inactive', !location.active)
         .append($('<i>', { class: 'rotating fa fa-play' }))
         .append($('<span>').text(location.name))
-
-      if (location.isPayer) {
-        $location.append($('<span>', { class: 'right' }).text('Tarjoamispaikka maksaa laskun'))
-      }
+        .append($('<span>').text(location.isPayer ? 'Tarjoamispaikka maksaa laskun' : ''))
+        .append($('<span>').text(utils.asDate(location.registrationDate)))
 
       return $location
     }

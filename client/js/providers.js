@@ -509,8 +509,8 @@ function providerPage() {
         if (activation.wasFirstActivation) {
           var $dialog = $("#templates").find('.location-registration-success-dialog').clone()
           $dialog.find('.name').text(location.name)
-          $dialog.find('.email').toggle(location.isPayer && activation.emailSent)
-          $dialog.find('.no-email').toggle(location.isPayer && !activation.emailSent)
+          $dialog.find('.email').toggle(activation.emailSent)
+          $dialog.find('.no-email').toggle(!activation.emailSent)
           $dialog.find('.ok').on('click', function() {
             closeDialog($selected)
           })

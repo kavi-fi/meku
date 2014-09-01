@@ -98,6 +98,11 @@ utils.asDate = function(date) {
   return date ? moment(date).format(utils.dateFormat) : ''
 }
 
+utils.parseDateRange = function(obj) {
+  var format = 'DD.MM.YYYY'
+  return { begin:  moment(obj.begin, format), end: moment(obj.end, format).add(1, 'days') }
+}
+
 utils.getProperty = function(obj, prop) {
   var path = prop.split('.')
   // Retrieve nested properties like object.billing.address

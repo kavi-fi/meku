@@ -625,10 +625,8 @@ app.get('/emails/search', function(req, res, next) {
 })
 
 app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next) {
-  var format = "DD.MM.YYYY"
-  var begin = moment(req.params.begin, format)
-  var end = moment(req.params.end, format).add(1, 'days')
-  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').lean().exec(respond(res, next))
+  var range = utils.parseDateRange(req.params)
+  InvoiceRow.find({registrationDate: {$gte: range.begin, $lt: range.end}}).sort('registrationDate').lean().exec(respond(res, next))
 })
 
 app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {

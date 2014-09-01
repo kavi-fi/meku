@@ -190,8 +190,11 @@ function requiredAttr(name, toField) {
 function optional(field, toField) {
   return function(xml) {
     toField = toField || field
-    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) return {program: utils.keyValue(toField, undefined), errors: []}
-    else return {program: utils.keyValue(toField, xml[field].$text), errors: []}
+    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) {
+      return {program: {}, errors: []}
+    } else {
+      return {program: utils.keyValue(toField, xml[field].$text), errors: []}
+    }
   }
 }
 

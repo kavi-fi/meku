@@ -658,7 +658,7 @@ app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res
 
   var dates = {
     $gte: moment(req.params.begin, format),
-    $lt: moment(req.params.end, format).add('days', 1)
+    $lt: moment(req.params.end, format).add(1, 'day')
   }
 
   var terms = {

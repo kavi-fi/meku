@@ -51,7 +51,7 @@ function providerPage() {
         })
     })
 
-    var begin = moment().subtract('months', 1).startOf('month')
+    var begin = moment().subtract(1, 'month').startOf('month')
     var end = moment().endOf('month')
 
     $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))

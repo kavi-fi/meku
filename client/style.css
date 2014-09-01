@@ -118,7 +118,7 @@ textarea { resize: vertical; }
 
 #header .navi { display: none; }
 #header .content { padding: 15px 0 0 0; }
-#header .reset-password-page { text-align: center; }
+#header .center { text-align: center; }
 
 #header h1 { margin-bottom: 30px; font-size: 22px; display: inline-block; }
 #header ul { list-style: none; padding: 0; margin: 0;}

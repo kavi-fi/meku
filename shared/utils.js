@@ -1,6 +1,7 @@
 if (isNodeJs()) {
   var _ = require('lodash')
   var enums = require('./enums')
+  var moment = require('moment')
 }
 
 var utils = {}

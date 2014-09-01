@@ -546,9 +546,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     provider.save(function(err, saved) {
       if (isFirstActivation) {
         var provider = saved.toObject()
-        providerUtils.registrationEmail(provider, function(err, email) {
-          sendEmail(email, logError)
-        })
+        providerUtils.registrationEmail(provider, logErrorOrSendEmail)
         sendProviderLocationEmails(provider)
         var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
         var withoutEmail = providerUtils.payingLocationsWithoutEmail(provider.locations)
@@ -562,9 +560,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     _.select(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
-      providerUtils.registrationEmailProviderLocation(_.merge({}, l, {provider: provider}), function(err, email) {
-        sendEmail(email, logError)
-      })
+      providerUtils.registrationEmailProviderLocation(_.merge({}, l, {provider: provider}), logErrorOrSendEmail)
     })
   }
 })
@@ -647,14 +643,10 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
     if (err) return next(err)
 
     _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
-      providerUtils.yearlyBillingProviderEmail(p, function(err, email) {
-        sendEmail(email, logError)
-      })
+      providerUtils.yearlyBillingProviderEmail(p, logErrorOrSendEmail)
     })
     _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
-      providerUtils.yearlyBillingProviderLocationEmail(l, function(err, email) {
-        sendEmail(email, logError)
-      })
+      providerUtils.yearlyBillingProviderLocationEmail(l, logErrorOrSendEmail)
     })
 
     ProviderMetadata.setYearlyBillingReminderSent(new Date(), respond(res, next))
@@ -726,17 +718,13 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
   function sendRegistrationEmails(provider, location, callback) {
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
-      providerUtils.registrationEmailProviderLocation(_.merge({}, location, {provider: provider}), function(err, email) {
-        sendEmail(email, logError)
-      })
+      providerUtils.registrationEmailProviderLocation(_.merge({}, location, {provider: provider}), logErrorOrSendEmail)
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else if (!location.isPayer) {
       // email the provider
       var providerData = _.clone(provider)
       providerData.locations = [location]
-      providerUtils.registrationEmail(providerData, function(err, email) {
-        sendEmail(email, logError)
-      })
+      providerUtils.registrationEmail(providerData, logErrorOrSendEmail)
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else {
       // location is the payer, but the location has no email addresses
@@ -1214,6 +1202,11 @@ function requireRole(role) {
     if (!utils.hasRole(req.user, role)) return res.send(403)
     else return next()
   }
+}
+
+function logErrorOrSendEmail(err, email) {
+  if (err) return console.error(err)
+  sendEmail(email, logError)
 }
 
 function sendEmail(opts, callback) {

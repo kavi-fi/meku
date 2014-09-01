@@ -513,6 +513,7 @@ function providerPage() {
           $dialog.find('.no-email').toggle(!activation.emailSent)
           $dialog.find('.ok').on('click', function() {
             closeDialog($selected)
+            $selected.toggleClass('inactive', !activation.active)
           })
           showDialog($dialog)
         } else {

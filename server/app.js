@@ -171,32 +171,32 @@ app.get('/programs/search/:q?', function(req, res, next) {
     }
     return { classifications: { $elemMatch: q } }
   }
-})
 
-function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
-  var page = req.query.page || 0
-  var filters = req.query.filters || []
-  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(respond(res, next))
+  function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
+    var page = req.query.page || 0
+    var filters = req.query.filters || []
+    Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(respond(res, next))
 
-  function query(extraQueryTerms) {
-    var ObjectId = mongoose.Types.ObjectId
-    var terms = req.params.q
-    var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
-    var and = []
-    if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
-    var nameQuery = toMongoArrayQuery(terms)
-    if (nameQuery) {
-      if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
-        and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
-      } else {
-        and.push({allNames: nameQuery})
+    function query(extraQueryTerms) {
+      var ObjectId = mongoose.Types.ObjectId
+      var terms = req.params.q
+      var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
+      var and = []
+      if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
+      var nameQuery = toMongoArrayQuery(terms)
+      if (nameQuery) {
+        if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
+          and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
+        } else {
+          and.push({allNames: nameQuery})
+        }
       }
+      if (filters.length > 0) q.programType = { $in: filters }
+      if (and.length > 0) q.$and = and
+      return q
     }
-    if (filters.length > 0) q.programType = { $in: filters }
-    if (and.length > 0) q.$and = and
-    return q
   }
-}
+})
 
 app.get('/episodes/:seriesId', function(req, res, next) {
   Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).lean().exec(respond(res, next))

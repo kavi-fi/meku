@@ -90,10 +90,8 @@ exports.import = function(file, callback) {
   }
 
   function createLocations(locationsData) {
-    var locations = []
-
-    _.forEach(locationsData, function(location) {
-      location = createObjectAndSetValuesWithMap(location, locationFieldMap, {
+    return _.map(locationsData, function(location) {
+      var location = createObjectAndSetValuesWithMap(location, locationFieldMap, {
         providingType: {
           fields: [
             'Tallenteiden tarjoaminen', 'Julkinen esittäminen', 'Valtakunnallinen TV-ohjelmisto',
@@ -102,18 +100,16 @@ exports.import = function(file, callback) {
           toValue: enums.getProvidingType
         }
       })
-      location.deleted = false
-      location.active = true
-      location.isPayer = stringXToBoolean(location.isPayer)
-      location.adultContent = stringXToBoolean(location.adultContent)
-      location.gamesWithoutPegi = stringXToBoolean(location.gamesWithoutPegi)
 
-      locations.push(location)
+      return utils.merge(location, {
+        deleted: false,
+        active: true,
+        isPayer: stringXToBoolean(location.isPayer),
+        adultContent: stringXToBoolean(location.adultContent),
+        gamesWithoutPegi: stringXToBoolean(location.gamesWithoutPegi)
+      })
     })
-
-    return locations
   }
-
   function stringXToBoolean(x) { return _.isString(x) ? x.toLowerCase() === 'x' : false }
 }
 

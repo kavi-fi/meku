@@ -738,11 +738,12 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
 
 app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.pid, function(err, provider) {
-    // TODO: Change log
-    var location = provider.locations.id(req.params.lid)
     var flatUpdates = utils.flattenObject(req.body)
+    var location = provider.locations.id(req.params.lid)
+    var watcher = watchChanges(location, req.user)
     _.forEach(flatUpdates, function(value, key) { location.set(key, value) })
     provider.save(respond(res, next))
+    saveChangeLogEntry(req.user, location, 'update', {updates: watcher.getChanges(), targetCollection: 'providerlocations'})
   })
 })
 
@@ -1319,7 +1320,7 @@ function logError(err) {
 
 function watchChanges(document, user, excludedLogPaths) {
   var oldObject = document.toObject()
-  return { applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges }
+  return { applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges, getChanges: getChanges }
 
   function applyUpdates(updates) {
     var flatUpdates = utils.flattenObject(updates)
@@ -1334,15 +1335,24 @@ function watchChanges(document, user, excludedLogPaths) {
     })
   }
 
+  function getChanges() {
+    var changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
+    return asChanges(changedPaths, oldObject, document)
+  }
+
   function isIncludedLogPath(p) {
     return document.isDirectModified(p) && document.schema.pathType(p) != 'nested' && !_.contains(excludedLogPaths, p)
   }
 
   function log(changedPaths, oldObject, updatedDocument, callback) {
-    var newObject = updatedDocument.toObject()
-    var changes = _(changedPaths).map(asChange).zipObject().valueOf()
+    var changes = asChanges(changedPaths, oldObject, updatedDocument)
     logUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
+  }
+
+  function asChanges(changedPaths, oldObject, updatedDocument) {
+    var newObject = updatedDocument.toObject()
+    return _(changedPaths).map(asChange).zipObject().valueOf()
 
     function asChange(path) {
       var newValue = utils.getProperty(newObject, path)

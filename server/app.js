@@ -149,10 +149,25 @@ app.post('/reset-password', function(req, res, next) {
 
 app.get('/programs/search/:q?', function(req, res, next) {
   if (req.user) {
-    var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
-    search({}, fields, req, res, next)
+    var isKavi = utils.hasRole(req.user, 'kavi')
+    var query = isKavi ? constructKaviQuery() : {}
+    var fields = isKavi ? null : { 'classifications.comments': 0 }
+    search(query, fields, req, res, next)
   } else {
     search({ $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }, Program.publicFields, req, res, next)
+  }
+
+  function constructKaviQuery() {
+    if (!req.query.registrationDateRange && !req.query.classifier) return {}
+    var q = {}
+    if (req.query.registrationDateRange) {
+      var range = utils.parseDateRange(req.query.registrationDateRange)
+      q.registrationDate = { $gte: range.begin, $lt: range.end }
+    }
+    if (req.query.classifier) {
+      q['author._id'] = req.query.classifier
+    }
+    return { classifications: { $elemMatch: q } }
   }
 })
 

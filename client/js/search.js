@@ -5,6 +5,7 @@ function publicSearchPage() {
   $page.find('.new-classification').remove()
   $page.find('.drafts').remove()
   $page.find('.recent').remove()
+  $page.find('.kavi-query-filters').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
     var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program.sequenceId+']')
@@ -287,6 +288,9 @@ function searchPage() {
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
   var $filters = $page.find('.filters input[type=checkbox]')
+  var $registrationDatePicker = $page.find('.kavi-query-filters .datepicker')
+  var $clearRegistrationDatePicker = $page.find('.kavi-query-filters .clear-date-picker')
+  var $classifier = $page.find('.kavi-query-filters input[name="classifier"]')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
@@ -294,6 +298,9 @@ function searchPage() {
 
   var detailRenderer = programBox()
   var state = { q:'', page: 0 }
+  var dateFormat = 'DD.MM.YYYY'
+
+  setupKaviFilters()
 
   $page.on('show', function(e, q, filters, programId) {
     if (q) $input.val(q).trigger('reset')
@@ -339,6 +346,49 @@ function searchPage() {
     $noResults.add($noMoreResults).hide()
   }
 
+  function setupKaviFilters() {
+    if (!hasRole('kavi')) {
+      $page.find('.kavi-query-filters').remove()
+      return
+    }
+
+    select2Autocomplete({
+      $el: $classifier,
+      path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
+      toOption: userToSelect2Option,
+      fromOption: select2OptionToIdNamePair,
+      termMinLength: 0,
+      allowClear: true
+    }, function() {
+      $input.trigger('fire')
+    })
+
+    $registrationDatePicker.dateRangePicker({
+      language: 'fi',
+      format: dateFormat,
+      separator: ' - ',
+      startOfWeek: 'monday',
+      shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['week', 'month']},
+      getValue: function() { return $registrationDatePicker.find('span').text() },
+      setValue: function(s) {
+        $clearRegistrationDatePicker.toggle(!!s)
+        $registrationDatePicker.find('span').text(s)
+      }
+    }).bind('datepicker-change',function(event, obj) {
+      var selection = { begin: moment(obj.date1).format(dateFormat), end: moment(obj.date2).format(dateFormat) }
+      if (!_.isEqual(selection, $registrationDatePicker.data('selection'))) {
+        $registrationDatePicker.data('selection', selection)
+        $input.trigger('fire')
+      }
+    })
+
+    $clearRegistrationDatePicker.click(function() {
+      $registrationDatePicker.removeData('selection')
+      $registrationDatePicker.data('dateRangePicker').clear()
+      $input.trigger('fire')
+    })
+  }
+
   function loadUntil(selectedProgramId, callback) {
     load(function() {
       if (!selectedProgramId) {
@@ -360,7 +410,12 @@ function searchPage() {
   function load(callback) {
     $loading.show()
     var url = '/programs/search/'+encodeURIComponent(state.q)
-    var data = $.param({ page: state.page, filters: currentFilters() })
+    var data = $.param({
+      page: state.page,
+      filters: currentFilters(),
+      classifier: currentClassifier(),
+      registrationDateRange: currentRegistrationDateRange()
+    })
     state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
       $noResults.toggle(state.page == 0 && results.length == 0)
@@ -380,6 +435,14 @@ function searchPage() {
     $filters.each(function() {
       $(this).prop('checked', filterString && filterString.indexOf($(this).data('id')) >= 0)
     })
+  }
+
+  function currentClassifier() {
+    var data = $classifier.select2 && $classifier.select2('data') || undefined
+    return data && data.id || undefined
+  }
+  function currentRegistrationDateRange() {
+    return $registrationDatePicker.data('selection')
   }
 
   function programDataUpdated(program) {

@@ -180,6 +180,23 @@ label.top { vertical-align: top; }
 #search-page .new-classification { width: 340px; }
 #search-page .new-classification label { width: 200px; }
 
+#search-page .datepicker {
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #e1e1e1;
+  color: #777;
+  padding: 4px 5px;
+  text-decoration: none;
+}
+#search-page .datepicker { display: inline-block; text-align: right; min-width: 238px; }
+#search-page .datepicker span { display: inline-block; margin-right: 5px; }
+#search-page .kavi-query-filters > div { margin-top: 10px; }
+#search-page .kavi-query-filters label { display: inline-block; }
+#search-page .kavi-query-filters .classifier-label { vertical-align: top; margin-top: 10px; }
+#search-page .kavi-query-filters .clear-date-picker { margin-left: 8px; display: none; cursor: pointer; }
+#search-page .kavi-query-filters .select2-container, #search-page .kavi-query-filters .datepicker { margin-left: 20px; }
+
 #search-page .recent { margin-bottom: 40px; }
 #search-page .drafts h3, #search-page .recent h3 { margin-bottom: 10px; }
 #search-page .extra > div { margin-bottom: 40px; }

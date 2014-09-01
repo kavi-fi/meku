@@ -609,6 +609,14 @@ app.post('/providers/billing/proe', requireRole('kavi'), express.urlencoded(), f
   ]}
   Provider.getForBilling(registrationDateFilters, function(err, data) {
     if (err) return next(err)
+
+    data.providers = _(data.providers).map(function(p) {
+      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+      return p
+    }).reject(function(p) { return _.isEmpty(p.locations) }).value()
+
+    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+
     var accountRows = getProviderBillingRows(data)
     var result = proe(dates, accountRows, 'provider')
     var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.txt'
@@ -656,9 +664,11 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
 app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res, next) {
   var format = 'DD.MM.YYYY'
 
+  var beginMoment = moment(req.params.begin, format)
+  var endMoment = moment(req.params.end, format).add(1, 'day')
   var dates = {
-    $gte: moment(req.params.begin, format),
-    $lt: moment(req.params.end, format).add(1, 'day')
+    $gte: beginMoment,
+    $lt: endMoment
   }
 
   var terms = {
@@ -672,7 +682,10 @@ app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res
   Provider.find(terms).lean().exec(function(err, providers) {
     if (err) return next(err)
     _.forEach(providers, function(provider) {
-      provider.locations = _(provider.locations).filter({ active: true, deleted: false }).sortBy('name').value()
+      provider.locations = _(provider.locations)
+        .filter({ active: true, deleted: false })
+        .filter(function(l) { return withinDateRange(l.registrationDate, beginMoment, endMoment) })
+        .sortBy('name').value()
     })
     res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
   })
@@ -1415,4 +1428,8 @@ function getHostname() {
   if (isDev()) return 'http://localhost:3000'
   else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
   else return 'https://meku.herokuapp.com'
+}
+
+function withinDateRange(date, beginDate, endDate) {
+  return date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
 }

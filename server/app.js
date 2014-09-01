@@ -527,8 +527,9 @@ app.get('/users', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
-  var q = { name: new RegExp("^" + utils.escapeRegExp(req.query.q), 'i') }
-  User.find(q).lean().exec(respond(res, next))
+  var regexp = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
+  var q = { $or:[{ name: regexp }, { username: regexp }] }
+  User.find(q).sort('name').lean().exec(respond(res, next))
 })
 
 app.delete('/users/:id', requireRole('root'), function(req, res, next) {

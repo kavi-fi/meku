@@ -81,18 +81,14 @@ app.post('/logout', function(req, res, next) {
 
 app.post('/forgot-password', function(req, res, next) {
   var username = req.body.username
-
   if (!username) return res.send(403)
-
   User.findOne({ username: username, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
-
-    if (!user.emails) {
+    if (_.isEmpty(user.emails)) {
       console.log(user.username + ' has no email address')
       return res.send(500)
     }
-
     var subject = 'Salasanan uusiminen'
     var text = '<p>Hei,<br/>' +
       'uusiaksesi salasanasi seuraa oheista linkkiä <a href="<%- link %>"><%- link %></a>, ' +
@@ -120,7 +116,6 @@ function sendHashLinkViaEmail(user, subject, text, callback) {
     body: _.template(text, { link: url }),
     sendInTraining: true
   }
-
   sendEmail(emailData, callback)
 }
 
@@ -132,7 +127,7 @@ function createAndSaveHash(user, callback) {
 }
 
 app.get('/check-reset-hash/:hash', function(req, res, next) {
-  User.findOne({ resetHash: req.params.hash, active: true }, function(err, user) {
+  User.findOne({ resetHash: req.params.hash, active: true }).lean().exec(function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.password) return res.send({ name: user.name })
@@ -171,7 +166,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 function search(extraQueryTerms, responseFields, req, res, next) {
   var page = req.query.page || 0
   var filters = req.query.filters || []
-  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').exec(respond(res, next))
+  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').lean().exec(respond(res, next))
 
   function query(extraQueryTerms) {
     var ObjectId = mongoose.Types.ObjectId
@@ -194,11 +189,11 @@ function search(extraQueryTerms, responseFields, req, res, next) {
 }
 
 app.get('/episodes/:seriesId', function(req, res, next) {
-  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).exec(respond(res, next))
+  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).lean().exec(respond(res, next))
 })
 
 app.get('/programs/drafts', function(req, res, next) {
-  Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }, function(err, programs) {
+  Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {
       return {_id: p._id, name: p.name, creationDate: p.draftClassifications[req.user._id].creationDate}
@@ -235,7 +230,7 @@ app.delete('/programs/drafts/:id', function(req, res, next) {
 })
 
 app.get('/programs/:id', function(req, res, next) {
-  Program.findById(req.params.id, respond(res, next))
+  Program.findById(req.params.id).lean().exec(respond(res, next))
 })
 
 app.post('/programs/new', function(req, res, next) {
@@ -278,7 +273,7 @@ app.post('/programs/:id/register', function(req, res, next) {
               if (err) return next(err)
               sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, getHostname()), function(err) {
                 if (err) return next(err)
-                updateMetadataIndexes(program, function() {
+                updateMetadataIndexesForNewProgram(program, function() {
                   logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
                   return res.send(program)
                 })
@@ -288,6 +283,11 @@ app.post('/programs/:id/register', function(req, res, next) {
         })
       })
     })
+
+    function updateMetadataIndexesForNewProgram(program, callback) {
+      if (program.classifications.length > 1) return callback()
+      updateMetadataIndexes(program, callback)
+    }
 
     function populateSentRegistrationEmailAddresses(classification, program, callback) {
       if (classification.buyer) {
@@ -341,7 +341,8 @@ app.post('/programs/:id/register', function(req, res, next) {
 app.post('/programs/:id/reclassification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
-    var draft = program.newDraftClassification(req.user)
+    if (!classificationUtils.canReclassify(program, req.user)) return res.send(400)
+    program.newDraftClassification(req.user)
     program.save(respond(res, next))
   })
 })
@@ -400,9 +401,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
 
   function updateTvEpisodeAllNamesOnParentNameChange(parent, callback) {
     if (!enums.util.isTvSeriesName(parent)) return callback()
-    var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
-    var nameChanges = _.any(parent.modifiedPaths(), function(p) { return _.contains(namePaths, p) })
-    if (!nameChanges) return callback()
+    if (!parent.hasNameChanges()) return callback()
     Program.find({ 'series._id': parent._id }).exec(function(err, episodes) {
       if (err) return callback(err)
       async.forEach(episodes, function(e, callback) { e.populateAllNames(parent, callback) }, function() {
@@ -413,14 +412,41 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
 })
 
 app.post('/programs/autosave/:id', function(req, res, next) {
-  Program.findOneAndUpdate({ _id: req.params.id, draftsBy: req.user._id }, req.body, function(err, program) {
+  Program.findOne({ _id: req.params.id, draftsBy: req.user._id }, function(err, program) {
     if (err) return next(err)
     if (!program) return res.send(409)
-    program.populateAllNames(function(err) {
+    if (!isValidUpdate(req.body, program, req.user)) return res.send(400)
+    watchChanges(program, req.user).applyUpdates(req.body)
+    program.verifyAllNamesUpToDate(function(err) {
       if (err) return next(err)
       program.save(respond(res, next))
     })
   })
+
+  function isValidUpdate(update, p, user) {
+    var allowedFields = allowedAutosaveFields(p, user)
+    return _.every(Object.keys(update), function(updateField) {
+      return _.any(allowedFields, function(allowedField) {
+        return allowedField[allowedField.length-1] == '*'
+          ? updateField.indexOf(allowedField.substring(0, allowedField.length-1)) == 0
+          : updateField == allowedField
+      })
+    })
+  }
+
+  function allowedAutosaveFields(p, user) {
+    var programFields = ['name.0', 'nameFi.0', 'nameSv.0', 'nameOther.0', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
+    var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationEmailAddresses', 'comments', 'criteriaComments*']
+    var kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
+    if (p.classifications.length == 0) {
+      return programFields.concat(classificationFields.map(asDraftField))
+    } else {
+      return utils.hasRole(user, 'kavi')
+        ? classificationFields.concat(kaviReclassificationFields).map(asDraftField)
+        : classificationFields.map(asDraftField)
+    }
+    function asDraftField(s) { return 'draftClassifications.'+user._id+'.'+s }
+  }
 })
 
 app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
@@ -444,6 +470,7 @@ app.get('/series/search', function(req, res, next) {
 })
 
 app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
   Account.findById(req.params.id, function(err, account) {
     if (err) return next(err)
     updateAndLogChanges(account, req.body, req.user, respond(res, next))
@@ -451,6 +478,7 @@ app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
 })
 
 app.post('/accounts', requireRole('kavi'), function(req, res, next) {
+  if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
   new Account(req.body).save(function(err, account) {
     if (err) return next(err)
     logCreateOperation(req.user, account)
@@ -468,8 +496,7 @@ app.delete('/accounts/:id', requireRole('root'), function(req, res, next) {
 app.get('/accounts', requireRole('kavi'), function(req, res, next) {
   var selectedRoles = req.query.roles
   var query = selectedRoles ? { roles: { $all: selectedRoles }} : {}
-
-  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
+  Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
 })
 
 app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
@@ -477,7 +504,7 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
   var query = _.isEmpty(selectedRoles)
     ? { roles: { $in: ['Classifier', 'Subscriber'] }}
     : { roles: { $all: selectedRoles }}
-  Account.find(_.merge(query, { deleted: { $ne: true }}), respond(res, next))
+  Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
 })
 
 app.get('/providers/unapproved', requireRole('kavi'), function(req, res, next) {
@@ -747,25 +774,29 @@ app.get('/accounts/search', function(req, res, next) {
   if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
   }
-
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
-  Account.find(q).sort('name').limit(50).exec(respond(res, next))
+  Account.find(q, { _id:1, name:1 }).sort('name').limit(50).lean().exec(respond(res, next))
 })
 
-app.get('/accounts/:id', function(req, res, next) {
-  Account.findById(req.params.id, respond(res, next))
+app.get('/accounts/:id/emailAddresses', function(req, res, next) {
+  Account.findById(req.params.id, { emailAddresses: 1, users: 1 }).exec(function(err, account) {
+    if (err) return next(err)
+    if (!account) return res.send(404)
+    if (!utils.hasRole(req.user, 'kavi') && !account.users.id(req.user._id)) return res.send(400)
+    res.send({ _id: account._id, emailAddresses: account.emailAddresses })
+  })
 })
 
 app.get('/users', requireRole('root'), function(req, res, next) {
   var roleFilters = req.query.roles
   var activeFilter = req.query.active ? req.query.active === 'true' : false
   var filters = _.merge({}, roleFilters ? { role: { $in: roleFilters }} : {}, activeFilter ? {active: true} : {})
-  User.find(filters, respond(res, next))
+  User.find(filters).lean().exec(respond(res, next))
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
   var q = { name: new RegExp("^" + utils.escapeRegExp(req.query.q), 'i') }
-  User.find(q).exec(respond(res, next))
+  User.find(q).lean().exec(respond(res, next))
 })
 
 app.delete('/users/:id', requireRole('root'), function(req, res, next) {
@@ -773,40 +804,34 @@ app.delete('/users/:id', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/exists/:username', requireRole('root'), function(req, res, next) {
-  User.findOne({ username: req.params.username }, function(err, user) {
+  User.findOne({ username: req.params.username }, { _id:1 }).lean().exec(function(err, user) {
     if (err) return next(err)
     res.send({ exists: !!user })
   })
 })
 
-function userHasRequiredFields(user) {
-  return (user.username != '' && user.emails[0].length > 0 && user.name != '')
-}
-
 app.post('/users/new', requireRole('root'), function(req, res, next) {
-  if (userHasRequiredFields(req.body)) {
-    new User(req.body).save(function(err, user) {
+  var hasRequiredFields = (req.body.username != '' && req.body.emails[0].length > 0 && req.body.name != '')
+  if (!hasRequiredFields || !utils.isValidUsername(req.body.username)) return res.send(400)
+  new User(req.body).save(function(err, user) {
+    if (err) return next(err)
+    createAndSaveHash(user, function(err) {
       if (err) return next(err)
-      createAndSaveHash(user, function(err) {
-        if (err) return next(err)
-        logCreateOperation(req.user, user)
-        var subject = 'Käyttäjätunnuksen aktivointi'
-        var text = '<p>Hei,<br/>' +
-          'Olet saanut käyttäjätunnuksen Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
-          '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
-          'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
-          'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +
-          '<p>Jos unohdat salasanasi, voit uusia sen sisäänkirjautumisikkunan kautta:<br/>' +
-          'Anna käyttäjätunnus ja paina "unohdin salasanani" -painiketta.</p>' +
-          '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
-          'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
-          '<p>Terveisin,<br/>KAVI</p>'
-        sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
-      })
+      logCreateOperation(req.user, user)
+      var subject = 'Käyttäjätunnuksen aktivointi'
+      var text = '<p>Hei,<br/>' +
+        'Olet saanut käyttäjätunnuksen Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
+        '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
+        'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
+        'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +
+        '<p>Jos unohdat salasanasi, voit uusia sen sisäänkirjautumisikkunan kautta:<br/>' +
+        'Anna käyttäjätunnus ja paina "unohdin salasanani" -painiketta.</p>' +
+        '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
+        'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+        '<p>Terveisin,<br/>KAVI</p>'
+      sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
     })
-  } else {
-    return res.send(500)
-  }
+  })
 })
 
 app.post('/users/:id', requireRole('root'), function(req, res, next) {
@@ -815,16 +840,20 @@ app.post('/users/:id', requireRole('root'), function(req, res, next) {
   })
 })
 
-app.get('/users/names/:names', function(req, res, next) {
-  if (!utils.hasRole(req.user, 'kavi')) return res.send([])
-  User.find({username: {$in: req.params.names.split(',')}}, 'name username', function(err, names) {
+app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
+  User.find({username: {$in: req.params.names.split(',')}}, 'name username').lean().exec(function(err, names) {
     if (err) return next(err)
-
     var usernamesAsKeys = _.reduce(names, function(acc, user) {
       return _.merge(acc, utils.keyValue(user.username, user.name))
     }, {})
-
     res.send(usernamesAsKeys)
+  })
+})
+
+app.get('/apiToken', requireRole('root'), function(req, res, next) {
+  bcrypt.genSalt(1, function(err, s) {
+    if (err) return next(err)
+    res.send({ apiToken: new Buffer(s, 'base64').toString('hex') })
   })
 })
 
@@ -840,14 +869,14 @@ app.get('/emails/search', function(req, res, next) {
   })
 
   function loadUsers(callback) {
-    var q = { $or: [ { name: terms }, { 'emails.0': terms } ], 'emails.0': { $exists: true } }
+    var q = { $or: [ { name: terms }, { 'emails.0': terms } ], 'emails.0': { $exists: true }, deleted: { $ne:true } }
     User.find(q, { name: 1, emails:1 }).sort('name').limit(25).lean().exec(function(err, res) {
       if (err) return callback(err)
       callback(null, res.map(function(u) { return { id: u.emails[0], name: u.name, role: 'user' } }))
     })
   }
   function loadAccounts(callback) {
-    var q = { $or: [ { name: terms }, { 'emailAddresses.0': terms } ], 'emailAddresses.0': { $exists: true }, roles: 'Subscriber' }
+    var q = { $or: [ { name: terms }, { 'emailAddresses.0': terms } ], 'emailAddresses.0': { $exists: true }, roles: 'Subscriber', deleted: { $ne:true } }
     Account.find(q, { name: 1, emailAddresses: 1 }).sort('name').limit(25).lean().exec(function(err, res) {
       if (err) return callback(err)
       callback(null, res.map(function(a) { return { id: a.emailAddresses[0], name: a.name, role: 'account' } }))
@@ -866,8 +895,8 @@ app.get('/emails/search', function(req, res, next) {
 app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next) {
   var format = "DD.MM.YYYY"
   var begin = moment(req.params.begin, format)
-  var end = moment(req.params.end, format).add('days', 1)
-  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').exec(respond(res, next))
+  var end = moment(req.params.end, format).add(1, 'days')
+  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').lean().exec(respond(res, next))
 })
 
 app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {
@@ -1021,7 +1050,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
 })
 
 app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next) {
-  ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).exec(respond(res, next))
+  ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).lean().exec(respond(res, next))
 })
 
 app.get('/environment', function(req, res, next) {
@@ -1211,7 +1240,7 @@ function queryNameIndex(schemaName) {
     var q = {}
     var parts = toMongoArrayQuery(req.query.q)
     if (parts) q.parts = parts
-    schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').exec(function(err, docs) {
+    schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').lean().exec(function(err, docs) {
       if (err) return next(err)
       res.send(_.pluck(docs || [], 'name'))
     })
@@ -1346,11 +1375,9 @@ function saveChangeLogEntry(user, document, operation, operationData) {
     targetCollection: document ? document.constructor.modelName : undefined,
     documentId: document ? document._id : undefined
   }
-
   if (operationData) {
     _.merge(data, operationData)
   }
-
   new ChangeLog(data).save(logError)
 }
 

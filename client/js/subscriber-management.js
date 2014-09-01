@@ -42,9 +42,7 @@ function subscriberManagementPage() {
 
   $page.find('button[name=new-subscriber]').on('click', function() {
     var $newSubscriberForm = renderSubscriberDetails()
-
     $newSubscriberForm.find('.modify-only').remove()
-
     bindEventHandlers($newSubscriberForm, function(subscriberData) {
       $.post('/accounts/', JSON.stringify(subscriberData), function(subscriber) {
         $subscribers.find('.result.selected').data('subscriber', subscriber)
@@ -90,7 +88,7 @@ function subscriberManagementPage() {
 
     $form.submit(function(event) {
       event.preventDefault()
-
+      $form.find('button[name=save]').prop('disabled', true)
       var subscriberData = {
         roles: findInput('roles').filter(':checked').map(function() {
           return $(this).val()
@@ -124,7 +122,9 @@ function subscriberManagementPage() {
         billingPreference: $form.find('input[name=billing-extra]').prop('checked')
           ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
-
+      if (hasRole('root')) {
+        subscriberData.apiToken = findInput('apiToken').val()
+      }
       submitCallback(subscriberData)
 
       function findInput(name) {
@@ -161,13 +161,20 @@ function subscriberManagementPage() {
       }
     })
 
+    $form.find('.apiToken a').click(function(e) {
+      e.preventDefault()
+      $.get('/apiToken').done(function(data) {
+        $form.find('.apiToken input').val(data.apiToken).addClass('touched').trigger('validate').end()
+      })
+    })
+
     $subscriberDetails.find('button[name=remove]').click(function() {
       var $selected = $page.find('.result.selected')
       var subscriber = $selected.data('subscriber')
       showDialog($('#templates').find('.remove-subscriber-dialog').clone()
         .find('.subscriber-name').text(subscriber.name).end()
-        .find('button[name=remove]').click(removeSubscriber).end()
-        .find('button[name=cancel]').click(closeDialog).end())
+        .find('button[name=remove]').one('click', removeSubscriber).end()
+        .find('button[name=cancel]').one('click', closeDialog).end())
 
       function removeSubscriber() {
         $.ajax('/accounts/' + subscriber._id, { type: 'DELETE' }).done(function() {
@@ -242,8 +249,8 @@ function subscriberManagementPage() {
       .find('input[name="billing.language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
 
     populateClassifiers(subscriber ? subscriber.users : [])
-
-    toggleBillingExtra($subscriberDetails)
+    toggleBillingExtra()
+    apiToken()
 
     return $subscriberDetails
 
@@ -286,6 +293,10 @@ function subscriberManagementPage() {
         $addressInputs.prop('disabled', type === 'eInvoice')
         $eInvoiceInputs.prop('disabled', type === 'address')
       }
+    }
+
+    function apiToken() {
+      if (!hasRole('root')) $subscriberDetails.find('.apiToken').remove()
     }
   }
 

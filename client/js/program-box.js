@@ -72,9 +72,9 @@ function programBox() {
         $result.removeClass('selected').next('.program-box').slideUp(function() { $(this).remove() }).end()
       } else {
         var p = $result.data('program')
-        var $details = programBox().render(p).slideDown()
+        var $details = programBox().render(p)
         $result.addClass('selected').after($details)
-        $details.trigger('showDetails', p)
+        $details.slideDown().trigger('showDetails', p)
       }
     })
 

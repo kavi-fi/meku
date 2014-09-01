@@ -6,7 +6,7 @@ body {
   color: #444444;
 }
 
-.pika-lendar { width: 248px; }
+.pika-single { width: 248px; }
 
 .hide { display: none !important; }
 .hidden { display: none; }
@@ -689,6 +689,8 @@ textarea.invalid:disabled,
 #subscriber-management-page .subscriber-details .roles label { width: auto; }
 #subscriber-management-page .billing-extra { margin: 15px 0; padding: 15px 0; border-top: 1px solid #D3D3D3; border-bottom: 1px solid #D3D3D3; clear: both; }
 #subscriber-management-page button[name=new-subscriber] { float: right; }
+#subscriber-management-page .apiToken > div { font-weight: normal; }
+#subscriber-management-page .apiToken input { width: 500px; margin-right: 20px; }
 
 #provider-page .controls button[name=new-provider] { float: right; }
 #provider-page .select2-float-right { float: right; margin-right: 34px; }

@@ -207,9 +207,9 @@ enums.classificationStatus = [
 ]
 
 enums.reclassificationReason = {
-  0: 'KAVIn oma aloite',
-  1: 'Yleisön palaute',
-  2: 'Valitus',
+  0: 'KAVI:n oma aloite',
+  1: 'Yleisön pyyntö',
+  2: 'Valitusosoitus',
   3: 'Oikaisupyyntö'
 }
 
@@ -217,21 +217,19 @@ enums.isOikaisupyynto = function(val) { return val == 3 }
 
 enums.authorOrganization = {
   0: 'Ulkopuolinen',
-  1: 'KAVIn virkailija',
-  2: 'Kuvalautakunta',
+  1: 'KAVI:n virkailija',
+  2: 'Kuvaohjelmalautakunta',
   3: 'KHO'
 }
 
-enums.isKHO = function(number) {
-  return number == 3
-}
-
 enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }
+enums.authorOrganizationIsKuvaohjelmalautakunta = function(c) { return c.authorOrganization === 2 }
+enums.authorOrganizationIsKHO = function(c) { return c.authorOrganization === 3 }
 
 enums.invoiceRowType = {
   registration: 'Kuvaohjelman rekisteröinti',
-  classification: 'KAVIn luokittelu',
-  reclassification: 'KAVIn uudelleenluokittelu'
+  classification: 'KAVI:n luokittelu',
+  reclassification: 'KAVI:n uudelleenluokittelu'
 }
 
 enums.countries = {

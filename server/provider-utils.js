@@ -34,6 +34,7 @@ exports.registrationEmail = function (provider, callback) {
     }
 
     readTemplate('registration-email.tpl.html', function(err, tpl) {
+      if (err) return callback(err)
       var html =  _.template(tpl, vars)
       //fs.writeFileSync('./tmp/registration-email.html', html)
       callback(null, html)

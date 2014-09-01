@@ -485,6 +485,7 @@ function searchPage() {
 
   function render(p, query) {
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
+    var showRegistrationDate = !!$registrationDatePicker.data('selection')
     return $('<div>', { class:'result', 'data-id': p._id }).data('program', p).append(series(p)).append(row(p))
 
     function series(p) {
@@ -497,16 +498,20 @@ function searchPage() {
     function row(p) {
       return $('<div>').addClass('items')
         .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
-        .append($('<span>', { class: 'country-and-year' }).text(countryAndYear(p)))
+        .append($('<span>', { class: 'country-year-date' }).text(countryAndYearAndDate(p)))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
         .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
-  }
 
-  function countryAndYear(p) {
-    var s = _([enums.util.toCountryString(p.country), p.year]).compact().join(', ')
-    return s == '' ? s : '('+s+')'
-  }
+    function countryAndYearAndDate(p) {
+      var s = _([registrationDate(p), enums.util.toCountryString(p.country), p.year]).compact().join(', ')
+      return s == '' ? s : '('+s+')'
+    }
 
+    function registrationDate(p) {
+      if (!showRegistrationDate) return undefined
+      return moment(p.classifications[0].registrationDate).format('D.M.YYYY')
+    }
+  }
 }

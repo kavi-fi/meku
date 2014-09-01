@@ -152,9 +152,11 @@ app.get('/programs/search/:q?', function(req, res, next) {
     var isKavi = utils.hasRole(req.user, 'kavi')
     var query = isKavi ? constructKaviQuery() : {}
     var fields = isKavi ? null : { 'classifications.comments': 0 }
-    search(query, fields, req, res, next)
+    var sortBy = req.query.registrationDateRange ? '-classifications.0.registrationDate' : 'name'
+    search(query, fields, sortBy, req, res, next)
   } else {
-    search({ $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }, Program.publicFields, req, res, next)
+    var query = { $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }
+    search(query, Program.publicFields, 'name', req, res, next)
   }
 
   function constructKaviQuery() {
@@ -171,10 +173,10 @@ app.get('/programs/search/:q?', function(req, res, next) {
   }
 })
 
-function search(extraQueryTerms, responseFields, req, res, next) {
+function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
   var page = req.query.page || 0
   var filters = req.query.filters || []
-  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').lean().exec(respond(res, next))
+  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(respond(res, next))
 
   function query(extraQueryTerms) {
     var ObjectId = mongoose.Types.ObjectId

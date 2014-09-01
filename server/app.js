@@ -516,7 +516,7 @@ app.get('/providers', requireRole('kavi'), function(req, res, next) {
 })
 
 app.post('/providers', requireRole('kavi'), function(req, res, next) {
-  new Provider(_.merge({}, req.body, { deleted: false, active: false, creationDate: new Date() })).save(function(err, provider) {
+  new Provider(utils.merge(req.body, { deleted: false, active: false, creationDate: new Date() })).save(function(err, provider) {
     if (err) return next(err)
     logCreateOperation(req.user, provider)
     res.send(provider)
@@ -560,7 +560,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     _.select(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
-      providerUtils.registrationEmailProviderLocation(_.merge({}, l, {provider: provider}), logErrorOrSendEmail)
+      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), logErrorOrSendEmail)
     })
   }
 })
@@ -718,7 +718,7 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
   function sendRegistrationEmails(provider, location, callback) {
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
-      providerUtils.registrationEmailProviderLocation(_.merge({}, location, {provider: provider}), logErrorOrSendEmail)
+      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), logErrorOrSendEmail)
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else if (!location.isPayer) {
       // email the provider
@@ -751,7 +751,7 @@ app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res
 app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, p) {
     if (err) return next(err)
-    p.locations.push(_.merge({}, req.body, { deleted: false, active: false }))
+    p.locations.push(utils.merge(req.body, { deleted: false, active: false }))
     p.save(function(err, p) {
       if (err) return next(err)
       logCreateOperation(req.user, _.last(p.locations))
@@ -1305,7 +1305,7 @@ function getProviderBillingRows(data) {
     var account = _.omit(provider, 'locations')
     var rows = _(provider.locations).filter({ isPayer: false }).map(function(l) {
       return _.map(l.providingType, function(p) {
-        return _.merge({}, l, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+        return utils.merge(l, { providingType: p, price: enums.providingTypePrices[p] * 100 })
       })
     }).flatten().value()
     accountRows.push({ account: account, rows: rows })
@@ -1313,7 +1313,7 @@ function getProviderBillingRows(data) {
 
   data.locations.forEach(function(location) {
     var rows = _.map(location.providingType, function(p) {
-      return _.merge({}, location, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+      return utils.merge(location, { providingType: p, price: enums.providingTypePrices[p] * 100 })
     })
     accountRows.push({ account: location, rows: rows })
   })

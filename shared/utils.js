@@ -140,6 +140,10 @@ utils.flattenObject = function flattenObject(deepObject) {
   return resultObject
 }
 
+utils.merge = function merge(x, y) {
+  return _.merge({}, x, y)
+}
+
 if (isNodeJs()) module.exports = utils
 
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

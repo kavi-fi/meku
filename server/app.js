@@ -546,11 +546,20 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     provider.save(function(err, saved) {
       if (isFirstActivation) {
         var provider = saved.toObject()
-        providerUtils.registrationEmail(provider, logErrorOrSendEmail)
+        var providerHasEmails = !_.isEmpty(provider.emailAddresses)
+        if (providerHasEmails) {
+          providerUtils.registrationEmail(provider, logErrorOrSendEmail)
+        }
         sendProviderLocationEmails(provider)
         var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
         var withoutEmail = providerUtils.payingLocationsWithoutEmail(provider.locations)
-        return res.send({active: true, wasFirstActivation: true, locationsWithEmail: withEmail, locationsWithoutEmail: withoutEmail})
+        return res.send({
+          active: true,
+          wasFirstActivation: true,
+          emailSent: providerHasEmails,
+          locationsWithEmail: withEmail,
+          locationsWithoutEmail: withoutEmail
+        })
       }
       res.send({active: saved.active, wasFirstActivation: false})
     })

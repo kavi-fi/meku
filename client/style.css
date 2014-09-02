@@ -11,6 +11,8 @@ body {
 .hide { display: none !important; }
 .hidden { display: none; }
 
+.align-top { vertical-align: top; }
+
 .clearfix:after { content:''; display:table; clear:both; }
 .dialog { border-radius: 5px; border: 5px solid #00BB88; background-color: #f8f8f8; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); padding: 20px 40px 20px 40px; max-width: 700px; }
 .dialog .buttons { display: -webkit-flex; display: flex; width: 100%; -webkit-justify-content: space-around; justify-content: space-around; margin-top: 15px; }
@@ -696,7 +698,6 @@ textarea.invalid:disabled,
 #provider-page .select2-float-right { float: right; margin-right: 34px; }
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
-#provider-page .locations .location-details label { vertical-align: top; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; }
 #provider-page .location-row span:nth-child(2) { -webkit-flex-grow: 2; flex-grow: 2; }
 #provider-page .location-row span:nth-child(3) { -webkit-flex-grow: 1; flex-grow: 1; }

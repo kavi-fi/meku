@@ -202,8 +202,8 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
 
   function getValues(from, row) {
     return _.reduce(from, function(result, field, key) {
-      if (key.match(new RegExp('.' + row))) result.push([parseColumnKey(key), field.v])
-      return result
+      if (key.match(new RegExp('.' + row))) return result.concat([[parseColumnKey(key), field.v]])
+      else return result
     }, [])
 
     function parseColumnKey(key) { return key.substring(0, key.search(/\d/)) }

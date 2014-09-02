@@ -17,7 +17,7 @@ body {
 #reset-password > div { margin: 0 auto; width: 350px; padding: 20px; }
 
 #login-overlay, #error-overlay, #conflict-overlay { z-index: 2; }
-#login, #error-dialog, #conflict-dialog { z-index: 3; display: none; position: fixed; top:0;bottom:0;left:0;right:0; box-sizing: border-box; align-items: center; justify-content: center; }
+#login, #error-dialog, #conflict-dialog { z-index: 3; display: none; position: fixed; top:0;bottom:0;left:0;right:0; box-sizing: border-box; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
 #login > div, #error-dialog > div, #conflict-dialog > div { background-color: #f8f8f8; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
 #login label, #reset-password label { text-align: left; font-weight: normal; }
 #login input, #reset-password input { width: 330px; font-weight: normal; margin: 10px 0; }
@@ -97,6 +97,7 @@ textarea { resize: vertical; }
   display: none;
   position: fixed;
   left: 0; right: 0; top: 0; bottom: 0;
+  -webkit-align-items: center; -webkit-justify-content: center;
   align-items: center; justify-content: center;
   z-index: 1000;
 }
@@ -501,7 +502,7 @@ textarea.invalid:disabled,
 .classification-criteria .category .heading {
   outline: 1px solid #D3D3D3;
   background-color: #fff;
-  padding: 0 0 0 70px;;
+  padding: 0 0 0 70px;
   height: 70px;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
   background-position: 15px 15px;

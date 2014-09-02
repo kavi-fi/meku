@@ -506,6 +506,8 @@ function providerPage() {
       var provider = findSelected().data('provider')
       var data = JSON.stringify({ active: newState === 'on' })
       $.ajax('/providers/' + provider._id + '/locations/' + location._id + '/active', { type: 'PUT' }).done(function(activation) {
+        location.active = activation.active
+        $selected.data('location', location)
         if (activation.wasFirstActivation) {
           var $dialog = $("#templates").find('.location-registration-success-dialog').clone()
           $dialog.find('.name').text(location.name)

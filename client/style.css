@@ -696,6 +696,7 @@ textarea.invalid:disabled,
 #provider-page .select2-float-right { float: right; margin-right: 34px; }
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
+#provider-page .locations .location-details label { vertical-align: top; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; }
 #provider-page .location-row span:nth-child(2) { -webkit-flex-grow: 2; flex-grow: 2; }
 #provider-page .location-row span:nth-child(3) { -webkit-flex-grow: 1; flex-grow: 1; }

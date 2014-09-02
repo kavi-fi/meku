@@ -512,7 +512,8 @@ function searchPage() {
 
     function registrationDate(p) {
       if (!showRegistrationDate) return undefined
-      return moment(p.classifications[0].registrationDate).format('D.M.YYYY')
+      var date = utils.getProperty(p, 'classifications.0.registrationDate')
+      return date ? moment(date).format('D.M.YYYY') : undefined
     }
   }
 }

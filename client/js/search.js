@@ -486,7 +486,7 @@ function searchPage() {
 
   function render(p, query) {
     var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
-    var showRegistrationDate = !!$registrationDatePicker.data('selection')
+    var showRegistrationDate = !!window.user
     return $('<div>', { class:'result', 'data-id': p._id }).data('program', p).append(series(p)).append(row(p))
 
     function series(p) {

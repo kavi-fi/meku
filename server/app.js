@@ -149,37 +149,54 @@ app.post('/reset-password', function(req, res, next) {
 
 app.get('/programs/search/:q?', function(req, res, next) {
   if (req.user) {
-    var fields = utils.hasRole(req.user, 'kavi') ? null : { 'classifications.comments': 0 }
-    search({}, fields, req, res, next)
+    var isKavi = utils.hasRole(req.user, 'kavi')
+    var query = isKavi ? constructKaviQuery() : {}
+    var fields = isKavi ? null : { 'classifications.comments': 0 }
+    var sortBy = req.query.registrationDateRange ? '-classifications.0.registrationDate' : 'name'
+    search(query, fields, sortBy, req, res, next)
   } else {
-    search({ $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }, Program.publicFields, req, res, next)
+    var query = { $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }
+    search(query, Program.publicFields, 'name', req, res, next)
+  }
+
+  function constructKaviQuery() {
+    if (!req.query.registrationDateRange && !req.query.classifier) return {}
+    var q = {}
+    if (req.query.registrationDateRange) {
+      var range = utils.parseDateRange(req.query.registrationDateRange)
+      q.registrationDate = { $gte: range.begin, $lt: range.end }
+    }
+    if (req.query.classifier) {
+      q['author._id'] = req.query.classifier
+    }
+    return { classifications: { $elemMatch: q } }
+  }
+
+  function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
+    var page = req.query.page || 0
+    var filters = req.query.filters || []
+    Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(respond(res, next))
+
+    function query(extraQueryTerms) {
+      var ObjectId = mongoose.Types.ObjectId
+      var terms = req.params.q
+      var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
+      var and = []
+      if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
+      var nameQuery = toMongoArrayQuery(terms)
+      if (nameQuery) {
+        if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
+          and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
+        } else {
+          and.push({allNames: nameQuery})
+        }
+      }
+      if (filters.length > 0) q.programType = { $in: filters }
+      if (and.length > 0) q.$and = and
+      return q
+    }
   }
 })
-
-function search(extraQueryTerms, responseFields, req, res, next) {
-  var page = req.query.page || 0
-  var filters = req.query.filters || []
-  Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort('name').lean().exec(respond(res, next))
-
-  function query(extraQueryTerms) {
-    var ObjectId = mongoose.Types.ObjectId
-    var terms = req.params.q
-    var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
-    var and = []
-    if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
-    var nameQuery = toMongoArrayQuery(terms)
-    if (nameQuery) {
-      if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
-        and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
-      } else {
-        and.push({allNames: nameQuery})
-      }
-    }
-    if (filters.length > 0) q.programType = { $in: filters }
-    if (and.length > 0) q.$and = and
-    return q
-  }
-}
 
 app.get('/episodes/:seriesId', function(req, res, next) {
   Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).lean().exec(respond(res, next))
@@ -527,8 +544,9 @@ app.get('/users', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
-  var q = { name: new RegExp("^" + utils.escapeRegExp(req.query.q), 'i') }
-  User.find(q).lean().exec(respond(res, next))
+  var regexp = new RegExp(utils.escapeRegExp(req.query.q), 'i')
+  var q = { $or:[{ name: regexp }, { username: regexp }] }
+  User.find(q).sort('name').lean().exec(respond(res, next))
 })
 
 app.delete('/users/:id', requireRole('root'), function(req, res, next) {
@@ -625,10 +643,8 @@ app.get('/emails/search', function(req, res, next) {
 })
 
 app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next) {
-  var format = "DD.MM.YYYY"
-  var begin = moment(req.params.begin, format)
-  var end = moment(req.params.end, format).add(1, 'days')
-  InvoiceRow.find({registrationDate: {$gte: begin, $lt: end}}).sort('registrationDate').lean().exec(respond(res, next))
+  var range = utils.parseDateRange(req.params)
+  InvoiceRow.find({registrationDate: {$gte: range.begin, $lt: range.end}}).sort('registrationDate').lean().exec(respond(res, next))
 })
 
 app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {

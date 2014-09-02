@@ -260,15 +260,6 @@ function subscriberManagementPage() {
       if (property !== undefined) $(this).val(property)
     }
 
-    function userToSelect2Option(user) {
-      if (!user) return null
-      return {
-        id: user._id,
-        text: user.name + ' (' + user.username + ')',
-        username: user.username
-      }
-    }
-
     function populateClassifiers(users) {
       var names = _.pluck(users, 'username').join(',')
       if (names.length === 0) return

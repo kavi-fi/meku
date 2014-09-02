@@ -945,7 +945,7 @@ function sendEmail(opts, callback) {
   if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV === 'training' && opts.sendInTraining)) {
     sendgrid.send(email, callback)
   } else {
-    console.log('email (suppressed): ', email)
+    console.log('email (suppressed) to: ', opts.recipients, email)
     return callback()
   }
 }

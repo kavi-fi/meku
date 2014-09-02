@@ -382,7 +382,8 @@ function searchPage() {
       }
     })
 
-    $clearRegistrationDatePicker.click(function() {
+    $clearRegistrationDatePicker.click(function(e) {
+      e.stopPropagation()
       $registrationDatePicker.removeData('selection')
       $registrationDatePicker.data('dateRangePicker').clear()
       $input.trigger('fire')

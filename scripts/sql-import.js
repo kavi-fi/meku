@@ -236,17 +236,39 @@ function classifications(callback) {
   function mapBuyers(result, callback) {
     documentMap('Account', 'emekuId', function(err, accountMap) {
       if (err) return callback(err)
-      _.values(result.classifications).forEach(function(c) {
-        if (!c.provider_id || c.provider_id == '0') return
-        // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
-        if (c.provider_id == '38d427ff-a829-14ce-9950-4fcf065ceb64') return
+      documentMap('Provider', 'emekuId', function(err, providerMap) {
+        if (err) return callback(err)
+        async.eachSeries(_.values(result.classifications), findBuyer, function(err) { callback(err, result) })
 
-        var a = accountMap[c.provider_id]
-        var obj = { _id: a._id, name: a.name }
-        c.buyer = obj
-        c.billing = obj
+        function findBuyer(c, callback) {
+          if (!c.provider_id || c.provider_id == '0') return cont()
+          // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
+          if (c.provider_id == '38d427ff-a829-14ce-9950-4fcf065ceb64') return cont()
+
+          var account = accountMap[c.provider_id]
+          if (account === undefined) {
+            var provider = providerMap[c.provider_id]
+
+            account = _(provider).omit('sequenceId', '_id').merge({ roles: ['Subscriber'] }).valueOf()
+            new schema.Account(account).save(function(err, newAccount) {
+              accountMap[c.provider_id] = newAccount.toObject()
+              if (err) return callback(err)
+              return setBuyerAndBilling(newAccount)
+            })
+          } else {
+            return setBuyerAndBilling(account)
+          }
+
+          function cont() { process.nextTick(callback) }
+
+          function setBuyerAndBilling(account) {
+            var obj = { _id: account._id, name: account.name }
+            c.buyer = obj
+            c.billing = obj
+            return cont()
+          }
+        }
       })
-      callback(null, result)
     })
   }
 
@@ -292,7 +314,11 @@ function classifications(callback) {
 }
 
 function accounts(callback) {
-  async.applyEachSeries([accountBase, accountEmailAddresses, providers, userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts], callback)
+  async.applyEachSeries([
+    accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, locationEmailAddresses,
+    userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts
+  ], callback)
+  var providerSeq = 1
 
   function accountBase(callback) {
     var seq = 1
@@ -300,7 +326,7 @@ function accounts(callback) {
       ' bills_lang, bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
       ' ownership, phone_office, phone_alternate' +
-      ' from accounts where customer_type not like "%Location_of_providing%" and deleted != "1"'
+      ' from accounts where customer_type != "^Location_of_providing^" and customer_type != "Location_of_providing" and customer_type != "^Provider^" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
       var billingAddress = row.billing_address_street
@@ -313,9 +339,16 @@ function accounts(callback) {
         : undefined
 
       var phoneNumber = row.phone_office || row.phone_alternate || undefined
+      var roles = row.customer_type === '^Distributor^'
+        ? ['Subscriber']
+        :  _.reject(optionListToArray(row.customer_type), function(t) { return t === 'Distributor' || t === 'Provider' })
 
       return {
-        emekuId: row.id, sequenceId:seq++, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        emekuId: row.id,
+        sequenceId:seq++,
+        name: trim(row.name),
+        roles: roles,
+        yTunnus: trim(row.sic_code),
         address: address,
         billing: { address: billingAddress, language: langCode(trim(row.bills_lang)), invoiceText: trim(row.bills_text) },
         eInvoice: eInvoice,
@@ -333,9 +366,117 @@ function accounts(callback) {
   }
 
   function providers(callback) {
-    var q = 'select id, name from accounts where customer_type like "%Location_of_providing%" and deleted != "1"'
-    function onRow(row) { return { emekuId: row.id, name: trim(row.name) } }
+    var q = 'select id, name, customer_type, sic_code, date_entered, ' +
+      ' bills_text, billing_address_street, billing_address_city, billing_address_postalcode, billing_address_country,' +
+      ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
+      ' ownership, phone_office, phone_alternate, provider_status, customer_lang' +
+      ' from accounts where customer_type LIKE "%Provider%" and deleted != "1"'
+    function onRow(row) {
+      var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
+      var billingAddress = row.billing_address_street
+        ? { street: trim1line(row.billing_address_street), city: trim(row.billing_address_city), zip: trim(row.billing_address_postalcode), country: legacyCountryToCode(trim(row.billing_address_country)) }
+        : undefined
+      if (_.isEqual(address, billingAddress)) billingAddress = undefined
+
+      var eInvoice = row.e_invoice
+        ? { address: trim(row.e_invoice), operator: trim(row.e_invoice_operator) }
+        : undefined
+
+      var phoneNumber = row.phone_office || row.phone_alternate || undefined
+      var active = row.provider_status === 'Approved' || row.provider_status === 'Changed'
+
+      return {
+        emekuId: row.id, name: trim(row.name), roles: optionListToArray(row.customer_type), yTunnus: trim(row.sic_code),
+        creationDate: new Date(),
+        registrationDate: active ? (row.date_entered ? readAsUTCDate(row.date_entered) : new Date(0)) : undefined,
+        address: address,
+        language: langCode(trim(row.customer_lang)),
+        billing: { address: billingAddress, invoiceText: trim(row.bills_text) },
+        eInvoice: eInvoice,
+        billingPreference: (!!eInvoice && 'eInvoice') || (!!billingAddress && 'address') || '',
+        contactName: row.ownership,
+        phoneNumber: phoneNumber,
+        deleted: false,
+        active: active,
+        locations: [],
+        sequenceId: providerSeq++
+      }
+    }
     batchInserter(q, onRow, 'Provider', callback)
+  }
+
+  function locations(callback) {
+    var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, website, bills_text, providing_type, ' +
+      ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
+      ' ownership, phone_office, phone_alternate, pegi, k18, date_entered' +
+      ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
+    batchUpdater(q, function(row, result) {
+      var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
+      var phoneNumber = row.phone_office || row.phone_alternate || undefined
+      var active = row.provider_status === 'Approved' || row.provider_status === 'Changed'
+      var registrationDate = active ? (row.date_entered ? readAsUTCDate(row.date_entered) : new Date(0)) : undefined
+      var location = {
+        emekuId: row.id,
+        name: trim(row.name),
+        yTunnus: trim(row.sic_code),
+        address: address,
+        isPayer: row.invoice_payer != '1',
+        contactName: row.ownership,
+        phoneNumber: phoneNumber,
+        providingType: optionListToArray(row.providing_type),
+        active: active,
+        registrationDate: registrationDate,
+        deleted: false,
+        adultContent: row.k18,
+        gamesWithoutPegi: row.pegi,
+        url: row.website || undefined,
+        sequenceId: providerSeq++
+      }
+      if (result[row.parent_id]) {
+        result[row.parent_id].push(location)
+      } else {
+        result[row.parent_id] = [location]
+      }
+
+    }, function(parentId, locations, callback) {
+      schema.Provider.findOneAndUpdate({ emekuId: parentId }, { $set: { locations: locations }}, callback)
+    }, callback)
+  }
+
+  function providerEmailAddresses(callback) {
+    accountEmailsTo('Provider', 'Provider', callback)
+  }
+
+  function locationEmailAddresses(callback) {
+    var q = 'select a.id, a.parent_id, e.email_address, j.primary_address' +
+      ' from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id)' +
+      ' where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts" and a.customer_type LIKE "%Location_of_providing%"'
+
+    batchUpdater(q, function(row, result) {
+      if (!result[row.parent_id]) result[row.parent_id] = {}
+      if (!result[row.parent_id][row.id]) result[row.parent_id][row.id] = []
+      if (row.primary_address == '1') {
+        result[row.parent_id][row.id].unshift(row.email_address)
+      } else {
+        result[row.parent_id][row.id].push(row.email_address)
+      }
+
+    }, function(parentId, emailsByLoc, callback) {
+      schema.Provider.findOne({ emekuId: parentId }, function(err, provider) {
+        if (err) return callback(err)
+        var locsById = _.indexBy(provider.locations, 'emekuId')
+        _.forEach(emailsByLoc, function(emails, locId) {
+          var location = locsById[locId]
+          location.emailAddresses = emails
+        })
+        provider.save(callback)
+      })
+    }, callback)
+  }
+
+  function accountEmailsTo(coll, customerType, callback) {
+    var q = 'select a.id, e.email_address, j.primary_address from accounts a join email_addr_bean_rel j on (j.bean_id = a.id) join email_addresses e on (j.email_address_id = e.id) where a.deleted != "1" and j.deleted != "1" and e.deleted != "1" and j.bean_module = "Accounts" and a.customer_type LIKE "%' + customerType + '%"'
+    batchUpdater(q, idToEmailMapper, singleFieldUpdater(coll, 'emailAddresses'), callback)
   }
 
   function userBase(callback) {
@@ -368,7 +509,7 @@ function accounts(callback) {
   }
 
   function linkUserAccounts(callback) {
-    conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and a.deleted != "1"')
+    conn.query('select a.id as accountId, u.id as userId from users u join accounts_users j on (u.id = j.user_id) join accounts a on (a.id = j.account_id) where u.deleted != "1" and j.deleted != "1" and customer_type != "^Distributor^" and a.deleted != "1"')
       .stream()
       .pipe(consumer(function(row, callback) {
         pushUserToAccount(row, function(err) {
@@ -552,7 +693,7 @@ function linkCustomersIds(callback) {
 }
 
 function sequences(callback) {
-  async.forEach([[500, 'Account'], [200000, 'Program']], createSequence, callback)
+  async.forEach([[500, 'Account'], [200000, 'Program'], [5000, 'Provider']], createSequence, callback)
 
   function createSequence(t, callback) { new schema.Sequence({ _id: t[1], seq: t[0] }).save(callback) }
 }

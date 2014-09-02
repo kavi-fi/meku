@@ -14,6 +14,11 @@ utils.keyValue = function(key, value) {
   return data
 }
 
+utils.showBoolean = function(b) {
+  if (b) return "Kyllä"
+  else return "Ei"
+}
+
 utils.escapeRegExp = function(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
 }
@@ -139,6 +144,10 @@ utils.flattenObject = function flattenObject(deepObject) {
     }
   })
   return resultObject
+}
+
+utils.merge = function merge(x, y) {
+  return _.merge({}, x, y)
 }
 
 if (isNodeJs()) module.exports = utils

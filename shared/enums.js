@@ -84,6 +84,32 @@ enums.roles = {
   'Other': 'Muu'
 }
 
+enums.providingType = {
+  'Recordings_provide': 'Tallenteiden tarjoaminen',
+  'Public_presentation': 'Julkinen esittäminen',
+  'National_TV': 'Valtakunnallinen televisio-ohjelmisto',
+  'Regional_TV': 'Alueellinen televisio-ohjelmisto',
+  'Transmitted_abroad_program': 'Ulkomailta välitetty ohjelmisto',
+  'Subscription_of_program': 'Tilausohjelmapalvelu'
+}
+
+enums.providingTypeName = function(type) {
+  return enums.providingType[type] || 'Tuntematon'
+}
+
+enums.getProvidingType = function(index) {
+  return _.keys(enums.providingType)[index]
+}
+
+enums.providingTypePrices = {
+  'Recordings_provide': 100,
+  'Public_presentation': 200,
+  'National_TV': 600,
+  'Regional_TV': 100,
+  'Transmitted_abroad_program': 400,
+  'Subscription_of_program': 400
+}
+
 enums.programType = {
   0: { type: 'unknown', fi: '?' },
   1: { type: 'movie', fi: 'Elokuva' },
@@ -331,6 +357,14 @@ enums.countries = {
   '-': 'Muu maa'
 }
 
+enums.getCountryCode = function(country) {
+  if (_.isEmpty(country)) return
+
+  return _(enums.countries).mapValues(function(country) {
+    return country.toLowerCase()
+  }).invert().value()[country.toLowerCase()]
+}
+
 enums.util.toCountry = function(code) { return enums.countries[code] || '-' }
 enums.util.toCountryString = function(countries) { return countries.map(function(c) { return enums.countries[c] }).join(', ') }
 
@@ -482,6 +516,8 @@ enums.billingLanguages = {
   'SV': 'Ruotsi',
   'EN': 'Englanti'
 }
+
+enums.billingLanguage = function(k) { return enums.billingLanguage[k] }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = enums

@@ -159,10 +159,108 @@ var AccountSchema = new Schema({
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))
 
-var Provider = exports.Provider = mongoose.model('providers', {
+var ProviderLocationSchema = new Schema({
   emekuId: String,
-  name: String
+  name: String,
+  sequenceId: Number,
+  address: { street: String, city: String, zip: String, country: String },
+  contactName: String,
+  phoneNumber: String,
+  emailAddresses: [String],
+  providingType: [String],
+  registrationDate: Date,
+  deleted: Boolean,
+  active: Boolean,
+  isPayer: Boolean,
+  adultContent: Boolean,
+  gamesWithoutPegi: Boolean,
+  url: String
 })
+
+ProviderLocationSchema.pre('save', ensureSequenceId('Provider'))
+
+var ProviderSchema = new Schema({
+  emekuId: String,
+  creationDate: Date,
+  sequenceId: Number,
+  registrationDate: Date,
+  yTunnus: String,
+  name: String,
+  address: { street: String, city: String, zip: String, country: String },
+  billing: { address: address, invoiceText: String },
+  eInvoice: { address:String, operator:String },
+  billingPreference: String, // '' || 'address' || 'eInvoice'
+  contactName: String,
+  phoneNumber: String,
+  emailAddresses: [String],
+  language: String,
+  deleted: Boolean,
+  active: Boolean,
+  locations: [ProviderLocationSchema]
+})
+
+ProviderSchema.pre('save', ensureSequenceId('Provider'))
+
+ProviderSchema.statics.getForBilling = function(extraFilters, callback) {
+  var filters = { active: true, deleted: false }
+  if (callback) _.merge(filters, extraFilters)
+  else callback = extraFilters
+  Provider.find(filters).lean().exec(function(err, providers) {
+    if (err) return callback(err)
+
+    _.forEach(providers, function(provider) {
+      provider.locations = _.filter(provider.locations, { active: true, deleted: false })
+    })
+
+    var providersForBilling = [], locationsForBilling = []
+    providers.forEach(function(p) {
+      var providerClone = _.cloneDeep(p)
+      delete providerClone.locations
+      _(p.locations).filter({ isPayer: true }).forEach(function(l) {
+        l.provider = providerClone
+        locationsForBilling.push(l)
+      })
+
+      if (_.any(p.locations, { isPayer: false })) {
+        providersForBilling.push(p)
+      }
+    })
+
+    callback(null, {
+      providers: providersForBilling,
+      locations: locationsForBilling
+    })
+  })
+}
+
+var Provider = exports.Provider = mongoose.model('providers', ProviderSchema)
+
+var ProviderMetadataSchema = new Schema({
+  yearlyBillingReminderSent: Date,
+  yearlyBillingProeCreated: Date
+})
+ProviderMetadataSchema.statics.getAll = function(callback) {
+  ProviderMetadata.findOne(function(err, metadata) {
+    if (err) return callback(err)
+    if (!metadata) new ProviderMetadata().save(callback)
+    else callback(undefined, metadata)
+  })
+}
+ProviderMetadataSchema.statics.setYearlyBillingReminderSent = function(date, callback) {
+  ProviderMetadata.getAll(function(err, metadata) {
+    if (err) return callback(err)
+    metadata.yearlyBillingReminderSent = date
+    metadata.save(callback)
+  })
+}
+ProviderMetadataSchema.statics.setYearlyBillingProeCreated = function(date, callback) {
+  ProviderMetadata.getAll(function(err, metadata) {
+    if (err) return callback(err)
+    metadata.yearlyBillingProeCreated = date
+    metadata.save(callback)
+  })
+}
+var ProviderMetadata = exports.ProviderMetadata = mongoose.model('providermetadatas', ProviderMetadataSchema)
 
 var UserSchema = new Schema({
   emekuId: String,
@@ -272,7 +370,7 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
+var models = exports.models = [Program, Account, Provider, ProviderMetadata, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

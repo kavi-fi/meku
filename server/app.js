@@ -10,6 +10,9 @@ var User = schema.User
 var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var ChangeLog = schema.ChangeLog
+var Provider = schema.Provider
+var ProviderLocation = schema.ProviderLocation
+var ProviderMetadata = schema.ProviderMetadata
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var proe = require('../shared/proe')
@@ -19,6 +22,9 @@ var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.S
 var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
 var CronJob = require('cron').CronJob
+var providerUtils = require('./provider-utils')
+var multer  = require('multer')
+var providerImport = require('./provider-import')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -31,6 +37,7 @@ app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
 app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
+app.use(multer({ dest: '/tmp/', limits: { fileSize:5000000, files:1 } }))
 
 mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/meku')
 
@@ -517,6 +524,280 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
   Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
 })
 
+app.get('/providers/unapproved', requireRole('kavi'), function(req, res, next) {
+  Provider.find({deleted: false, active: false, registrationDate: { $exists: false }}, '', respond(res, next))
+})
+
+app.get('/providers', requireRole('kavi'), function(req, res, next) {
+  Provider.find({deleted: false, registrationDate: { $exists: true }}, '', respond(res, next))
+})
+
+app.post('/providers', requireRole('kavi'), function(req, res, next) {
+  new Provider(utils.merge(req.body, { deleted: false, active: false, creationDate: new Date() })).save(function(err, provider) {
+    if (err) return next(err)
+    logCreateOperation(req.user, provider)
+    res.send(provider)
+  })
+})
+
+app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, function(err, provider) {
+    if (err) return next(err)
+    var isFirstActivation = !provider.registrationDate
+    var newActive = !provider.active
+    var updates = {active: {old: provider.active, new: newActive}}
+    provider.active = newActive
+    if (isFirstActivation) {
+      var now = new Date()
+      provider.registrationDate = now
+      updates.registrationDate = {old: undefined, new: now}
+      _.select(provider.locations, function(l) {
+        return !l.deleted && l.active
+      }).forEach(function(l) {
+        l.registrationDate = now
+        var updates = {registrationDate: {old: undefined, new: now}}
+        saveChangeLogEntry(req.user, l, 'update', {targetCollection: 'providerlocations', updates: updates})
+      })
+    }
+    saveChangeLogEntry(req.user, provider, 'update', {updates: updates})
+    provider.save(function(err, saved) {
+      if (isFirstActivation) {
+        var provider = saved.toObject()
+        var providerHasEmails = !_.isEmpty(provider.emailAddresses)
+        if (providerHasEmails) {
+          providerUtils.registrationEmail(provider, logErrorOrSendEmail)
+        }
+        sendProviderLocationEmails(provider)
+        var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
+        var withoutEmail = providerUtils.payingLocationsWithoutEmail(provider.locations)
+        return res.send({
+          active: true,
+          wasFirstActivation: true,
+          emailSent: providerHasEmails,
+          locationsWithEmail: withEmail,
+          locationsWithoutEmail: withoutEmail
+        })
+      }
+      res.send({active: saved.active, wasFirstActivation: false})
+    })
+  })
+
+  function sendProviderLocationEmails(provider) {
+    _.select(provider.locations, function(l) {
+      return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
+    }).forEach(function(l) {
+      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), logErrorOrSendEmail)
+    })
+  }
+})
+
+app.put('/providers/:id', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, function(err, provider) {
+    if (err) return next(err)
+    updateAndLogChanges(provider, req.body, req.user, respond(res, next))
+  })
+})
+
+app.delete('/providers/:id', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, function (err, provider) {
+    if (err) return next(err)
+    softDeleteAndLog(provider, req.user, respond(res, next))
+  })
+})
+
+app.get('/providers/metadata', requireRole('kavi'), function(req, res, next) {
+  ProviderMetadata.getAll(respond(res, next))
+})
+
+app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res, next) {
+  Provider.getForBilling(function(err, data) {
+    var accountRows = getProviderBillingRows(data)
+    var result = proe({ begin: moment() }, accountRows, 'provider')
+    res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.txt')
+    res.setHeader('Content-Type', 'text/plain')
+    ProviderMetadata.setYearlyBillingProeCreated(new Date(), function() {
+      res.send(result)
+    })
+  })
+})
+
+app.post('/providers/billing/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {
+  var dateFormat = 'DD.MM.YYYY'
+  var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat) }
+  var dateRangeQ = { $gte: dates.begin, $lt: dates.end.add(1, 'day') }
+  var registrationDateFilters = { $or: [
+    { registrationDate: dateRangeQ },
+    { 'locations.registrationDate': dateRangeQ }
+  ]}
+  Provider.getForBilling(registrationDateFilters, function(err, data) {
+    if (err) return next(err)
+
+    data.providers = _(data.providers).map(function(p) {
+      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+      return p
+    }).reject(function(p) { return _.isEmpty(p.locations) }).value()
+
+    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+
+    var accountRows = getProviderBillingRows(data)
+    var result = proe(dates, accountRows, 'provider')
+    var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.txt'
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    res.setHeader('Content-Type', 'text/plain')
+    res.send(result)
+  })
+})
+
+app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res, next) {
+  Provider.getForBilling(function(err, data) {
+    if (err) return next(err)
+
+    var providers = _.groupBy(data.providers, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
+    var locations = _.groupBy(data.locations, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
+
+    res.json({
+      providerCount: providers.withMail.length,
+      locationCount: locations.withMail.length,
+      providersWithoutMail: providers.noMail,
+      locationsWithoutMail: locations.noMail
+    })
+  })
+})
+
+app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function(req, res, next) {
+  Provider.getForBilling(function(err, data) {
+    if (err) return next(err)
+
+    _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
+      providerUtils.yearlyBillingProviderEmail(p, logErrorOrSendEmail)
+    })
+    _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
+      providerUtils.yearlyBillingProviderLocationEmail(l, logErrorOrSendEmail)
+    })
+
+    ProviderMetadata.setYearlyBillingReminderSent(new Date(), respond(res, next))
+  })
+})
+
+app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res, next) {
+  var format = 'DD.MM.YYYY'
+
+  var beginMoment = moment(req.params.begin, format)
+  var endMoment = moment(req.params.end, format).add(1, 'day')
+  var dates = {
+    $gte: beginMoment,
+    $lt: endMoment
+  }
+
+  var terms = {
+    active: true, deleted: false,
+    $or: [
+      { registrationDate: dates },
+      { 'locations.registrationDate': dates }
+    ]
+  }
+
+  Provider.find(terms).lean().exec(function(err, providers) {
+    if (err) return next(err)
+    _.forEach(providers, function(provider) {
+      provider.locations = _(provider.locations)
+        .filter({ active: true, deleted: false })
+        .filter(function(l) { return withinDateRange(l.registrationDate, beginMoment, endMoment) })
+        .sortBy('name').value()
+    })
+    res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
+  })
+})
+
+app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id).lean().exec(function(err, provider) {
+    if (err) return next(err)
+    provider.locations = _(provider.locations).filter({ deleted: false }).sortBy('name').value()
+    res.send(provider)
+  })
+})
+
+app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.pid, function(err, provider) {
+    if (err) return next(err)
+    var location = provider.locations.id(req.params.lid)
+    var firstActivation = isFirstActivation(provider, location)
+    var updates = {}
+    if (firstActivation) {
+      location.registrationDate = new Date()
+      updates.registrationDate = {old: undefined, new: location.registrationDate}
+    }
+    location.active = !location.active
+
+    updates.active = {old: !location.active, new: location.active}
+    saveChangeLogEntry(req.user, location, 'update', {targetCollection: 'providerlocations', updates: updates})
+
+    provider.save(function(err, saved) {
+      if (firstActivation) {
+        sendRegistrationEmails(saved.toObject(), location.toObject(), respond(res, next))
+      } else {
+        res.send({active: location.active, wasFirstActivation: false})
+      }
+    })
+  })
+
+  function sendRegistrationEmails(provider, location, callback) {
+    if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
+      // a paying location provider: send email to location
+      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), logErrorOrSendEmail)
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
+    } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
+      // email the provider
+      var providerData = _.clone(provider)
+      providerData.locations = [location]
+      providerUtils.registrationEmail(providerData, logErrorOrSendEmail)
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
+    } else {
+      // location is the payer, but the location has no email addresses
+      // or the provider has no email addresses
+      callback(null, {active: true, wasFirstActivation: true, emailSent: false})
+    }
+  }
+
+  function isFirstActivation(provider, location) {
+    return provider.registrationDate && !location.active && !location.registrationDate
+  }
+})
+
+app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.pid, function(err, provider) {
+    var flatUpdates = utils.flattenObject(req.body)
+    var location = provider.locations.id(req.params.lid)
+    var watcher = watchChanges(location, req.user)
+    _.forEach(flatUpdates, function(value, key) { location.set(key, value) })
+    provider.save(respond(res, next))
+    saveChangeLogEntry(req.user, location, 'update', {updates: watcher.getChanges(), targetCollection: 'providerlocations'})
+  })
+})
+
+app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.id, function(err, p) {
+    if (err) return next(err)
+    p.locations.push(utils.merge(req.body, { deleted: false, active: false }))
+    p.save(function(err, p) {
+      if (err) return next(err)
+      logCreateOperation(req.user, _.last(p.locations))
+      res.send(_.last(p.locations))
+    })
+  })
+})
+
+
+app.delete('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
+  Provider.findById(req.params.pid, function(err, provider) {
+    if (err) return next(err)
+    var location = provider.locations.id(req.params.lid)
+    location.deleted = true
+    saveChangeLogEntry(req.user, location, 'delete')
+    provider.save(respond(res, next))
+  })
+})
+
 app.get('/accounts/search', function(req, res, next) {
   var roles = req.query.roles ? req.query.roles.split(',') : []
   var q = { roles: { $in: roles }, deleted: { $ne: true }}
@@ -805,6 +1086,17 @@ app.get('/environment', function(req, res, next) {
   res.json({ environment: app.get('env') })
 })
 
+app.post('/files/provider-import', function(req, res, next) {
+  if (_.isEmpty(req.files) || !req.files.providerFile) return res.send(400)
+  if (req.files.providerFile.truncated) return res.send(400)
+  providerImport.import(req.files.providerFile.path, function(err, providerAndLocationsPreview) {
+    if (err) return res.send({ error: err })
+    res.send({
+      message: 'Ilmoitettu tarjoaja, sekä ' + providerAndLocationsPreview.locations.length + ' tarjoamispaikkaa.'
+    })
+  })
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
@@ -897,7 +1189,8 @@ function authenticate(req, res, next) {
     'GET:/index.html', 'GET:/public.html', 'GET:/templates.html',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
-    'POST:/reset-password', 'GET:/check-reset-hash'
+    'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
+    'GET:/register-provider.html'
   ]
   var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
 
@@ -936,6 +1229,11 @@ function requireRole(role) {
     if (!utils.hasRole(req.user, role)) return res.send(403)
     else return next()
   }
+}
+
+function logErrorOrSendEmail(err, email) {
+  if (err) return console.error(err)
+  sendEmail(email, logError)
 }
 
 function sendEmail(opts, callback) {
@@ -1027,13 +1325,35 @@ function verifyTvSeriesExistsOrCreate(program, user, callback) {
   }
 }
 
+function getProviderBillingRows(data) {
+  var accountRows = []
+
+  data.providers.forEach(function(provider) {
+    var account = _.omit(provider, 'locations')
+    var rows = _(provider.locations).filter({ isPayer: false }).map(function(l) {
+      return _.map(l.providingType, function(p) {
+        return utils.merge(l, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+      })
+    }).flatten().value()
+    accountRows.push({ account: account, rows: rows })
+  })
+
+  data.locations.forEach(function(location) {
+    var rows = _.map(location.providingType, function(p) {
+      return utils.merge(location, { providingType: p, price: enums.providingTypePrices[p] * 100 })
+    })
+    accountRows.push({ account: location, rows: rows })
+  })
+  return accountRows
+}
+
 function logError(err) {
   if (err) console.error(err)
 }
 
 function watchChanges(document, user, excludedLogPaths) {
   var oldObject = document.toObject()
-  return { applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges }
+  return { applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges, getChanges: getChanges }
 
   function applyUpdates(updates) {
     var flatUpdates = utils.flattenObject(updates)
@@ -1048,15 +1368,24 @@ function watchChanges(document, user, excludedLogPaths) {
     })
   }
 
+  function getChanges() {
+    var changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
+    return asChanges(changedPaths, oldObject, document)
+  }
+
   function isIncludedLogPath(p) {
     return document.isDirectModified(p) && document.schema.pathType(p) != 'nested' && !_.contains(excludedLogPaths, p)
   }
 
   function log(changedPaths, oldObject, updatedDocument, callback) {
-    var newObject = updatedDocument.toObject()
-    var changes = _(changedPaths).map(asChange).zipObject().valueOf()
+    var changes = asChanges(changedPaths, oldObject, updatedDocument)
     logUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
+  }
+
+  function asChanges(changedPaths, oldObject, updatedDocument) {
+    var newObject = updatedDocument.toObject()
+    return _(changedPaths).map(asChange).zipObject().valueOf()
 
     function asChange(path) {
       var newValue = utils.getProperty(newObject, path)
@@ -1119,4 +1448,8 @@ function getHostname() {
   if (isDev()) return 'http://localhost:3000'
   else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
   else return 'https://meku.herokuapp.com'
+}
+
+function withinDateRange(date, beginDate, endDate) {
+  return date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
 }

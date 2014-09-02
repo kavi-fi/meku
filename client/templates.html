@@ -153,6 +153,23 @@
   </table>
 </div>
 
+<div class="invoice-provider">
+  <table>
+    <tr class="invoice-provider-row">
+      <td><span class="name"></span></td>
+      <td class="registrationDate"></td>
+    </tr>
+    <tr class="invoice-location-row">
+      <td><span class="name left-margin"></span></td>
+      <td class="registrationDate"></td>
+    </tr>
+    <tr class="invoice-providing-type-row">
+      <td colspan="2"><span class="name left-margin"></span></td>
+      <td class="price"></td>
+    </tr>
+  </table>
+</div>
+
 <div class="warning-summary">
   <img class="agelimit" src="images/empty.png" /><div class="warnings"></div>
 </div>
@@ -239,7 +256,7 @@
 </div>
 
 <div class="change-log hide">
-  <a class="show-changelogs"><i class="fa fa-play"></i>Muutosloki</a>
+  <a class="show-changelogs"><i class="rotating fa fa-play"></i>Muutosloki</a>
   <div class="entries-container">
     <div class="entries">
     </div>
@@ -310,6 +327,135 @@
   </div>
 </div>
 
+<div class="provider-details detail-box clearfix">
+  <div class="activity modify-only">
+    <input name="provider-active" type="radio" value="active">
+    <input name="provider-active" type="radio" value="inactive">
+  </div>
+
+  <form class="form">
+    <div class="buttons">
+      <button name="save" type="submit" disabled class="button">Tallenna</button>
+      <button name="remove" type="button" class="button modify-only">Poista</button>
+      <span class="save-success hidden">Tiedot tallennettu</span>
+    </div>
+
+    <label>Toiminimi <input type="text" name="name" required></label>
+    <label>Y-tunnus <input type="text" name="yTunnus" required></label>
+    <label class="select2-float-right">Asiointikieli <input type="text" name="language"></label>
+
+    <div class="address">
+      <label>Lähiosoite <input type="text" name="address.street" required></label>
+      <label>Postinumero <input type="text" name="address.zip" required></label>
+      <label>Kaupunki <input type="text" name="address.city" required></label>
+      <label>Maa <input type="text" name="address.country" required class="required invalid"></label>
+    </div>
+
+    <label>Yhteyshenkilö <input type="text" name="contactName"></label>
+
+    <label>Puhelinnumero <input type="text" name="phoneNumber" required></label>
+
+    <label class="emails select2-float-right">Sähköposti <input type="text" name="emailAddresses" class="invalid"></label>
+
+    <div class="billing-extra">
+      <label class="full"><input type="checkbox" name="billing-extra"> Laskutus eri osoitteeseen tai verkkolaskulla</label>
+
+      <div class="billing-extra-fields">
+        <label class="full"><input type="radio" name="billing-extra-type" value="address" checked> Eri laskutusosoite</label>
+        <div class="billing-address">
+          <label>Lähiosoite <input type="text" name="billing.address.street" required></label>
+          <label>Postinumero <input type="text" name="billing.address.zip" required></label>
+          <label>Kaupunki <input type="text" name="billing.address.city" required></label>
+          <label>Maa <input type="text" name="billing.address.country" required class="required invalid"></label>
+        </div>
+
+        <label class="full"><input type="radio" name="billing-extra-type" value="eInvoice"> Verkkolasku</label>
+        <div class="eInvoice">
+          <label>Verkkolaskuosoite <input type="text" name="eInvoice.address" required></label>
+          <label>Välittäjätunnus <input type="text" name="eInvoice.operator" required></label>
+        </div>
+      </div>
+    </div>
+
+    <label class="double">Laskulle haluttava teksti <textarea name="billing.invoiceText"></textarea></label>
+  </form>
+
+  <div class="modify-only">
+    <h2>Tarjoamispaikat</h2>
+    <button name="new-location" class="button">Luo uusi tarjoamispaikka</button>
+    <div class="locations"></div>
+  </div>
+</div>
+
+<div class="provider-registration-success-dialog dialog">
+  <h4>Tarjoaja <span class="name"></span> rekisteröity<span class="email-sent"> ja tilausvahvistus lähetetty</span>.</h4>
+  <p class="no-email-sent">Tarjoajalle ei voitu lähettää tilausvahvistusta sähköpostitse.</p>
+  <div class="with-email">
+    <p>Seuraaville maksaville tarjoamispaikoille lähetettiin tilausvahvistus: <ul></ul></p>
+  </div>
+  <div class="without-email">
+    <p>Seuraaville maksaville tarjoamispaikoille ei voitu lähettää tilausvahvistusta sähköpostitse: <ul></ul></p>
+  </div>
+  <div class="buttons">
+    <button class="ok button">Ok</button>
+  </div>
+</div>
+
+<div class="location-registration-success-dialog dialog">
+  <p>Tarjoamispaikka <span class="name"></span> rekisteröity<span class="email"> ja tilausvahvistus lähetetty</span><span class="no-email">. Tilausvahvistusta ei lähetetty</span>.</p>
+  <div class="buttons">
+    <button class="ok button">Ok</button>
+  </div>
+</div>
+
+<div class="location-details detail-box clearfix">
+  <div class="activity modify-only">
+    <input name="location-active" type="radio" value="active">
+    <input name="location-active" type="radio" value="inactive">
+  </div>
+
+  <form class="form">
+    <div class="buttons">
+      <button name="save" type="submit" disabled class="button">Tallenna</button>
+      <button name="remove" type="button" class="button modify-only">Poista</button>
+      <span class="save-success hidden">Tiedot tallennettu</span>
+    </div>
+
+    <label>Tarjoamispaikan nimi <input type="text" name="name" required></label>
+    <label><input type="checkbox" name="isPayer"> Laskutetaan tarjoamispaikkaa</label>
+
+    <div class="address">
+      <label>Lähiosoite <input type="text" name="address.street" required></label>
+      <label>Postinumero <input type="text" name="address.zip" required></label>
+      <label>Kaupunki <input type="text" name="address.city" required></label>
+    </div>
+
+    <label>Yhteyshenkilö <input type="text" name="contactName"></label>
+    <label>Puhelinnumero <input type="text" name="phoneNumber" required></label>
+    <label class="emails select2-float-right">Sähköposti <input type="text" name="emailAddresses" class="invalid"></label>
+
+    <label>WWW-osoite <input type="text" name="url"></label>
+    <label class="align-top">Tarjoamistapa <input type="text" name="providingType" required class="required invalid"></label>
+
+    <label class="full"><input type="checkbox" name="adultContent"> Tarjolla myös LUOKITTELEMATTOMIA alle 18-vuotiailta kiellettyjä kuvaohjelmia</label>
+    <label class="full"><input type="checkbox" name="gamesWithoutPegi"> Tarjolla muita kuin PEGI-luokiteltuja pelejä</label>
+  </form>
+</div>
+
+<div class="remove-provider-dialog remove-dialog dialog">
+  <p>Haluatko varmasti poistaa tarjoajan <span class="provider-name"></span>?</p>
+  <div class="buttons">
+    <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
+  </div>
+</div>
+
+<div class="remove-location-dialog remove-dialog dialog">
+  <p>Haluatko varmasti poistaa tarjoamispaikan <span class="location-name"></span>?</p>
+  <div class="buttons">
+    <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
+  </div>
+</div>
+
 <div class="remove-program-dialog remove-dialog dialog">
   <p>Haluatko varmasti poistaa kuvaohjelman <span class="program-name"></span>?</p>
   <div class="buttons">
@@ -321,6 +467,22 @@
   <p>Muutokset tallennettu.</p>
   <div class="buttons">
     <button class="ok button">Ok</button>
+  </div>
+</div>
+
+<div class="yearly-billing-reminder-dialog dialog">
+  <h2>Lähetä vuositilausvahvistus</h2>
+  <div>
+    Tarjoajat: <span class="provider-count"></span><br>
+    Tarjoamispaikat: <span class="location-count"></span><br>
+    <h4>Tarjoajat ilman sähköpostia:</h4>
+    <div class="providers-without-mail"></div>
+    <h4>Tarjoamispaikat ilman sähköpostia:</h4>
+    <div class="locations-without-mail"></div>
+  </div>
+  <div class="buttons">
+    <button class="send button">Lähetä</button>
+    <button class="cancel button">Peruuta</button>
   </div>
 </div>
 

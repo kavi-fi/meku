@@ -74,7 +74,7 @@ exports.import = function(file, callback) {
 
     var billing = createObjectAndSetValuesWithMap(billingData, billingFieldMap)
 
-    provider = _.merge({}, provider, billing)
+    provider = utils.merge(provider, billing)
 
     if (provider.billing && provider.billing.address) {
       var address = provider.billing.address
@@ -141,7 +141,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
 
   return {
     provider: providerData,
-    billing: _.merge({}, billingData, eInvoiceData),
+    billing: utils.merge(billingData, eInvoiceData),
     locations: locationsData
   }
 
@@ -219,7 +219,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
     while (true) {
       var currentValues = getValues(providerSheet, index)
       if (currentValues.length > 0) {
-        values.push(toObject(fields, currentValues, _.merge(requiredFields, { row: index })))
+        values.push(toObject(fields, currentValues, utils.merge(requiredFields, { row: index })))
         index += 1
       }
       else return values

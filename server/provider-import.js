@@ -213,16 +213,15 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
     var rowNumber = findColumnRowByValue(providerSheet, column)
     var fields = getFields(providerSheet, rowNumber + 1)
 
-    var index = rowNumber + 2
-    var values = []
+    return values([], rowNumber + 2)
 
-    while (true) {
+    function values(xs, index) {
       var currentValues = getValues(providerSheet, index)
-      if (currentValues.length > 0) {
-        values.push(toObject(fields, currentValues, utils.merge(requiredFields, { row: index })))
-        index += 1
+      if (currentValues.length == 0) {
+        return xs
+      } else {
+        return values(xs.concat([toObject(fields, currentValues, utils.merge(requiredFields, { row: index }))]), index + 1)
       }
-      else return values
     }
   }
 }

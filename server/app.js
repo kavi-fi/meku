@@ -544,7 +544,7 @@ app.get('/users', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
-  var regexp = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
+  var regexp = new RegExp(utils.escapeRegExp(req.query.q), 'i')
   var q = { $or:[{ name: regexp }, { username: regexp }] }
   User.find(q).sort('name').lean().exec(respond(res, next))
 })

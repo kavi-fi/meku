@@ -729,7 +729,7 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
       // a paying location provider: send email to location
       providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), logErrorOrSendEmail)
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
-    } else if (!location.isPayer) {
+    } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
       // email the provider
       var providerData = _.clone(provider)
       providerData.locations = [location]
@@ -737,6 +737,7 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else {
       // location is the payer, but the location has no email addresses
+      // or the provider has no email addresses
       callback(null, {active: true, wasFirstActivation: true, emailSent: false})
     }
   }

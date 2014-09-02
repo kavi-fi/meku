@@ -76,8 +76,9 @@ textarea { resize: vertical; }
 .detail-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 
 .filters { font-size: 14px; color: #444444; }
-.filters label { padding-right: 12px; font-weight: normal; min-width: 118px; }
-.filters label.first { min-width: 80px; }
+.filters label { padding-right: 12px; font-weight: normal; min-width: 124px; }
+.filters label.first { min-width: 85px; }
+.filters label.second { min-width: 75px; }
 .filters input { margin-right: 7px; margin-bottom: 10px; }
 
 .warning-summary { display: inline-block; }
@@ -192,7 +193,7 @@ label.top { vertical-align: top; }
   height: 19px;
 }
 #search-page .datepicker .icon { float: right; margin: 2px 6px 0 0; }
-#search-page .kavi-query-filters > div { margin-top: 10px; min-height: 52px; }
+#search-page .kavi-query-filters > div { margin-top: 10px; min-height: 50px; }
 #search-page .kavi-query-filters label { display: inline-block; vertical-align: top; margin-top: 10px; margin-right: 20px; }
 #search-page .kavi-query-filters .clear-date-picker {
   display: none; cursor: pointer;

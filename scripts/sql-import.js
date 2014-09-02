@@ -238,12 +238,12 @@ function classifications(callback) {
       if (err) return callback(err)
       documentMap('Provider', 'emekuId', function(err, providerMap) {
         if (err) return callback(err)
-        async.each(_.values(result.classifications), findBuyer, function(err) { callback(err, result) })
+        async.eachSeries(_.values(result.classifications), findBuyer, function(err) { callback(err, result) })
 
         function findBuyer(c, callback) {
-          if (!c.provider_id || c.provider_id == '0') return callback()
+          if (!c.provider_id || c.provider_id == '0') return cont()
           // Special case: FOX is now 'Location_of_providing/Tarjoamispaikka' but used to probably be 'Subscriber/Tilaaja'
-          if (c.provider_id == '38d427ff-a829-14ce-9950-4fcf065ceb64') return callback()
+          if (c.provider_id == '38d427ff-a829-14ce-9950-4fcf065ceb64') return cont()
 
           var account = accountMap[c.provider_id]
           if (account === undefined) {
@@ -259,11 +259,13 @@ function classifications(callback) {
             return setBuyerAndBilling(account)
           }
 
+          function cont() { process.nextTick(callback) }
+
           function setBuyerAndBilling(account) {
             var obj = { _id: account._id, name: account.name }
             c.buyer = obj
             c.billing = obj
-            return callback()
+            return cont()
           }
         }
       })

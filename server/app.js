@@ -37,7 +37,7 @@ app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
 app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
-app.use(multer({ dest: '/tmp/'}))
+app.use(multer({ dest: '/tmp/', limits: { fileSize:5000000, files:1 } }))
 
 mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/meku')
 
@@ -1071,7 +1071,8 @@ app.get('/environment', function(req, res, next) {
 })
 
 app.post('/files/provider-import', function(req, res, next) {
-  if (_.isEmpty(req.files)) return res.send(400)
+  if (_.isEmpty(req.files) || !req.files.providerFile) return res.send(400)
+  if (req.files.providerFile.truncated) return res.send(400)
   providerImport.import(req.files.providerFile.path, function(err, providerAndLocationsPreview) {
     if (err) return res.send({ error: err })
     res.send({

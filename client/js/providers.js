@@ -189,7 +189,7 @@ function providerPage() {
             var $parent = $row.parent()
             $row.replaceWith(renderProvider(provider).addClass('selected'))
             $providerDetails.find('.touched').removeClass('touched')
-            $providerDetails.find('.buttons .save-success').fadeIn(500).delay(5000).fadeOut()
+            $providerDetails.find('.buttons .save-success:first').fadeIn(500).delay(5000).fadeOut()
         })
       })
 

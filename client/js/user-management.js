@@ -54,11 +54,9 @@ function userManagementPage() {
     var searchString = $(this).val().toLowerCase()
     $userList.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
-      if (_.contains(name, searchString)) {
-        $(this).show()
-      } else {
-        $(this).hide()
-      }
+      var username = $(this).children('.username').text().toLowerCase()
+      var match = _.contains(name, searchString) || _.contains(username, searchString)
+      $(this).toggle(match)
     })
     closeDetails()
   })

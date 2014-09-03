@@ -566,7 +566,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
         var provider = saved.toObject()
         var providerHasEmails = !_.isEmpty(provider.emailAddresses)
         if (providerHasEmails) {
-          providerUtils.registrationEmail(provider, logErrorOrSendEmail)
+          providerUtils.registrationEmail(provider, getHostname(), logErrorOrSendEmail)
         }
         sendProviderLocationEmails(provider)
         var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
@@ -587,7 +587,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     _.select(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
-      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), logErrorOrSendEmail)
+      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), getHostname(), logErrorOrSendEmail)
     })
   }
 })
@@ -670,10 +670,10 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
     if (err) return next(err)
 
     _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
-      providerUtils.yearlyBillingProviderEmail(p, logErrorOrSendEmail)
+      providerUtils.yearlyBillingProviderEmail(p, getHostname(), logErrorOrSendEmail)
     })
     _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
-      providerUtils.yearlyBillingProviderLocationEmail(l, logErrorOrSendEmail)
+      providerUtils.yearlyBillingProviderLocationEmail(l, getHostname(), logErrorOrSendEmail)
     })
 
     ProviderMetadata.setYearlyBillingReminderSent(new Date(), respond(res, next))
@@ -745,13 +745,13 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
   function sendRegistrationEmails(provider, location, callback) {
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
-      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), logErrorOrSendEmail)
+      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), getHostname(), logErrorOrSendEmail)
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
       // email the provider
       var providerData = _.clone(provider)
       providerData.locations = [location]
-      providerUtils.registrationEmail(providerData, logErrorOrSendEmail)
+      providerUtils.registrationEmail(providerData, getHostname(), logErrorOrSendEmail)
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else {
       // location is the payer, but the location has no email addresses

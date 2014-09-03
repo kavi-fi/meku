@@ -358,7 +358,9 @@ function searchPage() {
       toOption: userToSelect2Option,
       fromOption: select2OptionToIdNamePair,
       termMinLength: 0,
-      allowClear: true
+      allowClear: true,
+      formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
+      formatResultCssClass: function(user) { return user.active ? '' : 'grey' }
     }, function() {
       $input.trigger('fire')
     })

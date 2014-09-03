@@ -872,12 +872,11 @@ app.post('/users/:id', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
-  User.find({username: {$in: req.params.names.split(',')}}, 'name username').lean().exec(function(err, names) {
+  User.find({ username: {$in: req.params.names.split(',')}}, 'name username active').lean().exec(function(err, users) {
     if (err) return next(err)
-    var usernamesAsKeys = _.reduce(names, function(acc, user) {
-      return _.merge(acc, utils.keyValue(user.username, user.name))
-    }, {})
-    res.send(usernamesAsKeys)
+    var result = {}
+    users.forEach(function(user) { result[user.username] = { name: user.name, active: user.active } })
+    res.send(result)
   })
 })
 

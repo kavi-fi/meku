@@ -289,6 +289,8 @@ function select2Autocomplete(opts, onChangeFn) {
     multiple: opts.multiple,
     placeholder: 'Valitse...',
     allowClear: opts.allowClear,
+    formatSelection: opts.formatSelection,
+    formatResultCssClass: opts.formatResultCssClass,
     createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
   })
 
@@ -342,7 +344,7 @@ function select2OptionToIdNamePair(x) {
 
 function userToSelect2Option(user) {
   if (!user) return null
-  return { id: user._id, text: user.name + ' (' + user.username + ')', username: user.username }
+  return { id: user._id, text: user.name + ' (' + user.username + ')', username: user.username, active: user.active }
 }
 
 function select2OptionToInt(x) { return parseInt(x.id) }

@@ -237,6 +237,8 @@ function subscriberManagementPage() {
       multiple: true,
       toOption: userToSelect2Option,
       fromOption: select2OptionToIdUsernamePair,
+      formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
+      formatResultCssClass: function(user) { return user.active ? '' : 'grey' },
       termMinLength: 0
     })
 
@@ -265,9 +267,9 @@ function subscriberManagementPage() {
       if (names.length === 0) return
       $.get('/users/names/' + names, function(data) {
         var usersWithNames = _.map(users, function(user) {
-          return _.merge({}, user, { name: data[user.username] })
+          var userdata = data[user.username] || {}
+          return _.merge({}, user, { name: userdata.name, active: userdata.active })
         })
-
         $subscriberDetails.find('input[name=classifiers]').trigger('setVal', usersWithNames).end()
       })
     }
@@ -293,7 +295,7 @@ function subscriberManagementPage() {
 
   function select2OptionToIdUsernamePair(x) {
     if (!x) return null
-    return { _id: x.id, username: x.username }
+    return { _id: x.id, username: x.username, active: x.active }
   }
 
 }

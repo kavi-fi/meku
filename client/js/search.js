@@ -123,8 +123,8 @@ function internalSearchPage() {
   })
 
   function loadDrafts() {
-    $drafts.find('.draft').remove()
     $.get('/programs/drafts', function(drafts) {
+      $drafts.find('.draft').remove()
       drafts.forEach(function(draft) {
         var $date = $('<span>', {class: 'creationDate'}).text(utils.asDateTime(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
@@ -137,10 +137,10 @@ function internalSearchPage() {
   }
 
   function loadRecent() {
-    $recent.hide()
-    $recent.find('.result').remove()
     $recent.find('.program-box').remove()
     $.get('/programs/recent', function(recents) {
+      $recent.hide()
+      $recent.find('.result').remove()
       recents.forEach(function(p) {
         var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
           .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))

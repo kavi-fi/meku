@@ -777,7 +777,8 @@ app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res
 app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.id, function(err, p) {
     if (err) return next(err)
-    p.locations.push(utils.merge(req.body, { deleted: false, active: false }))
+    var active = !p.registrationDate
+    p.locations.push(utils.merge(req.body, { deleted: false, active: active }))
     p.save(function(err, p) {
       if (err) return next(err)
       logCreateOperation(req.user, _.last(p.locations))
@@ -785,7 +786,6 @@ app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, nex
     })
   })
 })
-
 
 app.delete('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
   Provider.findById(req.params.pid, function(err, provider) {
@@ -1450,5 +1450,5 @@ function getHostname() {
 }
 
 function withinDateRange(date, beginDate, endDate) {
-  return date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
+  return date && beginDate && endDate && date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
 }

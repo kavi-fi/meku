@@ -79,6 +79,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('input[name="classification.safe"]').prop('checked', !!c.safe).end()
       .find('.category-container').toggle(!c.safe).end()
 
+    select2Autocomplete(select2Opts.author, save).trigger('setVal', c.author)
     select2Autocomplete(select2Opts.buyer, save).trigger('setVal', c.buyer)
     select2Autocomplete(select2Opts.billing, save).trigger('setVal', c.billing)
     select2EnumAutocomplete(select2Opts.format, save).trigger('setVal', c.format)
@@ -306,6 +307,9 @@ function classificationFormUtils() {
         $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
       }
     }
+    $form.find('.classification-details span.author')
+      .prev().addClass('select2-label').end()
+      .replaceWith($('<input>', { type:'hidden', name:'classification.author', class:'required' }))
     $form.find('.classification-email h3.main').text('Luokittelupäätös')
     $form.find('button[name=save]').show()
     $form.find('button[name=register]').hide()
@@ -496,6 +500,15 @@ function classificationFormUtils() {
         path: function(term) { return '/actors/search?q=' + encodeURIComponent(term) },
         multiple: true,
         allowAdding: true,
+        termMinLength: 0
+      },
+      author: {
+        $el: $form.find('input[name="classification.author"]'),
+        path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
+        toOption: userToSelect2Option,
+        fromOption: select2OptionToUser,
+        formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
+        formatResultCssClass: function(user) { return user.active ? '' : 'grey' },
         termMinLength: 0
       },
       buyer: {

@@ -356,7 +356,7 @@ function searchPage() {
       $el: $classifier,
       path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
       toOption: userToSelect2Option,
-      fromOption: select2OptionToIdNamePair,
+      fromOption: select2OptionToUser,
       termMinLength: 0,
       allowClear: true,
       formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },

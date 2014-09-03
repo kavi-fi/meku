@@ -118,7 +118,7 @@ function subscriberManagementPage() {
         },
         contactName: findInput('contactName').val(),
         phoneNumber: findInput('phoneNumber').val(),
-        users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair),
+        users: findInput('classifiers').select2('data').map(select2OptionToUser),
         billingPreference: $form.find('input[name=billing-extra]').prop('checked')
           ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
@@ -236,7 +236,7 @@ function subscriberManagementPage() {
       path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
       multiple: true,
       toOption: userToSelect2Option,
-      fromOption: select2OptionToIdUsernamePair,
+      fromOption: select2OptionToUser,
       formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
       formatResultCssClass: function(user) { return user.active ? '' : 'grey' },
       termMinLength: 0
@@ -292,10 +292,4 @@ function subscriberManagementPage() {
       if (!hasRole('root')) $subscriberDetails.find('.apiToken').remove()
     }
   }
-
-  function select2OptionToIdUsernamePair(x) {
-    if (!x) return null
-    return { _id: x.id, username: x.username, active: x.active }
-  }
-
 }

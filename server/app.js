@@ -820,17 +820,13 @@ app.get('/users', requireRole('root'), function(req, res, next) {
   var roleFilters = req.query.roles
   var activeFilter = req.query.active ? req.query.active === 'true' : false
   var filters = _.merge({}, roleFilters ? { role: { $in: roleFilters }} : {}, activeFilter ? {active: true} : {})
-  User.find(filters).lean().exec(respond(res, next))
+  User.find(filters, User.noPrivateFields).sort('name').lean().exec(respond(res, next))
 })
 
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
   var regexp = new RegExp(utils.escapeRegExp(req.query.q), 'i')
   var q = { $or:[{ name: regexp }, { username: regexp }] }
-  User.find(q).sort('name').lean().exec(respond(res, next))
-})
-
-app.delete('/users/:id', requireRole('root'), function(req, res, next) {
-  User.findByIdAndRemove(req.params.id, respond(res, next))
+  User.find(q, 'name username active').limit(50).sort('name').lean().exec(respond(res, next))
 })
 
 app.get('/users/exists/:username', requireRole('root'), function(req, res, next) {
@@ -866,7 +862,12 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
 
 app.post('/users/:id', requireRole('root'), function(req, res, next) {
   User.findById(req.params.id, function (err, user) {
-    updateAndLogChanges(user, req.body, req.user, respond(res, next))
+    updateAndLogChanges(user, req.body, req.user, function(err, saved) {
+      if (err) return next(err)
+      var cleaned = saved.toObject()
+      User.privateFields.forEach(function(key) { delete cleaned[key] })
+      res.send(cleaned)
+    })
   })
 })
 

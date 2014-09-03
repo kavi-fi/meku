@@ -1126,7 +1126,7 @@ var server = app.listen(process.env.PORT || 3000, function() {
   console.log('Listening on port ' + server.address().port)
 })
 
-var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
+var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
   User.find({ $and: [
     { certificateEndDate: { $lt: new Date() }},
     { active: true},
@@ -1150,7 +1150,7 @@ var checkExpiredCerts = new CronJob('0 0 0 * * *', function() {
 })
 checkExpiredCerts.start()
 
-var checkCertsExpiringSoon = new CronJob('0 0 1 * * *', function() {
+var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
   User.find({ $and: [
     { certificateEndDate: { $lt: moment().add(3, 'months').toDate(), $gt: new Date() }},
     { active: true},

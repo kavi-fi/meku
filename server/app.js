@@ -158,7 +158,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
     var isKavi = utils.hasRole(req.user, 'kavi')
     var query = isKavi ? constructKaviQuery() : {}
     var fields = isKavi ? null : { 'classifications.comments': 0 }
-    var sortBy = req.query.registrationDateRange ? '-classifications.0.registrationDate' : 'name'
+    var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
     search(query, fields, sortBy, req, res, next)
   } else {
     var query = { $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }

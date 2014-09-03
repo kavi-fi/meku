@@ -30,6 +30,7 @@ express.static.mime.define({ 'text/xml': ['xsd'] })
 
 var app = express()
 
+app.use(forceSSL)
 app.use(express.compress())
 app.use(express.json())
 app.use(nocache)
@@ -1222,6 +1223,19 @@ function authenticateXmlApi(req, res, next) {
       res.send(403)
     }
   })
+}
+
+function forceSSL(req, res, next) {
+  // trust the proxy (Heroku) about X-Forwarded-Proto
+  if (!isDev() && req.headers['x-forwarded-proto'] !== 'https') {
+    if (req.method === 'GET') {
+      return res.redirect(301, 'https://' + req.get('host') + req.originalUrl)
+    } else {
+      return res.send(403, "Please use HTTPS")
+    }
+  } else {
+    return next()
+  }
 }
 
 function requireRole(role) {

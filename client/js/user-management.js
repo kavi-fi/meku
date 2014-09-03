@@ -16,9 +16,9 @@ function userManagementPage() {
 
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
-    $userList.empty()
     var active = $page.find('.filters input[name=active]').prop('checked')
     $.get('/users?' + $.param({ active: active, roles: roleFilters() }), function(users) {
+      $userList.empty()
       renderUsers(users)
 
       // Apply username search

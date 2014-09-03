@@ -118,7 +118,7 @@ function subscriberManagementPage() {
         },
         contactName: findInput('contactName').val(),
         phoneNumber: findInput('phoneNumber').val(),
-        users: findInput('classifiers').select2('data').map(select2OptionToIdNamePair),
+        users: findInput('classifiers').select2('data').map(select2OptionToIdUsernamePair),
         billingPreference: $form.find('input[name=billing-extra]').prop('checked')
           ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
@@ -236,7 +236,7 @@ function subscriberManagementPage() {
       path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
       multiple: true,
       toOption: userToSelect2Option,
-      fromOption: select2OptionToIdNamePair,
+      fromOption: select2OptionToIdUsernamePair,
       termMinLength: 0
     })
 
@@ -291,7 +291,7 @@ function subscriberManagementPage() {
     }
   }
 
-  function select2OptionToIdNamePair(x) {
+  function select2OptionToIdUsernamePair(x) {
     if (!x) return null
     return { _id: x.id, username: x.username }
   }

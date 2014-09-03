@@ -11,7 +11,6 @@ var Account = schema.Account
 var InvoiceRow = schema.InvoiceRow
 var ChangeLog = schema.ChangeLog
 var Provider = schema.Provider
-var ProviderLocation = schema.ProviderLocation
 var ProviderMetadata = schema.ProviderMetadata
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')

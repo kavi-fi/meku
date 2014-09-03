@@ -189,6 +189,7 @@ function providerPage() {
             var $parent = $row.parent()
             $row.replaceWith(renderProvider(provider).addClass('selected'))
             $providerDetails.find('.touched').removeClass('touched')
+            $providerDetails.find('form').trigger('validate')
             $providerDetails.find('.buttons .save-success:first').fadeIn(500).delay(5000).fadeOut()
         })
       })
@@ -452,6 +453,7 @@ function providerPage() {
               $providers.find('[data-id='+provider._id+']').data('provider', p)
 
               $locationDetails.find('.touched').removeClass('touched')
+              $locationDetails.find('form').trigger('validate')
               $locationDetails.find('.buttons .save-success').fadeIn(500).delay(5000).fadeOut()
 
               var $selected = $locations.find('.location-row.selected')

@@ -3,7 +3,7 @@ var _ = require('lodash')
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 
-exports.registrationEmail = function (provider, callback) {
+exports.registrationEmail = function (provider, hostName, callback) {
   function emailHtml(provider, callback) {
     var active =_.select(provider.locations, function(l) { return !l.deleted && l.active })
     var allLocations = active.map(function(l) {
@@ -17,6 +17,7 @@ exports.registrationEmail = function (provider, callback) {
     var locations = _.select(allLocations, function(l) { return !l.isPayer })
     var payerLocations = _.select(allLocations, function(l) { return l.isPayer })
     var vars = {
+      hostName: hostName,
       header: 'Ilmoittautuminen tarjoajaksi',
       emailAddress: provider.emailAddresses.join(', '),
       locations: locations,
@@ -52,9 +53,10 @@ exports.registrationEmail = function (provider, callback) {
   })
 }
 
-exports.registrationEmailProviderLocation = function (location, callback) {
+exports.registrationEmailProviderLocation = function (location, hostName, callback) {
   function emailHtml(location, callback) {
     var vars = _.merge({}, location, {
+      hostName: hostName,
       header: 'Ilmoittautuminen tarjoajaksi',
       emailAddress: location.emailAddresses.join(', '),
       providingTypes: location.providingType.map(enums.providingTypeName),
@@ -82,7 +84,7 @@ exports.registrationEmailProviderLocation = function (location, callback) {
   })
 }
 
-exports.yearlyBillingProviderEmail = function(provider, callback) {
+exports.yearlyBillingProviderEmail = function(provider, hostName, callback) {
   function emailHtml(provider, callback) {
     var locations = _(provider.locations)
       .map(function(l) { return {
@@ -92,6 +94,7 @@ exports.yearlyBillingProviderEmail = function(provider, callback) {
         providingTypes: l.providingType.map(enums.providingTypeName).join(', ')}})
       .groupBy(function(l) { return l.isPayer ? 'payer' : 'notPayer'}).value()
     var vars = {
+      hostName: hostName,
       header: 'Tarjoajan vuosilaskutuksen vahvistus',
       emailAddress: provider.emailAddresses.join(', '),
       locations: locations.notPayer,
@@ -125,9 +128,10 @@ exports.yearlyBillingProviderEmail = function(provider, callback) {
   })
 }
 
-exports.yearlyBillingProviderLocationEmail = function(location, callback) {
+exports.yearlyBillingProviderLocationEmail = function(location, hostName, callback) {
   function emailHtml(location, callback) {
     var vars = {
+      hostName: hostName,
       header: 'Tarjoamispaikan vuosilaskutuksen vahvistus',
       emailAddress: location.emailAddresses.join(', '),
       providingTypes: location.providingType.map(enums.providingTypeName),

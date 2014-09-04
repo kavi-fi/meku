@@ -16,9 +16,9 @@ function userManagementPage() {
 
   $page.on('show', function(event, userId) {
     updateLocationHash(userId || '')
-    $userList.empty()
     var active = $page.find('.filters input[name=active]').prop('checked')
     $.get('/users?' + $.param({ active: active, roles: roleFilters() }), function(users) {
+      $userList.empty()
       renderUsers(users)
 
       // Apply username search
@@ -54,11 +54,9 @@ function userManagementPage() {
     var searchString = $(this).val().toLowerCase()
     $userList.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
-      if (_.contains(name, searchString)) {
-        $(this).show()
-      } else {
-        $(this).hide()
-      }
+      var username = $(this).children('.username').text().toLowerCase()
+      var match = _.contains(name, searchString) || _.contains(username, searchString)
+      $(this).toggle(match)
     })
     closeDetails()
   })

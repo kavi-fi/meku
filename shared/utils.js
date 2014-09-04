@@ -57,6 +57,10 @@ utils.isValidYear = function(txt) {
   return /^\d{4}$/.test(txt) && parseInt(txt) > 1889
 }
 
+utils.isEmptyOrValidDate = function(txt) {
+  return $.trim(txt) == '' || moment(txt, utils.dateFormat).isValid()
+}
+
 utils.secondsToDuration = function(seconds) {
   var hours   = Math.floor(seconds / 3600)
   var minutes = Math.floor((seconds - (hours * 3600)) / 60)

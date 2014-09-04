@@ -529,9 +529,8 @@
     <div class="classification-details row">
       <div class="form content clearfix">
         <h2 class="main">Luokittelu</h2>
-        <div>
-          <label>Luokittelijan nimi</label>
-          <span class="author textified-field"></span>
+        <div class="classification-author-field">
+          <label>Luokittelijan nimi</label><span class="author textified-field"></span>
         </div>
         <div class="left author-and-reason-fields">
           <label class="select2-label">Peruste</label><input name="classification.reason" class="required" type="hidden"/>
@@ -609,4 +608,13 @@
       <div class="register"><button name="register" disabled class="button">Rekisteröi</button></div>
     </div>
   </form>
+</div>
+
+<div class="root-edit-author-and-date-fields">
+  <div class="classification-author-field left">
+    <label class="select2-label">Luokittelijan nimi</label><input type="hidden" name="classification.author" class="required" />
+  </div>
+  <div class="right">
+    <label>Rekisteröintipäivä</label><input type="text" name="classification.registrationDate" />
+  </div>
 </div>

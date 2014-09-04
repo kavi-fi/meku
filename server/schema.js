@@ -299,6 +299,8 @@ UserSchema.methods.checkPassword = function(pwd, callback) {
 }
 
 var User = exports.User = mongoose.model('users', UserSchema)
+User.privateFields = ['emekuId', 'password', 'resetHash']
+User.noPrivateFields = { emekuId:0, password: 0, resetHash: 0 }
 
 var InvoiceSchema = new Schema({
   account: {_id: ObjectId, name: String},

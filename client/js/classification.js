@@ -79,11 +79,19 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('input[name="classification.safe"]').prop('checked', !!c.safe).end()
       .find('.category-container').toggle(!c.safe).end()
 
+    select2Autocomplete(select2Opts.author, save).trigger('setVal', c.author)
     select2Autocomplete(select2Opts.buyer, save).trigger('setVal', c.buyer)
     select2Autocomplete(select2Opts.billing, save).trigger('setVal', c.billing)
     select2EnumAutocomplete(select2Opts.format, save).trigger('setVal', c.format)
     select2EnumAutocomplete(select2Opts.authorOrg, save).trigger('setVal', authorOrgVal)
     select2EnumAutocomplete(select2Opts.reason, save).trigger('setVal', reasonVal)
+
+    var $registrationDate = $form.find('input[name="classification.registrationDate"]')
+    var pikadayOpts = {
+      defaultDate: c.registrationDate ? moment(c.registrationDate).toDate() : '',
+      onSelect: function() { $registrationDate.trigger('input') }
+    }
+    $registrationDate.pikaday(_.defaults(pikadayOpts, pikadayDefaults))
 
     c.criteria.forEach(function(id) { $form.find('.criteria[data-id=' + id + ']').addClass('selected') })
     Object.keys(c.criteriaComments || {}).forEach(function(id) {
@@ -107,6 +115,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     })
     validateTextChange($form.find('.required'), isNotEmpty)
     validateTextChange($form.find('input[name=year]'), utils.isValidYear)
+    validateTextChange($form.find('input[name="classification.registrationDate"]'), utils.isEmptyOrValidDate)
     validateTextChange($form.find('.duration'), utils.isValidDuration)
     validateTextChange($form.find('input[name="classification.registrationEmailAddresses"]'), isMultiEmail)
     $form.on('select2-blur', function(e) { $(e.target).addClass('touched') })
@@ -161,7 +170,12 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       var val = $(this).val()
       $form.find('input[name="series"]').select2('data', { id: val, text: val, isNew: true })
     })
-
+    $form.find('input[name="classification.registrationDate"]').on('input', function() {
+      if ($(this).hasClass('invalid')) return false
+      var val = $.trim($(this).val())
+      var date = val != '' ? moment(val, utils.dateFormat).toJSON() : ''
+      save($(this).attr('name'), date)
+    })
     $form.find('input[name="classification.buyer"]').on('change', function() {
       var $billing = $form.find('input[name="classification.billing"]')
       if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate').trigger('change')
@@ -306,6 +320,7 @@ function classificationFormUtils() {
         $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
       }
     }
+    $form.find('.classification-author-field').replaceWith($('#templates > .root-edit-author-and-date-fields').clone().html())
     $form.find('.classification-email h3.main').text('Luokittelupäätös')
     $form.find('button[name=save]').show()
     $form.find('button[name=register]').hide()
@@ -496,6 +511,15 @@ function classificationFormUtils() {
         path: function(term) { return '/actors/search?q=' + encodeURIComponent(term) },
         multiple: true,
         allowAdding: true,
+        termMinLength: 0
+      },
+      author: {
+        $el: $form.find('input[name="classification.author"]'),
+        path: function(term) { return '/users/search?q=' + encodeURIComponent(term) },
+        toOption: userToSelect2Option,
+        fromOption: select2OptionToUser,
+        formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
+        formatResultCssClass: function(user) { return user.active ? '' : 'grey' },
         termMinLength: 0
       },
       buyer: {

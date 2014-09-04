@@ -81,6 +81,7 @@ function providerPage() {
     var searchString = $(this).val().toLowerCase()
     $providers.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
+      name += _.map($(this).data('provider').locations, function(l) { return l.name.toLowerCase() }).join(' ')
       $(this).toggle(_.contains(name, searchString))
     })
     closeDetails()

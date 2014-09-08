@@ -1,3 +1,17 @@
+/*
+ This import tool assumes a directory containing 1 xml-file per table to be created.
+
+  The following process was previously used to split the all-in-one xml file into table-specific files, YMMV:
+
+    1) Remove non-utf8 characters (e.g. <E6> @ import_maps - table):
+    iconv -c -f utf-8 -t utf-8 emeku.xml > emeku-stripped-utf8.xml
+
+    2) Remove utf8 control characters:
+    tr -d '\036\037' < emeku-stripped-utf8.xml > emeku-fixed-stripped-utf8.xml
+
+    3) Split into table-specific files:
+    mkdir split; cd split; awk '/<!-- Table/{ if (f) { print "</docs>" > f; close(f); } f = $3".xml"; print "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<docs>" > f }{ if (f) print > f }' ../emeku-fixed-stripped-utf8.xml
+*/
 var xml = require('xml-object-stream')
 var async = require('async')
 var path = require('path')

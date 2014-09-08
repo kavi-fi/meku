@@ -567,7 +567,8 @@ function accounts(callback) {
       'united kingdom': 'GB',
       'sweden': 'SE',
       'sverige': 'SE',
-      'denmark': 'DK'
+      'denmark': 'DK',
+      'norway': 'NO'
     }
     var result = mapping[country.toLowerCase()]
     if (!result) throw new Error('No legacyCountryCode for "'+country+'"')

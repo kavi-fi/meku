@@ -60,7 +60,13 @@ function setup() {
   var error = errorDialog()
   var conflict = conflictDialog()
 
-  $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json' })
+  $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json',
+    beforeSend: function(xhr, settings) {
+      if (!/^(GET|HEAD|OPTIONS|TRACE)$/.test(xhr.type)) {
+        xhr.setRequestHeader('x-csrf-token', $.cookie('_csrf_token'))
+      }
+    }
+  })
 
   $.get('/environment', function(res) {
     if (res.environment === 'training') {

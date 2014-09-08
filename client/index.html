@@ -95,6 +95,7 @@
         <form method="POST" action="/proe">
           <input type="hidden" name="begin" />
           <input type="hidden" name="end" />
+          <input type="hidden" name="_csrf">
           <div class="accounts"></div>
           <button class="button">Luo Proe-tiedosto</button>
         </form>
@@ -152,6 +153,7 @@
         <form method="post" action="/providers/billing/proe">
           <input type="hidden" name="begin">
           <input type="hidden" name="end">
+          <input type="hidden" name="_csrf">
           <table>
             <thead>
               <th></th><th>Rekisteröity</th><th>Hinta</th>

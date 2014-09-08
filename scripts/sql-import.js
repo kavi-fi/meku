@@ -18,7 +18,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications markTrainingProgramsDeleted markUnclassifiedProgramsDeleted linkTvSeries linkCustomersIds metadataIndex nameIndex
+   node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications deleteTrainingPrograms markUnclassifiedProgramsDeleted deleteTrainingUsers linkTvSeries linkCustomersIds metadataIndex nameIndex
 
  Should remove programs which have no classifications? -> ~7400
    check how many are tv-series-names?
@@ -33,7 +33,8 @@ var tasks = {
   wipeAccounts: wipeAccounts, accounts: accounts,
   nameIndex: nameIndex,
   wipeMetadataIndex: wipeMetadataIndex, metadataIndex: metadataIndex,
-  markTrainingProgramsDeleted: markTrainingProgramsDeleted,
+  deleteTrainingPrograms: deleteTrainingPrograms,
+  deleteTrainingUsers: deleteTrainingUsers,
   markUnclassifiedProgramsDeleted: markUnclassifiedProgramsDeleted,
   linkCustomersIds: linkCustomersIds,
   linkTvSeries: linkTvSeries
@@ -604,7 +605,7 @@ function metadataIndex(callback) {
   }
 }
 
-function markTrainingProgramsDeleted(callback) {
+function deleteTrainingPrograms(callback) {
   // CHECK: e.g.
   // * Armadillo OK
   // * Requiem for a dream (no valid entries, broken in emeku...)
@@ -615,17 +616,21 @@ function markTrainingProgramsDeleted(callback) {
     if (err) return callback(err)
     async.eachLimit(users, 50, function(u, callback) {
       var q = new RegExp('\\(' + utils.escapeRegExp(u.username) + '\\)')
-      schema.Program.update({ $or: [ { name: q }, { nameFi: q } ] }, { deleted: true }, { multi:true }, function(err, numChanged) {
+      schema.Program.remove({ $or: [ { name: q }, { nameFi: q } ] }, function(err, numChanged) {
         tick()
         count += numChanged
         callback()
       })
     }, function(err) {
       if (err) return callback(err)
-      console.log('\n> Number of test-programs marked as deleted: '+count)
+      console.log('\n> Number of test-programs deleted: '+count)
       schema.Program.update({ name:[] }, { deleted: 1 }, { multi:true }, callback)
     })
   })
+}
+
+function deleteTrainingUsers(callback) {
+  schema.User.remove({username: /^L.*$/}, callback)
 }
 
 function markUnclassifiedProgramsDeleted(callback) {

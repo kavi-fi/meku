@@ -1190,7 +1190,7 @@ function authenticate(req, res, next) {
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
-    'GET:/register-provider.html'
+    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls'
   ]
   var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
 

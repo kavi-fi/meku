@@ -27,36 +27,21 @@ function readExcel(file) {
   function readSheet(usernameField) {
     return xlsx.utils.sheet_to_json(sheet).map(function(row, index) {
       return { firstname: row.Etunimi, lastname: row.Sukunimi, username: row[usernameField], email:row.sähköposti, row:index }
-    })
+    }).filter(function(u) { return u.username != undefined })
   }
 }
 
 function combine(file, callback) {
   readMongo(function(err, mongoUsers) {
     if (err) return callback(err)
-    var excelUsers = _.select(readExcel(file), function(x) { return x.username != undefined })
+    var excelUsers = readExcel(file)
     var result = _(mongoUsers).map(function(mu) {
-      var eu = _.find(excelUsers, function(x) { return x.username == mu.username})
+      var eu = _.find(excelUsers, function(eu) { return eu.username == mu.username && eu.email != undefined })
       return eu ? { emekuId: mu.emekuId, username: mu.username, name: mu.name, email: eu.email, row: eu.row } : undefined
     }).compact().value()
 
     callback(null, result, mongoUsers, excelUsers)
   })
-
-  function byName(name) {
-    var loName = name.toLowerCase()
-    return function(u) {
-      if (!u.firstname || !u.lastname) return false
-      return loName.indexOf(u.firstname.toLowerCase()) >= 0
-        && loName.indexOf(u.lastname.toLowerCase()) >= 0
-    }
-  }
-  function byEmail(name) {
-    var nameParts = name.toLowerCase().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/å/g, 'o').split(/\W+/)
-    return function(u) {
-      return _.all(nameParts, function(part) { return u.email.indexOf(part) >= 0 })
-    }
-  }
 }
 
 function logTotals(file) {
@@ -70,7 +55,7 @@ function logTotals(file) {
         '\n#excel '+excelUsers.length + '  #mongo '+mongoUsers.length +
         '\nfound  '+foundRows.length  + '  unmapped '+notFound.length
     )
-    console.log('\nUnmapped: \n', _.pluck(notFound, 'lastname'))
+    console.log('\nUnmapped: \n', _.pluck(notFound, 'username'))
   })
 }
 

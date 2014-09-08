@@ -120,5 +120,6 @@ function billingPage() {
     }
     $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
     fetchInvoiceRows(begin, end)
+    $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
   })
 }

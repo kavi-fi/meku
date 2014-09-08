@@ -58,6 +58,7 @@ function providerPage() {
     fetchNewProviders(begin, end)
 
     updateMetadata()
+    $billingContainer.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
   })
 
   $page.on('click', 'button[name=new-provider]', function() {

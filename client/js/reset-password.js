@@ -35,7 +35,7 @@ function resetPassword() {
 
   $button.click(function() {
     $button.prop('disabled', true)
-    $.post('/reset-password', JSON.stringify({ resetHash: resetHash, password: $password.val() }))
+    $.post('/reset-password', JSON.stringify({ resetHash: resetHash, password: $password.val(), _csrf: $.cookie('_csrf_token') }))
       .done(function() {
         window.location = '/'
       })

@@ -24,6 +24,7 @@ var CronJob = require('cron').CronJob
 var providerUtils = require('./provider-utils')
 var multer  = require('multer')
 var providerImport = require('./provider-import')
+var csrf = require('csurf')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -32,8 +33,11 @@ var app = express()
 app.use(forceSSL)
 app.use(express.compress())
 app.use(express.json())
+app.use(express.urlencoded())
 app.use(nocache)
 app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
+app.use(csrf({ cookie: { httpOnly: true, secure: !isDev(), signed: true } }))
+app.use(setCsrfTokenCookie)
 app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
@@ -621,7 +625,7 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
   })
 })
 
-app.post('/providers/billing/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {
+app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next) {
   var dateFormat = 'DD.MM.YYYY'
   var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat) }
   var dateRangeQ = { $gte: dates.begin, $lt: dates.end.add(1, 'day') }
@@ -928,7 +932,7 @@ app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next
   InvoiceRow.find({registrationDate: {$gte: range.begin, $lt: range.end}}).sort('registrationDate').lean().exec(respond(res, next))
 })
 
-app.post('/proe', requireRole('kavi'), express.urlencoded(), function(req, res, next) {
+app.post('/proe', requireRole('kavi'), function(req, res, next) {
   var dates = { begin: req.body.begin, end: req.body.end }
   var invoiceIds = req.body.invoiceId
   if (!Array.isArray(invoiceIds)) invoiceIds = [invoiceIds]
@@ -1190,7 +1194,7 @@ function authenticate(req, res, next) {
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
-    'GET:/register-provider.html'
+    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls'
   ]
   var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
 
@@ -1235,6 +1239,14 @@ function forceSSL(req, res, next) {
   } else {
     return next()
   }
+}
+
+function setCsrfTokenCookie(req, res, next) {
+  if (!req.cookies._csrf_token) {
+    var csrf = req.csrfToken()
+    res.cookie('_csrf_token', csrf)
+  }
+  next()
 }
 
 function requireRole(role) {

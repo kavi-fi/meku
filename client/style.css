@@ -722,10 +722,17 @@ textarea.invalid:disabled,
 #provider-page .select2-float-right { float: right; margin-right: 34px; }
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
-#provider-page .location-row { background-color: #F8F8F8; padding: 10px; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; }
-#provider-page .location-row span:nth-child(2) { -webkit-flex-grow: 2; flex-grow: 2; }
-#provider-page .location-row span:nth-child(3) { -webkit-flex-grow: 1; flex-grow: 1; }
-#provider-page .results .result .date {float: right; }
+#provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
+#provider-page .location-row > span { display: inline-block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 5px; }
+#provider-page .location-row > i:nth-child(1) { float: left; }
+#provider-page .location-row > span:nth-child(2) { width: 300px; }
+#provider-page .location-row > span:nth-child(3) { width: 350px; }
+#provider-page .location-row > span:nth-child(4) { width: 80px; }
+#provider-page .location-row > span:nth-child(5) { float: right; }
+#provider-page .providers-list .result span { display: inline-block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 5px;}
+#provider-page .providers-list .result span:nth-child(1) { width: 400px; }
+#provider-page .providers-list .result span:nth-child(2) { }
+#provider-page .providers-list .result .date {float: right; }
 #provider-page .location-details .emails { margin-right: 24px; }
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 #provider-page .most-recent { margin-top: 10px; }

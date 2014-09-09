@@ -322,6 +322,7 @@ function providerPage() {
       .data('provider', provider)
       .toggleClass('inactive', !provider.active)
       .append($('<span>', { class: 'name' }).text(provider.name))
+      .append($('<span>').text(provider.address.street + ', ' + provider.address.city))
       .append($('<span>', { class: 'date'}).text(utils.asDate(provider.registrationDate)))
   }
 
@@ -548,14 +549,14 @@ function providerPage() {
     }
 
     function renderLocation(location) {
-      var $location = $('<div>', { 'data-id': location._id, class: 'location-row' })
+      return $('<div>', { 'data-id': location._id, class: 'location-row' })
         .data('location', location).toggleClass('inactive', !location.active)
         .append($('<i>', { class: 'rotating fa fa-play' }))
         .append($('<span>').text(location.name))
-        .append($('<span>').text(location.isPayer ? 'Tarjoamispaikka maksaa laskun' : ''))
+        .append($('<span>').text(
+          utils.getProperty(location, 'address.street')? (location.address.street + ', ' + location.address.city) : ''))
+        .append($('<span>').text(location.isPayer ? 'Laskutetaan' : ''))
         .append($('<span>').text(utils.asDate(location.registrationDate)))
-
-      return $location
     }
 
     function bindEventHandlers(provider, $locationDetails, submitCallback) {

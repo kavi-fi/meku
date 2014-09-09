@@ -97,6 +97,10 @@ function providerPage() {
     }
   })
 
+  $yearlyBilling.on('click', '> h3', function() {
+    $(this).toggleClass('selected').next().slideToggle()
+  })
+
   $yearlyBilling.on('click', 'button.yearly-billing-reminder', function() {
     var $button = $(this)
     $button.prop('disabled', true)

@@ -179,7 +179,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .result.inactive, .location-row.inactive { color: #afafaf; }
 
 .search-label { display: block; padding: 0 0 20px 0; width: 350px; }
-input.query { width: 350px; margin-top: 1px; }
+input.query { width: 350px; }
 button.search { margin-left: 15px; }
 label.top { vertical-align: top; }
 

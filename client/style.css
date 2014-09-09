@@ -731,8 +731,7 @@ textarea.invalid:disabled,
 #provider-page .location-row > span:nth-child(5) { float: right; }
 #provider-page .providers-list .result span { display: inline-block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 5px;}
 #provider-page .providers-list .result span:nth-child(1) { width: 400px; }
-#provider-page .providers-list .result span:nth-child(2) { }
-#provider-page .providers-list .result .date {float: right; }
+#provider-page .results .result .date { float: right; }
 #provider-page .location-details .emails { margin-right: 24px; }
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 #provider-page .most-recent { margin-top: 10px; }

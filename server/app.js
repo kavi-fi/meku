@@ -648,7 +648,9 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
     var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.txt'
     res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'text/plain')
-    res.send(result)
+    ProviderMetadata.setPreviousMidYearBilling(new Date(), dates.begin, dates.end, function() {
+      res.send(result)
+    })
   })
 })
 

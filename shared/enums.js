@@ -345,6 +345,7 @@ enums.countries = {
   'TR': 'Turkki',
   'TW': 'Taiwan',
   'TZ': 'Tansania',
+  'UA': 'Ukraina',
   'US': 'Yhdysvallat',
   'UY': 'Uruguay',
   'VA': 'Vatikaanivaltio',

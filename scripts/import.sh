@@ -14,14 +14,11 @@ echo "> Adding emails for users from $1"
 node scripts/map-user-emails.js logUpdates $1 | mongo meku
 node scripts/sql-import.js programs
 node scripts/sql-import.js names
-node scripts/sql-import.js \
-  metadata \
-  classifications \
-  deleteTrainingPrograms \
-  markUnclassifiedProgramsDeleted \
-  deleteTrainingUsers \
-  linkTvSeries \
-  linkCustomersIds \
-  metadataIndex \
-  nameIndex
+node scripts/sql-import.js metadata classifications markUnclassifiedProgramsDeleted
+
+if [ "$NODE_ENV" != "training" ]; then
+  node scripts/sql-import.js deleteTrainingPrograms deleteTrainingUsers
+fi
+
+node scripts/sql-import.js linkTvSeries linkCustomersIds metadataIndex nameIndex
 node scripts/create-demo-data.js

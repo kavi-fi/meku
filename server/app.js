@@ -36,7 +36,7 @@ app.use(express.json())
 app.use(express.urlencoded())
 app.use(nocache)
 app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
-app.use(csrf({ cookie: { httpOnly: true, secure: !isDev(), signed: true } }))
+app.use(setupCsrfMiddleware())
 app.use(setCsrfTokenCookie)
 app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
@@ -1189,19 +1189,10 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var whitelist = [
-    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html',
-    'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
-    'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
-    'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
-    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls'
-  ]
   var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
-
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
-  var isWhitelistedPath = _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
-  if (isWhitelistedPath) return next()
+  if (isWhitelisted(req)) return next()
   var isOptional =  _.any(optionalList, function(p) { return url.indexOf(p) == 0 })
   var cookie = req.signedCookies.user
   if (cookie) {
@@ -1241,8 +1232,19 @@ function forceSSL(req, res, next) {
   }
 }
 
+function setupCsrfMiddleware() {
+  var csrfMiddleware = csrf({ cookie: { httpOnly: true, secure: !isDev(), signed: true } })
+  return function(req, res, next) {
+    if (isWhitelisted(req)) {
+      return next()
+    } else {
+      return csrfMiddleware(req, res, next)
+    }
+  }
+}
+
 function setCsrfTokenCookie(req, res, next) {
-  if (!req.cookies._csrf_token) {
+  if (!req.cookies._csrf_token && req.csrfToken) {
     var csrf = req.csrfToken()
     res.cookie('_csrf_token', csrf)
   }
@@ -1477,4 +1479,16 @@ function getHostname() {
 
 function withinDateRange(date, beginDate, endDate) {
   return date && beginDate && endDate && date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
+}
+
+function isWhitelisted(req) {
+  var whitelist = [
+    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html',
+    'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
+    'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
+    'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
+    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls'
+  ]
+  var url = req.method + ':' + req.path
+  return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
 }

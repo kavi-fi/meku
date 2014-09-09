@@ -5,6 +5,7 @@
 // license : MIT
 // www.jszen.com
 
+// NOTE: initialization caused problems, so added isInitiated function to api
 // NOTE: moment-2.8.2.js update caused deprecation warning, so fixed moment.add(period, num) -> moment.add(num, period)
 
 (function($)
@@ -175,7 +176,8 @@
 				box.remove();
 				$(window).unbind('resize.datepicker',calcPosition);
 				$(document).unbind('click.datepicker',closeDatePicker);
-			}
+			},
+			isInitiated: function() { return initiated } // NOTE: Added by mtkopone
 		});
 		
 		$(window).bind('resize.datepicker',calcPosition);

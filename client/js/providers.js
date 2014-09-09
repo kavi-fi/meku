@@ -55,7 +55,7 @@ function providerPage() {
     var end = moment().endOf('month')
 
     $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
-    fetchNewProviders(begin, end)
+    if (!$datePicker.data('dateRangePicker').isInitiated()) fetchNewProviders(begin, end)
 
     updateMetadata()
     $billingContainer.find('form input[name=_csrf]').val($.cookie('_csrf_token'))

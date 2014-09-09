@@ -627,8 +627,8 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
 
 app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next) {
   var dateFormat = 'DD.MM.YYYY'
-  var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat) }
-  var dateRangeQ = { $gte: dates.begin, $lt: dates.end.add(1, 'day') }
+  var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat), inclusiveEnd: moment(req.body.end, dateFormat).add(1, 'day') }
+  var dateRangeQ = { $gte: dates.begin, $lt: dates.inclusiveEnd }
   var registrationDateFilters = { $or: [
     { registrationDate: dateRangeQ },
     { 'locations.registrationDate': dateRangeQ }
@@ -637,11 +637,11 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
     if (err) return next(err)
 
     data.providers = _(data.providers).map(function(p) {
-      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
       return p
     }).reject(function(p) { return _.isEmpty(p.locations) }).value()
 
-    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
 
     var accountRows = getProviderBillingRows(data)
     var result = proe(dates, accountRows, 'provider')

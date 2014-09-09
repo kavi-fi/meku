@@ -49,7 +49,7 @@ app.post('/login', function(req, res, next) {
   var username = req.body.username
   var password = req.body.password
   if (!username || !password) return res.send(403)
-  User.findOne({ username: username, password: {$exists: true}, active: true }, function(err, user) {
+  User.findOne({ username: username.toUpperCase(), password: {$exists: true}, active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
@@ -86,7 +86,7 @@ app.post('/logout', function(req, res, next) {
 app.post('/forgot-password', function(req, res, next) {
   var username = req.body.username
   if (!username) return res.send(403)
-  User.findOne({ username: username, active: true }, function(err, user) {
+  User.findOne({ username: username.toUpperCase(), active: true }, function(err, user) {
     if (err) return next(err)
     if (!user) return res.send(403)
     if (_.isEmpty(user.emails)) {
@@ -835,7 +835,8 @@ app.get('/users/search', requireRole('kavi'), function(req, res, next) {
 })
 
 app.get('/users/exists/:username', requireRole('root'), function(req, res, next) {
-  User.findOne({ username: req.params.username }, { _id:1 }).lean().exec(function(err, user) {
+  var q = (req.params.username || '').toUpperCase()
+  User.findOne({ username: q }, { _id:1 }).lean().exec(function(err, user) {
     if (err) return next(err)
     res.send({ exists: !!user })
   })
@@ -844,6 +845,7 @@ app.get('/users/exists/:username', requireRole('root'), function(req, res, next)
 app.post('/users/new', requireRole('root'), function(req, res, next) {
   var hasRequiredFields = (req.body.username != '' && req.body.emails[0].length > 0 && req.body.name != '')
   if (!hasRequiredFields || !utils.isValidUsername(req.body.username)) return res.send(400)
+  req.body.username = req.body.username.toUpperCase()
   new User(req.body).save(function(err, user) {
     if (err) return next(err)
     createAndSaveHash(user, function(err) {
@@ -877,7 +879,7 @@ app.post('/users/:id', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
-  User.find({ username: {$in: req.params.names.split(',')}}, 'name username active').lean().exec(function(err, users) {
+  User.find({ username: {$in: req.params.names.toUpperCase().split(',')}}, 'name username active').lean().exec(function(err, users) {
     if (err) return next(err)
     var result = {}
     users.forEach(function(user) { result[user.username] = { name: user.name, active: user.active } })
@@ -1040,7 +1042,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     })
 
     function verifyValidAuthor(program, callback) {
-      var username = program.classifications[0].author.name
+      var username = program.classifications[0].author.name.toUpperCase()
       var user = _.find(req.account.users, { username: username })
       if (user) {
         User.findOne({ username: username, active: true }, { _id: 1, username: 1, name: 1, role: 1 }).lean().exec(function(err, doc) {

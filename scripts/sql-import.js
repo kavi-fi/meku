@@ -484,7 +484,7 @@ function accounts(callback) {
     function onRow(row) {
       var phone = row.phone_mobile || undefined
       return {
-        emekuId: row.id, username: row.user_name, name: row.name, phoneNumber: phone, active: row.status == 'Active',
+        emekuId: row.id, username: row.user_name.toUpperCase(), name: row.name, phoneNumber: phone, active: row.status == 'Active',
         role: 'user'
       }
     }

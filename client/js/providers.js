@@ -43,7 +43,6 @@ function providerPage() {
 
     $.get('/providers/unapproved', function(providers) {
       $unapproved.empty()
-      $page.find('.unapproved').toggle(providers.length > 0)
       _(providers).sortBy('name')
         .map(renderProvider)
         .forEach(function(p) {
@@ -68,13 +67,13 @@ function providerPage() {
     bindEventHandlers($selected, $providerDetails, function(provider) {
       $.post('/providers', JSON.stringify(_.merge(provider, { deleted: false })), function(newProvider) {
         var $providerRow = renderProvider(newProvider)
-        $providers.prepend($providerRow)
+        $unapproved.prepend($providerRow)
         $providerRow.slideDown()
         closeDetails()
       })
     })
     closeDetails()
-    $providers.prepend($providerDetails)
+    $unapproved.prepend($providerDetails)
     $providerDetails.slideDown()
   })
 

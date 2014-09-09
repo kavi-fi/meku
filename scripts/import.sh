@@ -21,4 +21,3 @@ if [ "$NODE_ENV" != "training" ]; then
 fi
 
 node scripts/sql-import.js linkTvSeries linkCustomersIds metadataIndex nameIndex
-node scripts/create-demo-data.js

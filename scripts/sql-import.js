@@ -606,26 +606,9 @@ function metadataIndex(callback) {
 }
 
 function deleteTrainingPrograms(callback) {
-  // CHECK: e.g.
-  // * Armadillo OK
-  // * Requiem for a dream (no valid entries, broken in emeku...)
-  // * Antichrist (LUJUPI) is on nameFi
-  var tick = progressMonitor(1)
-  var count = 0
-  schema.User.find({ username: { $ne: 'VET' } }, { username: 1 }, function(err, users) {
+  schema.Program.remove({'classifications.author.username': /^L.*$/}, function(err) {
     if (err) return callback(err)
-    async.eachLimit(users, 50, function(u, callback) {
-      var q = new RegExp('\\(' + utils.escapeRegExp(u.username) + '\\)')
-      schema.Program.remove({ $or: [ { name: q }, { nameFi: q } ] }, function(err, numChanged) {
-        tick()
-        count += numChanged
-        callback()
-      })
-    }, function(err) {
-      if (err) return callback(err)
-      console.log('\n> Number of test-programs deleted: '+count)
-      schema.Program.update({ name:[] }, { deleted: 1 }, { multi:true }, callback)
-    })
+    schema.Program.update({ name:[] }, { deleted: 1 }, { multi:true }, callback)
   })
 }
 

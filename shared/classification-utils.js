@@ -45,11 +45,6 @@ exports.aggregateSummary = function(programs) {
   return summary(aggregateClassification(programs))
 }
 
-var criteriaAgeLimit = function(classification) {
-  if (classification.criteria.length == 0) return 0
-  return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
-}
-
 exports.canReclassify = function(program, user) {
   if (!program) return false
   if (enums.util.isUnknown(program) || enums.util.isTvSeriesName(program)) return false
@@ -74,9 +69,8 @@ var isReclassification = exports.isReclassification = function(program, classifi
 var ageLimit = exports.ageLimit = function(classification) {
   if (!classification) return undefined
   if (classification.safe) return 0
-  var criteria = criteriaAgeLimit(classification)
-  var legacy = classification.legacyAgeLimit || 0
-  return Math.max(criteria, legacy)
+  if (classification.criteria.length == 0) return classification.legacyAgeLimit || 0
+  return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
 }
 
 exports.registrationEmail = function(program, classification, user, hostName) {

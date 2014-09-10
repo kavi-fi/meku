@@ -530,6 +530,7 @@ function providerPage() {
       var data = JSON.stringify({ active: newState === 'on' })
       $.ajax('/providers/' + provider._id + '/locations/' + location._id + '/active', { type: 'PUT' }).done(function(activation) {
         location.active = activation.active
+        location.registrationDate = activation.registrationDate
         $selected.data('location', location)
         if (activation.wasFirstActivation) {
           var $dialog = $("#templates").find('.location-registration-success-dialog').clone()
@@ -537,8 +538,8 @@ function providerPage() {
           $dialog.find('.email').toggle(activation.emailSent)
           $dialog.find('.no-email').toggle(!activation.emailSent)
           $dialog.find('.ok').on('click', function() {
-            closeDialog($selected)
-            $selected.toggleClass('inactive', !activation.active)
+            closeDialog()
+            $selected.replaceWith(renderLocation(location).addClass('selected'))
           })
           showDialog($dialog)
         } else {

@@ -742,7 +742,7 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
       if (firstActivation) {
         sendRegistrationEmails(saved.toObject(), location.toObject(), respond(res, next))
       } else {
-        res.send({active: location.active, wasFirstActivation: false})
+        res.send({active: location.active, wasFirstActivation: false, registrationDate: location.registrationDate})
       }
     })
   })
@@ -751,17 +751,17 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
       providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), getHostname(), logErrorOrSendEmail)
-      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
       // email the provider
       var providerData = _.clone(provider)
       providerData.locations = [location]
       providerUtils.registrationEmail(providerData, getHostname(), logErrorOrSendEmail)
-      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else {
       // location is the payer, but the location has no email addresses
       // or the provider has no email addresses
-      callback(null, {active: true, wasFirstActivation: true, emailSent: false})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: false, registrationDate: location.registrationDate})
     }
   }
 

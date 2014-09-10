@@ -290,7 +290,8 @@ function searchPage() {
   var $filters = $page.find('.filters input[type=checkbox]')
   var $registrationDatePicker = $page.find('.kavi-query-filters .datepicker')
   var $clearRegistrationDatePicker = $page.find('.kavi-query-filters .clear-date-picker')
-  var $classifier = $page.find('.kavi-query-filters input[name="classifier"]')
+  var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
+  var $reclassifiedToggle = $page.find('.kavi-query-filters input[name=reclassified]')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
@@ -362,6 +363,9 @@ function searchPage() {
       formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
       formatResultCssClass: function(user) { return user.active ? '' : 'grey' }
     }, function() {
+      var isEmpty = !currentClassifier()
+      $reclassifiedToggle.prop('disabled', isEmpty).parent().toggleClass('grey', isEmpty)
+      if (isEmpty) $reclassifiedToggle.prop('checked', false)
       $input.trigger('fire')
     })
 
@@ -388,6 +392,10 @@ function searchPage() {
       e.stopPropagation()
       $registrationDatePicker.removeData('selection')
       $registrationDatePicker.data('dateRangePicker').clear()
+      $input.trigger('fire')
+    })
+
+    $reclassifiedToggle.change(function() {
       $input.trigger('fire')
     })
   }
@@ -417,7 +425,8 @@ function searchPage() {
       page: state.page,
       filters: currentFilters(),
       classifier: currentClassifier(),
-      registrationDateRange: currentRegistrationDateRange()
+      registrationDateRange: currentRegistrationDateRange(),
+      reclassified: $reclassifiedToggle.prop('checked')
     })
     state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return

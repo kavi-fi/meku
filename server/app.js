@@ -173,14 +173,18 @@ app.get('/programs/search/:q?', function(req, res, next) {
   function constructKaviQuery() {
     if (!req.query.registrationDateRange && !req.query.classifier) return {}
     var q = {}
+    var result = { classifications: { $elemMatch: q }}
     if (req.query.registrationDateRange) {
       var range = utils.parseDateRange(req.query.registrationDateRange)
       q.registrationDate = { $gte: range.begin, $lt: range.end }
     }
     if (req.query.classifier) {
       q['author._id'] = req.query.classifier
+      if (req.query.reclassified == 'true') {
+        result['classifications.0.author._id'] = { $ne: req.query.classifier }
+      }
     }
-    return { classifications: { $elemMatch: q } }
+    return result
   }
 
   function search(extraQueryTerms, responseFields, sortBy, req, res, next) {

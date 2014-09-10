@@ -1285,7 +1285,7 @@ function logErrorOrSendEmail(user) {
 function sendEmail(opts, user, callback) {
   var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
   if (process.env.NODE_ENV === 'training') {
-    email.to = user.email
+    email.to = user.email || user.emails[0]
   } else {
     opts.recipients.forEach(function(to) { email.addTo(to) })
   }

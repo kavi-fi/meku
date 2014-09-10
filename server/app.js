@@ -33,7 +33,7 @@ var app = express()
 app.use(forceSSL)
 app.use(express.compress())
 app.use(express.json())
-app.use(express.urlencoded())
+app.use(setupUrlEncodedBodyParser())
 app.use(nocache)
 app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
 app.use(setupCsrfMiddleware())
@@ -1249,6 +1249,13 @@ function forceSSL(req, res, next) {
   }
 }
 
+function setupUrlEncodedBodyParser() {
+  var parser = express.urlencoded()
+  return function(req, res, next) {
+    return isUrlEncodedBody(req) ? parser(req, res, next) : next()
+  }
+}
+
 function setupCsrfMiddleware() {
   var csrfMiddleware = csrf({ cookie: { httpOnly: true, secure: !isDev(), signed: true } })
   return function(req, res, next) {
@@ -1502,6 +1509,11 @@ function getHostname() {
 
 function withinDateRange(date, beginDate, endDate) {
   return date && beginDate && endDate && date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
+}
+
+function isUrlEncodedBody(req) {
+  var paths = ['POST:/proe', 'POST:/providers/billing/proe']
+  return _.contains(paths, req.method + ':' + req.path)
 }
 
 function isWhitelisted(req) {

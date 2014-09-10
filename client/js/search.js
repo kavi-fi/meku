@@ -420,6 +420,7 @@ function searchPage() {
 
   function load(callback) {
     $loading.show()
+    $results.empty()
     var url = '/programs/search/'+encodeURIComponent(state.q)
     var data = $.param({
       page: state.page,
@@ -434,7 +435,6 @@ function searchPage() {
       if (data.count != undefined) $page.find('.program-count .num').text(data.count)
       $noResults.toggle(state.page == 0 && results.length == 0)
       $noMoreResults.toggle((state.page > 0 || results.length > 0) && results.length < 100)
-      if (state.page == 0) $results.empty()
       $results.append(results.map(function(p) { return render(p, state.q) }))
       $loading.hide()
       if (callback) callback()

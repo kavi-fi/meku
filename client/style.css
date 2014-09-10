@@ -234,7 +234,7 @@ label.top { vertical-align: top; }
 #search-page .new-classification button { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 180px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
-#search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
+#search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto 2000px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
 #search-page .result .series { color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #search-page .result .items { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 #search-page .result .items > span:nth-child(1) { min-width: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }

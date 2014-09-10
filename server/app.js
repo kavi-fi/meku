@@ -117,10 +117,9 @@ function sendHashLinkViaEmail(user, subject, text, callback) {
   var emailData = {
     recipients: user.emails,
     subject: subject,
-    body: _.template(text, { link: url }),
-    sendInTraining: true
+    body: _.template(text, { link: url })
   }
-  sendEmail(emailData, callback)
+  sendEmail(emailData, user, callback)
 }
 
 function createAndSaveHash(user, callback) {
@@ -292,7 +291,7 @@ app.post('/programs/:id/register', function(req, res, next) {
             if (err) return next(err)
             addInvoicerows(newClassification, function(err) {
               if (err) return next(err)
-              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, getHostname()), function(err) {
+              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, getHostname()), req.user, function(err) {
                 if (err) return next(err)
                 updateMetadataIndexesForNewProgram(program, function() {
                   logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
@@ -569,7 +568,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
         var provider = saved.toObject()
         var providerHasEmails = !_.isEmpty(provider.emailAddresses)
         if (providerHasEmails) {
-          providerUtils.registrationEmail(provider, getHostname(), logErrorOrSendEmail)
+          providerUtils.registrationEmail(provider, getHostname(), logErrorOrSendEmail(req.user))
         }
         sendProviderLocationEmails(provider)
         var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
@@ -590,7 +589,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     _.select(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
-      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), getHostname(), logErrorOrSendEmail)
+      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), getHostname(), logErrorOrSendEmail(req.user))
     })
   }
 })
@@ -673,10 +672,10 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
     if (err) return next(err)
 
     _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
-      providerUtils.yearlyBillingProviderEmail(p, getHostname(), logErrorOrSendEmail)
+      providerUtils.yearlyBillingProviderEmail(p, getHostname(), logErrorOrSendEmail(req.user))
     })
     _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
-      providerUtils.yearlyBillingProviderLocationEmail(l, getHostname(), logErrorOrSendEmail)
+      providerUtils.yearlyBillingProviderLocationEmail(l, getHostname(), logErrorOrSendEmail(req.user))
     })
 
     ProviderMetadata.setYearlyBillingReminderSent(new Date(), respond(res, next))
@@ -748,13 +747,13 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
   function sendRegistrationEmails(provider, location, callback) {
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
-      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), getHostname(), logErrorOrSendEmail)
+      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), getHostname(), logErrorOrSendEmail(req.user))
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
       // email the provider
       var providerData = _.clone(provider)
       providerData.locations = [location]
-      providerUtils.registrationEmail(providerData, getHostname(), logErrorOrSendEmail)
+      providerUtils.registrationEmail(providerData, getHostname(), logErrorOrSendEmail(req.user))
       callback(null, {active: true, wasFirstActivation: true, emailSent: true})
     } else {
       // location is the payer, but the location has no email addresses
@@ -1150,7 +1149,7 @@ var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
         body: '<p>Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.<br/>' +
           '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
           '<p>Terveisin,<br/>KAVI</p>'
-      }, logError)
+      }, user, logError)
     })
   })
 })
@@ -1174,7 +1173,7 @@ var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
           '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.</p>' +
           '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
           '<p>Terveisin,<br/>KAVI</p>'
-      }, function(err) {
+      }, user, function(err) {
         if (err) console.error(err)
         else user.update({ certExpiryReminderSent: new Date() }, logError)
       })
@@ -1260,16 +1259,22 @@ function requireRole(role) {
   }
 }
 
-function logErrorOrSendEmail(err, email) {
-  if (err) return console.error(err)
-  sendEmail(email, logError)
+function logErrorOrSendEmail(user) {
+  return function(err, email) {
+    if (err) return console.error(err)
+    sendEmail(email, user, logError)
+  }
 }
 
-function sendEmail(opts, callback) {
+function sendEmail(opts, user, callback) {
   var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
-  opts.recipients.forEach(function(to) { email.addTo(to) })
+  if (process.env.NODE_ENV === 'training') {
+    email.to = user.email
+  } else {
+    opts.recipients.forEach(function(to) { email.addTo(to) })
+  }
 
-  if (process.env.NODE_ENV === 'production' || (process.env.NODE_ENV === 'training' && opts.sendInTraining)) {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'training') {
     sendgrid.send(email, callback)
   } else {
     console.log('email (suppressed) to: ', opts.recipients, email)

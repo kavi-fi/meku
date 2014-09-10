@@ -127,14 +127,11 @@ function loginPage() {
   })
 
   $form.on('validate', function() {
-    var invalid = $username.hasClass('invalid') || $password.hasClass('invalid')
-    $loginButton.prop('disabled', invalid)
     $forgotPasswordButton.prop('disabled', $username.hasClass('invalid'))
     $feedback.slideUp()
   })
 
   $loginButton.click(function() {
-    $loginButton.prop('disabled', true)
     $.post('/login', JSON.stringify({ username: $username.val(), password: $password.val() }))
       .done(function() { location.reload() })
       .fail(function(jqXHR) {

@@ -289,6 +289,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
     newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
+    Program.updateClassificationSummary(newClassification)
 
     program.draftClassifications = {}
     program.draftsBy = []
@@ -409,6 +410,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
     var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     watcher.applyUpdates(req.body)
+    program.classifications.forEach(function(c) { Program.updateClassificationSummary(c) })
     verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
@@ -1037,6 +1039,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
           p.classifications[0].registrationDate = now
           p.classifications[0].billing = account
           p.classifications[0].buyer = account
+          Program.updateClassificationSummary(p.classifications[0])
           p.populateAllNames(function (err) {
             if (err) return callback(err)
             p.save(function (err) {

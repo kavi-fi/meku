@@ -209,6 +209,9 @@ label.top { vertical-align: top; }
   width: 12px; height: 12px; font-size: 1px; text-decoration: none; border: 0;
   background: url('vendor/select2-3.4.6/select2.png') right top no-repeat;
 }
+#search-page .program-count { float: right; }
+#search-page .program-count span { display: inline-block; font-size: 14px; min-width: 50px; margin-top: 10px; text-align: right; }
+
 #search-page .recent { margin-bottom: 40px; }
 #search-page .drafts h3, #search-page .recent h3 { margin-bottom: 10px; }
 #search-page .extra > div { margin-bottom: 40px; }

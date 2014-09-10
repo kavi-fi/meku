@@ -186,7 +186,17 @@ app.get('/programs/search/:q?', function(req, res, next) {
   function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
     var page = req.query.page || 0
     var filters = req.query.filters || []
-    Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(respond(res, next))
+    var q = query(extraQueryTerms)
+    Program.find(q, responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
+      if (err) return next(err)
+      if (page == 0 && utils.hasRole(req.user, 'kavi')) {
+        Program.count(q, function(err, count) {
+          res.send({ count: count, programs: docs })
+        })
+      } else {
+        res.send({ programs: docs })
+      }
+    })
 
     function query(extraQueryTerms) {
       var ObjectId = mongoose.Types.ObjectId

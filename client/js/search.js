@@ -419,8 +419,10 @@ function searchPage() {
       classifier: currentClassifier(),
       registrationDateRange: currentRegistrationDateRange()
     })
-    state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
+    state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
+      var results = data.programs
+      if (data.count != undefined) $page.find('.program-count .num').text(data.count)
       $noResults.toggle(state.page == 0 && results.length == 0)
       $noMoreResults.toggle((state.page > 0 || results.length > 0) && results.length < 100)
       if (state.page == 0) $results.empty()

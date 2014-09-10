@@ -399,7 +399,7 @@ function searchPage() {
       $input.trigger('fire')
     })
 
-    $page.find('.kavi-query-filters .agelimit-filter').click(function() {
+    $page.find('.kavi-query-filters .filterbutton').click(function() {
       $(this).toggleClass('active')
       $input.trigger('fire')
     })
@@ -433,7 +433,8 @@ function searchPage() {
       classifier: currentClassifier(),
       registrationDateRange: currentRegistrationDateRange(),
       reclassified: $reclassifiedToggle.prop('checked'),
-      agelimits: currentAgelimits()
+      agelimits: currentAgelimits(),
+      warnings: currentWarnings()
     })
     state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
@@ -466,6 +467,9 @@ function searchPage() {
   }
   function currentAgelimits() {
     return $page.find('.kavi-query-filters .agelimit-filter.active').map(function() { return $(this).data('id') }).toArray()
+  }
+  function currentWarnings() {
+    return $page.find('.kavi-query-filters .warning-filter.active').map(function() { return $(this).data('id') }).toArray()
   }
 
 

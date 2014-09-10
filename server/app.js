@@ -190,6 +190,15 @@ app.get('/programs/search/:q?', function(req, res, next) {
         classificationMatch.agelimit = agelimitsIn
       }
     }
+    if (req.query.warnings) {
+      var warnings = { $all: req.query.warnings }
+      if (_.isEmpty(classificationMatch)) {
+        rootQuery['classifications.0.warnings'] = warnings
+      } else {
+        classificationMatch.warnings = warnings
+      }
+
+    }
     if (!_.isEmpty(classificationMatch)) rootQuery['classifications'] = { $elemMatch: classificationMatch }
     return rootQuery
   }

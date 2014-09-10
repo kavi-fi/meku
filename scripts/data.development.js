@@ -7,6 +7,6 @@ exports.users = [
 exports.accounts = [
   {name: "DEMO tilaaja 1", roles: ['Subscriber'], emailAddresses: [], users: ['ROOT', 'KAVI', 'USER'], yTunnus: 'DEMO1' },
   {name: "DEMO tilaaja 2", roles: ['Subscriber'], emailAddresses: [], users: ['ROOT', 'KAVI', 'USER'], yTunnus: 'DEMO2' },
-  {name: "DEMO tilaaja 3", roles: ['Subscriber', 'Classifier'], emailAddresses: [], users: ['ROOT', 'KAVI', 'USER'], yTunnus: 'DEMO3' }
+  {name: "DEMO tilaaja 3", roles: ['Subscriber', 'Classifier'], emailAddresses: [], users: ['ROOT', 'KAVI', 'USER'], yTunnus: 'DEMO3', apiToken: 'apiToken' }
 ]
 

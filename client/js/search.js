@@ -420,7 +420,7 @@ function searchPage() {
 
   function load(callback) {
     $loading.show()
-    $results.empty()
+    if (state.page == 0) $results.empty()
     var url = '/programs/search/'+encodeURIComponent(state.q)
     var data = $.param({
       page: state.page,

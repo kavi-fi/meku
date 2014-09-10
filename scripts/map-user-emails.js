@@ -18,44 +18,34 @@ function readMongo(callback) {
   })
 }
 
-function readExcel() {
-  var sheet = xlsx.readFile(__dirname + '/luokittelijat-lista.xlsx').Sheets['luokittelijat-lista']
-  return xlsx.utils.sheet_to_json(sheet).map(function(row, index) {
-    return { firstname: row.ETUNIMI, lastname: row.SUKUNIMI, email:row.EMAIL, row:index }
-  })
+function readExcel(file) {
+  var sheet = xlsx.readFile(file).Sheets['Kaikki']
+  var production = readSheet('Tuotantotunnus')
+  var training = readSheet('Harjoitustunnus')
+  return production.concat(training)
+
+  function readSheet(usernameField) {
+    return xlsx.utils.sheet_to_json(sheet).map(function(row, index) {
+      return { firstname: row.Etunimi, lastname: row.Sukunimi, username: row[usernameField], email:row.sähköposti, row:index }
+    }).filter(function(u) { return u.username != undefined })
+  }
 }
 
-function combine(callback) {
+function combine(file, callback) {
   readMongo(function(err, mongoUsers) {
     if (err) return callback(err)
-    var excelUsers = readExcel()
+    var excelUsers = readExcel(file)
     var result = _(mongoUsers).map(function(mu) {
-      var eu = _.find(excelUsers, byName(mu.name))
-        || _.find(excelUsers, byEmail(mu.name))
+      var eu = _.find(excelUsers, function(eu) { return eu.username == mu.username && eu.email != undefined })
       return eu ? { emekuId: mu.emekuId, username: mu.username, name: mu.name, email: eu.email, row: eu.row } : undefined
     }).compact().value()
 
     callback(null, result, mongoUsers, excelUsers)
   })
-
-  function byName(name) {
-    var loName = name.toLowerCase()
-    return function(u) {
-      if (!u.firstname || !u.lastname) return false
-      return loName.indexOf(u.firstname.toLowerCase()) >= 0
-        && loName.indexOf(u.lastname.toLowerCase()) >= 0
-    }
-  }
-  function byEmail(name) {
-    var nameParts = name.toLowerCase().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/å/g, 'o').split(/\W+/)
-    return function(u) {
-      return _.all(nameParts, function(part) { return u.email.indexOf(part) >= 0 })
-    }
-  }
 }
 
-function logTotals() {
-  combine(function(err, result, mongoUsers, excelUsers) {
+function logTotals(file) {
+  combine(file, function(err, result, mongoUsers, excelUsers) {
     if (err) throw err
     var foundRows = _.pluck(result, 'row')
     var notFound = excelUsers.filter(function(eu) {
@@ -65,13 +55,13 @@ function logTotals() {
         '\n#excel '+excelUsers.length + '  #mongo '+mongoUsers.length +
         '\nfound  '+foundRows.length  + '  unmapped '+notFound.length
     )
-    console.log('\nUnmapped: \n', _.pluck(notFound, 'email'))
+    console.log('\nUnmapped: \n', _.pluck(notFound, 'username'))
   })
 }
 
-function logUpdates() {
+function logUpdates(file) {
   var template = "db.users.update({ username:'$1', 'emails.0': { $exists: false } }, { $set: { emails:['$2'] } })"
-  combine(function(err, result) {
+  combine(file, function(err, result) {
     if (err) throw err
     var queries = result.map(function(row) { return template.replace('$1', row.username).replace('$2', row.email) })
     console.log(queries.join('\n'))
@@ -80,11 +70,12 @@ function logUpdates() {
 
 
 var cmd = process.argv[2]
+var file = process.argv[3]
 if (!cmd) {
-  console.error('Usage:\n  node '+process.argv[1]+' <logTotals|logUpdates>'); return;
+  console.error('Usage:\n  node '+process.argv[1]+' <logTotals|logUpdates> <path to .xlsx file>'); return;
 }
 var cmds = { logTotals: logTotals, logUpdates:logUpdates }
-cmds[cmd]()
+cmds[cmd](file)
 
 
 

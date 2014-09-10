@@ -398,6 +398,11 @@ function searchPage() {
     $reclassifiedToggle.change(function() {
       $input.trigger('fire')
     })
+
+    $page.find('.kavi-query-filters .agelimit-filter').click(function() {
+      $(this).toggleClass('active')
+      $input.trigger('fire')
+    })
   }
 
   function loadUntil(selectedProgramId, callback) {
@@ -427,7 +432,8 @@ function searchPage() {
       filters: currentFilters(),
       classifier: currentClassifier(),
       registrationDateRange: currentRegistrationDateRange(),
-      reclassified: $reclassifiedToggle.prop('checked')
+      reclassified: $reclassifiedToggle.prop('checked'),
+      agelimits: currentAgelimits()
     })
     state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
@@ -458,6 +464,10 @@ function searchPage() {
   function currentRegistrationDateRange() {
     return $registrationDatePicker.data('selection')
   }
+  function currentAgelimits() {
+    return $page.find('.kavi-query-filters .agelimit-filter.active').map(function() { return $(this).data('id') }).toArray()
+  }
+
 
   function programDataUpdated(program) {
     var $row = $page.find('.result[data-id=' + program._id + ']')

@@ -179,7 +179,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 .result.inactive, .location-row.inactive { color: #afafaf; }
 
 .search-label { display: block; padding: 0 0 20px 0; width: 350px; }
-input.query { width: 350px; margin-top: 1px; }
+input.query { width: 350px; }
 button.search { margin-left: 15px; }
 label.top { vertical-align: top; }
 
@@ -204,11 +204,16 @@ label.top { vertical-align: top; }
 #search-page .datepicker .icon { float: right; margin: 2px 6px 0 0; }
 #search-page .kavi-query-filters > div { margin-top: 10px; min-height: 50px; }
 #search-page .kavi-query-filters label { display: inline-block; vertical-align: top; margin-top: 10px; margin-right: 20px; }
+#search-page .kavi-query-filters label.grey { color: #d3d3d3; }
+#search-page .kavi-query-filters .reclassified input { margin: 0 5px 0 20px; }
 #search-page .kavi-query-filters .clear-date-picker {
   display: none; cursor: pointer;
   width: 12px; height: 12px; font-size: 1px; text-decoration: none; border: 0;
   background: url('vendor/select2-3.4.6/select2.png') right top no-repeat;
 }
+#search-page .program-count { float: right; }
+#search-page .program-count span { display: inline-block; font-size: 14px; min-width: 50px; margin-top: 10px; text-align: right; }
+
 #search-page .recent { margin-bottom: 40px; }
 #search-page .drafts h3, #search-page .recent h3 { margin-bottom: 10px; }
 #search-page .extra > div { margin-bottom: 40px; }
@@ -229,7 +234,8 @@ label.top { vertical-align: top; }
 #search-page .new-classification button { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 180px; margin-bottom: 0; }
 #search-page .new-classification input { width: auto; }
-#search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto; margin-bottom: 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
+#search-page .no-results, #search-page .no-more-results, #search-page .loading { display: none; width: 940px; margin: 20px auto 80px; font-size: 14px; text-align: center; padding: 10px 0; font-weight: 100; background-color: #fff; }
+#search-page .loading { margin-bottom: 2000px; }
 #search-page .result .series { color: #bbb; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #search-page .result .items { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 #search-page .result .items > span:nth-child(1) { min-width: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
@@ -722,15 +728,23 @@ textarea.invalid:disabled,
 #provider-page .select2-float-right { float: right; margin-right: 34px; }
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
-#provider-page .location-row { background-color: #F8F8F8; padding: 10px; display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; }
-#provider-page .location-row span:nth-child(2) { -webkit-flex-grow: 2; flex-grow: 2; }
-#provider-page .location-row span:nth-child(3) { -webkit-flex-grow: 1; flex-grow: 1; }
-#provider-page .results .result .date {float: right; }
+#provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
+#provider-page .location-row > span { display: inline-block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 5px; }
+#provider-page .location-row > i:nth-child(1) { float: left; }
+#provider-page .location-row > span:nth-child(2) { width: 300px; }
+#provider-page .location-row > span:nth-child(3) { width: 350px; }
+#provider-page .location-row > span:nth-child(4) { width: 80px; }
+#provider-page .location-row > span:nth-child(5) { float: right; }
+#provider-page .providers-list .result span { display: inline-block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 5px;}
+#provider-page .providers-list .result span:nth-child(1) { width: 400px; }
+#provider-page .results .result .date { float: right; }
 #provider-page .location-details .emails { margin-right: 24px; }
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 #provider-page .most-recent { margin-top: 10px; }
 #provider-page .most-recent .sent { margin-right: 15px; }
 #provider-page .yearly-billing { margin-bottom: 30px; }
+#provider-page .yearly-billing h3 { cursor: pointer }
+#provider-page .yearly-billing-content { display: none; }
 #provider-page .yearly-billing-proe-form { display: inline-block; }
 
 #provider-page .provider-details .save button { float: none; }
@@ -751,6 +765,7 @@ textarea.invalid:disabled,
   border-radius: 4px;
 }
 
+#provider-page .unapproved .new-button { margin-bottom: 10px; margin-top: -50px; text-align: right; }
 #provider-page .unapproved .results { margin-bottom: 30px; }
 #provider-page .unapproved .result .date { display: inline-block; width: 90px; }
 

@@ -237,7 +237,8 @@ var Provider = exports.Provider = mongoose.model('providers', ProviderSchema)
 
 var ProviderMetadataSchema = new Schema({
   yearlyBillingReminderSent: Date,
-  yearlyBillingProeCreated: Date
+  yearlyBillingProeCreated: Date,
+  previousMidYearBilling: { created: Date, begin: Date, end: Date }
 })
 ProviderMetadataSchema.statics.getAll = function(callback) {
   ProviderMetadata.findOne(function(err, metadata) {
@@ -260,6 +261,14 @@ ProviderMetadataSchema.statics.setYearlyBillingProeCreated = function(date, call
     metadata.save(callback)
   })
 }
+ProviderMetadataSchema.statics.setPreviousMidYearBilling = function(created, begin, end, callback) {
+  ProviderMetadata.getAll(function(err, metadata) {
+    if (err) return callback(err)
+    metadata.previousMidYearBilling = { created: created, begin: begin, end: end }
+    metadata.save(callback)
+  })
+}
+
 var ProviderMetadata = exports.ProviderMetadata = mongoose.model('providermetadatas', ProviderMetadataSchema)
 
 var UserSchema = new Schema({

@@ -207,8 +207,10 @@
       <div class="kavi-query-filters">
         <div>
           <label>Luokittelija</label><input type="hidden" name="classifier" />
+          <label class="reclassified grey"><input type="checkbox" disabled name="reclassified" /> Uudelleenluokitellut</label>
         </div>
         <div>
+          <div class="program-count"><label>Hakutuloksia</label><span class="num"></span></div>
           <label>Rekisteröintipäivä</label><span class="datepicker"><span></span><i class="icon fa fa-calendar"></i><i class="icon clear-date-picker"></i></span>
         </div>
       </div>
@@ -340,7 +342,7 @@
       <span class="save-success hidden">Tiedot tallennettu</span>
     </div>
 
-    <label>Toiminimi <input type="text" name="name" required></label>
+    <label>Tarjoajan nimi <input type="text" name="name" required></label>
     <label>Y-tunnus <input type="text" name="yTunnus" required></label>
     <label class="select2-float-right">Asiointikieli <input type="text" name="language"></label>
 

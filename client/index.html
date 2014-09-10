@@ -34,6 +34,7 @@
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
+  <title>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</title>
 </head>
 <body>
   <div class="training-ribbon"><span>Koulutusympäristö</span></div>
@@ -60,7 +61,7 @@
       <label>Käyttäjätunnus<input type="text" name="username" class="invalid"/></label>
       <label>Salasana<input type="password" name="password" class="invalid" /></label>
       <div class="feedback"></div>
-      <button disabled class="button login">Kirjaudu</button>
+      <button class="button login">Kirjaudu</button>
       <button disabled class="button forgot-password">Unohdin salasanani</button>
     </div>
   </form>
@@ -143,6 +144,7 @@
   <div id="provider-page" class="page">
     <div class="unapproved">
       <h3>Hyväksymättä</h3>
+      <div class="new-button"><button class="button" name="new-provider">Luo uusi</button></div>
       <div class="results"></div>
     </div>
 
@@ -163,25 +165,30 @@
           <div class="billing-buttons">
             <button class="button" name="create-proe" type="submit">Luo Proe</button>
           </div>
+          <div class="most-recent">
+            Viimeksi luotu: <span class="created">-</span><br/>
+            Viimeisin ajanjakso: <span class="dates">-</span>
+          </div>
         </form>
       </div>
     </div>
 
     <div class="yearly-billing">
-      <h3>Vuosilaskutus</h3>
-      <button class="button yearly-billing-reminder">Vuosilaskutus tilausvahvistuksen lähettäminen</button>
-      <form method="post" action="/providers/yearlyBilling/proe" class="yearly-billing-proe-form">
-        <button class="button yearly-billing-proe" type="submit">Luo vuosilaskutus Proe-tiedosto</button>
-      </form>
-      <div class="most-recent">
-        Viimeksi lähetetty: <span class="sent">Ei koskaan</span>
-        Viimeksi luotu: <span class="created">Ei koskaan</span>
+      <h3><i class="rotating fa fa-play"></i>Vuosilaskutus</h3>
+      <div class="yearly-billing-content">
+        <button class="button yearly-billing-reminder">Vuosilaskutus tilausvahvistuksen lähettäminen</button>
+        <form method="post" action="/providers/yearlyBilling/proe" class="yearly-billing-proe-form">
+          <button class="button yearly-billing-proe" type="submit">Luo vuosilaskutus Proe-tiedosto</button>
+        </form>
+        <div class="most-recent">
+          Viimeksi lähetetty: <span class="sent">Ei koskaan</span>
+          Viimeksi luotu: <span class="created">Ei koskaan</span>
+        </div>
       </div>
     </div>
 
     <h2 class="main">Tarjoajat</h2>
     <div class="controls">
-      <button class="button" name="new-provider">Luo uusi</button>
       <div class="search">
         <label for="provider-name-query" class="search-label">Nimi</label>
         <input class="query" type="search" id="provider-name-query" placeholder="Hae nimellä...">

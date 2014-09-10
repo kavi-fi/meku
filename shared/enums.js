@@ -217,7 +217,7 @@ enums.isOikaisupyynto = function(val) { return val == 3 }
 
 enums.authorOrganization = {
   0: 'Ulkopuolinen',
-  1: 'KAVI:n virkailija',
+  1: 'KAVI',
   2: 'Kuvaohjelmalautakunta',
   3: 'KHO'
 }

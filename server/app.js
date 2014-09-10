@@ -172,20 +172,34 @@ app.get('/programs/search/:q?', function(req, res, next) {
   function constructKaviQuery() {
     if (!req.query.registrationDateRange && !req.query.classifier) return {}
     var q = {}
+    var result = { classifications: { $elemMatch: q }}
     if (req.query.registrationDateRange) {
       var range = utils.parseDateRange(req.query.registrationDateRange)
       q.registrationDate = { $gte: range.begin, $lt: range.end }
     }
     if (req.query.classifier) {
       q['author._id'] = req.query.classifier
+      if (req.query.reclassified == 'true') {
+        result['classifications.0.author._id'] = { $ne: req.query.classifier }
+      }
     }
-    return { classifications: { $elemMatch: q } }
+    return result
   }
 
   function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
     var page = req.query.page || 0
     var filters = req.query.filters || []
-    Program.find(query(extraQueryTerms), responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(respond(res, next))
+    var q = query(extraQueryTerms)
+    Program.find(q, responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
+      if (err) return next(err)
+      if (page == 0 && utils.hasRole(req.user, 'kavi')) {
+        Program.count(q, function(err, count) {
+          res.send({ count: count, programs: docs })
+        })
+      } else {
+        res.send({ programs: docs })
+      }
+    })
 
     function query(extraQueryTerms) {
       var ObjectId = mongoose.Types.ObjectId
@@ -626,8 +640,8 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
 
 app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next) {
   var dateFormat = 'DD.MM.YYYY'
-  var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat) }
-  var dateRangeQ = { $gte: dates.begin, $lt: dates.end.add(1, 'day') }
+  var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat), inclusiveEnd: moment(req.body.end, dateFormat).add(1, 'day') }
+  var dateRangeQ = { $gte: dates.begin, $lt: dates.inclusiveEnd }
   var registrationDateFilters = { $or: [
     { registrationDate: dateRangeQ },
     { 'locations.registrationDate': dateRangeQ }
@@ -636,18 +650,20 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
     if (err) return next(err)
 
     data.providers = _(data.providers).map(function(p) {
-      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
       return p
     }).reject(function(p) { return _.isEmpty(p.locations) }).value()
 
-    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.end) })
+    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
 
     var accountRows = getProviderBillingRows(data)
     var result = proe(dates, accountRows, 'provider')
     var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.txt'
     res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'text/plain')
-    res.send(result)
+    ProviderMetadata.setPreviousMidYearBilling(new Date(), dates.begin, dates.end, function() {
+      res.send(result)
+    })
   })
 })
 
@@ -739,7 +755,7 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
       if (firstActivation) {
         sendRegistrationEmails(saved.toObject(), location.toObject(), respond(res, next))
       } else {
-        res.send({active: location.active, wasFirstActivation: false})
+        res.send({active: location.active, wasFirstActivation: false, registrationDate: location.registrationDate})
       }
     })
   })
@@ -748,17 +764,17 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
       providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), getHostname(), logErrorOrSendEmail(req.user))
-      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
       // email the provider
       var providerData = _.clone(provider)
       providerData.locations = [location]
       providerUtils.registrationEmail(providerData, getHostname(), logErrorOrSendEmail(req.user))
-      callback(null, {active: true, wasFirstActivation: true, emailSent: true})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else {
       // location is the payer, but the location has no email addresses
       // or the provider has no email addresses
-      callback(null, {active: true, wasFirstActivation: true, emailSent: false})
+      callback(null, {active: true, wasFirstActivation: true, emailSent: false, registrationDate: location.registrationDate})
     }
   }
 

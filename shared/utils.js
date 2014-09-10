@@ -93,8 +93,8 @@ utils.programDurationAsText = function(program) {
 }
 
 utils.hasRole = function (user, role) {
-  var roles = enums.userRoles
   if (!user) return false
+  var roles = enums.userRoles
   return roles[role].order >= roles[user.role].order
 }
 

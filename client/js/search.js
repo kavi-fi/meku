@@ -290,7 +290,8 @@ function searchPage() {
   var $filters = $page.find('.filters input[type=checkbox]')
   var $registrationDatePicker = $page.find('.kavi-query-filters .datepicker')
   var $clearRegistrationDatePicker = $page.find('.kavi-query-filters .clear-date-picker')
-  var $classifier = $page.find('.kavi-query-filters input[name="classifier"]')
+  var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
+  var $reclassifiedToggle = $page.find('.kavi-query-filters input[name=reclassified]')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
@@ -362,6 +363,9 @@ function searchPage() {
       formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
       formatResultCssClass: function(user) { return user.active ? '' : 'grey' }
     }, function() {
+      var isEmpty = !currentClassifier()
+      $reclassifiedToggle.prop('disabled', isEmpty).parent().toggleClass('grey', isEmpty)
+      if (isEmpty) $reclassifiedToggle.prop('checked', false)
       $input.trigger('fire')
     })
 
@@ -390,6 +394,10 @@ function searchPage() {
       $registrationDatePicker.data('dateRangePicker').clear()
       $input.trigger('fire')
     })
+
+    $reclassifiedToggle.change(function() {
+      $input.trigger('fire')
+    })
   }
 
   function loadUntil(selectedProgramId, callback) {
@@ -412,18 +420,21 @@ function searchPage() {
 
   function load(callback) {
     $loading.show()
+    if (state.page == 0) $results.empty()
     var url = '/programs/search/'+encodeURIComponent(state.q)
     var data = $.param({
       page: state.page,
       filters: currentFilters(),
       classifier: currentClassifier(),
-      registrationDateRange: currentRegistrationDateRange()
+      registrationDateRange: currentRegistrationDateRange(),
+      reclassified: $reclassifiedToggle.prop('checked')
     })
-    state.jqXHR = $.get(url, data).done(function(results, status, jqXHR) {
+    state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return
+      var results = data.programs
+      if (data.count != undefined) $page.find('.program-count .num').text(data.count)
       $noResults.toggle(state.page == 0 && results.length == 0)
       $noMoreResults.toggle((state.page > 0 || results.length > 0) && results.length < 100)
-      if (state.page == 0) $results.empty()
       $results.append(results.map(function(p) { return render(p, state.q) }))
       $loading.hide()
       if (callback) callback()

@@ -43,7 +43,6 @@ function providerPage() {
 
     $.get('/providers/unapproved', function(providers) {
       $unapproved.empty()
-      $page.find('.unapproved').toggle(providers.length > 0)
       _(providers).sortBy('name')
         .map(renderProvider)
         .forEach(function(p) {
@@ -68,13 +67,13 @@ function providerPage() {
     bindEventHandlers($selected, $providerDetails, function(provider) {
       $.post('/providers', JSON.stringify(_.merge(provider, { deleted: false })), function(newProvider) {
         var $providerRow = renderProvider(newProvider)
-        $providers.prepend($providerRow)
+        $unapproved.prepend($providerRow)
         $providerRow.slideDown()
         closeDetails()
       })
     })
     closeDetails()
-    $providers.prepend($providerDetails)
+    $unapproved.prepend($providerDetails)
     $providerDetails.slideDown()
   })
 
@@ -95,6 +94,10 @@ function providerPage() {
     if (!wasSelected) {
       openDetails($this)
     }
+  })
+
+  $yearlyBilling.on('click', '> h3', function() {
+    $(this).toggleClass('selected').next().slideToggle()
   })
 
   $yearlyBilling.on('click', 'button.yearly-billing-reminder', function() {
@@ -130,7 +133,7 @@ function providerPage() {
   })
 
   $yearlyBilling.on('click', 'button.yearly-billing-proe', function() {
-    $page.find('.most-recent .created').text(utils.asDateTime(moment()))
+    $yearlyBilling.find('.most-recent .created').text(utils.asDateTime(moment()))
     setTimeout(function() { updateMetadata() }, 10000)
   })
 
@@ -178,6 +181,15 @@ function providerPage() {
       })
     })
   }
+
+  $billing.on('click', 'button[name="create-proe"]', function() {
+    var begin = $billingContainer.find('input[name=begin]').val()
+    var end = $billingContainer.find('input[name=end]').val()
+    $billingContainer.find('.most-recent .created').text(utils.asDateTime(new Date()))
+    $billingContainer.find('.most-recent .dates').text(formatDate(begin) + ' - ' + formatDate(end))
+    setTimeout(function() { updateMetadata() }, 10000)
+    function formatDate(s) { return moment(s, format).format(utils.dateFormat) }
+  })
 
   function openDetails($row) {
     $.get('/providers/' + $row.data('id'), function(provider) {
@@ -282,8 +294,12 @@ function providerPage() {
 
   function updateMetadata() {
     $.get('/providers/metadata', function(metadata) {
-      $page.find('.most-recent .sent').text(metadata.yearlyBillingReminderSent ? utils.asDateTime(metadata.yearlyBillingReminderSent) : undefined)
-      $page.find('.most-recent .created').text(metadata.yearlyBillingProeCreated ? utils.asDateTime(metadata.yearlyBillingProeCreated) : undefined)
+      $yearlyBilling.find('.most-recent .sent').text(metadata.yearlyBillingReminderSent ? utils.asDateTime(metadata.yearlyBillingReminderSent) : undefined)
+      $yearlyBilling.find('.most-recent .created').text(metadata.yearlyBillingProeCreated ? utils.asDateTime(metadata.yearlyBillingProeCreated) : undefined)
+      if (metadata.previousMidYearBilling) {
+        $billingContainer.find('.most-recent .created').text(utils.asDateTime(metadata.previousMidYearBilling.created))
+        $billingContainer.find('.most-recent .dates').text(utils.asDate(metadata.previousMidYearBilling.begin) + ' - ' + utils.asDate(metadata.previousMidYearBilling.end))
+      }
     })
   }
 
@@ -305,6 +321,7 @@ function providerPage() {
       .data('provider', provider)
       .toggleClass('inactive', !provider.active)
       .append($('<span>', { class: 'name' }).text(provider.name))
+      .append($('<span>').text(provider.address.street + ', ' + provider.address.city))
       .append($('<span>', { class: 'date'}).text(utils.asDate(provider.registrationDate)))
   }
 
@@ -513,6 +530,7 @@ function providerPage() {
       var data = JSON.stringify({ active: newState === 'on' })
       $.ajax('/providers/' + provider._id + '/locations/' + location._id + '/active', { type: 'PUT' }).done(function(activation) {
         location.active = activation.active
+        location.registrationDate = activation.registrationDate
         $selected.data('location', location)
         if (activation.wasFirstActivation) {
           var $dialog = $("#templates").find('.location-registration-success-dialog').clone()
@@ -520,8 +538,8 @@ function providerPage() {
           $dialog.find('.email').toggle(activation.emailSent)
           $dialog.find('.no-email').toggle(!activation.emailSent)
           $dialog.find('.ok').on('click', function() {
-            closeDialog($selected)
-            $selected.toggleClass('inactive', !activation.active)
+            closeDialog()
+            $selected.replaceWith(renderLocation(location).addClass('selected'))
           })
           showDialog($dialog)
         } else {
@@ -531,14 +549,14 @@ function providerPage() {
     }
 
     function renderLocation(location) {
-      var $location = $('<div>', { 'data-id': location._id, class: 'location-row' })
+      return $('<div>', { 'data-id': location._id, class: 'location-row' })
         .data('location', location).toggleClass('inactive', !location.active)
         .append($('<i>', { class: 'rotating fa fa-play' }))
         .append($('<span>').text(location.name))
-        .append($('<span>').text(location.isPayer ? 'Tarjoamispaikka maksaa laskun' : ''))
+        .append($('<span>').text(
+          utils.getProperty(location, 'address.street')? (location.address.street + ', ' + location.address.city) : ''))
+        .append($('<span>').text(location.isPayer ? 'Laskutetaan' : ''))
         .append($('<span>').text(utils.asDate(location.registrationDate)))
-
-      return $location
     }
 
     function bindEventHandlers(provider, $locationDetails, submitCallback) {

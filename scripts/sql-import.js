@@ -5,6 +5,7 @@ var bcrypt = require('bcrypt')
 var schema = require('../server/schema')
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
+var classificationUtils = require('../shared/classification-utils')
 var stream = require('stream')
 var _ = require('lodash')
 var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'emeku' })
@@ -277,7 +278,11 @@ function classifications(callback) {
     Object.keys(result.classifications).forEach(function(key) {
       var obj = result.classifications[key]
       if (obj.criteria && obj.criteria.length > 0) {
+        schema.Program.updateClassificationSummary(obj)
         delete obj.legacyAgeLimit
+      } else {
+        obj.agelimit = obj.legacyAgeLimit
+        obj.warnings = []
       }
     })
     Object.keys(result.programs).forEach(function(key) {

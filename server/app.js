@@ -170,20 +170,37 @@ app.get('/programs/search/:q?', function(req, res, next) {
   }
 
   function constructKaviQuery() {
-    if (!req.query.registrationDateRange && !req.query.classifier) return {}
-    var q = {}
-    var result = { classifications: { $elemMatch: q }}
+    var rootQuery = {}
+    var classificationMatch = {}
     if (req.query.registrationDateRange) {
       var range = utils.parseDateRange(req.query.registrationDateRange)
-      q.registrationDate = { $gte: range.begin, $lt: range.end }
+      classificationMatch.registrationDate = { $gte: range.begin, $lt: range.end }
     }
     if (req.query.classifier) {
-      q['author._id'] = req.query.classifier
+      classificationMatch['author._id'] = req.query.classifier
       if (req.query.reclassified == 'true') {
-        result['classifications.0.author._id'] = { $ne: req.query.classifier }
+        rootQuery['classifications.0.author._id'] = { $ne: req.query.classifier }
       }
     }
-    return result
+    if (req.query.agelimits) {
+      var agelimitsIn = { $in: req.query.agelimits.map(function(s) { return parseInt(s) }) }
+      if (_.isEmpty(classificationMatch)) {
+        rootQuery['classifications.0.agelimit'] = agelimitsIn
+      } else {
+        classificationMatch.agelimit = agelimitsIn
+      }
+    }
+    if (req.query.warnings) {
+      var warnings = { $all: req.query.warnings }
+      if (_.isEmpty(classificationMatch)) {
+        rootQuery['classifications.0.warnings'] = warnings
+      } else {
+        classificationMatch.warnings = warnings
+      }
+
+    }
+    if (!_.isEmpty(classificationMatch)) rootQuery['classifications'] = { $elemMatch: classificationMatch }
+    return rootQuery
   }
 
   function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
@@ -289,6 +306,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
     newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
+    Program.updateClassificationSummary(newClassification)
 
     program.draftClassifications = {}
     program.draftsBy = []
@@ -409,6 +427,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
     var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     watcher.applyUpdates(req.body)
+    program.classifications.forEach(function(c) { Program.updateClassificationSummary(c) })
     verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
@@ -1037,6 +1056,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
           p.classifications[0].registrationDate = now
           p.classifications[0].billing = account
           p.classifications[0].buyer = account
+          Program.updateClassificationSummary(p.classifications[0])
           p.populateAllNames(function (err) {
             if (err) return callback(err)
             p.save(function (err) {

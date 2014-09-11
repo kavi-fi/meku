@@ -20,7 +20,7 @@ var summary = exports.summary = function(classification) {
     .filter(function(c) { return c.age > 0 && c.age == maxAgeLimit })
     .map(function(c) { return {id: c.id, category: c.category} })
     .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
-  if (classification.warningOrder.length > 0) {
+  if (classification.warningOrder && classification.warningOrder.length > 0) {
     var order = classification.warningOrder
     warnings = warnings.sort(function(a, b) {
       return order.indexOf(a.category) - order.indexOf(b.category)
@@ -43,11 +43,6 @@ var aggregateClassification = exports.aggregateClassification = function(program
 
 exports.aggregateSummary = function(programs) {
   return summary(aggregateClassification(programs))
-}
-
-var criteriaAgeLimit = function(classification) {
-  if (classification.criteria.length == 0) return 0
-  return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
 }
 
 exports.canReclassify = function(program, user) {
@@ -74,9 +69,8 @@ var isReclassification = exports.isReclassification = function(program, classifi
 var ageLimit = exports.ageLimit = function(classification) {
   if (!classification) return undefined
   if (classification.safe) return 0
-  var criteria = criteriaAgeLimit(classification)
-  var legacy = classification.legacyAgeLimit || 0
-  return Math.max(criteria, legacy)
+  if (classification.criteria.length == 0) return classification.legacyAgeLimit || 0
+  return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
 }
 
 exports.registrationEmail = function(program, classification, user, hostName) {

@@ -27,7 +27,9 @@ var classification = {
   comments: String,
   publicComments: String,
   reason: Number,
-  status: String
+  status: String,
+  agelimit: Number,
+  warnings: [String]
 }
 
 var ProgramSchema = new Schema({
@@ -85,7 +87,11 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
     Program.update({ _id: seriesId }, { episodes: { count: programs.length, criteria: data.criteria, legacyAgeLimit: data.legacyAgeLimit } }, callback)
   })
 }
-
+ProgramSchema.statics.updateClassificationSummary = function(classification) {
+  var summary = classificationUtils.summary(classification)
+  classification.agelimit = summary.age
+  classification.warnings = _.pluck(summary.warnings, 'category')
+}
 ProgramSchema.methods.hasNameChanges = function() {
   var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
   return _.any(this.modifiedPaths(), function(path) { return _.contains(namePaths, path) })

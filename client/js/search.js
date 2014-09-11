@@ -6,6 +6,7 @@ function publicSearchPage() {
   $page.find('.drafts').remove()
   $page.find('.recent').remove()
   $page.find('.kavi-query-filters').remove()
+  $page.find('.controls h2.main').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
     var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program.sequenceId+']')

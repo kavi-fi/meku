@@ -628,8 +628,9 @@ app.get('/providers/metadata', requireRole('kavi'), function(req, res, next) {
 
 app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res, next) {
   Provider.getForBilling(function(err, data) {
+    var year = moment().year()
     var accountRows = getProviderBillingRows(data)
-    var result = proe({ begin: moment() }, accountRows, 'provider')
+    var result = proe.createYearlyProviderRegistration(year, accountRows)
     res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.txt')
     res.setHeader('Content-Type', 'text/plain')
     ProviderMetadata.setYearlyBillingProeCreated(new Date(), function() {
@@ -657,7 +658,7 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
     data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
 
     var accountRows = getProviderBillingRows(data)
-    var result = proe(dates, accountRows, 'provider')
+    var result = proe.createProviderRegistration(accountRows)
     var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.txt'
     res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'text/plain')
@@ -963,7 +964,7 @@ app.post('/proe', requireRole('kavi'), function(req, res, next) {
       function accountName(tuple) { return tuple.account.name }
 
       var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
-      var result = proe(dates, data)
+      var result = proe.createClassificationRegistrationProe(dates, data)
       res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
       res.setHeader('Content-Type', 'text/plain')
       res.send(result)

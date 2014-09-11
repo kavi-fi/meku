@@ -1512,7 +1512,7 @@ function withinDateRange(date, beginDate, endDate) {
 }
 
 function isUrlEncodedBody(req) {
-  var paths = ['POST:/proe', 'POST:/providers/billing/proe']
+  var paths = ['POST:/proe', 'POST:/providers/billing/proe', 'POST:/providers/yearlyBilling/proe']
   return _.contains(paths, req.method + ':' + req.path)
 }
 

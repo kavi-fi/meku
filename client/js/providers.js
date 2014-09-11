@@ -57,7 +57,7 @@ function providerPage() {
     if (!$datePicker.data('dateRangePicker').isInitiated()) fetchNewProviders(begin, end)
 
     updateMetadata()
-    $billingContainer.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
+    $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
   })
 
   $page.on('click', 'button[name=new-provider]', function() {

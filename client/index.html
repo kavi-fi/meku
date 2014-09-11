@@ -178,6 +178,7 @@
       <div class="yearly-billing-content">
         <button class="button yearly-billing-reminder">Vuosilaskutus tilausvahvistuksen lähettäminen</button>
         <form method="post" action="/providers/yearlyBilling/proe" class="yearly-billing-proe-form">
+          <input type="hidden" name="_csrf">
           <button class="button yearly-billing-proe" type="submit">Luo vuosilaskutus Proe-tiedosto</button>
         </form>
         <div class="most-recent">

@@ -22,7 +22,6 @@ var providerFieldMap = {
 
 var billingFieldMap = {
   'billing.address.city':    'Postitoimipaikka',
-  //'billing.address.country': 'Maa', // not imported, though in schema and in UI
   'billing.address.street':  'Lähiosoite',
   'billing.address.zip':     'Postinro',
   'billing.invoiceText':     'Laskulle haluttava teksti',
@@ -78,7 +77,6 @@ exports.import = function(file, callback) {
 
     if (provider.billing && provider.billing.address) {
       var address = provider.billing.address
-      provider.billing.address.country = enums.getCountryCode(address.country) || address.country
       provider.billingPreference = 'address'
     }
 

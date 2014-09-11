@@ -193,7 +193,7 @@ var ProviderSchema = new Schema({
   yTunnus: String,
   name: String,
   address: { street: String, city: String, zip: String, country: String },
-  billing: { address: address, invoiceText: String },
+  billing: { address: { street: String, city: String, zip: String }, invoiceText: String },
   eInvoice: { address:String, operator:String },
   billingPreference: String, // '' || 'address' || 'eInvoice'
   contactName: String,

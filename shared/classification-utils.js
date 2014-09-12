@@ -204,8 +204,6 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
   function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }
 
-  function ageAsText(age) { return age && age.toString() || 'S' }
-
   function criteriaText(warnings) {
     return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
   }
@@ -216,6 +214,8 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     function img(fileName) { return '<img src="'+hostName+'/images/'+fileName+'.png" style="width: 40px; height: 40px; padding-right: 8px;"/>' }
   }
 }
+
+var ageAsText = exports.ageAsText = function(age) { return age && age.toString() || 'S' }
 
 exports.price = function(program, duration) {
   // https://kavi.fi/fi/meku/kuvaohjelmat/maksut

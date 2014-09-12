@@ -424,7 +424,7 @@ background-image: -webkit-gradient(
       <body>
 	  <div class="container">
 	  <div class="sugar"><h1>XML-FORMAATIN SPESIFIKAATIO</h1>
-	  <h3>XML-skeema: "http://meku.herokuapp.com/xml/schema/VETschema.xsd"</h3>
+	  <h3>XML-skeema: "https://luokittelu.kavi.fi/xml/schema/VETschema.xsd"</h3>
 	  </div>
 			<div class="sugar_tab">
 				KAVIn kuvaohjelmien rekisteröintijärjestelmä valmistautuu vastaanottamaan seuraavanmuotoista XML-dataa. XML-datan koodaus tulee olla UTF-8 joka ilmoitetaan XML-deklaraatiossa. Sen jälkeen tiedosto koostuu yhdestä ASIAKAS-elementistä sekä yhdestä tai useammasta KUVAOHJELMA-elementistä.

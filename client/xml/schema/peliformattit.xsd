@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-			xmlns="http://meku.herokuapp.com/xml/schema/peliformat"
-			targetNamespace="http://meku.herokuapp.com/xml/schema/peliformat">
+			xmlns="https://luokittelu.kavi.fi/xml/schema/peliformat"
+			targetNamespace="https://luokittelu.kavi.fi/xml/schema/peliformat">
 <xsd:annotation>
 	<xsd:documentation>Pelin formaatti.</xsd:documentation>
 </xsd:annotation>

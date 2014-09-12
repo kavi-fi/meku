@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-			xmlns="http://meku.herokuapp.com/xml/schema/pelinlajit"
-			targetNamespace="http://meku.herokuapp.com/xml/schema/pelinlajit">
+			xmlns="https://luokittelu.kavi.fi/xml/schema/pelinlajit"
+			targetNamespace="https://luokittelu.kavi.fi/xml/schema/pelinlajit">
 	<xsd:annotation>
 		<xsd:documentation>Pelin genret.</xsd:documentation>
 	</xsd:annotation>

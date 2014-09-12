@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-			xmlns="http://meku.herokuapp.com/xml/schema/lajit"
-			targetNamespace="http://meku.herokuapp.com/xml/schema/lajit">
+			xmlns="https://luokittelu.kavi.fi/xml/schema/lajit"
+			targetNamespace="https://luokittelu.kavi.fi/xml/schema/lajit">
 	<xsd:annotation>
 		<xsd:documentation>Kuvaohjelman genret: '1' - 'Fiktio','2' - 'Animaatio','3' - 'Viihde','4' - 'Seksi / Erotiikka','5' - 'Dokumentti','6' - 'Lasten ohjelmat','9' - 'Muut','1a' - 'Romantiikka','1b' - 'Draama','1c' - 'Historiallinen näytelmä','1d' - 'Trilleri','1e' - 'Seikkailu','1f' - 'Western','1g' - 'Sota','1h' - 'Kauhu','1j' - 'Tieteisseikkailu','1k' - 'Toimintaelokuva','1m' - 'Fantasia','1n' - 'Komedia ja farssi','3c' - 'Musiikki','5a' - 'Opetus','5b' - 'Urheilu','5c' - 'Matkailu','5d' - 'Henkilödokumentti','5e' - 'Luontodokumentti','6a' - 'Lasten animaatio','6b' - 'Lasten fiktio','6c' - 'Muu lastenelokuva','7a' - 'Traileri','7b' - 'Extra','9a' - 'Mainonta','9c' - 'Tietoisku','9d' - 'Kokeiluelokuva','9e' - 'Videotaide'. Esimerkki:&lt;LAJIT&gt;1 2 3&lt;/LAJIT&gt;</xsd:documentation>
 	</xsd:annotation>

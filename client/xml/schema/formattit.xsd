@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-			xmlns="http://meku.herokuapp.com/xml/schema/format"
-			targetNamespace="http://meku.herokuapp.com/xml/schema/format">
+			xmlns="https://luokittelu.kavi.fi/xml/schema/format"
+			targetNamespace="https://luokittelu.kavi.fi/xml/schema/format">
 <xsd:annotation>
 	<xsd:documentation>Kuvaohjelman formaatti. Pakollinen kenttä.</xsd:documentation>
 </xsd:annotation>

@@ -1,17 +1,17 @@
 <?xml version="1.0" ?>
 <?xml-stylesheet type="text/xsl" href="specification.xsl" ?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:term="http://meku.herokuapp.com/xml/schema/term"
-  xmlns:maat="http://meku.herokuapp.com/xml/schema/maat" xmlns:lajit="http://meku.herokuapp.com/xml/schema/lajit" xmlns:tvlajit="http://meku.herokuapp.com/xml/schema/tvlajit"
-  xmlns:pelinlajit="http://meku.herokuapp.com/xml/schema/pelinlajit" xmlns:format="http://meku.herokuapp.com/xml/schema/format"
-  xmlns:peliformat="http://meku.herokuapp.com/xml/schema/peliformat">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:term="https://luokittelu.kavi.fi/xml/schema/term"
+  xmlns:maat="https://luokittelu.kavi.fi/xml/schema/maat" xmlns:lajit="https://luokittelu.kavi.fi/xml/schema/lajit" xmlns:tvlajit="https://luokittelu.kavi.fi/xml/schema/tvlajit"
+  xmlns:pelinlajit="https://luokittelu.kavi.fi/xml/schema/pelinlajit" xmlns:format="https://luokittelu.kavi.fi/xml/schema/format"
+  xmlns:peliformat="https://luokittelu.kavi.fi/xml/schema/peliformat">
   <!-- import types with lists -->
-  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/peliformat" schemaLocation="peliformattit.xsd"/>
-  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/format" schemaLocation="formattit.xsd"/>
-  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/lajit" schemaLocation="lajit.xsd"/>
-  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/tvlajit" schemaLocation="tvlajit.xsd"/>
-  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/pelinlajit" schemaLocation="pelinlajit.xsd"/>
-  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/maat" schemaLocation="maat.xsd"/>
-  <xsd:import namespace="http://meku.herokuapp.com/xml/schema/term" schemaLocation="termit.xsd"/>
+  <xsd:import namespace="https://luokittelu.kavi.fi/xml/schema/peliformat" schemaLocation="peliformattit.xsd"/>
+  <xsd:import namespace="https://luokittelu.kavi.fi/xml/schema/format" schemaLocation="formattit.xsd"/>
+  <xsd:import namespace="https://luokittelu.kavi.fi/xml/schema/lajit" schemaLocation="lajit.xsd"/>
+  <xsd:import namespace="https://luokittelu.kavi.fi/xml/schema/tvlajit" schemaLocation="tvlajit.xsd"/>
+  <xsd:import namespace="https://luokittelu.kavi.fi/xml/schema/pelinlajit" schemaLocation="pelinlajit.xsd"/>
+  <xsd:import namespace="https://luokittelu.kavi.fi/xml/schema/maat" schemaLocation="maat.xsd"/>
+  <xsd:import namespace="https://luokittelu.kavi.fi/xml/schema/term" schemaLocation="termit.xsd"/>
   <xsd:annotation>
     <xsd:documentation/>
   </xsd:annotation>

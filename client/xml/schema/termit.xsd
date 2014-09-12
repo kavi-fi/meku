@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-			xmlns="http://meku.herokuapp.com/xml/schema/term"
-			targetNamespace="http://meku.herokuapp.com/xml/schema/term">
+			xmlns="https://luokittelu.kavi.fi/xml/schema/term"
+			targetNamespace="https://luokittelu.kavi.fi/xml/schema/term">
 	<xsd:annotation>
 		<xsd:documentation>Valittutermi luokittelussa.</xsd:documentation>
 	</xsd:annotation>

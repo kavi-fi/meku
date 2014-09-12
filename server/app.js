@@ -1524,7 +1524,7 @@ function getIpAddress(req) {
 function getHostname() {
   if (isDev()) return 'http://localhost:3000'
   else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
-  else return 'https://meku.herokuapp.com'
+  else return 'https://luokittelu.kavi.fi'
 }
 
 function withinDateRange(date, beginDate, endDate) {

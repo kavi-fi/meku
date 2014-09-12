@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-			xmlns="http://meku.herokuapp.com/xml/schema/maat"
-			targetNamespace="http://meku.herokuapp.com/xml/schema/maat">
+			xmlns="https://luokittelu.kavi.fi/xml/schema/maat"
+			targetNamespace="https://luokittelu.kavi.fi/xml/schema/maat">
 	<xsd:annotation>
 		<xsd:documentation>Kuvaohjelman valmistusmaat:'US'-'Yhdysvallat','FI'-'Suomi','DE'-'Saksa','GB'-'Iso-Britannia','FR'-'Ranska','NL'-'Alankomaat','IT'-'Italia','SE'-'Ruotsi','CA'-'Kanada','JP'-'Japani','SU'-'Neuvostoliitto','DK'-'Tanska','EE'-'Viro','AU'-'Australia','NO'-'Norja','RU'-'Venäjä','CS'-'Serbia / Tsekkoslovakia','PL'-'Puola','CN'-'Kiina','IN'-'Intia' ja jne. ISO-3166 standatrista ja '?'-'Ei tiedossa', '-'-'Muu maa' .  Esimerkki:&lt;MAAT&gt;FI SE DK&lt;/MAAT&gt;</xsd:documentation>
 	</xsd:annotation>

@@ -13,7 +13,6 @@ module.exports = {
   kaviAgelimitChanges: kaviAgelimitChanges,
   kaviAuthor: kaviAuthor,
   kaviReclassificationReason: kaviReclassificationReason,
-  kaviDuration: kaviDuration,
   kaviClassificationList: kaviClassificationList
 }
 
@@ -88,8 +87,7 @@ function agelimitChanges(dateRange, callback) {
   }
   schema.Program.find(q, fields).lean().exec(function(err, programs) {
     if (err) return callback(err)
-    var result = _(programs).map(classificationsToAgelimitChange(dateRange)).flatten().compact().countBy().value()
-    callback(null, result)
+    callback(null, mapProgramsToAgeLimitChanges(dateRange, programs))
   })
 }
 
@@ -121,8 +119,7 @@ function kaviAgelimitChanges(dateRange, callback) {
     }
     schema.Program.find(q, fields).lean().exec(function(err, programs) {
       if (err) return callback(err)
-      var result = _(programs).map(classificationsToAgelimitChange(dateRange)).flatten().compact().countBy().value()
-      callback(null, result)
+      callback(null, mapProgramsToAgeLimitChanges(dateRange, programs))
     })
   })
 }
@@ -158,7 +155,7 @@ function kaviReclassificationReason(dateRange, callback) {
   })
 }
 
-function kaviDuration(dateRange, callback) {
+function kaviClassificationList(dateRange, callback) {
   schema.User.find({ role: { $in:['kavi','admin'] } }, 'username').lean().exec(function(err, users) {
     if (err) return callback(err)
     var q = {
@@ -169,25 +166,20 @@ function kaviDuration(dateRange, callback) {
       .match(q)
       .unwind('classifications')
       .match(q)
-      .project({ name: '$name', value: '$classifications.duration', date: '$classifications.registrationDate', sequenceId: 1 })
+      .project({ name:1, sequenceId:1, programType:1, duration: '$classifications.duration', date: '$classifications.registrationDate', comments: '$classifications.comments' })
       .sort('date')
-      .exec(function(err, docs) {
-        if (err) return callback(err)
-        var result = docs.map(function(d) {
-          return { _id: d.name[0] + ' [' + d.sequenceId + '] ' + moment(d.date).format('D.M.YYYY'), value: d.value }
-        })
-        callback(null, result)
-      })
+      .exec(callback)
   })
-}
-
-function kaviClassificationList(dateRange, callback) {
-  // NOTE: not implemented yet
-  callback(null, ['not implemented yet'])
 }
 
 function query(range) {
   return { 'classifications.registrationDate': { $gte: range.begin.toDate(), $lt: range.end.toDate() } }
+}
+
+function mapProgramsToAgeLimitChanges(dateRange, programs) {
+  return _(programs)
+    .map(classificationsToAgelimitChange(dateRange)).flatten().compact().countBy()
+    .pairs().map(function(arr) { return { _id:arr[0], value:arr[1] }}).value()
 }
 
 function classificationsToAgelimitChange(dateRange) {

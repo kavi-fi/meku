@@ -217,6 +217,23 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
 var ageAsText = exports.ageAsText = function(age) { return age && age.toString() || 'S' }
 
+exports.durationToSeconds = function(duration) {
+  if (!duration) return 0
+  var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec($.trim(duration))
+    .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
+  return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
+}
+
+exports.secondsToDuration = function(seconds) {
+  if (!seconds) return '00:00:00'
+  var h = Math.floor(seconds / 3600)
+  var m = Math.floor((seconds % 3600) / 60)
+  var s = Math.floor((seconds % 3600) % 60)
+  return [h,m,s].map(pad).join(':')
+
+  function pad(s) { return s < 10 ? '0'+s : ''+s }
+}
+
 exports.price = function(program, duration) {
   // https://kavi.fi/fi/meku/kuvaohjelmat/maksut
   return enums.util.isGameType(program) ? exports.gameClassificationPrice(duration) : exports.classificationPrice(duration)

@@ -31,6 +31,7 @@
   <script src="js/user-management.js"></script>
   <script src="js/subscriber-management.js"></script>
   <script src="js/providers.js"></script>
+  <script src="js/reports.js"></script>
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
@@ -79,6 +80,7 @@
         <li><a href="#laskutus" data-href="#billing-page">Laskutus</a></li>
         <li><a href="#kayttajat" data-href="#user-management-page">Käyttäjät</a></li>
         <li><a href="#tarjoajat" data-href="#provider-page">Tarjoajat</a></li>
+        <li><a href="#raportit" data-href="#reports-page">Raportit</a></li>
       </ul>
     </div>
   </div>
@@ -196,6 +198,36 @@
       </div>
     </div>
     <div class="providers-list results"></div>
+  </div>
+
+  <div id="reports-page" class="page">
+    <table class="input">
+      <tr>
+        <td>Päivämääräväli</td>
+        <td><span class="datepicker"><span></span><i class="fa fa-calendar"></i></span></td>
+      </tr>
+      <tr>
+        <td class="label">Kaikki luokittelut</td>
+        <td class="report-selection">
+          <div data-name="programType" class="selected">Ohjelmatyyppi</div>
+          <div data-name="agelimit">Ikäraja</div>
+          <div data-name="author">Luokittelija</div>
+          <div data-name="warnings">Haitallisuusperusteet</div>
+          <div data-name="agelimitChanges">Ikärajamuutokset</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="label">KAVI:n luokittelut</td>
+        <td class="report-selection">
+          <div data-name="kaviAuthor">Luokittelija</div>
+          <div data-name="kaviAgelimit">Ikäraja</div>
+          <div data-name="kaviAgelimitChanges">Ikärajamuutokset</div>
+          <div data-name="kaviReclassificationReason">Uudelleenluokittelun syy</div>
+          <div data-name="kaviClassificationList">Lista KAVIN:n luokittelemista ohjelmista</div>
+        </td>
+      </tr>
+    </table>
+    <div class="report"></div>
   </div>
 
   <div id="templates"></div>

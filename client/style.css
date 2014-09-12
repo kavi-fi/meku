@@ -126,12 +126,13 @@ textarea { resize: vertical; }
 
 #header h1 { margin-bottom: 30px; font-size: 22px; display: inline-block; }
 #header ul { list-style: none; padding: 0; margin: 0;}
-#header ul li { display: inline-block; margin-right: 15px; }
+#header ul li { display: inline-block; margin-right: 10px; }
+#header ul li:last-of-type { margin-right: 0px; }
 #header ul li a {
   display: block;
   background-color: black;
   padding: 20px 0;
-  width: 168px;
+  width: 144px;
   text-align: center;
   text-transform: uppercase;
   text-decoration: none;
@@ -773,6 +774,25 @@ textarea.invalid:disabled,
 #provider-page .billing td { padding: 5px 5px 5px 10px; }
 #provider-page .billing .left-margin { margin-left: 10px; }
 #provider-page .billing td.empty-row { padding-bottom: 20px; }
+
+#reports-page .input .label { min-width: 140px; vertical-align: top; padding-top: 12px; }
+#reports-page .input td { padding-bottom: 25px; }
+#reports-page .input .datepicker { margin-left: 4px; }
+#reports-page .report-selection div { opacity: 0.5; min-width: 100px; text-align: center; display: inline-block; cursor: pointer; border: 1px solid #d3d3d3; border-radius: 3px; padding: 7px 15px; margin: 4px; }
+#reports-page .report-selection div:hover { background-color: #fff; }
+#reports-page .report-selection div.selected { opacity: 1; background-color: #fff; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); }
+
+#reports-page .report table { margin: 60px 0; font-size: 14px; }
+#reports-page .report thead { border-bottom: 1px solid #ddd; color: #00BB88; font-size: 16px; }
+#reports-page .report { margin-bottom: 200px; }
+#reports-page .report th ~ th { border-left: 1px solid #ddd; }
+#reports-page .report td ~ td { border-left: 1px solid #ddd; }
+#reports-page .report td { vertical-align: top; padding: 5px 10px; text-align: right; }
+#reports-page .report th { font-weight: normal; padding: 5px 10px; text-align: right; }
+#reports-page .report-table .id { min-width: 400px; }
+#reports-page .report-table td, #reports-page .report-table th { min-width: 150px; }
+#reports-page .report a { color: #444; }
+#reports-page .report .comments { text-align: left; }
 
 .rotating.fa-play {
     margin-right: 5px;

@@ -364,7 +364,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     }
 
     function addInvoicerows(currentClassification, callback) {
-      var seconds = durationToSeconds(currentClassification.duration)
+      var seconds = classificationUtils.durationToSeconds(currentClassification.duration)
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
@@ -1064,7 +1064,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
               logCreateOperation(req.user, p)
               updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
-                var seconds = durationToSeconds(_.first(p.classifications).duration)
+                var seconds = classificationUtils.durationToSeconds(_.first(p.classifications).duration)
                 InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
                   if (err) return callback(err)
                   updateActorAndDirectorIndexes(p, callback)
@@ -1344,13 +1344,6 @@ function updateMetadataIndexes(program, callback) {
   schema.ProductionCompany.updateWithNames(program.productionCompanies, function() {
     updateActorAndDirectorIndexes(program, callback)
   })
-}
-
-function durationToSeconds(duration) {
-  if (!duration) return 0
-  var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(duration)
-    .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
-  return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
 }
 
 function queryNameIndex(schemaName) {

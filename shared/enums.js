@@ -369,6 +369,8 @@ enums.getCountryCode = function(country) {
 enums.util.toCountry = function(code) { return enums.countries[code] || '-' }
 enums.util.toCountryString = function(countries) { return countries.map(function(c) { return enums.countries[c] }).join(', ') }
 
+enums.warnings = { violence: 'Väkivalta', sex: 'Seksi', fear: 'Ahdistus', drugs: 'Huumeet' }
+
 enums.classificationCriteria = [
   { id:1,  category: 'violence', age: 18, title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa" },
   { id:2,  category: 'violence', age: 18, title: "Erittäin voimakasta väkivaltaa", description: "Aitoa ja yksityiskohtaisesti tai selväpiirteisesti sekä viihteellisesti tai ihannoiden esitettyä ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },

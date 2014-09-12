@@ -14,6 +14,13 @@
       var $button = $form.find('button')
       var $feedback = $form.find('.feedback')
 
+      $.get('/environment', function(res) {
+        if (res.environment === 'training') {
+          $('.training-ribbon').show()
+          $('a.xls').prop('href', 'KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls')
+        }
+      })
+
       $button.on('click', function(e) {
         e.preventDefault()
 
@@ -62,6 +69,7 @@
   <title>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</title>
 </head>
 <body>
+  <div class="training-ribbon"><span>Koulutusympäristö</span></div>
   <div id="header">
     <div class="content center">
       <div>
@@ -73,7 +81,7 @@
     <h2>Tarjoajaksi ilmoittautuminen</h2>
     <p>
       Ilmoittaudu kuvaohjelmatarjoajaksi täyttämällä taulukko
-      (lataa <a href="KAVI-tarjoajaksi-ilmoittautuminen.xls">tästä</a>)
+      (lataa <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">tästä</a>)
       ja lähettämällä se alla olevan lomakkeen avulla.
     </p>
     <div>

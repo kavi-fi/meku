@@ -186,22 +186,7 @@ label.top { vertical-align: top; }
 #search-page .row { border-bottom: none; padding-bottom: 0; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }
 #search-page input.query { width: 373px; }
-#search-page .datepicker {
-  cursor: pointer;
-  display: inline-block;
-  text-align: center;
-  min-width: 253px;
-  background-color: #fff;
-  padding: 8px 0;
-  border: 1px solid #D3D3D3;
-  border-radius: 3px;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
-  font-size: 14px;
-  color: #666666;
-  line-height: 19px;
-  height: 19px;
-}
-#search-page .datepicker .icon { float: right; margin: 2px 6px 0 0; }
+#search-page .datepicker { min-width: 253px; }
 #search-page .kavi-query-filters > div { margin-top: 10px; min-height: 50px; }
 #search-page .kavi-query-filters label { display: inline-block; vertical-align: top; margin-top: 10px; margin-right: 20px; }
 #search-page .kavi-query-filters label.grey { color: #d3d3d3; }
@@ -654,19 +639,29 @@ textarea.invalid:disabled,
 #classification-page .register { padding: 25px 0; }
 #classification-page .register button { font-size: 25px; width: 100%; }
 
-#billing-page .datepicker {
+.datepicker {
+  min-width: 230px;
   cursor: pointer;
-  border: 1px solid #ccc;
+  display: inline-block;
+  text-align: center;
+  background-color: #fff;
+  padding: 8px 0;
+  border: 1px solid #D3D3D3;
   border-radius: 3px;
-  background-color: #e1e1e1;
-  color: #777;
-  padding: 4px 5px;
-  text-decoration: none;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
+  font-size: 14px;
+  color: #666666;
+  line-height: 19px;
+  height: 19px;
 }
+.datepicker span { display: inline-block; margin-right: 5px; margin-left: 10px; }
+.datepicker .fa-calendar { float: right; margin: 2px 6px 0 0; }
 
-#billing-page .date-selection { height: 30px; line-height: 30px; margin-bottom: 20px; }
-#billing-page .datepicker span { display: inline-block; margin-right: 5px; }
-#billing-page .datepicker i { color: #000; }
+.date-selection { height: 30px; line-height: 30px; margin-bottom: 20px; }
+.date-selection .datepicker { margin-left: 15px; }
+.date-selection .datepicker i { color: #000; }
+.date-selection .datepicker span { display: inline-block; margin-right: 5px; }
+
 #billing-page input[type=checkbox] { margin-right: 5px; }
 #billing-page .rows input[type=checkbox] { margin: 5px; }
 #billing-page h4 { display: inline-block; margin: 0; padding: 0; }
@@ -772,16 +767,6 @@ textarea.invalid:disabled,
 #provider-page .unapproved .new-button { margin-bottom: 10px; margin-top: -50px; text-align: right; }
 #provider-page .unapproved .results { margin-bottom: 30px; }
 #provider-page .unapproved .result .date { display: inline-block; width: 90px; }
-
-#provider-page .billing .datepicker {
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    background-color: #e1e1e1;
-    color: #777;
-    padding: 4px 5px;
-    text-decoration: none;
-}
 
 #provider-page .billing { font-size: 14px; margin-bottom: 30px; }
 #provider-page .billing th { padding: 10px; }

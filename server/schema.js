@@ -22,7 +22,7 @@ var classification = {
   warningOrder: [String],
   legacyAgeLimit: Number,
   creationDate: Date,
-  registrationDate: Date,
+  registrationDate: { type: Date, index: true },
   registrationEmailAddresses: [String],
   comments: String,
   publicComments: String,

@@ -1138,6 +1138,12 @@ app.post('/files/provider-import', function(req, res, next) {
   })
 })
 
+app.get('/report/:name', requireRole('root'), function(req, res, next) {
+  var range = utils.parseDateRange(req.query)
+  var reports = require('./reports')
+  reports[req.params.name](range, respond(res, next))
+})
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)

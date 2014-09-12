@@ -38,7 +38,7 @@ var locationFieldMap = {
   'contactName':      'Tarjoamispaikan yhteyshenkilö',
   'emailAddresses':   'Sähköpostiosoite',
   'gamesWithoutPegi': 'Pelejä (ei PEGI)',
-  'isPayer':          'Lasku Tarjoamis-paikalle',
+  'isPayer':          'Lasku Tarjoamispaikalle',
   'name':             'Tarjoamispaikan nimi',
   'phoneNumber':      'Puhelinnumero',
   //'providingType':    '', // special case

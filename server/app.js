@@ -669,11 +669,11 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
     if (err) return next(err)
 
     data.providers = _(data.providers).map(function(p) {
-      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
+      p.locations = _.filter(p.locations, function(l) { return utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
       return p
     }).reject(function(p) { return _.isEmpty(p.locations) }).value()
 
-    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
+    data.locations = _.filter(data.locations, function(l) { return utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
 
     var accountRows = getProviderBillingRows(data)
     var result = proe(dates, accountRows, 'provider')
@@ -740,7 +740,7 @@ app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res
     _.forEach(providers, function(provider) {
       provider.locations = _(provider.locations)
         .filter({ active: true, deleted: false })
-        .filter(function(l) { return withinDateRange(l.registrationDate, beginMoment, endMoment) })
+        .filter(function(l) { return utils.withinDateRange(l.registrationDate, beginMoment, endMoment) })
         .sortBy('name').value()
     })
     res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
@@ -1525,10 +1525,6 @@ function getHostname() {
   if (isDev()) return 'http://localhost:3000'
   else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
   else return 'https://luokittelu.kavi.fi'
-}
-
-function withinDateRange(date, beginDate, endDate) {
-  return date && beginDate && endDate && date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
 }
 
 function isUrlEncodedBody(req) {

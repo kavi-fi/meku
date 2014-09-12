@@ -112,6 +112,10 @@ utils.parseDateRange = function(obj) {
   return { begin:  moment(obj.begin, format), end: moment(obj.end, format).add(1, 'days') }
 }
 
+utils.withinDateRange = function(date, beginDate, endDate) {
+  return date && beginDate && endDate && date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
+}
+
 utils.getProperty = function(obj, prop) {
   var path = prop.split('.')
   // Retrieve nested properties like object.billing.address

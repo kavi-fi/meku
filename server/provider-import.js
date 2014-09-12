@@ -37,7 +37,6 @@ var locationFieldMap = {
   'adultContent':     'K18 ohjelmia',
   'contactName':      'Tarjoamispaikan yhteyshenkilö',
   'emailAddresses':   'Sähköpostiosoite',
-  'gamesWithoutPegi': 'Pelejä (ei PEGI)',
   'isPayer':          'Lasku Tarjoamispaikalle',
   'name':             'Tarjoamispaikan nimi',
   'phoneNumber':      'Puhelinnumero',
@@ -104,7 +103,6 @@ exports.import = function(file, callback) {
         active: true,
         isPayer: stringXToBoolean(location.isPayer),
         adultContent: stringXToBoolean(location.adultContent),
-        gamesWithoutPegi: stringXToBoolean(location.gamesWithoutPegi)
       })
     })
   }

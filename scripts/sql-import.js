@@ -414,7 +414,7 @@ function accounts(callback) {
   function locations(callback) {
     var q = 'select id, name, customer_type, sic_code, parent_id, provider_status, invoice_payer, website, bills_text, providing_type, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
-      ' ownership, phone_office, phone_alternate, pegi, k18, date_entered' +
+      ' ownership, phone_office, phone_alternate, k18, date_entered' +
       ' from accounts where customer_type LIKE "%Location_of_providing%" and deleted != "1"'
     batchUpdater(q, function(row, result) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
@@ -434,7 +434,6 @@ function accounts(callback) {
         registrationDate: registrationDate,
         deleted: false,
         adultContent: row.k18,
-        gamesWithoutPegi: row.pegi,
         url: row.website || undefined,
         sequenceId: providerSeq++
       }

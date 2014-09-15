@@ -165,8 +165,12 @@ function programBox() {
       var category = enums.classificationCategoriesFI[cr.category]
       return $('<div>')
         .append($('<label>', { title: cr.description }).text(category + ' ('+cr.id+')'))
-        .append($('<p>').text(c.criteriaComments && c.criteriaComments[cr.id] || ''))
+        .append($('<p>').text(renderCriteriaComments()))
+
+      function renderCriteriaComments() {
+        if (!hasRole('kavi') && utils.getProperty(c, 'author._id') !== user._id) return ''
+        else return c.criteriaComments && c.criteriaComments[cr.id] || ''
+      }
     })
   }
 }
-

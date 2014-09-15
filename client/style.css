@@ -448,7 +448,7 @@ textarea.invalid,
 input:invalid:not(.pending),
 .select2-container.invalid .select2-choices,
 .select2-container.invalid .select2-choice {
-  background: #F0FFF0;
+  background: #D8FFCE;
 }
 
 input[type=text].invalid.touched,
@@ -458,7 +458,7 @@ input:required:invalid.touched:not(.pending),
 textarea.invalid.touched,
 .select2-container.invalid.touched .select2-choices,
 .select2-container.invalid.touched .select2-choice {
-  background: #fff0f0;
+  background: #FFDCDC;
 }
 
 .select2-container.select2-container-disabled.invalid .select2-choice {

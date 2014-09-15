@@ -177,7 +177,7 @@ function classifications(callback) {
         tick()
         var classification = { emekuId: row.classificationId }
         if (row.format) classification.format = mapFormat(row.format)
-        if (row.runtime) classification.duration = row.runtime
+        if (row.runtime) classification.duration = (row.runtime || '').trim()
         if (row.age_level) {
           classification.legacyAgeLimit = row.age_level == 'S' ? 0 : parseInt(row.age_level)
         }

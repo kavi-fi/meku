@@ -19,6 +19,7 @@ function providerPage() {
     separator: ' - ',
     startOfWeek: 'monday',
     shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']},
+    endDate: moment().subtract(1, 'days').format(format),
     getValue: function() { return $datePicker.find('span').text() },
     setValue: function(s) { $datePicker.find('span').text(s) }
   }).bind('datepicker-change', function(event, obj) {
@@ -50,8 +51,8 @@ function providerPage() {
         })
     })
 
-    var begin = moment().subtract(1, 'month').startOf('month')
-    var end = moment().endOf('month')
+    var begin = moment().subtract(1, 'days').startOf('month')
+    var end = moment().subtract(1, 'days')
 
     $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
     if (!$datePicker.data('dateRangePicker').isInitiated()) fetchNewProviders(begin, end)

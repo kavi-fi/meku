@@ -399,7 +399,7 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
   })
 })
 
-app.post('/programs/:id/categorization', requireRole('kavi'), function(req, res, next) {
+app.post('/programs/:id/categorization', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)

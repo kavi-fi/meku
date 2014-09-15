@@ -158,7 +158,7 @@ function internalSearchPage() {
     if (enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').toggle(hasRole('kavi'))
+      $detail.find('button.categorize').show()
     } else if (enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()

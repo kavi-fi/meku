@@ -747,6 +747,11 @@ textarea.invalid:disabled,
 #provider-page .yearly-billing-content { display: none; }
 #provider-page .yearly-billing-proe-form { display: inline-block; }
 
+#provider-page .statistics h3 { cursor: pointer; }
+#provider-page .statistics-content { display: none; font-size: 14px; margin-bottom: 20px; }
+#provider-page .statistics-content div { margin-bottom: 8px; }
+#provider-page .statistics-content .providingTypes { margin-left: 15px; margin-top: 6px; }
+
 #provider-page .provider-details .save button { float: none; }
 #provider-page .buttons { height: 40px; margin-bottom: 20px; }
 #provider-page .activity { float: left; }

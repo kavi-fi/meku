@@ -30,6 +30,7 @@ function providerPage() {
     updateLocationHash(providerId || '')
     $.get('/providers', function(providers) {
       renderProviders(providers)
+      renderStatistics(providers)
 
       // Apply provider search
       $providerNameQuery.trigger('input')
@@ -98,6 +99,9 @@ function providerPage() {
   })
 
   $yearlyBilling.on('click', '> h3', function() {
+    $(this).toggleClass('selected').next().slideToggle()
+  })
+  $page.find('.statistics').on('click', '> h3', function() {
     $(this).toggleClass('selected').next().slideToggle()
   })
 
@@ -302,6 +306,24 @@ function providerPage() {
         $billingContainer.find('.most-recent .dates').text(utils.asDate(metadata.previousMidYearBilling.begin) + ' - ' + utils.asDate(metadata.previousMidYearBilling.end))
       }
     })
+  }
+
+  function renderStatistics(providers) {
+    var $root = $page.find('.statistics-content')
+    var registeredProviders = _.filter(providers, function(p) { return !!p.active })
+    var registeredLocationCount = _.reduce(registeredProviders, function(acc, p) { return acc + _.filter(p.locations, function(l) { return !!l.active }).length }, 0)
+    $root.find('.providerCount').text(registeredProviders.length)
+    $root.find('.providerLocationCount').text(registeredLocationCount)
+
+    var $types = Object.keys(enums.providingType).map(function(type) {
+      var count = _.reduce(registeredProviders, function(acc, p) {
+        var hasLocationWithType = _.any(p.locations, function(l) { return !!l.active && _.contains(l.providingType, type) })
+        return hasLocationWithType ? acc + 1 : acc
+      }, 0)
+      return $('<div>').text(enums.providingType[type] + ': ').append($('<span>').text(count))
+    })
+    $root.find('.providingTypes').html($types)
+
   }
 
   function renderProviders(providers) {

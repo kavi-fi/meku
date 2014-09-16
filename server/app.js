@@ -161,6 +161,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
   if (req.user) {
     var isKavi = utils.hasRole(req.user, 'kavi')
     var query = isKavi ? constructKaviQuery() : {}
+    if (req.query.ownClassificationsOnly === 'true') _.merge(query, { classifications: { $elemMatch: { 'author._id': req.user._id }}})
     var fields = isKavi ? null : { 'classifications.comments': 0 }
     var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
     search(query, fields, sortBy, req, res, next)

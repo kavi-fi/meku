@@ -6,6 +6,7 @@ function publicSearchPage() {
   $page.find('.drafts').remove()
   $page.find('.recent').remove()
   $page.find('.kavi-query-filters').remove()
+  $page.find('.user-query-filters').remove()
   $page.find('.controls h2.main').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
@@ -293,6 +294,7 @@ function searchPage() {
   var $clearRegistrationDatePicker = $page.find('.kavi-query-filters .clear-date-picker')
   var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
   var $reclassifiedToggle = $page.find('.kavi-query-filters input[name=reclassified]')
+  var $ownClassificationsOnly = $page.find('.user-query-filters input[name=own-classifications-only]')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
@@ -315,6 +317,7 @@ function searchPage() {
 
   $button.click(function() { $input.trigger('fire') })
   $filters.on('change', function() { $input.trigger('fire') })
+  $ownClassificationsOnly.on('change', function() { $input.trigger('fire') })
 
   $(window).on('scroll', function() {
     if (!$page.is(':visible')) return
@@ -353,6 +356,8 @@ function searchPage() {
       $page.find('.kavi-query-filters').remove()
       return
     }
+
+    $page.find('.user-query-filters').remove()
 
     select2Autocomplete({
       $el: $classifier,
@@ -435,7 +440,8 @@ function searchPage() {
       registrationDateRange: currentRegistrationDateRange(),
       reclassified: $reclassifiedToggle.prop('checked'),
       agelimits: currentAgelimits(),
-      warnings: currentWarnings()
+      warnings: currentWarnings(),
+      ownClassificationsOnly: $ownClassificationsOnly.is(':checked')
     })
     state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return

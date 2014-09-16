@@ -161,6 +161,7 @@ function providerPage() {
       var $template = $('#templates').find('.invoice-provider').clone()
 
       $billingContainer.toggle(providers.length > 0)
+      $billing.find('.no-results').toggle(providers.length == 0)
 
       _.forEach(providers, function(provider) {
         var $provider = $template.find('.invoice-provider-row').clone()

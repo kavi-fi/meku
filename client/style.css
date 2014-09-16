@@ -745,6 +745,7 @@ textarea.invalid:disabled,
 
 #provider-page .billing h3 { cursor: pointer }
 #provider-page .billing-content { display: none; }
+#provider-page .billing-content .no-results { display: none; color: #d3d3d3; }
 
 #provider-page .yearly-billing { margin-bottom: 30px; }
 #provider-page .yearly-billing h3 { cursor: pointer }

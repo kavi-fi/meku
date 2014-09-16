@@ -98,6 +98,9 @@ function providerPage() {
     }
   })
 
+  $billing.on('click', '> h3', function() {
+    $(this).toggleClass('selected').next().slideToggle()
+  })
   $yearlyBilling.on('click', '> h3', function() {
     $(this).toggleClass('selected').next().slideToggle()
   })

@@ -742,6 +742,10 @@ textarea.invalid:disabled,
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 #provider-page .most-recent { margin-top: 10px; }
 #provider-page .most-recent .sent { margin-right: 15px; }
+
+#provider-page .billing h3 { cursor: pointer }
+#provider-page .billing-content { display: none; }
+
 #provider-page .yearly-billing { margin-bottom: 30px; }
 #provider-page .yearly-billing h3 { cursor: pointer }
 #provider-page .yearly-billing-content { display: none; }
@@ -800,7 +804,8 @@ textarea.invalid:disabled,
 #reports-page .report .comments { text-align: left; }
 
 .rotating.fa-play {
-    margin-right: 5px;
+    margin-right: 7px;
+    margin-left: 1px;
     -webkit-transition: .3s linear;
     -moz-transition: .3s linear;
     -o-transition: .3s linear;

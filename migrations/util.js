@@ -3,6 +3,10 @@ var mongoose = require('mongoose')
 
 exports.mongoose = mongoose
 
+exports.connectMongoose = function() {
+  mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost/meku')
+}
+
 exports.progressMonitor = function(num) {
   var ii = 0
   var tick = num || 250

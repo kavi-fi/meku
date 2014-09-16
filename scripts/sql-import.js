@@ -617,7 +617,10 @@ function deleteTrainingPrograms(callback) {
 }
 
 function deleteTrainingUsers(callback) {
-  schema.User.remove({username: /^L.*$/}, callback)
+  schema.User.remove({username: /^L.*$/}, function(err) {
+    if (err) return callback(err)
+    schema.Account.update({}, { $pull: { users: { username: /^L.*$/ } } }, { multi: true }, callback)
+  })
 }
 
 function markUnclassifiedProgramsDeleted(callback) {

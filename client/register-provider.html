@@ -36,18 +36,13 @@
           type: 'POST',
           success: function(data) {
             if (data.error) {
-              if (data.error.message) {
-                var $list = $('<ul>')
+              var $list = $('<ul>')
 
-                _.forEach(data.error.message.split(','), function (error) {
-                  $list.append($('<li>').text(error.trim()))
-                })
+              _.forEach(data.error.messages, function (error) {
+                $list.append($('<li>').text(error.trim()))
+              })
 
-                $feedback.text('').append($list)
-              } else {
-                $feedback.text('Tiedoston käsitteleminen epäonnistui.')
-              }
-
+              $feedback.text('').append($list)
               $button.prop('disabled', false)
             } else {
               $form.find('div, p').not('.feedback').hide()

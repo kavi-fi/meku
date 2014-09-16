@@ -135,7 +135,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
   if (locationsData.length === 0) errors.push('Tarjoamispaikkojen tiedot puuttuvat')
 
   if (errors.length > 0) {
-    callback({ message: errors.join(', ') })
+    return callback({ messages: errors })
   } else {
     return callback(null, {
       provider: providerData,

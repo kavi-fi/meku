@@ -1132,10 +1132,12 @@ app.get('/environment', function(req, res, next) {
 app.post('/files/provider-import', function(req, res, next) {
   if (_.isEmpty(req.files) || !req.files.providerFile) return res.send(400)
   if (req.files.providerFile.truncated) return res.send(400)
-  providerImport.import(req.files.providerFile.path, function(err, providerAndLocationsPreview) {
+  providerImport.import(req.files.providerFile.path, function(err, provider) {
     if (err) return res.send({ error: err })
-    res.send({
-      message: 'Ilmoitettu tarjoaja, sekä ' + providerAndLocationsPreview.locations.length + ' tarjoamispaikkaa.'
+    new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) {
+      res.send({
+        message: 'Ilmoitettu tarjoaja, sekä ' + providerAndLocationsPreview.locations.length + ' tarjoamispaikkaa.'
+      })
     })
   })
 })

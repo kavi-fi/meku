@@ -40,27 +40,22 @@ var locationFieldMap = {
   'isPayer':          'Lasku Tarjoamispaikalle',
   'name':             'Tarjoamispaikan nimi',
   'phoneNumber':      'Puhelinnumero',
-  //'providingType':    '', // special case
   'url':              'www-osoite'
 }
 
 exports.import = function(file, callback) {
-  try {
-    var parser = false
+  var parser = false
 
-    if (file.search(/.xls$/) > 1) parser = xls
-    else if (file.search(/.xlsx$/) > 1) parser = xlsx
-    else return callback({ message: '.xlsx or .xls required' })
+  if (file.search(/.xls$/) > 1) parser = xls
+  else if (file.search(/.xlsx$/) > 1) parser = xlsx
+  else return callback({ message: '.xlsx or .xls required' })
 
-    var providerAndLocations = getProviderAndLocationsFromSpreadSheet(parser.readFile(file).Sheets['Tarjoajaksi ilmoittautuminen'])
-  } catch (err) {
-    return callback(err)
-  }
-
-  var provider = createProvider(providerAndLocations.provider, providerAndLocations.billing)
-  provider.locations = createLocations(providerAndLocations.locations)
-
-  return new schema.Provider(_.omit(provider, 'other')).save(function(err, provider) { return callback(err, provider) })
+  getProviderAndLocationsFromSpreadSheet(parser.readFile(file).Sheets['Tarjoajaksi ilmoittautuminen'], function(err, providerAndLocations) {
+    if (err) return callback(err)
+    var provider = createProvider(providerAndLocations.provider, providerAndLocations.billing)
+    provider.locations = createLocations(providerAndLocations.locations)
+    return callback(null, provider)
+  })
 
   function createProvider(providerData, billingData) {
     var provider = createObjectAndSetValuesWithMap(providerData, providerFieldMap)
@@ -109,7 +104,7 @@ exports.import = function(file, callback) {
   function stringXToBoolean(x) { return _.isString(x) ? x.toLowerCase() === 'x' : false }
 }
 
-function getProviderAndLocationsFromSpreadSheet(providerSheet) {
+function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
   // TODO: check
   var requiredProviderFields = {
     name: 'Tarjoajan tiedot:',
@@ -124,28 +119,36 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
     fieldMap: locationFieldMap
   }
 
+  var noRequiredFields = {
+    name: '',
+    values: [],
+    fieldMap: {}
+  }
+
   var errors = []
 
   var providerData = parseFieldRowAndValueRowAfterColumn('Tarjoaja', requiredProviderFields)
-  var billingData = parseFieldRowAndValueRowAfterColumn('Lasku eri osoitteeseen kuin Tarjoajan osoite')
-  var eInvoiceData = parseFieldRowAndValueRowAfterColumn('TAI verkkolasku')
+  var billingData = parseFieldRowAndValueRowAfterColumn('Lasku eri osoitteeseen kuin Tarjoajan osoite', noRequiredFields)
+  var eInvoiceData = parseFieldRowAndValueRowAfterColumn('TAI verkkolasku', noRequiredFields)
   var locationsData = parseFieldRowAndValueRowsAfterColumn('Tarjoamispaikkojen tiedot ja tarjoamistavat', requiredLocationFields)
 
   if (locationsData.length === 0) errors.push('Tarjoamispaikkojen tiedot puuttuvat')
 
-  if (errors.length > 0) throw { message: errors.join(', ') }
-
-  return {
-    provider: providerData,
-    billing: utils.merge(billingData, eInvoiceData),
-    locations: locationsData
+  if (errors.length > 0) {
+    callback({ message: errors.join(', ') })
+  } else {
+    return callback(null, {
+      provider: providerData,
+      billing: utils.merge(billingData, eInvoiceData),
+      locations: locationsData
+    })
   }
 
   function parseFieldRowAndValueRowAfterColumn(column, requiredFields) {
     var rowNumber = findColumnRowByValue(providerSheet, column)
     var rows = toObject(getFields(providerSheet, rowNumber + 1), getValues(providerSheet, rowNumber + 2))
 
-    var errorMessages = validate(rows, requiredFields)
+    var errorMessages = validate(rows, requiredFields, rowNumber + 2)
     errorMessages.forEach(function(msg) {
       errors.push(msg)
     })
@@ -175,28 +178,24 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
     }, {})
   }
 
-  function validate(values, requiredFields) {
+  function validate(values, requiredFields, index) {
     var errors = []
-    if (requiredFields) {
-      var inverted = _.invert(requiredFields.fieldMap)
-      var present = _(values).keys().map(function(x) {
-        return inverted[x]
-      }).value()
+    var inverted = _.invert(requiredFields.fieldMap)
+    var present = _(values).keys().map(function(x) {
+      return inverted[x]
+    }).value()
 
-      var missing = _.reduce(requiredFields.values, function(acc, r) {
-        if (_.indexOf(present, r) === -1) return acc.concat(r)
-        else return acc
-      }, [])
+    var missing = _.reduce(requiredFields.values, function(acc, r) {
+      if (_.indexOf(present, r) === -1) return acc.concat(r)
+      else return acc
+    }, [])
 
-      _.forEach(missing, function (field) {
-        var errorString = '<%- name %> pakollinen kenttä "<%- field %>" puuttuu'
-        if (requiredFields.row) errorString = 'Rivillä <%- row %>. ' + errorString
-
-        errors.push(_.template(errorString, {
-          name: requiredFields.name, field: requiredFields.fieldMap[field], row: requiredFields.row
-        }))
-      })
-    }
+    _.forEach(missing, function (field) {
+      var errorString = 'Rivillä <%- row %>. <%- name %> pakollinen kenttä "<%- field %>" puuttuu'
+      errors.push(_.template(errorString, {
+        name: requiredFields.name, field: requiredFields.fieldMap[field], row: index
+      }))
+    })
     return errors
   }
 

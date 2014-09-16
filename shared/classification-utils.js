@@ -219,7 +219,8 @@ var ageAsText = exports.ageAsText = function(age) { return age && age.toString()
 
 exports.durationToSeconds = function(duration) {
   if (!duration) return 0
-  var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec($.trim(duration))
+  var trimmed = duration.trim && duration.trim() || $.trim(duration)
+  var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(trimmed)
     .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
   return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
 }

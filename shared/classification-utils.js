@@ -204,8 +204,6 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
   function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }
 
-  function ageAsText(age) { return age && age.toString() || 'S' }
-
   function criteriaText(warnings) {
     return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
   }
@@ -215,6 +213,26 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     return '<div style="margin: 10px 0;">'+img('agelimit-'+summary.age) + warningHtml+'</div>'
     function img(fileName) { return '<img src="'+hostName+'/images/'+fileName+'.png" style="width: 40px; height: 40px; padding-right: 8px;"/>' }
   }
+}
+
+var ageAsText = exports.ageAsText = function(age) { return age && age.toString() || 'S' }
+
+exports.durationToSeconds = function(duration) {
+  if (!duration) return 0
+  var trimmed = duration.trim && duration.trim() || $.trim(duration)
+  var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(trimmed)
+    .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
+  return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
+}
+
+exports.secondsToDuration = function(seconds) {
+  if (!seconds) return '00:00:00'
+  var h = Math.floor(seconds / 3600)
+  var m = Math.floor((seconds % 3600) / 60)
+  var s = Math.floor((seconds % 3600) % 60)
+  return [h,m,s].map(pad).join(':')
+
+  function pad(s) { return s < 10 ? '0'+s : ''+s }
 }
 
 exports.price = function(program, duration) {

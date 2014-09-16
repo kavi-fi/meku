@@ -126,12 +126,13 @@ textarea { resize: vertical; }
 
 #header h1 { margin-bottom: 30px; font-size: 22px; display: inline-block; }
 #header ul { list-style: none; padding: 0; margin: 0;}
-#header ul li { display: inline-block; margin-right: 15px; }
+#header ul li { display: inline-block; margin-right: 10px; }
+#header ul li:last-of-type { margin-right: 0px; }
 #header ul li a {
   display: block;
   background-color: black;
   padding: 20px 0;
-  width: 168px;
+  width: 144px;
   text-align: center;
   text-transform: uppercase;
   text-decoration: none;
@@ -186,22 +187,7 @@ label.top { vertical-align: top; }
 #search-page .row { border-bottom: none; padding-bottom: 0; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }
 #search-page input.query { width: 373px; }
-#search-page .datepicker {
-  cursor: pointer;
-  display: inline-block;
-  text-align: center;
-  min-width: 253px;
-  background-color: #fff;
-  padding: 8px 0;
-  border: 1px solid #D3D3D3;
-  border-radius: 3px;
-  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
-  font-size: 14px;
-  color: #666666;
-  line-height: 19px;
-  height: 19px;
-}
-#search-page .datepicker .icon { float: right; margin: 2px 6px 0 0; }
+#search-page .datepicker { min-width: 253px; }
 #search-page .kavi-query-filters > div { margin-top: 10px; min-height: 50px; }
 #search-page .kavi-query-filters label { display: inline-block; vertical-align: top; margin-top: 10px; margin-right: 20px; }
 #search-page .kavi-query-filters label.grey { color: #d3d3d3; }
@@ -654,19 +640,29 @@ textarea.invalid:disabled,
 #classification-page .register { padding: 25px 0; }
 #classification-page .register button { font-size: 25px; width: 100%; }
 
-#billing-page .datepicker {
+.datepicker {
+  min-width: 230px;
   cursor: pointer;
-  border: 1px solid #ccc;
+  display: inline-block;
+  text-align: center;
+  background-color: #fff;
+  padding: 8px 0;
+  border: 1px solid #D3D3D3;
   border-radius: 3px;
-  background-color: #e1e1e1;
-  color: #777;
-  padding: 4px 5px;
-  text-decoration: none;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
+  font-size: 14px;
+  color: #666666;
+  line-height: 19px;
+  height: 19px;
 }
+.datepicker span { display: inline-block; margin-right: 5px; margin-left: 10px; }
+.datepicker .fa-calendar { float: right; margin: 2px 6px 0 0; }
 
-#billing-page .date-selection { height: 30px; line-height: 30px; margin-bottom: 20px; }
-#billing-page .datepicker span { display: inline-block; margin-right: 5px; }
-#billing-page .datepicker i { color: #000; }
+.date-selection { height: 30px; line-height: 30px; margin-bottom: 20px; }
+.date-selection .datepicker { margin-left: 15px; }
+.date-selection .datepicker i { color: #000; }
+.date-selection .datepicker span { display: inline-block; margin-right: 5px; }
+
 #billing-page input[type=checkbox] { margin-right: 5px; }
 #billing-page .rows input[type=checkbox] { margin: 5px; }
 #billing-page h4 { display: inline-block; margin: 0; padding: 0; }
@@ -746,10 +742,20 @@ textarea.invalid:disabled,
 #provider-page button[name=new-location] { margin-bottom: 10px; }
 #provider-page .most-recent { margin-top: 10px; }
 #provider-page .most-recent .sent { margin-right: 15px; }
+
+#provider-page .billing h3 { cursor: pointer }
+#provider-page .billing-content { display: none; }
+#provider-page .billing-content .no-results { display: none; color: #d3d3d3; }
+
 #provider-page .yearly-billing { margin-bottom: 30px; }
 #provider-page .yearly-billing h3 { cursor: pointer }
 #provider-page .yearly-billing-content { display: none; }
 #provider-page .yearly-billing-proe-form { display: inline-block; }
+
+#provider-page .statistics h3 { cursor: pointer; }
+#provider-page .statistics-content { display: none; font-size: 14px; margin-bottom: 20px; }
+#provider-page .statistics-content div { margin-bottom: 8px; }
+#provider-page .statistics-content .providingTypes { margin-left: 15px; margin-top: 6px; }
 
 #provider-page .provider-details .save button { float: none; }
 #provider-page .buttons { height: 40px; margin-bottom: 20px; }
@@ -773,24 +779,37 @@ textarea.invalid:disabled,
 #provider-page .unapproved .results { margin-bottom: 30px; }
 #provider-page .unapproved .result .date { display: inline-block; width: 90px; }
 
-#provider-page .billing .datepicker {
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    background-color: #e1e1e1;
-    color: #777;
-    padding: 4px 5px;
-    text-decoration: none;
-}
-
 #provider-page .billing { font-size: 14px; margin-bottom: 30px; }
 #provider-page .billing th { padding: 10px; }
 #provider-page .billing td { padding: 5px 5px 5px 10px; }
 #provider-page .billing .left-margin { margin-left: 10px; }
 #provider-page .billing td.empty-row { padding-bottom: 20px; }
 
+#reports-page .input .label { min-width: 140px; vertical-align: top; padding-top: 12px; }
+#reports-page .input td { padding-bottom: 25px; }
+#reports-page .input .datepicker { margin-left: 4px; }
+#reports-page .report-selection div { opacity: 0.5; min-width: 100px; text-align: center; display: inline-block; cursor: pointer; border: 1px solid #d3d3d3; border-radius: 3px; padding: 7px 15px; margin: 4px; }
+#reports-page .report-selection div:hover { background-color: #fff; }
+#reports-page .report-selection div.selected { opacity: 1; background-color: #fff; box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10); }
+
+#reports-page .report table { margin: 60px 0; font-size: 14px; }
+#reports-page .report thead { border-bottom: 1px solid #ddd; color: #00BB88; font-size: 16px; }
+#reports-page .report { margin-bottom: 200px; }
+#reports-page .report th ~ th { border-left: 1px solid #ddd; }
+#reports-page .report td ~ td { border-left: 1px solid #ddd; }
+#reports-page .report td { vertical-align: top; padding: 5px 10px; text-align: right; }
+#reports-page .report th { font-weight: normal; padding: 5px 10px; text-align: right; }
+#reports-page .report-table .id { min-width: 400px; }
+#reports-page .report-table td, #reports-page .report-table th { min-width: 150px; }
+#reports-page .report a { color: #444; }
+#reports-page .report .comments { text-align: left; }
+
+#reports-page .report-kavi-durations-table .id { min-width: 400px; }
+#reports-page .report-kavi-durations-table .reclassifications { border-bottom: 1px solid #ddd; }
+
 .rotating.fa-play {
-    margin-right: 5px;
+    margin-right: 7px;
+    margin-left: 1px;
     -webkit-transition: .3s linear;
     -moz-transition: .3s linear;
     -o-transition: .3s linear;

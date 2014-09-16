@@ -364,7 +364,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     }
 
     function addInvoicerows(currentClassification, callback) {
-      var seconds = durationToSeconds(currentClassification.duration)
+      var seconds = classificationUtils.durationToSeconds(currentClassification.duration)
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
@@ -669,11 +669,11 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
     if (err) return next(err)
 
     data.providers = _(data.providers).map(function(p) {
-      p.locations = _.filter(p.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
+      p.locations = _.filter(p.locations, function(l) { return utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
       return p
     }).reject(function(p) { return _.isEmpty(p.locations) }).value()
 
-    data.locations = _.filter(data.locations, function(l) { return withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
+    data.locations = _.filter(data.locations, function(l) { return utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
 
     var accountRows = getProviderBillingRows(data)
     var result = proe(dates, accountRows, 'provider')
@@ -740,7 +740,7 @@ app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res
     _.forEach(providers, function(provider) {
       provider.locations = _(provider.locations)
         .filter({ active: true, deleted: false })
-        .filter(function(l) { return withinDateRange(l.registrationDate, beginMoment, endMoment) })
+        .filter(function(l) { return utils.withinDateRange(l.registrationDate, beginMoment, endMoment) })
         .sortBy('name').value()
     })
     res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
@@ -1064,7 +1064,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
               logCreateOperation(req.user, p)
               updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
-                var seconds = durationToSeconds(_.first(p.classifications).duration)
+                var seconds = classificationUtils.durationToSeconds(_.first(p.classifications).duration)
                 InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
                   if (err) return callback(err)
                   updateActorAndDirectorIndexes(p, callback)
@@ -1136,6 +1136,12 @@ app.post('/files/provider-import', function(req, res, next) {
       message: 'Ilmoitettu tarjoaja, sekä ' + providerAndLocationsPreview.locations.length + ' tarjoamispaikkaa.'
     })
   })
+})
+
+app.get('/report/:name', requireRole('root'), function(req, res, next) {
+  var range = utils.parseDateRange(req.query)
+  var reports = require('./reports')
+  reports[req.params.name](range, respond(res, next))
 })
 
 // Error handler
@@ -1340,13 +1346,6 @@ function updateMetadataIndexes(program, callback) {
   })
 }
 
-function durationToSeconds(duration) {
-  if (!duration) return 0
-  var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(duration)
-    .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
-  return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
-}
-
 function queryNameIndex(schemaName) {
   return function(req, res, next) {
     var q = {}
@@ -1525,10 +1524,6 @@ function getHostname() {
   if (isDev()) return 'http://localhost:3000'
   else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
   else return 'https://luokittelu.kavi.fi'
-}
-
-function withinDateRange(date, beginDate, endDate) {
-  return date && beginDate && endDate && date.valueOf() >= beginDate.valueOf() && date.valueOf() < endDate.valueOf()
 }
 
 function isUrlEncodedBody(req) {

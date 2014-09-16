@@ -22,7 +22,7 @@ var classification = {
   warningOrder: [String],
   legacyAgeLimit: Number,
   creationDate: Date,
-  registrationDate: Date,
+  registrationDate: { type: Date, index: true },
   registrationEmailAddresses: [String],
   comments: String,
   publicComments: String,
@@ -160,6 +160,7 @@ var AccountSchema = new Schema({
   apiToken: String,
   contactName: String,
   phoneNumber: String,
+  isKavi: Boolean,
   deleted: Boolean
 })
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)

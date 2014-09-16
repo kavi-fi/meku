@@ -37,7 +37,7 @@
           success: function(data) {
             if (data.error) {
               var $list = $('<ul>').html(_.map(data.error.messages, function (error) {
-                return $('<li>').text(error.trim())
+                return $('<li>').text(error)
               }))
 
               $feedback.text('').append($list)

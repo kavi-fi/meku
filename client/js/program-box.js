@@ -168,7 +168,7 @@ function programBox() {
         .append($('<p>').text(renderCriteriaComments()))
 
       function renderCriteriaComments() {
-        if (!hasRole('kavi') && utils.getProperty(c, 'author._id') !== user._id) return ''
+        if (!hasRole('kavi') && utils.getProperty(c, 'author._id') !== utils.getProperty(this, 'user._id')) return ''
         else return c.criteriaComments && c.criteriaComments[cr.id] || ''
       }
     })

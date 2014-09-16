@@ -160,6 +160,7 @@ var AccountSchema = new Schema({
   apiToken: String,
   contactName: String,
   phoneNumber: String,
+  isKavi: Boolean,
   deleted: Boolean
 })
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)

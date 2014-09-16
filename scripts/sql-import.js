@@ -322,7 +322,7 @@ function classifications(callback) {
 function accounts(callback) {
   async.applyEachSeries([
     accountBase, accountEmailAddresses, providers, providerEmailAddresses, locations, locationEmailAddresses,
-    userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts
+    userBase, userEmails, userRoles, linkUserAccounts, linkSecurityGroupAccounts, markKavi
   ], callback)
   var providerSeq = 1
 
@@ -529,6 +529,14 @@ function accounts(callback) {
     conn.query('select a.id as accountId, u.id as userId from users u join securitygroups_users sgu on (u.id = sgu.user_id) join securitygroups sg on (sg.id = sgu.securitygroup_id) join securitygroups_records sgr on (sg.id = sgr.securitygroup_id and sgr.module = "Accounts") join accounts a on (sgr.record_id = a.id) where sg.id != "8d4ad931-1055-a4f5-96da-4e3664911855" and u.deleted != "1" and sgu.deleted != "1" and sg.deleted != "1" and sgr.deleted != "1" and a.deleted != "1"')
       .stream()
       .pipe(consumer(pushUserToAccount, callback))
+  }
+
+  function markKavi(callback) {
+    var kaviNames = [
+      'Kansallinen audiovisuaalinen instituutti',
+      'Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikkö'
+    ]
+    async.forEach(kaviNames, function(n, callback) { schema.Account.update({ name: n }, { isKavi: true }, callback) }, callback)
   }
 
   function idToEmailMapper(row, result) {

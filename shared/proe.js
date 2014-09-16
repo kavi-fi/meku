@@ -5,8 +5,7 @@ if (isNodeJs()) {
   var enums = require('./enums')
 }
 
-proe = {}
-
+var proe = {}
 var dateFormat = 'DD.MM.YYYY'
 
 // [{ account:Account, rows:[InvoiceRow] }] -> String

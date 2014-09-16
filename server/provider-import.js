@@ -179,7 +179,6 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
   }
 
   function validate(values, requiredFields, index) {
-    var errors = []
     var inverted = _.invert(requiredFields.fieldMap)
     var present = _(values).keys().map(function(x) {
       return inverted[x]
@@ -190,13 +189,12 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
       else return acc
     }, [])
 
-    _.forEach(missing, function (field) {
+    return _.map(missing, function (field) {
       var errorString = 'Rivillä <%- row %>. <%- name %> pakollinen kenttä "<%- field %>" puuttuu'
-      errors.push(_.template(errorString, {
+      return _.template(errorString, {
         name: requiredFields.name, field: requiredFields.fieldMap[field], row: index
-      }))
+      })
     })
-    return errors
   }
 
   function getFields(from, row) {

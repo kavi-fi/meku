@@ -319,15 +319,23 @@ function providerPage() {
     $root.find('.providerCount').text(registeredProviders.length)
     $root.find('.providerLocationCount').text(registeredLocationCount)
 
+    var k18Count = _.filter(registeredProviders, hasAdultContentLocation).length
+    $root.find('.k18ProviderCount').text(k18Count)
+
     var $types = Object.keys(enums.providingType).map(function(type) {
-      var count = _.reduce(registeredProviders, function(acc, p) {
-        var hasLocationWithType = _.any(p.locations, function(l) { return !!l.active && _.contains(l.providingType, type) })
-        return hasLocationWithType ? acc + 1 : acc
-      }, 0)
-      return $('<div>').text(enums.providingType[type] + ': ').append($('<span>').text(count))
+      var count = _.filter(registeredProviders, hasLocationWithProvidingType(type)).length
+      return $('<div>').text(enums.providingType[type] + ': ' + count)
     })
     $root.find('.providingTypes').html($types)
 
+    function hasAdultContentLocation(provider) {
+      return _.any(provider.locations, function(l) { return !!l.active && !!l.adultContent })
+    }
+    function hasLocationWithProvidingType(type) {
+      return function(provider) {
+        return _.any(provider.locations, function(l) { return !!l.active && _.contains(l.providingType, type) })
+      }
+    }
   }
 
   function renderProviders(providers) {

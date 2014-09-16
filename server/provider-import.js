@@ -112,14 +112,14 @@ exports.import = function(file, callback) {
 function getProviderAndLocationsFromSpreadSheet(providerSheet) {
   // TODO: check
   var requiredProviderFields = {
-    name: 'Tarjoaja',
+    name: 'Tarjoajan tiedot:',
     values: ['name', 'yTunnus', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber', 'language'],
     fieldMap: providerFieldMap
   }
 
   // TODO: check
   var requiredLocationFields = {
-    name: 'Tarjoamispaikkojen tiedot ja tarjoamistavat',
+    name: 'Tarjoamispaikan tiedot:',
     values: ['name', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber'],
     fieldMap: locationFieldMap
   }
@@ -143,7 +143,14 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
 
   function parseFieldRowAndValueRowAfterColumn(column, requiredFields) {
     var rowNumber = findColumnRowByValue(providerSheet, column)
-    return toObject(getFields(providerSheet, rowNumber + 1), getValues(providerSheet, rowNumber + 2), requiredFields)
+    var rows = toObject(getFields(providerSheet, rowNumber + 1), getValues(providerSheet, rowNumber + 2))
+
+    var errorMessages = validate(rows, requiredFields)
+    errorMessages.forEach(function(msg) {
+      errors.push(msg)
+    })
+
+    return rows
   }
 
   function findColumnRowByValue(from, value) {
@@ -161,32 +168,36 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
     function parseRowNumber(key) { return parseInt(key.substring(key.search(/\d/))) }
   }
 
-  function toObject(fields, values, requiredFields) {
-    fields = _.clone(fields)
-    var object = _.reduce(values, function(result, value) {
+  function toObject(fields, values) {
+    return _.reduce(values, function(result, value) {
       result[fields[value[0]]] = value[1]
-      delete fields[value[0]]
       return result
     }, {})
+  }
 
+  function validate(values, requiredFields) {
+    var errors = []
     if (requiredFields) {
-      var reqFields = _.map(requiredFields.values, function(value) {
-        return requiredFields.fieldMap[value]
-      })
+      var inverted = _.invert(requiredFields.fieldMap)
+      var present = _(values).keys().map(function(x) {
+        return inverted[x]
+      }).value()
 
-      _.forEach(fields, function (field) {
-        if (_.contains(reqFields, field)) {
-          var errorString = '<%- name %> pakollinen kenttä "<%- field %>" puuttuu'
-          if (requiredFields.row) errorString = 'Rivillä <%- row %>. ' + errorString
+      var missing = _.reduce(requiredFields.values, function(acc, r) {
+        if (_.indexOf(present, r) === -1) return acc.concat(r)
+        else return acc
+      }, [])
 
-          errors.push(_.template(errorString, {
-            name: requiredFields.name, field: field, row: requiredFields.row
-          }))
-        }
+      _.forEach(missing, function (field) {
+        var errorString = '<%- name %> pakollinen kenttä "<%- field %>" puuttuu'
+        if (requiredFields.row) errorString = 'Rivillä <%- row %>. ' + errorString
+
+        errors.push(_.template(errorString, {
+          name: requiredFields.name, field: requiredFields.fieldMap[field], row: requiredFields.row
+        }))
       })
     }
-
-    return object
+    return errors
   }
 
   function getFields(from, row) {
@@ -209,14 +220,44 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet) {
     var rowNumber = findColumnRowByValue(providerSheet, column)
     var fields = getFields(providerSheet, rowNumber + 1)
 
-    return values([], rowNumber + 2)
+    var rows = values([], rowNumber + 2)
+    
+    var errorMessages = _.reduce(rows, function(acc, val) {
+      var index = acc[0]
+      var errors = acc[1]
+      var fieldErrors = validate(val, requiredFields, index)
+      return [index + 1, errors.concat(fieldErrors).concat(validateProvidingType(val, index))]
+    }, [rowNumber + 2, []])[1]
+
+    errorMessages.forEach(function(msg) {
+      errors.push(msg)
+    })
+
+    return rows
 
     function values(xs, index) {
       var currentValues = getValues(providerSheet, index)
       if (currentValues.length == 0) {
         return xs
       } else {
-        return values(xs.concat([toObject(fields, currentValues, utils.merge(requiredFields, { row: index }))]), index + 1)
+        return values(xs.concat([toObject(fields, currentValues)]), index + 1)
+      }
+    }
+
+    function validateProvidingType(val, index) {
+      var providingTypeFields = [
+        'Tallenteiden tarjoaminen', 'Julkinen esittäminen', 'Valtakunnallinen TV-ohjelmisto',
+        'Alueellinen ohjelmisto', 'Ulkomailta välitetty ohjelm.', 'Tilausohjelma-palvelu'
+      ]
+      var present = _.keys(val)
+      var hasAtLeastOneProvidingType = _(providingTypeFields).map(function(name) {
+        return _.indexOf(present, name) > 0
+      }).some()
+
+      if (!hasAtLeastOneProvidingType) {
+        return ['Tarjoamispaikan tiedot rivillä ' + index + ': tarjoamispaikalla täytyy olla ainakin yksi tajoamistapa.']
+      } else {
+        return []
       }
     }
   }

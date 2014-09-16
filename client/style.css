@@ -804,6 +804,9 @@ textarea.invalid:disabled,
 #reports-page .report a { color: #444; }
 #reports-page .report .comments { text-align: left; }
 
+#reports-page .report-kavi-durations-table .id { min-width: 400px; }
+#reports-page .report-kavi-durations-table .reclassifications { border-bottom: 1px solid #ddd; }
+
 .rotating.fa-play {
     margin-right: 7px;
     margin-left: 1px;

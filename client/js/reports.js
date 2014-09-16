@@ -5,12 +5,6 @@ function reportsPage() {
   var $reportSelection = $page.find('.report-selection')
   var $report = $page.find('.report')
 
-  var $defaultReportTemplate = $('#templates > .report-table').clone()
-  var $defaultRowTemplate = $defaultReportTemplate.find('tbody tr').clone()
-
-  var $classificationListTemplate = $('#templates > .report-classification-list-table').clone()
-  var $classificationListRowTemplate = $classificationListTemplate.find('tbody tr').clone()
-
   var format = 'DD.MM.YYYY'
   var latestAjax = switchLatestDeferred()
 
@@ -73,18 +67,36 @@ function reportsPage() {
   }
 
   function render(reportName, report) {
-    if (reportName == 'kaviClassificationList') {
+    if (reportName == 'kaviDurations') {
+      renderKaviDurations(report)
+    } else if (reportName == 'kaviClassificationList') {
       renderKaviClassificationList(report)
     } else {
       renderDefaultReport(reportName, report)
     }
   }
 
+  function renderKaviDurations(report) {
+    var $table = $('#templates > .report-kavi-durations-table').clone()
+    $table.find('thead .id').text($reportSelection.find('.selected').text())
+    fillRow($table.find('tr.classifications'), report.classifications)
+    fillRow($table.find('tr.reclassifications'), report.reclassifications)
+    fillRow($table.find('tr.kavi'), report.kavi)
+    fillRow($table.find('tr.other'), report.other)
+    $report.html($table)
+
+    function fillRow($row, data) {
+      $row
+        .find('.count').text(data.count).end()
+        .find('.duration').text(classificationUtils.secondsToDuration(data.duration)).end()
+    }
+  }
+
   function renderKaviClassificationList(report) {
-    var $table = $classificationListTemplate.clone()
+    var $table = $('#templates > .report-classification-list-table').clone()
+    var $rowTemplate = $table.find('tbody tr').clone()
     var $tbody = $table.find('tbody').empty()
     var totalDuration = report.reduce(function(acc, row) {
-      if (row.duration.indexOf(' ') != -1) console.log(row)
       return acc + classificationUtils.durationToSeconds(row.duration)
     }, 0)
 
@@ -95,7 +107,7 @@ function reportsPage() {
 
     function renderRow(row) {
       var href = '#haku/'+row.sequenceId+'//'+row._id
-      return $classificationListRowTemplate.clone()
+      return $rowTemplate.clone()
         .find('.id').html($('<a>', { href: href, target:'_blank' }).text(row.name[0])).end()
         .find('.sequenceId').text(row.sequenceId).end()
         .find('.programType').text(enums.programType[row.programType].fi).end()
@@ -107,7 +119,9 @@ function reportsPage() {
 
   function renderDefaultReport(reportName, report) {
     var idMapper = idMappers[reportName] || function(id) { return id || 'Ei tiedossa' }
-    var $table = $defaultReportTemplate.clone()
+    var $table = $('#templates > .report-table').clone()
+    var $rowTemplate = $table.find('tbody tr').clone()
+
     var $tbody = $table.find('tbody').empty()
     $table.find('thead .id').text($reportSelection.find('.selected').text())
 
@@ -117,7 +131,7 @@ function reportsPage() {
     $report.html($table)
 
     function renderRow(row) {
-      return $defaultRowTemplate.clone()
+      return $rowTemplate.clone()
         .find('.id').text(idMapper(row._id)).end()
         .find('.count').text(row.value).end()
         .find('.percent').text(((row.value * 100) / total).toFixed(2)).end()

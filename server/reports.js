@@ -1,6 +1,7 @@
 var moment = require('moment')
 var schema = require('./schema')
 var utils = require('../shared/utils')
+var classificationUtils = require('../shared/classification-utils')
 
 module.exports = {
   programType: programType,
@@ -13,6 +14,7 @@ module.exports = {
   kaviAgelimitChanges: kaviAgelimitChanges,
   kaviAuthor: kaviAuthor,
   kaviReclassificationReason: kaviReclassificationReason,
+  kaviDurations: kaviDurations,
   kaviClassificationList: kaviClassificationList
 }
 
@@ -155,6 +157,58 @@ function kaviReclassificationReason(dateRange, callback) {
   })
 }
 
+function kaviDurations(dateRange, callback) {
+  schema.Account.find({ isKavi: true}, '_id', function(err, accounts) {
+    if (err) return callback(err)
+    var kaviAccounts = _.pluck(accounts, '_id').map(function(objectId) { return String(objectId) })
+
+    schema.User.find({ role: { $in:['kavi','admin'] } }, '_id').lean().exec(function(err, users) {
+      if (err) return callback(err)
+
+      var kaviAuthorIds = _.pluck(users, '_id').map(function(objectId) { return String(objectId) })
+      var fields = {
+        'classifications.author._id': 1, 'classifications.registrationDate': 1,
+        'classifications.duration': 1, 'classifications.buyer': 1
+      }
+      var q = { classifications: { $elemMatch: {
+        'author._id' : { $in: kaviAuthorIds },
+        registrationDate: { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate() }
+      }}}
+
+      schema.Program.find(q, fields).lean().exec(function(err, programs) {
+        if (err) return callback(err)
+        var result = programs.reduce(sumClassifications, {})
+        return callback(null, result)
+      })
+
+      function sumClassifications(result, p) {
+        _(p.classifications).forEach(function(c, classificationIndex) {
+          if (!c.author || kaviAuthorIds.indexOf(String(c.author._id)) == -1) return
+          if (!utils.withinDateRange(c.registrationDate, dateRange.begin, dateRange.end)) return
+
+          var seconds = classificationUtils.durationToSeconds(c.duration)
+          var column = (classificationIndex == (p.classifications.length - 1))
+            ? 'classifications'
+            : 'reclassifications'
+          addTo(result, column, seconds)
+
+          var buyer = c.buyer
+            ? kaviAccounts.indexOf(String(c.buyer._id)) == -1 ? 'other' : 'kavi'
+            : 'other'
+          addTo(result, buyer, seconds)
+        })
+        return result
+      }
+    })
+  })
+
+  function addTo(obj, key, seconds) {
+    if (!obj[key]) obj[key] = { count:0, duration:0 }
+    obj[key].count++
+    obj[key].duration += seconds
+  }
+}
+
 function kaviClassificationList(dateRange, callback) {
   schema.User.find({ role: { $in:['kavi','admin'] } }, 'username').lean().exec(function(err, users) {
     if (err) return callback(err)
@@ -162,7 +216,7 @@ function kaviClassificationList(dateRange, callback) {
       'classifications.author._id' : { $in: _.pluck(users, '_id') },
       'classifications.registrationDate': { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate() }
     }
-    schema. Program.aggregate()
+    schema.Program.aggregate()
       .match(q)
       .unwind('classifications')
       .match(q)

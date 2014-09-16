@@ -99,6 +99,38 @@ function setup() {
   navigation.start()
 }
 
+function setupDatePicker($datePicker, opts, onChange) {
+  var defaults = {
+    language: 'fi',
+    format: 'DD.MM.YYYY',
+    separator: ' - ',
+    startOfWeek: 'monday',
+    getValue: function() { return $datePicker.find('span').text() },
+    setValue: function(s) { $datePicker.find('span').text(s) }
+  }
+  $datePicker.dateRangePicker(_.merge({}, defaults, opts)).bind('datepicker-change', function(event, obj) {
+    var selection = stringDateRange({ begin: moment(obj.date1), end: moment(obj.date2) })
+    if (!_.isEqual(selection, $datePicker.data('selection'))) {
+      $datePicker.data('selection', selection)
+      onChange(selection)
+    }
+  })
+}
+
+function setDatePickerSelection($datePicker, range, callbackWhenManualFire) {
+  var rangeAsString = stringDateRange(range)
+  $datePicker.data('dateRangePicker').setDateRange(rangeAsString.begin, rangeAsString.end)
+  if (!$datePicker.data('dateRangePicker').isInitiated()) {
+    $datePicker.data('selection', rangeAsString)
+    callbackWhenManualFire(rangeAsString)
+  }
+}
+
+function stringDateRange(range) {
+  var format = 'DD.MM.YYYY'
+  return { begin: range.begin.format(format), end: range.end.format(format) }
+}
+
 function errorDialog() {
   var $overlay = $('#error-overlay')
   var $dialog = $('#error-dialog')

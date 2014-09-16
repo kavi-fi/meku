@@ -13,18 +13,11 @@ function providerPage() {
   var $spinner = spinner().appendTo($page.find('.date-selection'))
   var latestAjax = switchLatestDeferred()
 
-  $datePicker.dateRangePicker({
-    language: 'fi',
-    format: format,
-    separator: ' - ',
-    startOfWeek: 'monday',
+  var datePickerOpts = {
     shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']},
-    endDate: moment().subtract(1, 'days').format(format),
-    getValue: function() { return $datePicker.find('span').text() },
-    setValue: function(s) { $datePicker.find('span').text(s) }
-  }).bind('datepicker-change', function(event, obj) {
-    fetchNewProviders(obj.date1, obj.date2)
-  })
+    endDate: moment().subtract(1, 'days').format(format)
+  }
+  setupDatePicker($datePicker, datePickerOpts, fetchNewProviders)
 
   $page.on('show', function(event, providerId) {
     updateLocationHash(providerId || '')
@@ -52,12 +45,11 @@ function providerPage() {
         })
     })
 
-    var begin = moment().subtract(1, 'days').startOf('month')
-    var end = moment().subtract(1, 'days')
-
-    $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
-    if (!$datePicker.data('dateRangePicker').isInitiated()) fetchNewProviders(begin, end)
-
+    var range = {
+      begin: moment().subtract(1, 'days').startOf('month'),
+      end: moment().subtract(1, 'days')
+    }
+    setDatePickerSelection($datePicker, range, fetchNewProviders)
     updateMetadata()
     $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
   })
@@ -149,15 +141,12 @@ function providerPage() {
     return $allProviders.find('.result.selected')
   }
 
-  function fetchNewProviders(begin, end) {
-    begin = moment(begin).format(format)
-    end = moment(end).format(format)
-
+  function fetchNewProviders(range) {
     var $list = $billing.find('.new-providers-list').empty()
 
-    latestAjax($.get('/providers/billing/'+ begin + '/' + end), $spinner).done(function(providers) {
-      $page.find('.billing-container input[name=begin]').val(begin)
-      $page.find('.billing-container input[name=end]').val(end)
+    latestAjax($.get('/providers/billing/'+ range.begin + '/' + range.end), $spinner).done(function(providers) {
+      $page.find('.billing-container input[name=begin]').val(range.begin)
+      $page.find('.billing-container input[name=end]').val(range.end)
       var $template = $('#templates').find('.invoice-provider').clone()
 
       $billingContainer.toggle(providers.length > 0)

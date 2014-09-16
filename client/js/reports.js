@@ -6,6 +6,7 @@ function reportsPage() {
   var $report = $page.find('.report')
 
   var format = 'DD.MM.YYYY'
+  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month', 'year'] } }
   var latestAjax = switchLatestDeferred()
 
   $page.on('show', function(e, reportName, begin, end) {
@@ -15,29 +16,10 @@ function reportsPage() {
     var range = (begin && end)
       ? { begin: moment(begin, format), end: moment(end, format) }
       : { begin: moment().subtract(1, 'months').startOf('month'), end: moment().subtract(1, 'months').endOf('month') }
-    var rangeAsString = stringDateRange(range)
-    $datePicker.data('dateRangePicker').setDateRange(rangeAsString.begin, rangeAsString.end)
-    if (!$datePicker.data('dateRangePicker').isInitiated()) {
-      $datePicker.data('selection', rangeAsString)
-      update()
-    }
+    setDatePickerSelection($datePicker, range, update)
   })
 
-  $datePicker.dateRangePicker({
-    language: 'fi',
-    format: format,
-    separator: ' - ',
-    startOfWeek: 'monday',
-    shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month', 'year']},
-    getValue: function() { return $datePicker.find('span').text() },
-    setValue: function(s) { $datePicker.find('span').text(s) }
-  }).bind('datepicker-change',function(event, obj) {
-    var selection = stringDateRange({ begin: moment(obj.date1), end: moment(obj.date2) })
-    if (!_.isEqual(selection, $datePicker.data('selection'))) {
-      $datePicker.data('selection', selection)
-      update()
-    }
-  })
+  setupDatePicker($datePicker, datePickerOpts, update)
 
   $reportSelection.find('div').click(function() {
     setSelectedReport($(this))
@@ -60,10 +42,6 @@ function reportsPage() {
 
   function updateLocation(reportName, stringRange) {
     setLocation('#raportit/'+reportName+'/'+stringRange.begin+'/'+stringRange.end)
-  }
-
-  function stringDateRange(range) {
-    return { begin: range.begin.format(format), end: range.end.format(format) }
   }
 
   function render(reportName, report) {

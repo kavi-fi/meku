@@ -97,10 +97,6 @@ enums.providingTypeName = function(type) {
   return enums.providingType[type] || 'Tuntematon'
 }
 
-enums.getProvidingType = function(index) {
-  return _.keys(enums.providingType)[index]
-}
-
 enums.providingTypePrices = {
   'Recordings_provide': 100,
   'Public_presentation': 200,

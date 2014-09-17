@@ -122,7 +122,8 @@ function reportsPage() {
     kaviAgelimit: classificationUtils.ageAsText,
     warnings: warningMapper,
     agelimitChanges: agelimitChangeMapper,
-    kaviAgelimitChanges: agelimitChangeMapper
+    kaviAgelimitChanges: agelimitChangeMapper,
+    kaviReclassificationReason: function(id) { return enums.reclassificationReason[id] || 'Ei tiedossa' }
   }
 
   function warningMapper(id) {

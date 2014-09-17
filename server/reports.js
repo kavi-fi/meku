@@ -143,14 +143,17 @@ function kaviAuthor(dateRange, callback) {
 }
 
 function kaviReclassificationReason(dateRange, callback) {
-  var q = query(dateRange)
   loadKaviUsers('_id', function(err, users) {
     if (err) return callback(err)
+    var q = {
+      'classifications.registrationDate': { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate() },
+      'classifications.author._id': { $in: _.pluck(users, '_id') },
+      'classifications.isReclassification': true
+    }
     schema.Program.aggregate()
       .match(q)
       .unwind('classifications')
       .match(q)
-      .match({ 'classifications.author._id': { $in: _.pluck(users, '_id')} })
       .project({ reason:'$classifications.reason' })
       .group({ _id: '$reason', value: { $sum: 1 } })
       .exec(callback)

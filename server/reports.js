@@ -197,7 +197,7 @@ function kaviDurations(dateRange, callback) {
 
           var buyer = c.buyer
             ? kaviAccounts.indexOf(String(c.buyer._id)) == -1 ? 'other' : 'kavi'
-            : 'other'
+            : 'unknown'
           addTo(result, buyer, seconds)
         })
         return result

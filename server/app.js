@@ -1058,6 +1058,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
           p.classifications[0].registrationDate = now
           p.classifications[0].billing = account
           p.classifications[0].buyer = account
+          p.classifications[0].isReclassification = false
           Program.updateClassificationSummary(p.classifications[0])
           p.populateAllNames(function (err) {
             if (err) return callback(err)

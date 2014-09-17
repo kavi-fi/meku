@@ -29,7 +29,8 @@ var classification = {
   reason: Number,
   status: String,
   agelimit: Number,
-  warnings: [String]
+  warnings: [String],
+  isReclassification: Boolean
 }
 
 var ProgramSchema = new Schema({
@@ -70,7 +71,8 @@ ProgramSchema.methods.newDraftClassification = function(user) {
     creationDate: new Date(),
     status: 'in_process',
     author: { _id: user._id, name: user.name, username: user.username },
-    warningOrder: [], criteria: [], criteriaComments: {}, registrationEmailAddresses: []
+    warningOrder: [], criteria: [], criteriaComments: {}, registrationEmailAddresses: [],
+    isReclassification: this.classifications.length > 0
   }
   if (!this.draftClassifications) this.draftClassifications = {}
   this.draftClassifications[user._id] = draft

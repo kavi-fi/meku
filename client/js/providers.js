@@ -4,6 +4,7 @@ function providerPage() {
   var $unapproved = $page.find('.unapproved .results')
   var $allProviders = $providers.add($unapproved)
   var $providerNameQuery = $page.find('#provider-name-query')
+  var $onlyK18 = $page.find('.k18-label input')
   var $yearlyBilling = $page.find('.yearly-billing')
   var $billing = $page.find('.billing')
   var $datePicker = $billing.find('.datepicker')
@@ -73,12 +74,20 @@ function providerPage() {
 
   $providerNameQuery.on('input', function() {
     var searchString = $(this).val().toLowerCase()
+    var onlyK18 = $onlyK18.is(':checked')
     $providers.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
-      name += _.map($(this).data('provider').locations, function(l) { return l.name.toLowerCase() }).join(' ')
-      $(this).toggle(_.contains(name, searchString))
+      var providerLocations = $(this).data('provider').locations
+      name += _.map(providerLocations, function(l) { return l.name.toLowerCase() }).join(' ')
+      var matchesName = _.contains(name, searchString)
+      var matchesK18 = onlyK18 ? _.any(providerLocations, 'adultContent'): true
+      $(this).toggle(matchesName && matchesK18)
     })
     closeDetails()
+  })
+
+  $onlyK18.on('change', function() {
+    $providerNameQuery.trigger('input')
   })
 
   $allProviders.on('click', '.result', function() {

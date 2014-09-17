@@ -728,6 +728,8 @@ textarea.invalid:disabled,
 #subscriber-management-page .apiToken input { width: 500px; margin-right: 20px; }
 
 #provider-page .controls button[name=new-provider] { float: right; }
+#provider-page .controls .k18-label { display: block; cursor: pointer; }
+#provider-page .controls .k18-label input { margin-right: 8px; }
 #provider-page .select2-float-right { float: right; margin-right: 34px; }
 #provider-page .emails .select2-choices { overflow: auto; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }

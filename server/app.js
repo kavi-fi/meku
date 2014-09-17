@@ -1134,7 +1134,8 @@ app.post('/files/provider-import', function(req, res, next) {
   if (req.files.providerFile.truncated) return res.send(400)
   providerImport.import(req.files.providerFile.path, function(err, provider) {
     if (err) return res.send({ error: err })
-    new schema.Provider(_.omit(provider, 'other')).save(function(err, saved) {
+    var providerData = utils.merge(provider, {message: req.body.message ? req.body.message : undefined})
+    new schema.Provider(providerData).save(function(err, saved) {
       res.send({
         message: 'Ilmoitettu tarjoaja, sekä ' + provider.locations.length + ' tarjoamispaikkaa.'
       })

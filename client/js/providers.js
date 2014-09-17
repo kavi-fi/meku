@@ -372,6 +372,8 @@ function providerPage() {
     $providerDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, provider))
     $providerDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
 
+    var message = provider && provider.message ? provider.message.split('\n').map(_.escape) : []
+
     $providerDetails
       .find('input[name="address.country"]').select2({ data: select2DataFromEnumObject(enums.countries) }).end()
       .find('input[name=emailAddresses]').select2({ tags: [], multiple: true, tokenSeparators: [' '] }).end()
@@ -379,6 +381,8 @@ function providerPage() {
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
+      .find('.message').toggle(!_.isEmpty(message)).end()
+      .find('.message .text').html('<p>' + message.join('</p><p>') + '</p>').end()
       .find('.locations').replaceWith(renderProviderLocations($providerDetails, provider))
 
 

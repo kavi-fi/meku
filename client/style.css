@@ -758,9 +758,12 @@ textarea.invalid:disabled,
 #provider-page .yearly-billing-proe-form { display: inline-block; }
 
 #provider-page .statistics h3 { cursor: pointer; }
-#provider-page .statistics-content { display: none; font-size: 14px; margin-bottom: 20px; }
-#provider-page .statistics-content div { margin-bottom: 8px; }
-#provider-page .statistics-content .providingTypes { margin-left: 15px; margin-top: 6px; }
+#provider-statistics-content { display: none; font-size: 14px; margin-bottom: 20px; }
+#provider-statistics-content .first { font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+#provider-statistics-content .last { border-top: 1px solid #ddd; }
+#provider-statistics-content thead td { color: #00BB88; }
+#provider-statistics-content td { padding: 5px 10px; text-align: right; min-width: 120px; }
+#provider-statistics-content td:nth-child(2) { border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
 
 #provider-page .provider-details .save button { float: none; }
 #provider-page .buttons { height: 40px; margin-bottom: 20px; }

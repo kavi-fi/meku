@@ -24,7 +24,7 @@ function providerPage() {
     updateLocationHash(providerId || '')
     $.get('/providers', function(providers) {
       renderProviders(providers)
-      renderStatistics(providers)
+      updateStatistics()
 
       // Apply provider search
       $providerNameQuery.trigger('input')
@@ -200,6 +200,7 @@ function providerPage() {
 
   function openDetails($row) {
     $.get('/providers/' + $row.data('id'), function(provider) {
+      $row.data('provider', provider)
       var $providerDetails = renderProviderDetails(provider)
 
       if (hasRole('root')) $providerDetails.append(changeLog(provider).render())
@@ -212,6 +213,7 @@ function providerPage() {
             $providerDetails.find('.touched').removeClass('touched')
             $providerDetails.find('form').trigger('validate')
             $providerDetails.find('.buttons .save-success:first').fadeIn(500).delay(5000).fadeOut()
+            updateStatistics()
         })
       })
 
@@ -253,7 +255,10 @@ function providerPage() {
         $.ajax('/providers/' + provider._id, { type: 'DELETE' }).done(function() {
           closeDialog()
           closeDetails()
-          $selected.slideUp(function() { $(this).remove() })
+          $selected.slideUp(function() {
+            $(this).remove()
+            updateStatistics()
+          })
         })
       }
     })
@@ -263,6 +268,7 @@ function providerPage() {
     var $selected = $allProviders.find('.selected')
     var provider = $selected.data('provider')
     $.ajax('/providers/' + provider._id + '/active', { type: 'PUT' }).done(function(activation) {
+      provider.active = activation.active
       if (activation.wasFirstActivation) {
         var $dialog = $("#templates").find('.provider-registration-success-dialog').clone()
         $dialog.find('.name').text(provider.name)
@@ -283,6 +289,7 @@ function providerPage() {
         showDialog($dialog)
       } else {
         $selected.toggleClass('inactive', !activation.active)
+        updateStatistics()
       }
     })
   }
@@ -310,30 +317,37 @@ function providerPage() {
     })
   }
 
-  function renderStatistics(providers) {
-    var $root = $page.find('.statistics-content')
+  function updateStatistics() {
+    var providers = $providers.find('> .result').map(function() { return $(this).data('provider') }).toArray()
     var registeredProviders = _.filter(providers, function(p) { return !!p.active })
     var registeredLocationCount = _.reduce(registeredProviders, function(acc, p) { return acc + _.filter(p.locations, function(l) { return !!l.active }).length }, 0)
-    $root.find('.providerCount').text(registeredProviders.length)
-    $root.find('.providerLocationCount').text(registeredLocationCount)
+    var $rows = [$row('Rekisterissä', registeredProviders.length, registeredLocationCount).addClass('first')]
 
-    var k18Count = _.filter(registeredProviders, hasAdultContentLocation).length
-    $root.find('.k18ProviderCount').text(k18Count)
-
-    var $types = Object.keys(enums.providingType).map(function(type) {
-      var count = _.filter(registeredProviders, hasLocationWithProvidingType(type)).length
-      return $('<div>').text(enums.providingType[type] + ': ' + count)
+    Object.keys(enums.providingType).forEach(function(type) {
+      var matchingLocationCounts = _(registeredProviders).map(countLocationsWithProvidingType(type)).compact().value()
+      $rows.push($row(enums.providingType[type], matchingLocationCounts.length, matchingLocationCounts.reduce(sum)))
     })
-    $root.find('.providingTypes').html($types)
 
-    function hasAdultContentLocation(provider) {
-      return _.any(provider.locations, function(l) { return !!l.active && !!l.adultContent })
+    var k18Counts = _(registeredProviders).map(countAdultContentLocations).compact().value()
+    $rows.push($row('Tarjolla K-18 ohjelmia', k18Counts.length, k18Counts.reduce(sum)).addClass('last'))
+
+    $page.find('.statistics-rows').html($rows)
+
+    function countAdultContentLocations(provider) {
+      return _.filter(provider.locations, function(l) { return !!l.active && !!l.adultContent }).length
     }
-    function hasLocationWithProvidingType(type) {
+    function countLocationsWithProvidingType(type) {
       return function(provider) {
-        return _.any(provider.locations, function(l) { return !!l.active && _.contains(l.providingType, type) })
+        return _.filter(provider.locations, function(l) { return !!l.active && _.contains(l.providingType, type) }).length
       }
     }
+    function $row(a,b,c) {
+      return $('<tr>')
+        .append($('<td>').text(a))
+        .append($('<td>').text(b))
+        .append($('<td>').text(c))
+    }
+    function sum(a, b) { return a + b }
   }
 
   function renderProviders(providers) {
@@ -476,6 +490,7 @@ function providerPage() {
           $providers.find('[data-id='+provider._id+']').data('provider', provider)
           $locations.find('.location-details').slideUp(function() {
             $locations.prepend(renderLocation(l))
+            updateStatistics()
           })
         })
       })
@@ -509,6 +524,7 @@ function providerPage() {
 
               var $selected = $locations.find('.location-row.selected')
               $selected.replaceWith(renderLocation(_.find(p.locations, { _id: location._id })).addClass('selected'))
+              updateStatistics()
             })
         })
 
@@ -531,7 +547,10 @@ function providerPage() {
           closeDialog()
           closeLocationDetails()
           $providers.find('[data-id='+provider._id+']').data('provider', p)
-          $selected.slideUp(function() { $(this).remove() })
+          $selected.slideUp(function() {
+            $(this).remove()
+            updateStatistics()
+          })
         })
       }
     })
@@ -572,10 +591,12 @@ function providerPage() {
           $dialog.find('.ok').on('click', function() {
             closeDialog()
             $selected.replaceWith(renderLocation(location).addClass('selected'))
+            updateStatistics()
           })
           showDialog($dialog)
         } else {
           $selected.toggleClass('inactive', !activation.active)
+          updateStatistics()
         }
       })
     }

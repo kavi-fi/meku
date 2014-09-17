@@ -121,14 +121,17 @@ function reportsPage() {
 
   var idMappers = {
     programType: function(id) { return enums.programType[id].fi },
-    agelimit: classificationUtils.ageAsText,
-    kaviAgelimit: classificationUtils.ageAsText,
+    agelimit: agelimitMapper,
+    kaviAgelimit: agelimitMapper,
     warnings: warningMapper,
     agelimitChanges: agelimitChangeMapper,
     kaviAgelimitChanges: agelimitChangeMapper,
     kaviReclassificationReason: function(id) { return enums.reclassificationReason[id] || 'Ei tiedossa' }
   }
 
+  function agelimitMapper(id) {
+    return id == null ? 'Ei tiedossa' : classificationUtils.ageAsText(id)
+  }
   function warningMapper(id) {
     if (id == '-') return 'Ei varoituksia'
     return enums.warnings[id]

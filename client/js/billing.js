@@ -4,10 +4,9 @@ function billingPage() {
   var $proeButton = $page.find('button')
   var $accounts = $page.find('.accounts')
   var detailRenderer = programBox()
+  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']} }
   var format = 'DD.MM.YYYY'
-
   var $spinner = spinner().appendTo($page.find('.date-selection'))
-
   var latestAjax = switchLatestDeferred()
 
   $page.on('click', 'input[name=invoiceId]', function() {
@@ -40,26 +39,13 @@ function billingPage() {
     setTimeout(function() { $proeButton.prop('disabled', false) }, 4000)
   })
 
-  $datePicker.dateRangePicker({
-    language: 'fi',
-    format: format,
-    separator: ' - ',
-    startOfWeek: 'monday',
-    shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']},
-    getValue: function() { return $datePicker.find('span').text() },
-    setValue: function(s) { $datePicker.find('span').text(s) }
-  }).bind('datepicker-change',function(event, obj) {
-    $proeButton.prop('disabled', false)
-    fetchInvoiceRows(obj.date1, obj.date2)
-  })
+  setupDatePicker($datePicker, datePickerOpts, fetchInvoiceRows)
 
-  function fetchInvoiceRows(date1, date2) {
-    var begin = moment(date1).format(format)
-    var end = moment(date2).format(format)
-    setLocation('#laskutus/'+begin+'/'+end)
-    latestAjax($.get('/invoicerows/' + begin + '/' + end), $spinner).done(function(rows) {
-      $page.find('input[name=begin]').val(begin)
-      $page.find('input[name=end]').val(end)
+  function fetchInvoiceRows(range) {
+    setLocation('#laskutus/'+range.begin+'/'+range.end)
+    latestAjax($.get('/invoicerows/' + range.begin + '/' + range.end), $spinner).done(function(rows) {
+      $page.find('input[name=begin]').val(range.begin)
+      $page.find('input[name=end]').val(range.end)
       var $accounts = $page.find('.accounts').empty()
 
       _(rows).groupBy(function(x) { return x.account.name }).pairs().sortBy(function(t) { return t[0] }).forEach(function(account) {
@@ -111,15 +97,10 @@ function billingPage() {
   }
 
   $page.on('show', function(e, begin, end) {
-    if (begin && end) {
-      begin = moment(begin, format)
-      end = moment(end, format)
-    } else {
-      begin = moment().subtract(1, 'months').startOf('month')
-      end = moment().subtract(1, 'months').endOf('month')
-    }
-    $datePicker.data('dateRangePicker').setDateRange(begin.format(format), end.format(format))
-    if (!$datePicker.data('dateRangePicker').isInitiated()) fetchInvoiceRows(begin, end)
     $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
+    var range = (begin && end)
+      ? { begin: moment(begin, format), end: moment(end, format) }
+      : { begin: moment().subtract(1, 'months').startOf('month'), end: moment().subtract(1, 'months').endOf('month') }
+    setDatePickerSelection($datePicker, range, fetchInvoiceRows)
   })
 }

@@ -375,23 +375,16 @@ function searchPage() {
       $input.trigger('fire')
     })
 
-    $registrationDatePicker.dateRangePicker({
-      language: 'fi',
-      format: dateFormat,
-      separator: ' - ',
-      startOfWeek: 'monday',
+    var datePickerOpts = {
       shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['week', 'month']},
       getValue: function() { return $registrationDatePicker.find('span').text() },
       setValue: function(s) {
         $clearRegistrationDatePicker.toggle(!!s)
         $registrationDatePicker.find('span').text(s)
       }
-    }).bind('datepicker-change',function(event, obj) {
-      var selection = { begin: moment(obj.date1).format(dateFormat), end: moment(obj.date2).format(dateFormat) }
-      if (!_.isEqual(selection, $registrationDatePicker.data('selection'))) {
-        $registrationDatePicker.data('selection', selection)
-        $input.trigger('fire')
-      }
+    }
+    setupDatePicker($registrationDatePicker, datePickerOpts, function() {
+      $input.trigger('fire')
     })
 
     $clearRegistrationDatePicker.click(function(e) {

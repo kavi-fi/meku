@@ -126,7 +126,7 @@ function programBox() {
 
     function classificationLinks() {
       return p.classifications.map(function(c, index) {
-        var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
+        var registrationDate = utils.asDate(c.registrationDate) || 'Tuntematon rekisteröintiaika'
         return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
       })
     }

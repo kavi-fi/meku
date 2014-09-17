@@ -152,8 +152,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
     var rows = values([], rowNumber + 2)
     
     var errorMessages = _.reduce(rows, function(acc, val) {
-      var index = acc[0]
-      var errors = acc[1]
+      var index = acc[0], errors = acc[1]
       var fieldErrors = validate(val, requiredFields, index, fieldMap)
       return [index + 1, errors.concat(fieldErrors).concat(validateProvidingType(val, index))]
     }, [rowNumber + 2, []])[1]

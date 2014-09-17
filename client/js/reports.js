@@ -91,6 +91,7 @@ function reportsPage() {
         .find('.programType').text(enums.programType[row.programType].fi).end()
         .find('.date').text(moment(row.date).format(format)).end()
         .find('.duration').text(row.duration).end()
+        .find('.type').text(row.isReclassification ? 'Uudelleenluokittelu' : 'Luokittelu').end()
         .find('.comments').text(row.comments).end()
     }
   }

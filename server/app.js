@@ -889,7 +889,9 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
       logCreateOperation(req.user, user)
       var subject = 'Käyttäjätunnuksen aktivointi'
       var text = '<p>Hei,<br/>' +
-        'Olet saanut käyttäjätunnuksen Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
+        'Sinulle on luotu käyttäjätunnus ' +
+        '<span style="font-weight: bold;">' + _.escape(req.body.username) + '</span> ' +
+        'Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
         '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
         'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
         'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +

@@ -152,7 +152,8 @@ textarea { resize: vertical; }
   color: #fff;
 }
 #header .user-info { color: #66665d; font-size: 14px; float: right; margin: 18px 20px 0 0; line-height: 30px; }
-#header .user-info .name { color: #fff; font-weight: bold; padding-right: 8px; }
+#header .user-info .name { color: #fff; font-weight: bold; }
+#header .user-info .username { color: #fff; padding-right: 8px; }
 #header .user-info a { color: #00BB88; padding-left: 8px; }
 
 .row { border-bottom: 1px solid #D3D3D3; width: 100%; float: left; margin: 0; padding: 70px 0 80px 0; }

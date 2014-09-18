@@ -44,11 +44,11 @@ p.help { font-size: 15px; margin: 3px 0; }
   padding: 10px 50px;
 }
 
-#register-provider { width: 600px; margin: 0 auto; }
-#register-provider h2 { text-align: center; }
-#register-provider .feedback { padding: 10px; }
-#register-provider textarea { width: 400px; height: 60px; }
-#register-provider a { color: #00BB88; }
+#register-provider-page #header .content { width: 600px; margin: 0 auto; }
+#register-provider-page form { width: 600px; margin: 0 auto; }
+#register-provider-page .feedback { padding: 10px; }
+#register-provider-page textarea { width: 550px; height: 60px; }
+#register-provider-page a { color: #00BB88; }
 
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;

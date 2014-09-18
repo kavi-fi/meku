@@ -1137,7 +1137,7 @@ app.post('/files/provider-import', function(req, res, next) {
     var providerData = utils.merge(provider, {message: req.body.message ? req.body.message : undefined})
     new schema.Provider(providerData).save(function(err, saved) {
       res.send({
-        message: 'Ilmoitettu tarjoaja, sekä ' + provider.locations.length + ' tarjoamispaikkaa.'
+        message: 'Ilmoitettu tarjoaja sekä ' + provider.locations.length + ' tarjoamispaikkaa.'
       })
     })
   })

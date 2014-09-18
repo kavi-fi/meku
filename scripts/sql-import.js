@@ -188,9 +188,13 @@ function classifications(callback) {
         classification.registrationDate = readAsUTCDate(row.reg_date)
         classification.assigned_user_id = row.assigned_user_id
         classification.status = row.status
-        if (!result.programs[row.programId]) result.programs[row.programId] = []
-        result.programs[row.programId].push(classification)
-        result.classifications[row.classificationId] = classification
+        // Skip duplicates in meku_audiovassification_c mapping-table
+        // eg: p.id: c6865987-9b9a-4b02-b82b-89d2d503b306, c.id: 5fcb057b-71d2-2eaa-fa40-4f211a5b3a59
+        if (!result.classifications[row.classificationId]) {
+          if (!result.programs[row.programId]) result.programs[row.programId] = []
+          result.programs[row.programId].push(classification)
+          result.classifications[row.classificationId] = classification
+        }
         done()
       }, function(err) {
         callback(err, result)
@@ -288,6 +292,9 @@ function classifications(callback) {
     Object.keys(result.programs).forEach(function(key) {
       var arr = result.programs[key]
       if (arr.length > 1) result.programs[key] = _.sortBy(arr, 'registrationDate').reverse()
+      result.programs[key].forEach(function(c, index) {
+        c.isReclassification = index < (result.programs[key].length - 1)
+      })
     })
     callback(null, result)
   }

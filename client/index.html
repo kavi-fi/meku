@@ -195,11 +195,14 @@
 
     <div class="statistics">
       <h3><i class="rotating fa fa-play"></i>Tilastot</h3>
-      <div class="statistics-content">
-        <div>Tarjoajia: <span class="providerCount"></span></div>
-        <div>Tarjoamispaikkoja: <span class="providerLocationCount"></span></div>
-        <div>K-18 ohjelmien tarjoajia: <span class="k18ProviderCount"></span></div>
-        <div>Tarjoamistapojen jakautuminen: <div class="providingTypes"></div></div>
+      <div id="provider-statistics-content">
+        <table>
+          <thead>
+            <tr><td> </td><td>Tarjoajia</td><td>Tarjoamispaikkoja</td></tr>
+          </thead>
+          <tbody class="statistics-rows">
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -208,6 +211,7 @@
       <div class="search">
         <label for="provider-name-query" class="search-label">Nimi</label>
         <input class="query" type="search" id="provider-name-query" placeholder="Hae nimellä...">
+        <label class="k18-label"><input type="checkbox" />Vain K-18 ohjelmien tarjoajat</label>
       </div>
     </div>
     <div class="providers-list results"></div>
@@ -217,7 +221,7 @@
     <table class="input">
       <tr>
         <td>Päivämääräväli</td>
-        <td><span class="datepicker"><span></span><i class="fa fa-calendar"></i></span></td>
+        <td class="date-selection"><span class="datepicker"><span></span><i class="fa fa-calendar"></i></span></td>
       </tr>
       <tr>
         <td class="label">Kaikki luokittelut</td>

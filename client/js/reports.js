@@ -61,9 +61,11 @@ function reportsPage() {
     fillRow($table.find('tr.reclassifications'), report.reclassifications)
     fillRow($table.find('tr.kavi'), report.kavi)
     fillRow($table.find('tr.other'), report.other)
+    fillRow($table.find('tr.unknown'), report.unknown)
     $report.html($table)
 
     function fillRow($row, data) {
+      if (!data) data = { count: 0, duration: 0 }
       $row
         .find('.count').text(data.count).end()
         .find('.duration').text(classificationUtils.secondsToDuration(data.duration)).end()
@@ -91,6 +93,7 @@ function reportsPage() {
         .find('.programType').text(enums.programType[row.programType].fi).end()
         .find('.date').text(moment(row.date).format(format)).end()
         .find('.duration').text(row.duration).end()
+        .find('.type').text(row.isReclassification ? 'Uudelleenluokittelu' : 'Luokittelu').end()
         .find('.comments').text(row.comments).end()
     }
   }
@@ -118,13 +121,17 @@ function reportsPage() {
 
   var idMappers = {
     programType: function(id) { return enums.programType[id].fi },
-    agelimit: classificationUtils.ageAsText,
-    kaviAgelimit: classificationUtils.ageAsText,
+    agelimit: agelimitMapper,
+    kaviAgelimit: agelimitMapper,
     warnings: warningMapper,
     agelimitChanges: agelimitChangeMapper,
-    kaviAgelimitChanges: agelimitChangeMapper
+    kaviAgelimitChanges: agelimitChangeMapper,
+    kaviReclassificationReason: function(id) { return enums.reclassificationReason[id] || 'Ei tiedossa' }
   }
 
+  function agelimitMapper(id) {
+    return id == null ? 'Ei tiedossa' : classificationUtils.ageAsText(id)
+  }
   function warningMapper(id) {
     if (id == '-') return 'Ei varoituksia'
     return enums.warnings[id]

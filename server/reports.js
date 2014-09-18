@@ -95,7 +95,7 @@ function agelimitChanges(dateRange, callback) {
 
 function kaviAgelimit(dateRange, callback) {
   var q = query(dateRange)
-  schema.User.find({ role: { $in:['kavi','admin'] } }, '_id').lean().exec(function(err, users) {
+  loadKaviUsers('_id', function(err, users) {
     if (err) return callback(err)
     schema.Program.aggregate()
       .match(q)
@@ -109,7 +109,7 @@ function kaviAgelimit(dateRange, callback) {
 }
 
 function kaviAgelimitChanges(dateRange, callback) {
-  schema.User.find({ role: { $in:['kavi','admin'] } }, '_id').lean().exec(function(err, users) {
+  loadKaviUsers('_id', function(err, users) {
     if (err) return callback(err)
     var fields = { _id: 0, 'classifications.registrationDate': 1, 'classifications.agelimit': 1 }
     var q = {
@@ -128,7 +128,7 @@ function kaviAgelimitChanges(dateRange, callback) {
 
 function kaviAuthor(dateRange, callback) {
   var q = query(dateRange)
-  schema.User.find({ role: { $in:['kavi','admin'] } }, 'username').lean().exec(function(err, users) {
+  loadKaviUsers('username', function(err, users) {
     if (err) return callback(err)
     schema.Program.aggregate()
       .match(q)
@@ -143,14 +143,17 @@ function kaviAuthor(dateRange, callback) {
 }
 
 function kaviReclassificationReason(dateRange, callback) {
-  var q = query(dateRange)
-  schema.User.find({ role: { $in:['kavi','admin'] } }, '_id').lean().exec(function(err, users) {
+  loadKaviUsers('_id', function(err, users) {
     if (err) return callback(err)
+    var q = {
+      'classifications.registrationDate': { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate() },
+      'classifications.author._id': { $in: _.pluck(users, '_id') },
+      'classifications.isReclassification': true
+    }
     schema.Program.aggregate()
       .match(q)
       .unwind('classifications')
       .match(q)
-      .match({ 'classifications.author._id': { $in: _.pluck(users, '_id')} })
       .project({ reason:'$classifications.reason' })
       .group({ _id: '$reason', value: { $sum: 1 } })
       .exec(callback)
@@ -162,7 +165,7 @@ function kaviDurations(dateRange, callback) {
     if (err) return callback(err)
     var kaviAccounts = _.pluck(accounts, '_id').map(function(objectId) { return String(objectId) })
 
-    schema.User.find({ role: { $in:['kavi','admin'] } }, '_id').lean().exec(function(err, users) {
+    loadKaviUsers('_id', function(err, users) {
       if (err) return callback(err)
 
       var kaviAuthorIds = _.pluck(users, '_id').map(function(objectId) { return String(objectId) })
@@ -194,7 +197,7 @@ function kaviDurations(dateRange, callback) {
 
           var buyer = c.buyer
             ? kaviAccounts.indexOf(String(c.buyer._id)) == -1 ? 'other' : 'kavi'
-            : 'other'
+            : 'unknown'
           addTo(result, buyer, seconds)
         })
         return result
@@ -210,7 +213,7 @@ function kaviDurations(dateRange, callback) {
 }
 
 function kaviClassificationList(dateRange, callback) {
-  schema.User.find({ role: { $in:['kavi','admin'] } }, 'username').lean().exec(function(err, users) {
+  loadKaviUsers('username', function(err, users) {
     if (err) return callback(err)
     var q = {
       'classifications.author._id' : { $in: _.pluck(users, '_id') },
@@ -220,10 +223,17 @@ function kaviClassificationList(dateRange, callback) {
       .match(q)
       .unwind('classifications')
       .match(q)
-      .project({ name:1, sequenceId:1, programType:1, duration: '$classifications.duration', date: '$classifications.registrationDate', comments: '$classifications.comments' })
+      .project({
+        name:1, sequenceId:1, programType:1,
+        duration: '$classifications.duration', date: '$classifications.registrationDate',
+        isReclassification: '$classifications.isReclassification', comments: '$classifications.comments' })
       .sort('date')
       .exec(callback)
   })
+}
+
+function loadKaviUsers(returnFields, callback) {
+  schema.User.find({ role: { $in:['kavi','root'] } }, returnFields).lean().exec(callback)
 }
 
 function query(range) {

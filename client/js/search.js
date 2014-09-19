@@ -476,11 +476,20 @@ function searchPage() {
   function programDataUpdated(program) {
     var $row = $page.find('.result[data-id=' + program._id + ']')
     if (_.isEmpty($row)) return
-    var $newRow = render(program, state.q)
-    $row.next('.program-box').remove()
-    $row.replaceWith($newRow)
-    if ($row.is('.selected')) {
-      openDetail($newRow, false)
+    var episodesAreOpen = $row.next('.program-box').find('.episode-container > h3').hasClass('open')
+    if (episodesAreOpen) {
+      $.get('/episodes/'+ program._id).done(updateUI)
+    } else {
+      updateUI()
+    }
+
+    function updateUI(episodes) {
+      var $newRow = render(program, state.q)
+      $row.next('.program-box').remove()
+      $row.replaceWith($newRow)
+      if ($row.is('.selected')) {
+        openDetail($newRow, false, episodes)
+      }
     }
   }
 
@@ -490,10 +499,10 @@ function searchPage() {
     $row.next('.program-box').add($row).slideUp(function() { $(this).remove() })
   }
 
-  function openDetail($row, animate) {
+  function openDetail($row, animate, preloadedEpisodes) {
     var p = $row.data('program')
     updateLocationHash(p._id)
-    var $details = detailRenderer.render(p)
+    var $details = detailRenderer.render(p, preloadedEpisodes)
     $row.addClass('selected').after($details)
     animate ? $details.slideDown() : $details.show()
     $details.trigger('showDetails', p)

@@ -30,11 +30,11 @@ express.static.mime.define({ 'text/xml': ['xsd'] })
 
 var app = express()
 
+app.use(nocache)
 app.use(forceSSL)
 app.use(express.compress())
 app.use(express.json())
 app.use(setupUrlEncodedBodyParser())
-app.use(nocache)
 app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
 app.use(setupCsrfMiddleware())
 app.use(setCsrfTokenCookie)

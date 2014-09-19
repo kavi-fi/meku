@@ -291,7 +291,11 @@ function classifications(callback) {
     })
     Object.keys(result.programs).forEach(function(key) {
       var arr = result.programs[key]
-      if (arr.length > 1) result.programs[key] = _.sortBy(arr, 'registrationDate').reverse()
+      if (arr.length > 1) {
+        var noRegistrationDate = _.filter(arr, function(x) { return !x.registrationDate })
+        var withRegistrationDate = _(arr).filter('registrationDate').sortBy('registrationDate').value()
+        result.programs[key] = noRegistrationDate.concat(withRegistrationDate).reverse()
+      }
       result.programs[key].forEach(function(c, index) {
         c.isReclassification = index < (result.programs[key].length - 1)
       })

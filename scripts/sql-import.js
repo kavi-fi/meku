@@ -171,7 +171,7 @@ function classifications(callback) {
         ' from meku_audiovisualprograms p' +
         ' join meku_audiovassification_c j on (p.id = j.meku_audio31d8rograms_ida)' +
         ' join meku_classification c on (c.id = j.meku_audioc249ication_idb)' +
-        ' where (p.program_type != "11" or p.program_type is null) and p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "disapproved" and c.status != "in_pocess" and c.status != "in_process"')
+        ' where (p.program_type != "11" or p.program_type is null) and p.deleted != "1" and j.deleted != "1" and c.deleted != "1" and c.status != "in_pocess" and c.status != "in_process"')
       .stream()
       .pipe(consumer(function(row, done) {
         tick()
@@ -187,7 +187,7 @@ function classifications(callback) {
         classification.creationDate = readAsUTCDate(row.date_entered)
         classification.registrationDate = readAsUTCDate(row.reg_date)
         classification.assigned_user_id = row.assigned_user_id
-        classification.status = row.status
+        classification.status = row.status === 'disapproved' ? 'registered' : row.status
         // Skip duplicates in meku_audiovassification_c mapping-table
         // eg: p.id: c6865987-9b9a-4b02-b82b-89d2d503b306, c.id: 5fcb057b-71d2-2eaa-fa40-4f211a5b3a59
         if (!result.classifications[row.classificationId]) {

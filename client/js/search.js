@@ -203,6 +203,11 @@ function internalSearchPage() {
     var $series = $tvEpisodeForm.find('input[name=series]')
     var $newSeriesForm = $categorizationForm.find('.categorization-form-tv-new-series')
 
+    $categorySelection.select2(programTypesSelect2).select2('val', 1)
+    $categorySelection.change(function() {
+      $tvEpisodeForm.toggleClass('hide', !isTvEpisode()).find('input').trigger('validate')
+    })
+
     select2Autocomplete({
       $el: $series,
       path: function(term) { return '/series/search?q=' + encodeURIComponent(term) },
@@ -210,35 +215,6 @@ function internalSearchPage() {
       fromOption: select2OptionToIdNamePair,
       allowAdding: true,
       termMinLength: 0
-    })
-
-    $categorySelection.select2(programTypesSelect2).select2('val', 1)
-
-    var isTvEpisode = function() {
-      return enums.util.isTvEpisode({ programType: $categorySelection.select2('val') })
-    }
-
-    $categorizationForm.on('select2-blur', function(e) { $(e.target).addClass('touched') })
-
-    $categorizationForm.show()
-    validateTextChange($categorizationForm.find('input.required'), isNotEmpty)
-
-    $categorizationForm.on('validation input', function(e) {
-      var required = $categorizationForm.find('.required.invalid, input:invalid')
-        .not('.select2-container')
-        .filter(function() {
-          var $this = $(this)
-          // Filter hidden elements, but select the hidden offscreen input if its select2 container is visible
-          if ($this.is('.select2-offscreen')) {
-            return $($this.select2('container')).is(':visible')
-          }
-          return $this.is(':visible')
-        })
-      $categorySaveButton.prop('disabled', required.length > 0)
-    })
-
-    $categorySelection.change(function() {
-      $tvEpisodeForm.toggleClass('hide', !isTvEpisode()).find('input').trigger('validate')
     })
 
     $series.change(function() {
@@ -259,6 +235,26 @@ function internalSearchPage() {
       var val = $(this).val()
       $series.select2('data', { id: val, text: val, isNew: true })
     })
+
+    $categorizationForm.on('select2-blur', function(e) { $(e.target).addClass('touched') })
+
+    validateTextChange($categorizationForm.find('input.required'), isNotEmpty)
+
+    $categorizationForm.on('validation input', function(e) {
+      var required = $categorizationForm.find('.required.invalid, input:invalid')
+        .not('.select2-container')
+        .filter(function() {
+          var $this = $(this)
+          // Filter hidden elements, but select the hidden offscreen input if its select2 container is visible
+          if ($this.is('.select2-offscreen')) {
+            return $($this.select2('container')).is(':visible')
+          }
+          return $this.is(':visible')
+        })
+      $categorySaveButton.prop('disabled', required.length > 0)
+    })
+
+    $categorizationForm.show()
 
     $categorySaveButton.click(function() {
       $categorySaveButton.prop('disabled', true)
@@ -282,6 +278,11 @@ function internalSearchPage() {
         searchPageApi.programDataUpdated(program)
       })
     })
+
+    function isTvEpisode() {
+      return enums.util.isTvEpisode({ programType: $categorySelection.select2('val') })
+    }
+
   }
 }
 

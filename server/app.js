@@ -440,11 +440,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
             updateMetadataIndexes(program, function() {
               updateTvSeriesClassification(program, function(err) {
                 if (err) return next(err)
-                if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
-                  Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
-                } else {
-                  res.send(program)
-                }
+                updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, respond(res, next, program))
               })
             })
           })
@@ -1382,6 +1378,14 @@ function respond(res, next, overrideData) {
   return function(err, data) {
     if (err) return next(err)
     res.send(overrideData || data)
+  }
+}
+
+function updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, previousSeries, callback) {
+  if (previousSeries && previousSeries._id && String(previousSeries._id) != String(program.series._id)) {
+    Program.updateTvSeriesClassification(previousSeries._id, callback)
+  } else {
+    callback()
   }
 }
 

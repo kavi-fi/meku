@@ -403,9 +403,13 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
 app.post('/programs/:id/categorization', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
+    var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
     watcher.applyUpdates(updates)
+    if (!enums.util.isTvEpisode(program)) {
+      program.series = program.episode = program.season = undefined
+    }
     verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
@@ -414,7 +418,7 @@ app.post('/programs/:id/categorization', function(req, res, next) {
           if (err) return next(err)
           updateTvSeriesClassification(program, function(err) {
             if (err) return next(err)
-            res.send(program)
+            updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, respond(res, next, program))
           })
         })
       })

@@ -93,6 +93,11 @@ function internalSearchPage() {
     showCategorizationForm($(this).closest('.program-box'))
   })
 
+  $results.on('click', 'button.recategorize', function() {
+    $(this).prop('disabled', true)
+    showCategorizationForm($(this).closest('.program-box'))
+  })
+
   $results.on('click', 'button.edit', function() {
     $(this).prop('disabled', true)
     var $programBox = $(this).closest('.program-box')
@@ -159,24 +164,26 @@ function internalSearchPage() {
     if (enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').show()
+      $detail.find('button.recategorize').hide()
     } else if (enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').hide()
     } else if (p.draftClassifications && p.draftClassifications[user._id]) {
       $detail.find('button.continue-classification').show()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').hide()
     } else if (p.classifications.length == 0) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(hasRole('kavi'))
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').toggle(hasRole('kavi'))
     } else {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(classificationUtils.canReclassify(p, user))
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').toggle(hasRole('kavi'))
     }
+    $detail.find('button.categorize').toggle(enums.util.isUnknown(p))
+
     $detail.find('button.edit').toggle(hasRole('root'))
     $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))
   }
@@ -192,7 +199,7 @@ function internalSearchPage() {
   }
 
   function showCategorizationForm($programBox) {
-    var id = $programBox.data('id')
+    var program = $programBox.prev('.result').data('program')
     var $categorizationForm = $programBox.find('.categorization-form')
     var $categorySelection = $categorizationForm.find('input[name=category-select]')
     var $categorySaveButton = $categorizationForm.find('.save-category')
@@ -256,6 +263,13 @@ function internalSearchPage() {
 
     $categorizationForm.show()
 
+    if (enums.util.isDefinedProgramType(program.programType)) {
+      $categorySelection.select2('val', program.programType).trigger('change')
+      $series.select2('data', idNamePairToSelect2Option(program.series)).trigger('validate')
+      $season.val(program.season).trigger('validate')
+      $episode.val(program.episode).trigger('validate')
+    }
+
     $categorySaveButton.click(function() {
       $categorySaveButton.prop('disabled', true)
       var categoryData = { programType: $categorySelection.select2('val') }
@@ -274,7 +288,12 @@ function internalSearchPage() {
           }
         }
       }
-      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
+      $.post('/programs/' + program._id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
+        var $row = $programBox.prev('.result')
+        if (!_.isEmpty($categorizationForm.parents('.episodes'))) {
+          var $parentRow = $row.closest('.program-box').prev('.result')
+          $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
+        }
         searchPageApi.programDataUpdated(program)
       })
     })

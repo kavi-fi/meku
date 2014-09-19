@@ -1322,13 +1322,15 @@ function logErrorOrSendEmail(user) {
 
 function sendEmail(opts, user, callback) {
   var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
-  if (process.env.NODE_ENV === 'training') {
+  if (process.env.EMAIL_TO != undefined) {
+    email.to = process.env.EMAIL_TO
+  } else if (process.env.NODE_ENV === 'training') {
     email.to = user.email || user.emails[0]
   } else {
     opts.recipients.forEach(function(to) { email.addTo(to) })
   }
 
-  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'training') {
+  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'training' || process.env.EMAIL_TO != undefined) {
     sendgrid.send(email, callback)
   } else {
     console.log('email (suppressed) to: ', opts.recipients, email)

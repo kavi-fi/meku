@@ -314,7 +314,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    program.populateSentRegistrationEmailAddresses(newClassification, req.user, function(err, program) {
+    program.populateSentRegistrationEmailAddresses([req.user.email], function(err, program) {
       if (err) return next(err)
       verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)

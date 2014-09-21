@@ -81,25 +81,31 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   return draft
 }
 
-ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(classification, user, callback) {
+ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(additionalEmailAddresses, callback) {
   var program = this
-  if (classification.buyer) {
-    Account.findById(classification.buyer._id, 'emailAddresses', function(err, buyer) {
-      if (err) return callback(err)
-      populate(buyer.emailAddresses, callback)
-    })
-  } else {
-    populate([], callback)
-  }
-
-  function populate(buyerEmails, callback) {
-    var manual = classification.registrationEmailAddresses
-    var newEmails = _.uniq(program.sentRegistrationEmailAddresses
-      .concat(manual)
-      .concat(buyerEmails)
-      .concat([user.email]))
-    program.sentRegistrationEmailAddresses = newEmails
+  async.parallel([loadAuthorEmails, loadBuyerEmails], function(err, emails) {
+    if (err) return callback(err)
+    var manual = _.pluck(program.classifications, 'registrationEmailAddresses')
+    var all = emails.concat(manual).concat(additionalEmailAddresses)
+    program.sentRegistrationEmailAddresses = _(all).flatten().compact().uniq().value()
     callback(null, program)
+  })
+
+  function loadAuthorEmails(callback) {
+    load(User, uniqIds('author'), 'emails', function(u) { return u.emails ? u.emails[0] : undefined }, callback)
+  }
+  function loadBuyerEmails(callback) {
+    load(Account, uniqIds('buyer'), 'emailAddresses', 'emailAddresses', callback)
+  }
+  function load(schema, ids, field, plucker, callback) {
+    schema.find({ _id: { $in: ids } }, field).lean().exec(function(err, docs) {
+      if (err) return callback(err)
+      callback(null, _.map(docs, plucker))
+    })
+  }
+  function uniqIds(param) {
+    var all = program.classifications.map(function(c) { return c[param] && c[param]._id ? String(c[param]._id) : undefined })
+    return _(all).uniq().compact().value()
   }
 }
 

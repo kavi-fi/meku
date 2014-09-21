@@ -292,9 +292,7 @@ function internalSearchPage() {
         var oldProgram = program
         var oldSeriesId = utils.getProperty(oldProgram, 'series._id')
         var newSeriesId = utils.getProperty(newProgram, 'series._id')
-
         if (oldSeriesId && oldSeriesId != newSeriesId) searchPageApi.updateProgramIfVisible(oldSeriesId)
-        if (newSeriesId) searchPageApi.updateProgramIfVisible(newSeriesId)
         searchPageApi.programDataUpdated(newProgram)
       })
     })
@@ -500,6 +498,8 @@ function searchPage() {
   }
 
   function programDataUpdated(program) {
+    var seriesId = utils.getProperty(program, 'series._id')
+    if (seriesId) updateProgramIfVisible(seriesId)
     var $rows = $page.find('.result[data-id=' + program._id + ']')
     if (_.isEmpty($rows)) return
     var episodesAreOpen = $rows.next('.program-box').find('.episode-container > h3').hasClass('open')

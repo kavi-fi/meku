@@ -117,10 +117,6 @@ function internalSearchPage() {
       $.ajax('/programs/' + program._id, { type: 'delete' }).done(function() {
         closeDialog()
         searchPageApi.programDeleted(program, function() {
-          if (!_.isEmpty($(this).parents('.episodes'))) {
-            var $parentRow = $row.closest('.program-box').prev('.result')
-            $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
-          }
           loadDrafts()
           loadRecent()
         })
@@ -530,6 +526,7 @@ function searchPage() {
   function programDeleted(program, callback) {
     if (!callback) callback = function() {}
     updateLocationHash()
+    if (program.series && program.series._id) updateProgramIfVisible(program.series._id)
     var $rows = $page.find('.result[data-id=' + program._id + ']')
     if (_.isEmpty($rows)) return callback()
     var $remove = $rows.next('.program-box').add($rows).slideUp()

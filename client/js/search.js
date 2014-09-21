@@ -151,15 +151,20 @@ function internalSearchPage() {
       $recent.hide()
       $recent.find('.result').remove()
       recents.forEach(function(p) {
-        var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
-          .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
-          .append($('<span>', { class: 'name' }).text(p.name[0]))
-          .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
-          .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
-          .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
+        var $result = renderRecentRow(p)
         $recent.show().append($result)
       })
     })
+
+    function renderRecentRow(p) {
+      return $('<div>', { 'data-id': p._id }).addClass('result').data('program', p)
+        .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
+        .append($('<span>', { class: 'name' }).text(p.name[0]))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
+        .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
+        .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
+        .data('renderer', renderRecentRow)
+    }
   }
 
   function toggleDetailButtons($detail, p) {
@@ -496,9 +501,9 @@ function searchPage() {
 
 
   function programDataUpdated(program) {
-    var $row = $page.find('.result[data-id=' + program._id + ']')
-    if (_.isEmpty($row)) return
-    var episodesAreOpen = $row.next('.program-box').find('.episode-container > h3').hasClass('open')
+    var $rows = $page.find('.result[data-id=' + program._id + ']')
+    if (_.isEmpty($rows)) return
+    var episodesAreOpen = $rows.next('.program-box').find('.episode-container > h3').hasClass('open')
     if (episodesAreOpen) {
       $.get('/episodes/'+ program._id).done(updateUI)
     } else {
@@ -506,12 +511,16 @@ function searchPage() {
     }
 
     function updateUI(episodes) {
-      var $newRow = render(program, state.q)
-      $row.next('.program-box').remove()
-      $row.replaceWith($newRow)
-      if ($row.is('.selected')) {
-        openDetail($newRow, false, episodes)
-      }
+      $rows.each(function() {
+        var $row = $(this)
+        var customRenderer = $row.data('renderer')
+        var $newRow = customRenderer ? customRenderer(program) : render(program, state.q)
+        $row.next('.program-box').remove()
+        $row.replaceWith($newRow)
+        if ($row.is('.selected')) {
+          openDetail($newRow, false, episodes)
+        }
+      })
     }
   }
 

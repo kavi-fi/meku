@@ -116,6 +116,7 @@ function internalSearchPage() {
     function removeProgram() {
       $.ajax('/programs/' + program._id, { type: 'delete' }).done(function() {
         closeDialog()
+        searchPageApi.updateLocationHash()
         $programBox.slideUp(function() { $(this).remove() })
         $row.slideUp(function() {
           if (!_.isEmpty($(this).parents('.recent'))) { loadRecent() }
@@ -365,7 +366,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted, updateLocationHash: updateLocationHash }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }

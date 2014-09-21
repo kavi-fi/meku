@@ -292,13 +292,14 @@ function internalSearchPage() {
           }
         }
       }
-      $.post('/programs/' + program._id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
-        var $row = $programBox.prev('.result')
-        if (!_.isEmpty($categorizationForm.parents('.episodes'))) {
-          var $parentRow = $row.closest('.program-box').prev('.result')
-          $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
-        }
-        searchPageApi.programDataUpdated(program)
+      $.post('/programs/' + program._id + '/categorization', JSON.stringify(categoryData)).done(function(newProgram) {
+        var oldProgram = program
+        var oldSeriesId = utils.getProperty(oldProgram, 'series._id')
+        var newSeriesId = utils.getProperty(newProgram, 'series._id')
+
+        if (oldSeriesId && oldSeriesId != newSeriesId) searchPageApi.updateProgramIfVisible(oldSeriesId)
+        if (newSeriesId) searchPageApi.updateProgramIfVisible(newSeriesId)
+        searchPageApi.programDataUpdated(newProgram)
       })
     })
 
@@ -368,7 +369,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted, updateProgramIfVisible: updateProgramIfVisible }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -496,6 +497,11 @@ function searchPage() {
     return $page.find('.kavi-query-filters .warning-filter.active').map(function() { return $(this).data('id') }).toArray()
   }
 
+  function updateProgramIfVisible(programId) {
+    var $rows = $page.find('.result[data-id=' + programId + ']')
+    if (_.isEmpty($rows)) return
+    $.get('/programs/'+programId).done(programDataUpdated)
+  }
 
   function programDataUpdated(program) {
     var $rows = $page.find('.result[data-id=' + program._id + ']')

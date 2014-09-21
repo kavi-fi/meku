@@ -245,7 +245,7 @@ app.get('/episodes/:seriesId', function(req, res, next) {
 })
 
 app.get('/programs/drafts', function(req, res, next) {
-  Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
+  Program.find({ draftsBy: req.user._id, deleted: { $ne:true } }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {
       return {_id: p._id, name: p.name, creationDate: p.draftClassifications[req.user._id].creationDate}

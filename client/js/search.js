@@ -171,20 +171,32 @@ function internalSearchPage() {
     $.get('/programs/recent', function(recents) {
       $recent.hide()
       $recent.find('.result').remove()
-      recents.forEach(function(p) {
-        var $result = renderRecentRow(p)
+      recents.forEach(function(program) {
+        var classification = _.find(program.classifications, { author: { _id: user._id } })
+        var $result = renderRecentRow(program, classification)
         $recent.show().append($result)
       })
     })
 
-    function renderRecentRow(p) {
+    function renderRecentRow(p, c) {
+      var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
       return $('<div>', { 'data-id': p._id }).addClass('result').data('program', p)
-        .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
+        .append($('<span>', { class: 'registrationDate' }).text(registrationDate))
         .append($('<span>', { class: 'name' }).text(p.name[0]))
-        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.durationAsText(c.duration)))
         .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
-        .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
-        .data('renderer', renderRecentRow)
+        .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.summary(c)) || ' - '))
+        .data('renderer', rerenderRecentRow)
+    }
+
+    function rerenderRecentRow(program) {
+      var classification = _.find(program.classifications, { author: { _id: user._id } })
+      if (classification) {
+        return renderRecentRow(program, classification)
+      } else {
+        loadRecent()
+        return
+      }
     }
   }
 
@@ -545,9 +557,13 @@ function searchPage() {
         var customRenderer = $row.data('renderer')
         var $newRow = customRenderer ? customRenderer(program) : render(program, state.q)
         $row.next('.program-box').remove()
-        $row.replaceWith($newRow)
-        if ($row.is('.selected')) {
-          openDetail($newRow, false, episodes)
+        if ($newRow) {
+          $row.replaceWith($newRow)
+          if ($row.is('.selected')) {
+            openDetail($newRow, false, episodes)
+          }
+        } else {
+          $row.remove()
         }
       })
     }

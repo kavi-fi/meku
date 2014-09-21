@@ -75,9 +75,14 @@ utils.secondsToDuration = function(seconds) {
 
 utils.programDurationAsText = function(program) {
   var c = program.classifications[0]
-  if (!c || !c.duration) return ''
-  var match = c.duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
-  if (!match) return c.duration
+  if (!c) return ''
+  return utils.durationAsText(c.duration)
+}
+
+utils.durationAsText = function(duration) {
+  if (!duration) return ''
+  var match = duration.match(/(?:(\d+)?:)?(\d+):(\d+)$/)
+  if (!match) return duration
   match.shift()
   return _(match).map(suffixify).compact().join(' ')
 

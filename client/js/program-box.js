@@ -48,21 +48,23 @@ function programBox() {
 
     var $episodes = $e.find('.episodes')
     var $episodeHeader = $e.find('.episode-container > h3')
-    if (preloadedEpisodes) {
-      renderEpisodes(preloadedEpisodes)
-      toggleEpisodesOpen(false)
-      $episodeHeader.click(function() { toggleEpisodesOpen(true) })
-    } else if (p.episodes.count > 0) {
-      var $spinner = spinner()
-      $episodeHeader.append(' '+p.episodes.count + ' kpl').append($spinner).one('click', function() {
-        $spinner.addClass('active')
-        $.get('/episodes/'+ p._id).done(function(allEpisodes) {
-          $spinner.remove()
-          $episodeHeader.click(function() { toggleEpisodesOpen(true) })
-          renderEpisodes(allEpisodes)
-          toggleEpisodesOpen(true)
+    if (p.episodes.count > 0) {
+      if (preloadedEpisodes) {
+        renderEpisodes(preloadedEpisodes)
+        toggleEpisodesOpen(false)
+        $episodeHeader.click(function() { toggleEpisodesOpen(true) })
+      } else {
+        var $spinner = spinner()
+        $episodeHeader.append(' '+p.episodes.count + ' kpl').append($spinner).one('click', function() {
+          $spinner.addClass('active')
+          $.get('/episodes/'+ p._id).done(function(allEpisodes) {
+            $spinner.remove()
+            $episodeHeader.click(function() { toggleEpisodesOpen(true) })
+            renderEpisodes(allEpisodes)
+            toggleEpisodesOpen(true)
+          })
         })
-      })
+      }
     } else {
       $episodeHeader.empty().addClass('disabled').text('Ei jaksoja.')
       $episodes.remove()

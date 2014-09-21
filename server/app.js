@@ -369,6 +369,15 @@ app.post('/programs/:id/register', function(req, res, next) {
   })
 })
 
+app.post('/programs/:id/classification', function(req, res, next) {
+  Program.findById(req.params.id, function(err, program) {
+    if (err) next(err)
+    if (program.classifications.length > 0) return res.send(400)
+    program.newDraftClassification(req.user)
+    program.save(respond(res, next))
+  })
+})
+
 app.post('/programs/:id/reclassification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)

@@ -74,6 +74,14 @@ function internalSearchPage() {
     })
   })
 
+  $results.on('click', 'button.classify', function() {
+    $(this).prop('disabled', true)
+    var id = $(this).closest('.program-box').data('id')
+    $.post('/programs/' + id + '/classification').done(function(program) {
+      showClassificationPage(program._id)
+    })
+  })
+
   $results.on('click', 'button.reclassify', function() {
     $(this).prop('disabled', true)
     var id = $(this).closest('.program-box').data('id')
@@ -195,7 +203,8 @@ function internalSearchPage() {
       $detail.find('button.recategorize').hide()
     } else if (p.classifications.length == 0) {
       $detail.find('button.continue-classification').hide()
-      $detail.find('button.reclassify').toggle(hasRole('kavi'))
+      $detail.find('button.reclassify').hide()
+      $detail.find('button.classify').toggle(hasRole('kavi'))
       $detail.find('button.recategorize').toggle(hasRole('kavi'))
     } else {
       $detail.find('button.continue-classification').hide()
@@ -203,7 +212,6 @@ function internalSearchPage() {
       $detail.find('button.recategorize').toggle(hasRole('kavi'))
     }
     $detail.find('button.categorize').toggle(enums.util.isUnknown(p))
-
     $detail.find('button.edit').toggle(hasRole('root'))
     $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))
     $detail.find('button.remove-classification').toggle(hasRole('root'))

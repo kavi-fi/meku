@@ -119,13 +119,13 @@ function internalSearchPage() {
         searchPageApi.updateLocationHash()
         $programBox.slideUp(function() { $(this).remove() })
         $row.slideUp(function() {
-          if (!_.isEmpty($(this).parents('.recent'))) { loadRecent() }
           if (!_.isEmpty($(this).parents('.episodes'))) {
             var $parentRow = $row.closest('.program-box').prev('.result')
             $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
           }
           $(this).remove()
           loadDrafts()
+          loadRecent()
         })
       })
     }

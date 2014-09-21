@@ -147,6 +147,7 @@ function internalSearchPage() {
     function removeClassification() {
       $.ajax('/programs/' + program._id +'/classification/' + classification._id, { type: 'delete' }).done(function(program) {
         closeDialog()
+        searchPageApi.updateLocationHash()
         searchPageApi.programDataUpdated(program)
       })
     }
@@ -405,7 +406,8 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted, updateProgramIfVisible: updateProgramIfVisible }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted,
+           updateProgramIfVisible: updateProgramIfVisible, updateLocationHash: updateLocationHash }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }

@@ -124,6 +124,7 @@ function internalSearchPage() {
             $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
           }
           $(this).remove()
+          loadDrafts()
         })
       })
     }

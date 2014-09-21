@@ -660,7 +660,7 @@ textarea.invalid:disabled,
   height: 19px;
 }
 .datepicker span { display: inline-block; margin-right: 5px; margin-left: 10px; }
-.datepicker .fa-calendar { float: right; margin: 2px 6px 0 0; }
+.datepicker .fa-calendar, .datepicker .clear-date-picker { float: right; margin: 2px 6px 0 0; }
 
 .date-selection { height: 30px; line-height: 30px; margin-bottom: 20px; }
 .date-selection .datepicker { margin-left: 15px; }

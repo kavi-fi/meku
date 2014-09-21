@@ -173,6 +173,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
   function constructKaviQuery() {
     var rootQuery = {}
     var classificationMatch = {}
+    var rootOrs = []
     if (req.query.registrationDateRange) {
       var range = utils.parseDateRange(req.query.registrationDateRange)
       classificationMatch.registrationDate = { $gte: range.begin, $lt: range.end }
@@ -183,23 +184,35 @@ app.get('/programs/search/:q?', function(req, res, next) {
         rootQuery['classifications.0.author._id'] = { $ne: req.query.classifier }
       }
     }
-    if (req.query.agelimits) {
+    if (req.query.agelimits && req.query.warnings) {
+      var agelimitsIn = { $in: req.query.agelimits.map(function(s) { return parseInt(s) }) }
+      var warnings = { $all: req.query.warnings }
+      if (_.isEmpty(classificationMatch)) {
+        rootOrs.push({
+          $or: [
+            { 'classifications.0.agelimit': agelimitsIn, 'classifications.0.warnings': warnings },
+            { 'episodes.agelimit': agelimitsIn, 'episodes.warnings': warnings }
+          ] })
+      } else {
+        classificationMatch.agelimit = agelimitsIn
+        classificationMatch.warnings = warnings
+      }
+    } else if (req.query.agelimits) {
       var agelimitsIn = { $in: req.query.agelimits.map(function(s) { return parseInt(s) }) }
       if (_.isEmpty(classificationMatch)) {
-        rootQuery['classifications.0.agelimit'] = agelimitsIn
+        rootOrs.push({ $or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn } ] })
       } else {
         classificationMatch.agelimit = agelimitsIn
       }
-    }
-    if (req.query.warnings) {
+    } else if (req.query.warnings) {
       var warnings = { $all: req.query.warnings }
       if (_.isEmpty(classificationMatch)) {
-        rootQuery['classifications.0.warnings'] = warnings
+        rootOrs.push({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
       } else {
         classificationMatch.warnings = warnings
       }
-
     }
+    if (!_.isEmpty(rootOrs)) rootQuery['$or'] = rootOrs
     if (!_.isEmpty(classificationMatch)) rootQuery['classifications'] = { $elemMatch: classificationMatch }
     return rootQuery
   }

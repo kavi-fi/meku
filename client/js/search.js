@@ -116,14 +116,11 @@ function internalSearchPage() {
     function removeProgram() {
       $.ajax('/programs/' + program._id, { type: 'delete' }).done(function() {
         closeDialog()
-        searchPageApi.updateLocationHash()
-        $programBox.slideUp(function() { $(this).remove() })
-        $row.slideUp(function() {
+        searchPageApi.programDeleted(program, function() {
           if (!_.isEmpty($(this).parents('.episodes'))) {
             var $parentRow = $row.closest('.program-box').prev('.result')
             $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
           }
-          $(this).remove()
           loadDrafts()
           loadRecent()
         })
@@ -371,7 +368,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted, updateLocationHash: updateLocationHash }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -524,10 +521,16 @@ function searchPage() {
     }
   }
 
-  function programDeleted(program) {
-    var $row = $page.find('.result[data-id=' + program._id + ']')
-    if (_.isEmpty($row)) return
-    $row.next('.program-box').add($row).slideUp(function() { $(this).remove() })
+  function programDeleted(program, callback) {
+    if (!callback) callback = function() {}
+    updateLocationHash()
+    var $rows = $page.find('.result[data-id=' + program._id + ']')
+    if (_.isEmpty($rows)) return callback()
+    var $remove = $rows.next('.program-box').add($rows).slideUp()
+    $remove.promise().done(function() {
+      $remove.remove()
+      callback()
+    })
   }
 
   function openDetail($row, animate, preloadedEpisodes) {

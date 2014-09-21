@@ -80,6 +80,29 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   this.markModified('draftClassifications')
   return draft
 }
+
+ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(classification, user, callback) {
+  var program = this
+  if (classification.buyer) {
+    Account.findById(classification.buyer._id, 'emailAddresses', function(err, buyer) {
+      if (err) return callback(err)
+      populate(buyer.emailAddresses, callback)
+    })
+  } else {
+    populate([], callback)
+  }
+
+  function populate(buyerEmails, callback) {
+    var manual = classification.registrationEmailAddresses
+    var newEmails = _.uniq(program.sentRegistrationEmailAddresses
+      .concat(manual)
+      .concat(buyerEmails)
+      .concat([user.email]))
+    program.sentRegistrationEmailAddresses = newEmails
+    callback(null, program)
+  }
+}
+
 ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
   var query = { 'series._id': seriesId, deleted: { $ne: true } }
   var fields = { classifications: { $slice: 1 } }

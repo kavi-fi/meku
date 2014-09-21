@@ -314,7 +314,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    populateSentRegistrationEmailAddresses(newClassification, program, function(err, program) {
+    program.populateSentRegistrationEmailAddresses(newClassification, req.user, function(err, program) {
       if (err) return next(err)
       verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)
@@ -340,28 +340,6 @@ app.post('/programs/:id/register', function(req, res, next) {
     function updateMetadataIndexesForNewProgram(program, callback) {
       if (program.classifications.length > 1) return callback()
       updateMetadataIndexes(program, callback)
-    }
-
-    function populateSentRegistrationEmailAddresses(classification, program, callback) {
-      if (classification.buyer) {
-        Account.findById(classification.buyer._id, 'emailAddresses', function(err, buyer) { 
-          if (err) return callback(err)
-          populate(buyer.emailAddresses, callback)
-        })
-      } else {
-        populate([], callback)
-      }
-
-      function populate(buyerEmails, callback) {
-        var classifier = req.user.email
-        var manual = classification.registrationEmailAddresses
-        var newEmails = _.uniq(program.sentRegistrationEmailAddresses
-          .concat(manual)
-          .concat(buyerEmails)
-          .concat([classifier]))
-        program.sentRegistrationEmailAddresses = newEmails
-        callback(null, program)
-      }
     }
 
     function addInvoicerows(currentClassification, callback) {

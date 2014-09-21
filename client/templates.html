@@ -3,7 +3,6 @@
   <div class="header clearfix">
     <div class="buttons">
       <button class="button remove">Poista</button>
-      <button class="button hidden edit">Muuta tietoja</button>
       <button class="button reclassify">Luokittele uudelleen</button>
       <button class="button continue-classification">Jatka luokittelua</button>
       <button class="button categorize">Määritä kategoria</button>
@@ -91,6 +90,10 @@
   <label>Ikäraja</label>
   <div class="warning-summary">
     <img class="agelimit" src="images/empty.png" /><div class="warnings"></div>
+  </div>
+  <div class="classification-buttons">
+    <button class="button edit">Muuta tietoja</button>
+    <button class="button remove-classification">Poista luokittelu</button>
   </div>
   <div class="criteria"></div>
   <label>Uudelleenluokittelun peruste</label>
@@ -474,6 +477,13 @@
 
 <div class="remove-program-dialog remove-dialog dialog">
   <p>Haluatko varmasti poistaa kuvaohjelman <span class="program-name"></span>?</p>
+  <div class="buttons">
+    <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
+  </div>
+</div>
+
+<div class="remove-classification-dialog remove-dialog dialog">
+  <p>Haluatko varmasti poistaa <span class="registration-date"></span> rekisteröidyn<br/>luokittelun kuvaohjelmasta <span class="program-name"></span>?</p>
   <div class="buttons">
     <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
   </div>

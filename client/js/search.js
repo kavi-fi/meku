@@ -124,6 +124,26 @@ function internalSearchPage() {
     }
   })
 
+  $results.on('click', 'button.remove-classification', function() {
+    var $programBox = $(this).closest('.program-box')
+    var $row = $programBox.prev('.result')
+    var program = $row.data('program')
+    var classification = $programBox.find('.classification.selected').data('classification')
+    var registrationDate = utils.asDate(classification.registrationDate) || 'Tuntematon rekisteröintiaika'
+    showDialog($('#templates').find('.remove-classification-dialog').clone()
+      .find('.registration-date').text(registrationDate).end()
+      .find('.program-name').text(program.name).end()
+      .find('button[name=remove]').one('click', removeClassification).end()
+      .find('button[name=cancel]').one('click', closeDialog).end())
+
+    function removeClassification() {
+      $.ajax('/programs/' + program._id +'/classification/' + classification._id, { type: 'delete' }).done(function(program) {
+        closeDialog()
+        searchPageApi.programDataUpdated(program)
+      })
+    }
+  })
+
   function loadDrafts() {
     $.get('/programs/drafts', function(drafts) {
       $drafts.find('.draft').remove()
@@ -186,6 +206,8 @@ function internalSearchPage() {
 
     $detail.find('button.edit').toggle(hasRole('root'))
     $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))
+    $detail.find('button.remove-classification').toggle(hasRole('root'))
+
   }
 
   function showClassificationPage(programId) {

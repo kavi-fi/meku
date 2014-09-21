@@ -491,6 +491,24 @@ app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
   })
 })
 
+app.delete('/programs/:programId/classification/:classificationId', requireRole('root'), function(req, res, next) {
+  var classificationId = req.params.classificationId
+  Program.findById(req.params.programId, function(err, program) {
+    if (err) return next(err)
+    var watcher = watchChanges(program, req.user, ['deletedClassifications', 'sentRegistrationEmailAddresses'])
+    var classification = program.classifications.id(classificationId)
+    program.classifications.pull(classificationId)
+    program.deletedClassifications.push(classification)
+    program.populateSentRegistrationEmailAddresses([], function(err) {
+      if (err) return next(err)
+      watcher.saveAndLogChanges(function(err) {
+        if (err) return next(err)
+        updateTvSeriesClassification(program, respond(res, next, program))
+      })
+    })
+  })
+})
+
 app.get('/series/search', function(req, res, next) {
   var q = { programType: 2 }
   var parts = toMongoArrayQuery(req.query.q)

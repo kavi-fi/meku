@@ -22,7 +22,8 @@
     "xlsjs": "0.7.1",
     "xlsx": "0.7.8",
     "xml-object-stream": "0.2.0",
-    "xmlbuilder": "2.4.3"
+    "xmlbuilder": "2.4.3",
+    "iconv-lite": "0.4.4"
   },
   "devDependencies": {
     "express-livereload": "~0.0.24",

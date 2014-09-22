@@ -74,6 +74,14 @@ function internalSearchPage() {
     })
   })
 
+  $results.on('click', 'button.classify', function() {
+    $(this).prop('disabled', true)
+    var id = $(this).closest('.program-box').data('id')
+    $.post('/programs/' + id + '/classification').done(function(program) {
+      showClassificationPage(program._id)
+    })
+  })
+
   $results.on('click', 'button.reclassify', function() {
     $(this).prop('disabled', true)
     var id = $(this).closest('.program-box').data('id')
@@ -124,6 +132,27 @@ function internalSearchPage() {
     }
   })
 
+  $results.on('click', 'button.remove-classification', function() {
+    var $programBox = $(this).closest('.program-box')
+    var $row = $programBox.prev('.result')
+    var program = $row.data('program')
+    var classification = $programBox.find('.classification.selected').data('classification')
+    var registrationDate = utils.asDate(classification.registrationDate) || 'Tuntematon rekisteröintiaika'
+    showDialog($('#templates').find('.remove-classification-dialog').clone()
+      .find('.registration-date').text(registrationDate).end()
+      .find('.program-name').text(program.name).end()
+      .find('button[name=remove]').one('click', removeClassification).end()
+      .find('button[name=cancel]').one('click', closeDialog).end())
+
+    function removeClassification() {
+      $.ajax('/programs/' + program._id +'/classification/' + classification._id, { type: 'delete' }).done(function(program) {
+        closeDialog()
+        searchPageApi.updateLocationHash()
+        searchPageApi.programDataUpdated(program)
+      })
+    }
+  })
+
   function loadDrafts() {
     $.get('/programs/drafts', function(drafts) {
       $drafts.find('.draft').remove()
@@ -143,20 +172,32 @@ function internalSearchPage() {
     $.get('/programs/recent', function(recents) {
       $recent.hide()
       $recent.find('.result').remove()
-      recents.forEach(function(p) {
-        var $result = renderRecentRow(p)
+      recents.forEach(function(program) {
+        var classification = _.find(program.classifications, { author: { _id: user._id } })
+        var $result = renderRecentRow(program, classification)
         $recent.show().append($result)
       })
     })
 
-    function renderRecentRow(p) {
+    function renderRecentRow(p, c) {
+      var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
       return $('<div>', { 'data-id': p._id }).addClass('result').data('program', p)
-        .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
+        .append($('<span>', { class: 'registrationDate' }).text(registrationDate))
         .append($('<span>', { class: 'name' }).text(p.name[0]))
-        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.durationAsText(c.duration)))
         .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
-        .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
-        .data('renderer', renderRecentRow)
+        .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.summary(c)) || ' - '))
+        .data('renderer', rerenderRecentRow)
+    }
+
+    function rerenderRecentRow(program) {
+      var classification = _.find(program.classifications, { author: { _id: user._id } })
+      if (classification) {
+        return renderRecentRow(program, classification)
+      } else {
+        loadRecent()
+        return
+      }
     }
   }
 
@@ -175,7 +216,8 @@ function internalSearchPage() {
       $detail.find('button.recategorize').hide()
     } else if (p.classifications.length == 0) {
       $detail.find('button.continue-classification').hide()
-      $detail.find('button.reclassify').toggle(hasRole('kavi'))
+      $detail.find('button.reclassify').hide()
+      $detail.find('button.classify').toggle(hasRole('kavi'))
       $detail.find('button.recategorize').toggle(hasRole('kavi'))
     } else {
       $detail.find('button.continue-classification').hide()
@@ -183,9 +225,10 @@ function internalSearchPage() {
       $detail.find('button.recategorize').toggle(hasRole('kavi'))
     }
     $detail.find('button.categorize').toggle(enums.util.isUnknown(p))
-
     $detail.find('button.edit').toggle(hasRole('root'))
     $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))
+    $detail.find('button.remove-classification').toggle(hasRole('root'))
+
   }
 
   function showClassificationPage(programId) {
@@ -292,9 +335,7 @@ function internalSearchPage() {
         var oldProgram = program
         var oldSeriesId = utils.getProperty(oldProgram, 'series._id')
         var newSeriesId = utils.getProperty(newProgram, 'series._id')
-
         if (oldSeriesId && oldSeriesId != newSeriesId) searchPageApi.updateProgramIfVisible(oldSeriesId)
-        if (newSeriesId) searchPageApi.updateProgramIfVisible(newSeriesId)
         searchPageApi.programDataUpdated(newProgram)
       })
     })
@@ -365,7 +406,8 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted, updateProgramIfVisible: updateProgramIfVisible }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted,
+           updateProgramIfVisible: updateProgramIfVisible, updateLocationHash: updateLocationHash }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -500,6 +542,8 @@ function searchPage() {
   }
 
   function programDataUpdated(program) {
+    var seriesId = utils.getProperty(program, 'series._id')
+    if (seriesId) updateProgramIfVisible(seriesId)
     var $rows = $page.find('.result[data-id=' + program._id + ']')
     if (_.isEmpty($rows)) return
     var episodesAreOpen = $rows.next('.program-box').find('.episode-container > h3').hasClass('open')
@@ -515,9 +559,13 @@ function searchPage() {
         var customRenderer = $row.data('renderer')
         var $newRow = customRenderer ? customRenderer(program) : render(program, state.q)
         $row.next('.program-box').remove()
-        $row.replaceWith($newRow)
-        if ($row.is('.selected')) {
-          openDetail($newRow, false, episodes)
+        if ($newRow) {
+          $row.replaceWith($newRow)
+          if ($row.is('.selected')) {
+            openDetail($newRow, false, episodes)
+          }
+        } else {
+          $row.remove()
         }
       })
     }

@@ -52,6 +52,7 @@ var ProgramSchema = new Schema({
   actors: [String],
   synopsis: String,
   classifications: [classification],
+  deletedClassifications: [classification],
   draftsBy: { type: [ObjectId], index: true },
   draftClassifications: {}, // { userId:classification, userId:classification2 }
   programType: Number, // enums.programType
@@ -80,6 +81,35 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   this.markModified('draftClassifications')
   return draft
 }
+
+ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(additionalEmailAddresses, callback) {
+  var program = this
+  async.parallel([loadAuthorEmails, loadBuyerEmails], function(err, emails) {
+    if (err) return callback(err)
+    var manual = _.pluck(program.classifications, 'registrationEmailAddresses')
+    var all = emails.concat(manual).concat(additionalEmailAddresses)
+    program.sentRegistrationEmailAddresses = _(all).flatten().compact().uniq().value()
+    callback(null, program)
+  })
+
+  function loadAuthorEmails(callback) {
+    load(User, uniqIds('author'), 'emails', function(u) { return u.emails ? u.emails[0] : undefined }, callback)
+  }
+  function loadBuyerEmails(callback) {
+    load(Account, uniqIds('buyer'), 'emailAddresses', 'emailAddresses', callback)
+  }
+  function load(schema, ids, field, plucker, callback) {
+    schema.find({ _id: { $in: ids } }, field).lean().exec(function(err, docs) {
+      if (err) return callback(err)
+      callback(null, _.map(docs, plucker))
+    })
+  }
+  function uniqIds(param) {
+    var all = program.classifications.map(function(c) { return c[param] && c[param]._id ? String(c[param]._id) : undefined })
+    return _(all).uniq().compact().value()
+  }
+}
+
 ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
   var query = { 'series._id': seriesId, deleted: { $ne: true } }
   var fields = { classifications: { $slice: 1 } }
@@ -144,7 +174,7 @@ Program.excludedChangeLogPaths = ['allNames']
 
 Program.publicFields = {
   emekuId:0, customersId:0, allNames:0, draftsBy: 0, draftClassifications:0,
-  createdBy:0, sentRegistrationEmailAddresses:0,
+  createdBy:0, sentRegistrationEmailAddresses:0, deletedClassifications: 0,
   'classifications.emekuId':0, 'classifications.author':0,
   'classifications.billing': 0, 'classifications.buyer': 0, 'classifications.registrationEmailAddresses':0,
   'classifications.authorOrganization': 0, 'classifications.reason': 0,

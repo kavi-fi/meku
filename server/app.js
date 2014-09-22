@@ -327,7 +327,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    populateSentRegistrationEmailAddresses(newClassification, program, function(err, program) {
+    program.populateSentRegistrationEmailAddresses([req.user.email], function(err, program) {
       if (err) return next(err)
       verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)
@@ -355,28 +355,6 @@ app.post('/programs/:id/register', function(req, res, next) {
       updateMetadataIndexes(program, callback)
     }
 
-    function populateSentRegistrationEmailAddresses(classification, program, callback) {
-      if (classification.buyer) {
-        Account.findById(classification.buyer._id, 'emailAddresses', function(err, buyer) { 
-          if (err) return callback(err)
-          populate(buyer.emailAddresses, callback)
-        })
-      } else {
-        populate([], callback)
-      }
-
-      function populate(buyerEmails, callback) {
-        var classifier = req.user.email
-        var manual = classification.registrationEmailAddresses
-        var newEmails = _.uniq(program.sentRegistrationEmailAddresses
-          .concat(manual)
-          .concat(buyerEmails)
-          .concat([classifier]))
-        program.sentRegistrationEmailAddresses = newEmails
-        callback(null, program)
-      }
-    }
-
     function addInvoicerows(currentClassification, callback) {
       var seconds = classificationUtils.durationToSeconds(currentClassification.duration)
 
@@ -401,6 +379,15 @@ app.post('/programs/:id/register', function(req, res, next) {
         })
       }
     }
+  })
+})
+
+app.post('/programs/:id/classification', function(req, res, next) {
+  Program.findById(req.params.id, function(err, program) {
+    if (err) next(err)
+    if (program.classifications.length > 0) return res.send(400)
+    program.newDraftClassification(req.user)
+    program.save(respond(res, next))
   })
 })
 
@@ -522,6 +509,24 @@ app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
     softDeleteAndLog(program, req.user, function(err, program) {
       if (err) return next(err)
       updateTvSeriesClassification(program, respond(res, next, program))
+    })
+  })
+})
+
+app.delete('/programs/:programId/classification/:classificationId', requireRole('root'), function(req, res, next) {
+  var classificationId = req.params.classificationId
+  Program.findById(req.params.programId, function(err, program) {
+    if (err) return next(err)
+    var watcher = watchChanges(program, req.user, ['deletedClassifications', 'sentRegistrationEmailAddresses'])
+    var classification = program.classifications.id(classificationId)
+    program.classifications.pull(classificationId)
+    program.deletedClassifications.push(classification)
+    program.populateSentRegistrationEmailAddresses([], function(err) {
+      if (err) return next(err)
+      watcher.saveAndLogChanges(function(err) {
+        if (err) return next(err)
+        updateTvSeriesClassification(program, respond(res, next, program))
+      })
     })
   })
 })

@@ -3,12 +3,13 @@ if (isNodeJs()) {
   var moment = require('moment')
   var utils = require('./utils')
   var enums = require('./enums')
+  var iconv = require('iconv-lite')
 }
 
 var proe = {}
 var dateFormat = 'DD.MM.YYYY'
 
-// [{ account:Account, rows:[InvoiceRow] }] -> String
+// [{ account:Account, rows:[InvoiceRow] }] -> Buffer<win1252>
 proe.createProviderRegistration = function createProviderRegistration(accountRows) {
   return createProe(accountRows, textRows, providerBillingRow)
 
@@ -18,7 +19,7 @@ proe.createProviderRegistration = function createProviderRegistration(accountRow
   }
 }
 
-// Number -> [{ account:Account, rows:[InvoiceRow] }] -> String
+// Number -> [{ account:Account, rows:[InvoiceRow] }] -> Buffer<win1252>
 proe.createYearlyProviderRegistration = function createYearlyProviderRegistration(year, accountRows) {
   return createProe(accountRows, _.curry(providerTextRows)(moment().year()), providerBillingRow)
 }
@@ -42,7 +43,7 @@ function providerBillingRow(id, invoice) {
   return billingRowText(id, invoice.price, txt)
 }
 
-// { begin: moment, end: moment } -> [{ account:Account, rows:[InvoiceRow] }] -> String
+// { begin: moment, end: moment } -> [{ account:Account, rows:[InvoiceRow] }] -> Buffer<win1252>
 proe.createClassificationRegistrationProe = function createClassificationRegistrationProe(dateRange, accountRows) {
   var period = dateRange.begin + ' - ' + dateRange.end
 
@@ -78,7 +79,7 @@ proe.createClassificationRegistrationProe = function createClassificationRegistr
 }
 
 function createProe(accounts, textRows, billingRow) {
-  return _(accounts).map(function (i) {
+  var string = _(accounts).map(function (i) {
     var id = i.account.sequenceId
     return [
       accountHeaderRow(id, i.account),
@@ -87,6 +88,8 @@ function createProe(accounts, textRows, billingRow) {
       i.rows.map(_.curry(billingRow)(id))
     ]
   }).flatten().compact().join('\r\n')
+
+  return iconv.encode(string, 'win1252')
 }
 
 function accountHeaderRow(id, account) {

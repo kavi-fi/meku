@@ -85,7 +85,7 @@ function programBox() {
 
     function renderEpisodes(allEpisodes) {
       var grouped = _.groupBy(allEpisodes, 'season')
-      var seasons = Object.keys(grouped).sort()
+      var seasons = _.sortBy(Object.keys(grouped), function(s) { return parseInt(s) })
       seasons.forEach(function(season) {
         var episodes = grouped[season]
         $episodes.append($('<div>').addClass('season-header')

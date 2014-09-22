@@ -10,9 +10,12 @@
   </script>
   <script>
     $(function() {
-      var $form = $('#register-provider')
+      var $form = $('form')
       var $button = $form.find('button')
       var $feedback = $form.find('.feedback')
+      var $invalid = $feedback.find('.invalid')
+      var $error = $feedback.find('.error')
+      var $success = $feedback.find('.success')
 
       $.get('/environment', function(res) {
         if (res.environment === 'training') {
@@ -25,7 +28,6 @@
         e.preventDefault()
 
         $button.prop('disabled', true)
-        $feedback.text('Tiedostoa ladataan palvelimelle...')
 
         $.ajax({
           url: '/files/provider-import',
@@ -35,27 +37,23 @@
           processData: false,
           type: 'POST',
           success: function(data) {
+            $invalid.toggle(!!data.error)
+            $success.toggle(!data.error)
+            $error.hide()
             if (data.error) {
-              if (data.error.message) {
-                var $list = $('<ul>')
+              var errors = _.map(data.error.messages, function (error) {
+                return $('<li>').text(error)
+              })
 
-                _.forEach(data.error.message.split(','), function (error) {
-                  $list.append($('<li>').text(error.trim()))
-                })
-
-                $feedback.text('').append($list)
-              } else {
-                $feedback.text('Tiedoston käsitteleminen epäonnistui.')
-              }
-
+              $invalid.find('ul').html(errors)
               $button.prop('disabled', false)
             } else {
-              $form.find('div, p').not('.feedback').hide()
-              $feedback.text(data.message)
+              $success.text(data.message)
+              $form.find('.fields').hide()
             }
           },
           error: function() {
-            $feedback.text('Tiedoston lähettäminen ei onnistunut.')
+            $error.show()
             $button.prop('disabled', false)
           }
         })
@@ -68,29 +66,43 @@
   </script>
   <title>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</title>
 </head>
-<body>
+<body id="register-provider-page">
   <div class="training-ribbon"><span>Koulutusympäristö</span></div>
   <div id="header">
-    <div class="content center">
+    <div class="content">
       <div>
         <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
       </div>
     </div>
   </div>
-  <form id="register-provider" enctype="multipart/form-data">
+  <form enctype="multipart/form-data">
     <h2>Tarjoajaksi ilmoittautuminen</h2>
-    <p>
-      Ilmoittaudu kuvaohjelmatarjoajaksi täyttämällä taulukko
-      (lataa <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">tästä</a>)
-      ja lähettämällä se alla olevan lomakkeen avulla.
-    </p>
-    <div>
-      <label>Valitse taulukko-tiedosto <input type="file" name="providerFile" /></label>
+    <div class="fields">
+      <p>
+        Ilmoittaudu kuvaohjelmatarjoajaksi täyttämällä Excel-taulukko tarjoajan
+        tiedoista sekä tarjoamispaikoista, ja lähettämällä se alla olevalla lomakkeella.
+        Lataa ilmoittautumislomake <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">tästä</a>.
+      </p>
+      <div>
+        <label for="message">Viesti Kaville</label>
+        <p class="help">Tähän kenttään voit tarvittaessa kirjoittaa kommentit tai pyynnöt
+        Kaville. Esim. Milloin kuvaohjelmien tarjonta aloitetaan?</p>
+        <textarea name="message" id="message"></textarea></label>
+        <label>Valitse taulukko-tiedosto <input type="file" name="providerFile" /></label>
+      </div>
+      <div>
+        <button class="button" disabled>Lähetä tiedosto</button>
+      </div>
     </div>
-    <div>
-      <button class="button" disabled>Lähetä tiedosto</button>
+    <div class="feedback">
+      <p class="success hidden"></p>
+      <p class="error hidden">Tiedoston lähettäminen ei onnistunut.</p>
+      <div class="invalid hidden">
+        <p>Tarjoajan tai tarjoajan tiedoista puuttui pakollisia tietoja. Ole
+        hyvä, täytä puuttuvat tiedot ja lähetä tiedosto uudelleen.</p>
+        <ul></ul>
+      </div>
     </div>
-    <div class="feedback"></div>
   </form>
 </body>
 </html>

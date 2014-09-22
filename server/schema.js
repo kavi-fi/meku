@@ -205,6 +205,7 @@ var ProviderSchema = new Schema({
   language: String,
   deleted: Boolean,
   active: Boolean,
+  message: String,
   locations: [ProviderLocationSchema]
 })
 

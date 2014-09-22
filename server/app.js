@@ -396,7 +396,9 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
     if (err) next(err)
     if (!classificationUtils.canReclassify(program, req.user)) return res.send(400)
     program.newDraftClassification(req.user)
-    program.save(respond(res, next))
+    program.populateSentRegistrationEmailAddresses([], function(err) {
+      program.save(respond(res, next))
+    })
   })
 })
 

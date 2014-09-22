@@ -154,7 +154,9 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
     var errorMessages = _.reduce(rows, function(acc, val) {
       var index = acc[0], errors = acc[1]
       var fieldErrors = validate(val, requiredFields, index, fieldMap)
-      return [index + 1, errors.concat(fieldErrors).concat(validateProvidingType(val, index))]
+      return [index + 1, errors.concat(fieldErrors)
+        .concat(validateProvidingType(val, index))
+        .concat(validateRequiredEmail(val, index))]
     }, [rowNumber + 2, []])[1]
 
     errorMessages.forEach(function(msg) {
@@ -184,6 +186,12 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
       } else {
         return []
       }
+    }
+
+    function validateRequiredEmail(val, row) {
+      var msg = 'Tarjoamispaikan tiedot rivillä ' + row + ': sähköpostiosoite on pakollinen jos lasku lähetetään tarjoamispaikalle.'
+      if (val.isPayer && !val.emailAddresses) return [msg]
+      else return []
     }
   }
 

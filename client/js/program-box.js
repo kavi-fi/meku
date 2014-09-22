@@ -9,9 +9,9 @@ function programBox() {
 
   return { render: render }
 
-  function render(p) {
+  function render(p, episodes) {
     var $e = renderProgram(p)
-    enums.util.isTvSeriesName(p) ? renderTvSeries($e, p) : renderClassifications($e, p)
+    enums.util.isTvSeriesName(p) ? renderTvSeries($e, p, episodes) : renderClassifications($e, p)
     return $e
   }
 
@@ -38,7 +38,7 @@ function programBox() {
       .find('.synopsis').labeledText(p.synopsis).end()
   }
 
-  function renderTvSeries($e, p) {
+  function renderTvSeries($e, p, preloadedEpisodes) {
     var summary = classificationUtils.fullSummary(p)
     $e.find('.classification-container').html($classificationTemplates.tvSeries.clone()).end()
       .find('.agelimit').attr('src', ageLimitIcon(summary)).end()
@@ -49,16 +49,22 @@ function programBox() {
     var $episodes = $e.find('.episodes')
     var $episodeHeader = $e.find('.episode-container > h3')
     if (p.episodes.count > 0) {
-      var $spinner = spinner()
-      $episodeHeader.append(' '+p.episodes.count + ' kpl').append($spinner).one('click', function() {
-        $spinner.addClass('active')
-        $.get('/episodes/'+ p._id).done(function(allEpisodes) {
-          $spinner.remove()
-          $episodeHeader.click(toggleEpisodesOpen)
-          renderEpisodes(allEpisodes)
-          toggleEpisodesOpen()
+      if (preloadedEpisodes) {
+        renderEpisodes(preloadedEpisodes)
+        toggleEpisodesOpen(false)
+        $episodeHeader.click(function() { toggleEpisodesOpen(true) })
+      } else {
+        var $spinner = spinner()
+        $episodeHeader.append(' '+p.episodes.count + ' kpl').append($spinner).one('click', function() {
+          $spinner.addClass('active')
+          $.get('/episodes/'+ p._id).done(function(allEpisodes) {
+            $spinner.remove()
+            $episodeHeader.click(function() { toggleEpisodesOpen(true) })
+            renderEpisodes(allEpisodes)
+            toggleEpisodesOpen(true)
+          })
         })
-      })
+      }
     } else {
       $episodeHeader.empty().addClass('disabled').text('Ei jaksoja.')
       $episodes.remove()
@@ -78,9 +84,9 @@ function programBox() {
       }
     })
 
-    function toggleEpisodesOpen() {
+    function toggleEpisodesOpen(animate) {
       $episodeHeader.toggleClass('open')
-      $episodes.slideToggle()
+      animate ? $episodes.slideToggle() : $episodes.toggle()
     }
 
     function renderEpisodes(allEpisodes) {

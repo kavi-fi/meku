@@ -245,7 +245,7 @@ app.get('/episodes/:seriesId', function(req, res, next) {
 })
 
 app.get('/programs/drafts', function(req, res, next) {
-  Program.find({ draftsBy: req.user._id }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
+  Program.find({ draftsBy: req.user._id, deleted: { $ne:true } }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {
       return {_id: p._id, name: p.name, creationDate: p.draftClassifications[req.user._id].creationDate}
@@ -403,9 +403,13 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
 app.post('/programs/:id/categorization', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
+    var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
     watcher.applyUpdates(updates)
+    if (!enums.util.isTvEpisode(program)) {
+      program.series = program.episode = program.season = undefined
+    }
     verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {
@@ -414,7 +418,7 @@ app.post('/programs/:id/categorization', function(req, res, next) {
           if (err) return next(err)
           updateTvSeriesClassification(program, function(err) {
             if (err) return next(err)
-            res.send(program)
+            updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, respond(res, next, program))
           })
         })
       })
@@ -440,11 +444,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
             updateMetadataIndexes(program, function() {
               updateTvSeriesClassification(program, function(err) {
                 if (err) return next(err)
-                if (oldSeries && oldSeries._id && String(oldSeries._id) != String(program.series._id)) {
-                  Program.updateTvSeriesClassification(oldSeries._id, respond(res, next, program))
-                } else {
-                  res.send(program)
-                }
+                updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, respond(res, next, program))
               })
             })
           })
@@ -1385,6 +1385,14 @@ function respond(res, next, overrideData) {
   return function(err, data) {
     if (err) return next(err)
     res.send(overrideData || data)
+  }
+}
+
+function updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, previousSeries, callback) {
+  if (previousSeries && previousSeries._id && String(previousSeries._id) != String(program.series._id)) {
+    Program.updateTvSeriesClassification(previousSeries._id, callback)
+  } else {
+    callback()
   }
 }
 

@@ -93,6 +93,11 @@ function internalSearchPage() {
     showCategorizationForm($(this).closest('.program-box'))
   })
 
+  $results.on('click', 'button.recategorize', function() {
+    $(this).prop('disabled', true)
+    showCategorizationForm($(this).closest('.program-box'))
+  })
+
   $results.on('click', 'button.edit', function() {
     $(this).prop('disabled', true)
     var $programBox = $(this).closest('.program-box')
@@ -111,14 +116,9 @@ function internalSearchPage() {
     function removeProgram() {
       $.ajax('/programs/' + program._id, { type: 'delete' }).done(function() {
         closeDialog()
-        $programBox.slideUp(function() { $(this).remove() })
-        $row.slideUp(function() {
-          if (!_.isEmpty($(this).parents('.recent'))) { loadRecent() }
-          if (!_.isEmpty($(this).parents('.episodes'))) {
-            var $parentRow = $row.closest('.program-box').prev('.result')
-            $.get('/programs/' + $parentRow.data('id')).done(searchPageApi.programDataUpdated)
-          }
-          $(this).remove()
+        searchPageApi.programDeleted(program, function() {
+          loadDrafts()
+          loadRecent()
         })
       })
     }
@@ -144,39 +144,46 @@ function internalSearchPage() {
       $recent.hide()
       $recent.find('.result').remove()
       recents.forEach(function(p) {
-        var $result = $('<div>').addClass('result').data('id', p._id).data('program', p)
-          .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
-          .append($('<span>', { class: 'name' }).text(p.name[0]))
-          .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
-          .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
-          .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
+        var $result = renderRecentRow(p)
         $recent.show().append($result)
       })
     })
+
+    function renderRecentRow(p) {
+      return $('<div>', { 'data-id': p._id }).addClass('result').data('program', p)
+        .append($('<span>', { class: 'registrationDate' }).text(utils.asDateTime(p.classifications[0].registrationDate)))
+        .append($('<span>', { class: 'name' }).text(p.name[0]))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
+        .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
+        .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
+        .data('renderer', renderRecentRow)
+    }
   }
 
   function toggleDetailButtons($detail, p) {
     if (enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').show()
+      $detail.find('button.recategorize').hide()
     } else if (enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').hide()
     } else if (p.draftClassifications && p.draftClassifications[user._id]) {
       $detail.find('button.continue-classification').show()
       $detail.find('button.reclassify').hide()
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').hide()
     } else if (p.classifications.length == 0) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(hasRole('kavi'))
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').toggle(hasRole('kavi'))
     } else {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(classificationUtils.canReclassify(p, user))
-      $detail.find('button.categorize').hide()
+      $detail.find('button.recategorize').toggle(hasRole('kavi'))
     }
+    $detail.find('button.categorize').toggle(enums.util.isUnknown(p))
+
     $detail.find('button.edit').toggle(hasRole('root'))
     $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))
   }
@@ -192,7 +199,7 @@ function internalSearchPage() {
   }
 
   function showCategorizationForm($programBox) {
-    var id = $programBox.data('id')
+    var program = $programBox.prev('.result').data('program')
     var $categorizationForm = $programBox.find('.categorization-form')
     var $categorySelection = $categorizationForm.find('input[name=category-select]')
     var $categorySaveButton = $categorizationForm.find('.save-category')
@@ -203,6 +210,11 @@ function internalSearchPage() {
     var $series = $tvEpisodeForm.find('input[name=series]')
     var $newSeriesForm = $categorizationForm.find('.categorization-form-tv-new-series')
 
+    $categorySelection.select2(programTypesSelect2).select2('val', 1)
+    $categorySelection.change(function() {
+      $tvEpisodeForm.toggleClass('hide', !isTvEpisode()).find('input').trigger('validate')
+    })
+
     select2Autocomplete({
       $el: $series,
       path: function(term) { return '/series/search?q=' + encodeURIComponent(term) },
@@ -210,35 +222,6 @@ function internalSearchPage() {
       fromOption: select2OptionToIdNamePair,
       allowAdding: true,
       termMinLength: 0
-    })
-
-    $categorySelection.select2(programTypesSelect2).select2('val', 1)
-
-    var isTvEpisode = function() {
-      return enums.util.isTvEpisode({ programType: $categorySelection.select2('val') })
-    }
-
-    $categorizationForm.on('select2-blur', function(e) { $(e.target).addClass('touched') })
-
-    $categorizationForm.show()
-    validateTextChange($categorizationForm.find('input.required'), isNotEmpty)
-
-    $categorizationForm.on('validation input', function(e) {
-      var required = $categorizationForm.find('.required.invalid, input:invalid')
-        .not('.select2-container')
-        .filter(function() {
-          var $this = $(this)
-          // Filter hidden elements, but select the hidden offscreen input if its select2 container is visible
-          if ($this.is('.select2-offscreen')) {
-            return $($this.select2('container')).is(':visible')
-          }
-          return $this.is(':visible')
-        })
-      $categorySaveButton.prop('disabled', required.length > 0)
-    })
-
-    $categorySelection.change(function() {
-      $tvEpisodeForm.toggleClass('hide', !isTvEpisode()).find('input').trigger('validate')
     })
 
     $series.change(function() {
@@ -260,6 +243,33 @@ function internalSearchPage() {
       $series.select2('data', { id: val, text: val, isNew: true })
     })
 
+    $categorizationForm.on('select2-blur', function(e) { $(e.target).addClass('touched') })
+
+    validateTextChange($categorizationForm.find('input.required'), isNotEmpty)
+
+    $categorizationForm.on('validation input', function(e) {
+      var required = $categorizationForm.find('.required.invalid, input:invalid')
+        .not('.select2-container')
+        .filter(function() {
+          var $this = $(this)
+          // Filter hidden elements, but select the hidden offscreen input if its select2 container is visible
+          if ($this.is('.select2-offscreen')) {
+            return $($this.select2('container')).is(':visible')
+          }
+          return $this.is(':visible')
+        })
+      $categorySaveButton.prop('disabled', required.length > 0)
+    })
+
+    $categorizationForm.show()
+
+    if (enums.util.isDefinedProgramType(program.programType)) {
+      $categorySelection.select2('val', program.programType).trigger('change')
+      $series.select2('data', idNamePairToSelect2Option(program.series)).trigger('validate')
+      $season.val(program.season).trigger('validate')
+      $episode.val(program.episode).trigger('validate')
+    }
+
     $categorySaveButton.click(function() {
       $categorySaveButton.prop('disabled', true)
       var categoryData = { programType: $categorySelection.select2('val') }
@@ -278,10 +288,21 @@ function internalSearchPage() {
           }
         }
       }
-      $.post('/programs/' + id + '/categorization', JSON.stringify(categoryData)).done(function(program) {
-        searchPageApi.programDataUpdated(program)
+      $.post('/programs/' + program._id + '/categorization', JSON.stringify(categoryData)).done(function(newProgram) {
+        var oldProgram = program
+        var oldSeriesId = utils.getProperty(oldProgram, 'series._id')
+        var newSeriesId = utils.getProperty(newProgram, 'series._id')
+
+        if (oldSeriesId && oldSeriesId != newSeriesId) searchPageApi.updateProgramIfVisible(oldSeriesId)
+        if (newSeriesId) searchPageApi.updateProgramIfVisible(newSeriesId)
+        searchPageApi.programDataUpdated(newProgram)
       })
     })
+
+    function isTvEpisode() {
+      return enums.util.isTvEpisode({ programType: $categorySelection.select2('val') })
+    }
+
   }
 }
 
@@ -344,7 +365,7 @@ function searchPage() {
     }
   })
 
-  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted }
+  return { programDataUpdated: programDataUpdated, programDeleted: programDeleted, updateProgramIfVisible: updateProgramIfVisible }
 
   function queryChanged(q) {
     state = { q:q, page: 0 }
@@ -472,28 +493,53 @@ function searchPage() {
     return $page.find('.kavi-query-filters .warning-filter.active').map(function() { return $(this).data('id') }).toArray()
   }
 
+  function updateProgramIfVisible(programId) {
+    var $rows = $page.find('.result[data-id=' + programId + ']')
+    if (_.isEmpty($rows)) return
+    $.get('/programs/'+programId).done(programDataUpdated)
+  }
 
   function programDataUpdated(program) {
-    var $row = $page.find('.result[data-id=' + program._id + ']')
-    if (_.isEmpty($row)) return
-    var $newRow = render(program, state.q)
-    $row.next('.program-box').remove()
-    $row.replaceWith($newRow)
-    if ($row.is('.selected')) {
-      openDetail($newRow, false)
+    var $rows = $page.find('.result[data-id=' + program._id + ']')
+    if (_.isEmpty($rows)) return
+    var episodesAreOpen = $rows.next('.program-box').find('.episode-container > h3').hasClass('open')
+    if (episodesAreOpen) {
+      $.get('/episodes/'+ program._id).done(updateUI)
+    } else {
+      updateUI()
+    }
+
+    function updateUI(episodes) {
+      $rows.each(function() {
+        var $row = $(this)
+        var customRenderer = $row.data('renderer')
+        var $newRow = customRenderer ? customRenderer(program) : render(program, state.q)
+        $row.next('.program-box').remove()
+        $row.replaceWith($newRow)
+        if ($row.is('.selected')) {
+          openDetail($newRow, false, episodes)
+        }
+      })
     }
   }
 
-  function programDeleted(program) {
-    var $row = $page.find('.result[data-id=' + program._id + ']')
-    if (_.isEmpty($row)) return
-    $row.next('.program-box').add($row).slideUp(function() { $(this).remove() })
+  function programDeleted(program, callback) {
+    if (!callback) callback = function() {}
+    updateLocationHash()
+    if (program.series && program.series._id) updateProgramIfVisible(program.series._id)
+    var $rows = $page.find('.result[data-id=' + program._id + ']')
+    if (_.isEmpty($rows)) return callback()
+    var $remove = $rows.next('.program-box').add($rows).slideUp()
+    $remove.promise().done(function() {
+      $remove.remove()
+      callback()
+    })
   }
 
-  function openDetail($row, animate) {
+  function openDetail($row, animate, preloadedEpisodes) {
     var p = $row.data('program')
     updateLocationHash(p._id)
-    var $details = detailRenderer.render(p)
+    var $details = detailRenderer.render(p, preloadedEpisodes)
     $row.addClass('selected').after($details)
     animate ? $details.slideDown() : $details.show()
     $details.trigger('showDetails', p)

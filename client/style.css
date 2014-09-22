@@ -674,6 +674,7 @@ textarea.invalid:disabled,
 .date-selection .datepicker span { display: inline-block; margin-right: 5px; }
 
 #billing-page input[type=checkbox] { margin-right: 5px; }
+#billing-page .no-results { display: none; margin-top: 40px; color: #d3d3d3; }
 #billing-page .rows input[type=checkbox] { margin: 5px; }
 #billing-page h4 { display: inline-block; margin: 0; padding: 0; }
 #billing-page table { margin-left: 50px; width: 100%; }

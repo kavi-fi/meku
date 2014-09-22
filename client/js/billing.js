@@ -3,6 +3,7 @@ function billingPage() {
   var $datePicker = $page.find('.datepicker')
   var $proeButton = $page.find('button')
   var $accounts = $page.find('.accounts')
+  var $noResults = $page.find('.no-results')
   var detailRenderer = programBox()
   var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']} }
   var format = 'DD.MM.YYYY'
@@ -47,7 +48,7 @@ function billingPage() {
       $page.find('input[name=begin]').val(range.begin)
       $page.find('input[name=end]').val(range.end)
       var $accounts = $page.find('.accounts').empty()
-
+      $noResults.toggle(rows.length == 0)
       _(rows).groupBy(function(x) { return x.account.name }).pairs().sortBy(function(t) { return t[0] }).forEach(function(account) {
         var name = account[0]
         var rows = account[1]

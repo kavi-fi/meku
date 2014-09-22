@@ -21,8 +21,6 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
  There are some memory issues, so run in parts, eg:
    node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications deleteTrainingPrograms markUnclassifiedProgramsDeleted deleteTrainingUsers linkTvSeries linkCustomersIds metadataIndex nameIndex
 
- Should remove programs which have no classifications? -> ~7400
-   check how many are tv-series-names?
  Pre-deployment: Check that sequence start numbers are ok.
 */
 
@@ -98,7 +96,6 @@ function programs(callback) {
 }
 
 function names(callback) {
-  // NOTE: Should add meku_audiovisualprograms.name somehow?
   var q = 'select p.id, j.type, n.name from meku_audiovisualprograms p join meku_audiovs_meku_names_c j on (p.id = j.meku_audio91farograms_ida) join meku_names n on (j.meku_audio7e24u_names_idb = n.id) where p.deleted != "1" and j.deleted != "1" and n.deleted != "1" and j.type in ("1A", "1B", "2S", "3R", "4M")'
   batchUpdater(q, mapper, update, callback)
 
@@ -118,7 +115,7 @@ function names(callback) {
 
   function nameType(type) {
     if (type == '1A') return 'name'
-    if (type == '1B') return 'nameOther' // ???
+    if (type == '1B') return 'nameOther'
     if (type == '2S') return 'nameFi'
     if (type == '3R') return 'nameSv'
     if (type == '4M') return 'nameOther'
@@ -158,9 +155,6 @@ function metadata(callback) {
 }
 
 function classifications(callback) {
-  // TODO: add c.no_items (== safe?)
-  // TODO: verify that reg_date order is the valid ordering
-
   async.waterfall([base, criteria, mapUsers, mapBuyers, harmonize, resolveSentEmails, save], callback)
 
   function base(callback) {

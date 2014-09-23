@@ -126,7 +126,7 @@ function reportsPage() {
     warnings: warningMapper,
     agelimitChanges: agelimitChangeMapper,
     kaviAgelimitChanges: agelimitChangeMapper,
-    kaviReclassificationReason: function(id) { return enums.reclassificationReason[id].uiText || 'Ei tiedossa' }
+    kaviReclassificationReason: function(id) { return utils.getProperty(enums.reclassificationReason[id], 'uiText') || 'Ei tiedossa' }
   }
 
   function agelimitMapper(id) {

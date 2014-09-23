@@ -94,7 +94,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
       publicComments: classification.publicComments || 'ei määritelty.',
       classifier: classifierName(),
-      reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason] : 'ei määritelty',
+      reason: classification.reason !== undefined ? enums.reclassificationReason[classification.reason].emailText : 'ei määritelty',
       extraInfoLink: extraInfoLink(),
       appendixLink: appendixLink(),
       previous: previous(),

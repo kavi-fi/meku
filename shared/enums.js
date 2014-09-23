@@ -203,10 +203,10 @@ enums.classificationStatus = [
 ]
 
 enums.reclassificationReason = {
-  0: 'KAVI:n oma aloite',
-  1: 'Yleisön pyyntö',
-  2: 'Valitusosoitus',
-  3: 'Oikaisupyyntö'
+  0: { emailText: 'KAVI:n oma aloite', uiText: 'KAVI:n oma aloite' },
+  1: { emailText: 'Yleisön pyyntö', uiText: 'Palaute' },
+  2: { emailText: 'Valitusosoitus', uiText: 'Valitus' },
+  3: { emailText: 'Oikaisupyyntö', uiText: 'Oikaisuvaatimus' }
 }
 
 enums.isOikaisupyynto = function(val) { return val == 3 }

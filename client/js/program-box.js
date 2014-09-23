@@ -151,7 +151,7 @@ function programBox() {
     var summary = classificationUtils.summary(c)
     $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warningIcons(summary)).end()
-      .find('.reason').labeledText(enums.reclassificationReason[c.reason]).end()
+      .find('.reason').labeledText(enums.reclassificationReason[c.reason].uiText).end()
       .find('.author').labeledText(c.author ? c.author.name + ' (' + c.author.username + ')' : '').end()
       .find('.authorOrganization').labeledText(enums.authorOrganization[c.authorOrganization]).end()
       .find('.buyer').labeledText(c.buyer && c.buyer.name || '').end()

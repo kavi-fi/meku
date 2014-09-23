@@ -590,7 +590,7 @@ function classificationFormUtils() {
       },
       reason: {
         $el: $form.find('input[name="classification.reason"]'),
-        data: _.map(enums.reclassificationReason, function(text, id) { return { id: id, text: text } }),
+        data: _.map(enums.reclassificationReason, function(reason, id) { return { id: id, text: reason.uiText } }),
         fromOption: select2OptionToInt
       }
     }

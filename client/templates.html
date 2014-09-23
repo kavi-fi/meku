@@ -535,10 +535,18 @@
             <label>TV-sarjan muu nimi</label><input name="series.draft.nameOther" disabled class="throttledInput" type="text" />
           </div>
         </div>
-        <label>Alkuperäinen nimi</label><input name="name.0" class="required throttledInput" type="text" />
-        <label>Suomalainen nimi</label><input name="nameFi.0" class="required throttledInput" type="text" />
-        <label>Ruotsinkielinen nimi</label><input name="nameSv.0" class="throttledInput" type="text" />
-        <label>Muu nimi</label><input name="nameOther.0" class="throttledInput" type="text" />
+        <div class="nameContainer">
+          <label>Alkuperäinen nimi</label><input name="name" class="required throttledNameInput" type="text" />
+        </div>
+        <div class="nameFiContainer">
+          <label>Suomalainen nimi</label><input name="nameFi" class="required throttledNameInput" type="text" />
+        </div>
+        <div class="nameSvContainer">
+          <label>Ruotsinkielinen nimi</label><input name="nameSv" class="throttledNameInput" type="text" />
+        </div>
+        <div class="nameOtherContainer">
+          <label>Muu nimi</label><input name="nameOther" class="throttledNameInput" type="text" /><button tabindex="-1" data-name-type="nameOther" class="button addExtraName">+</button>
+        </div>
         <label class="select2-label">Maat</label><input name="country" class="country required" type="hidden" />
         <label>Valmistumisvuosi</label><input name="year" type="text" class="required throttledInput" />
         <label class="select2-label">Tuotantoyhtiöt</label><input name="productionCompanies" class="required" type="hidden"/>

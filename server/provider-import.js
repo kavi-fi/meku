@@ -7,46 +7,49 @@ var xls = require('xlsjs')
 var async = require('async')
 var enums = require('../shared/enums')
 
-var providerFieldMap = {
-  'address.city':    'Postitoimipaikka',
-  'address.country': 'Maa',
-  'address.street':  'Lähiosoite',
-  'address.zip':     'Postinro',
-  'contactName':     'Tarjoajan yhteyshenkilö',
-  'emailAddresses':  'Sähköposti',
-  'language':        'Asiointikieli',
-  'name':            'Yritys/Toiminimi',
-  'phoneNumber':     'Puhelinnumero',
-  'yTunnus':         'Y-tunnus'
-}
+var providerFieldMap = [
+  'name',
+  'yTunnus',
+  'address.street',
+  'address.zip',
+  'address.city',
+  'language',
+  'contactName',
+  'emailAddresses',
+  'phoneNumber',
+  'address.country'
+]
 
-var billingFieldMap = {
-  'billing.address.city':    'Postitoimipaikka',
-  'billing.address.street':  'Lähiosoite',
-  'billing.address.zip':     'Postinro',
-  'billing.invoiceText':     'Laskulle haluttava teksti',
-  'eInvoice.address':        'Verkkolaskuosoite (OVT/IBAN)',
-  'eInvoice.operator':       'Välittäjätunnus'
-}
+var billingFieldMap = [
+  'billing.address.street',
+  'billing.address.zip',
+  'billing.address.city',
+  'billing.invoiceText'
+]
 
-var locationFieldMap = {
-  'address.city':               'Postitoimipaikka',
-  'address.street':             'Lähiosoite',
-  'address.zip':                'Postinro',
-  'adultContent':               'Luokittelemattomia K18 ohjelmia',
-  'contactName':                'Tarjoamispaikan yhteyshenkilö',
-  'emailAddresses':             'Sähköpostiosoite',
-  'isPayer':                    'Lasku lähetetään Tarjoamispaikalle',
-  'name':                       'Tarjoamispaikan nimi',
-  'phoneNumber':                'Puhelinnumero',
-  'url':                        ' www-osoite',
-  'Recordings_provide':         'Tallenteiden tarjoaminen',
-  'Public_presentation':        'Julkinen esittäminen',
-  'National_TV':                'Valtakunnallinen TV-ohjelmisto',
-  'Regional_TV':                'Alueellinen ohjelmisto',
-  'Transmitted_abroad_program': 'Ulkomailta välitetty ohjelm.',
-  'Subscription_of_program':    'Tilausohjelma-palvelu'
-}
+var eInvoiceFieldMap = [
+  'eInvoice.address',
+  'eInvoice.operator'
+]
+
+var locationFieldMap = [
+  'name',
+  'address.street',
+  'address.zip',
+  'address.city',
+  'isPayer',
+  'contactName',
+  'emailAddresses',
+  'phoneNumber',
+  'Recordings_provide',
+  'Public_presentation',
+  'National_TV',
+  'Regional_TV',
+  'Transmitted_abroad_program',
+  'Subscription_of_program',
+  'url',
+  'adultContent'
+]
 
 exports.import = function(file, callback) {
   var parser = false
@@ -118,7 +121,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
 
   var providerData = parseFieldRowAndValueRowAfterColumn('Tarjoaja', providerFieldMap, requiredProviderFields)
   var billingData = parseFieldRowAndValueRowAfterColumn('Lasku eri osoitteeseen kuin Tarjoajan osoite', billingFieldMap, noRequiredFields)
-  var eInvoiceData = parseFieldRowAndValueRowAfterColumn('TAI verkkolasku', billingFieldMap, noRequiredFields)
+  var eInvoiceData = parseFieldRowAndValueRowAfterColumn('TAI verkkolasku', eInvoiceFieldMap, noRequiredFields)
   var locationsData = parseFieldRowAndValueRowsAfterColumn('Tarjoamispaikkojen tiedot ja tarjoamistavat', locationFieldMap, requiredLocationFields)
 
   if (locationsData.length === 0) errors.push('Tarjoamispaikkojen tiedot puuttuvat')
@@ -135,8 +138,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
 
   function parseFieldRowAndValueRowAfterColumn(column, fieldMap, requiredFields) {
     var rowNumber = findColumnRowByValue(providerSheet, column)
-    var row = toObject(getFields(providerSheet, rowNumber + 1, _.invert(fieldMap)), getValues(providerSheet, rowNumber + 2))
-
+    var row = toObject(providerSheet, rowNumber + 2, fieldMap)
     var errorMessages = validate(row, requiredFields, rowNumber + 2, fieldMap)
     errorMessages.forEach(function(msg) {
       errors.push(msg)
@@ -147,7 +149,6 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
 
   function parseFieldRowAndValueRowsAfterColumn(column, fieldMap, requiredFields) {
     var rowNumber = findColumnRowByValue(providerSheet, column)
-    var fields = getFields(providerSheet, rowNumber + 1, _.invert(fieldMap))
 
     var rows = values([], rowNumber + 2)
     
@@ -165,12 +166,12 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
 
     return rows
 
-    function values(xs, index) {
-      var currentValues = getValues(providerSheet, index)
-      if (currentValues.length == 0) {
+    function values(xs, row) {
+      var currentValues = toObject(providerSheet, row, fieldMap)
+      if (_.all(currentValues, function(x) { return x === null})) {
         return xs
       } else {
-        return values(xs.concat([toObject(fields, currentValues)]), index + 1)
+        return values(xs.concat([currentValues]), row + 1)
       }
     }
 
@@ -210,12 +211,6 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
     function parseRowNumber(key) { return parseInt(key.substring(key.search(/\d/))) }
   }
 
-  function toObject(fields, values) {
-    return _.reduce(values, function(result, value) {
-      return utils.merge(result, utils.keyValue(fields[value[0]], value[1]))
-    }, {})
-  }
-
   function validate(values, requiredFields, index, fieldMap) {
     var present = _.keys(values)
     var missing = _.reduce(requiredFields.values, function(acc, r) {
@@ -233,22 +228,30 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
     })
   }
 
-  function getFields(from, row, fieldMap) {
-    return _.reduce(getValues(from, row), function(result, value) {
-      var excelColIndex = value[0]
-      var excelCol = value[1]
-      result[excelColIndex] = fieldMap[excelCol]
-      return result
-    }, {})
-  }
-
-  function getValues(from, row) {
-    return _.reduce(from, function(result, field, key) {
-      if (key.match(new RegExp('.' + row))) return result.concat([[parseColumnKey(key), field.v]])
+  function toObject(from, row, fields) {
+    var fst = function(x) { return x[0] }
+    var snd = function(x) { return x[1] }
+    
+    var ob = _.reduce(from, function(result, field, key) {
+      if (key.match(new RegExp('.' + row))) {
+        return utils.merge(result, utils.keyValue(key.substr(0, 1), field.v))
+      }
       else return result
-    }, [])
+    }, emptyRow(fields.length))
+
+    var values = _(ob).pairs().sortBy(fst).map(snd).value()
+
+    return _(_.pairs(_.zipObject(fields, values))).filter(function(x) {
+      return x[1] !== null
+    }).object().value()
 
     function parseColumnKey(key) { return key.substring(0, key.search(/\d/)) }
+  }
+
+  function emptyRow(count) {
+    return _('BCDEFGHIJKLMNOPQRSTU'.split('')).take(count).reduce(function(ob, c) {
+      return utils.merge(ob, utils.keyValue(c, null)) 
+    }, {})
   }
 }
 

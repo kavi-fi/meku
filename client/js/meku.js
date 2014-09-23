@@ -1,3 +1,12 @@
+// Check for modern browsers. Modern is defined as supporting flexbox.
+(function() {
+  var e = document.createElement('test')
+  if (e.style['flexWrap'] === undefined && e.style['webkitFlexWrap'] === undefined) {
+    document.location = '/upgrade-browser.html'
+    throw true
+  }
+})()
+
 var user
 var pikadayDefaults = {
   defaultDate: new Date(),

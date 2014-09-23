@@ -5,16 +5,16 @@ enums.criteriaCategories = ['violence', 'sex', 'fear', 'drugs']
 enums.classificationCategoriesFI = {violence: 'väkivalta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
 
 enums.format = [
+  'Blu-ray Disc',
+  'DCP',
+  'DVD',
+  'Verkkoaineisto',
   '8 mm',
   '16 mm',
   '35 mm',
   '70 mm',
-  'Blu-ray Disc',
   'CDKuva',
-  'DCP',
-  'DVD',
   'Televisio',
-  'Verkkoaineisto',
   'VHS',
   'video',
   'VoD',

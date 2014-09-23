@@ -16,7 +16,7 @@ function programBox() {
   }
 
   function renderProgram(p) {
-    var names = { n: p.name.join(', '), fi: p.nameFi.join(', '), sv: p.nameSv.join(', '), other: p.nameOther.join(', ')}
+    var names = { n: join(p.name), fi: join(p.nameFi), sv: join(p.nameSv), other: join(p.nameOther) }
     var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
     return $detailTemplate.clone()
@@ -37,6 +37,8 @@ function programBox() {
       .find('.actors').labeledText(p.actors.join(', ')).end()
       .find('.synopsis').labeledText(p.synopsis).end()
   }
+
+  function join(arr) { return _.reject(arr, _.isEmpty).join(', ') }
 
   function renderTvSeries($e, p, preloadedEpisodes) {
     var summary = classificationUtils.fullSummary(p)

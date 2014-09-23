@@ -45,10 +45,6 @@ function classificationForm(program, classificationFinder, rootEditMode) {
 
   function setProgramFields(p) {
     $form
-      .find('input[name="name.0"]').val(p.name[0]).end()
-      .find('input[name="nameFi.0"]').val(p.nameFi[0]).end()
-      .find('input[name="nameSv.0"]').val(p.nameSv[0]).end()
-      .find('input[name="nameOther.0"]').val(p.nameOther[0]).end()
       .find('input[name=year]').val(p.year).end()
       .find('input[name=season]').val(p.season).end()
       .find('input[name=episode]').val(p.episode).end()
@@ -58,6 +54,11 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('input[name="series.draft.nameSv"]').val(utils.getProperty(p, 'series.draft.nameSv') || '').end()
       .find('input[name="series.draft.nameOther"]').val(utils.getProperty(p, 'series.draft.nameOther') || '').end()
 
+    cfu.nameFields.forEach(function(field) {
+      p[field].forEach(function(val, index) {
+        $form.find('input[name="'+field+'"]').eq(index).val(val).end()
+      })
+    })
     select2Autocomplete(select2Opts.series, save).trigger('setVal', p.series)
     select2EnumAutocomplete(select2Opts.countries, save).trigger('setVal', p.country)
     select2Autocomplete(select2Opts.productionCompanies, save).trigger('setVal', p.productionCompanies)
@@ -155,6 +156,27 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       if (($(this).is(':invalid') || $(this).hasClass('invalid')) && $(this).val().length > 0) return false
       save($(this).attr('name'), txt)
     })
+
+    $form.find('.throttledNameInput').throttledInput(function() { saveNames($(this).attr('name'), $(this).parent()) })
+
+    $form.on('click', 'button.addExtraName', function(e) {
+      e.preventDefault()
+      var fieldName = $(this).data('name-type')
+      var $html = cfu.nameFieldHtml(fieldName).appendTo($(this).parent())
+      $html.filter('input[type=text]').throttledInput(function() { saveNames(fieldName, $(this).parent()) })
+    })
+    $form.on('click', 'button.removeExtraName', function(e) {
+      e.preventDefault()
+      var $container = $(this).parent()
+      $(this).prev().add($(this)).remove()
+      saveNames($(this).data('name-type'), $container)
+    })
+
+    function saveNames(fieldName, $container) {
+      var values = $container.find('input[type=text]').map(function() { return $(this).val() }).toArray()
+      save(fieldName, values)
+    }
+
     $form.find('input[name="classification.safe"]').change(function() {
       var safe = $(this).is(':checked')
       $form.find('.category-container').slideToggle()
@@ -246,20 +268,37 @@ function classificationForm(program, classificationFinder, rootEditMode) {
 }
 
 function classificationFormUtils() {
+  var nameFields = ['name', 'nameFi', 'nameSv', 'nameOther']
 
   return {
     renderForm: renderForm, updateWarningOrdering: updateWarningOrdering,
     registrationEmails: registrationEmails, warningDragOrder: warningDragOrder,
-    cloneForProgramBox: cloneForProgramBox,  select2Opts: select2Opts
+    cloneForProgramBox: cloneForProgramBox,  select2Opts: select2Opts,
+    nameFields: nameFields, nameFieldHtml: nameFieldHtml
   }
 
   function renderForm(program, classification, editMode) {
     $('#classification-page').html($('#templates .program-details').clone())
     var $form = $('#classification-page .program-details-form')
     renderClassificationCriteria($form)
+    renderExtraNameFields($form, program)
     filterFields($form, program, classification, editMode)
     if (editMode) configureRootEditMode($form, program, classification)
     return $form
+  }
+
+  function renderExtraNameFields($form, p) {
+    nameFields.forEach(function(field) {
+      _.range(1, p[field].length).forEach(function() {
+        $form.find('.' + field + 'Container').append(nameFieldHtml(field))
+      })
+    })
+  }
+
+  function nameFieldHtml(name) {
+    var $input = $('<input>', { name: name, class: 'throttledNameInput extraName', type: 'text' })
+    var $removeButton = $('<button>', { class: 'button removeExtraName', 'data-name-type': name, tabindex: '-1' }).text('-')
+    return $input.add($removeButton)
   }
 
   function renderClassificationCriteria($form) {
@@ -309,7 +348,11 @@ function classificationFormUtils() {
     }
     if (!hasRole('kavi')) $form.find('.private-comments').remove()
 
-    if (isReclassification && !editMode) $form.find('.program-info input, .program-info textarea').prop('disabled', true)
+    if (isReclassification && !editMode) {
+      $form.find('.program-info input, .program-info textarea').prop('disabled', true)
+      $form.find('.program-info button.addExtraName').remove()
+      $form.find('.program-info button.removeExtraName').remove()
+    }
   }
 
   function configureRootEditMode($form, p, c) {

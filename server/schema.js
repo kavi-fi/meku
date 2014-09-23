@@ -159,7 +159,7 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
   }
 
   function populate(p, extraNames) {
-    var words = concatNames(p).concat([utils.seasonEpisodeCode(p)]).concat(extraNames)
+    var words = _.reject(concatNames(p).concat([utils.seasonEpisodeCode(p)]).concat(extraNames), _.isEmpty)
     words = words.map(function(s) { return (s + ' ' + s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1')).split(/\s+/) })
     p.allNames = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
   }

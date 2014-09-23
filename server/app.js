@@ -494,7 +494,7 @@ app.post('/programs/autosave/:id', function(req, res, next) {
   }
 
   function allowedAutosaveFields(p, user) {
-    var programFields = ['name.0', 'nameFi.0', 'nameSv.0', 'nameOther.0', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
+    var programFields = ['name', 'nameFi', 'nameSv', 'nameOther', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
     var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationEmailAddresses', 'comments', 'criteriaComments*']
     var kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
     if (p.classifications.length == 0) {

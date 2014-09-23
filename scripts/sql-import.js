@@ -19,7 +19,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications deleteTrainingPrograms markUnclassifiedProgramsDeleted deleteTrainingUsers linkTvSeries linkCustomersIds metadataIndex nameIndex
+   node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications deleteTrainingPrograms markUnclassifiedProgramsDeleted deleteTrainingUsers deleteLegacyGames linkTvSeries linkCustomersIds metadataIndex nameIndex
 
  Pre-deployment: Check that sequence start numbers are ok.
 */
@@ -34,6 +34,7 @@ var tasks = {
   wipeMetadataIndex: wipeMetadataIndex, metadataIndex: metadataIndex,
   deleteTrainingPrograms: deleteTrainingPrograms,
   deleteTrainingUsers: deleteTrainingUsers,
+  deleteLegacyGames: deleteLegacyGames,
   markUnclassifiedProgramsDeleted: markUnclassifiedProgramsDeleted,
   linkCustomersIds: linkCustomersIds,
   linkTvSeries: linkTvSeries
@@ -85,7 +86,7 @@ function programs(callback) {
         .concat(optionListToArray(row.tv_program_genre).map(function(g) { return enums.legacyTvGenres[g] }))
         .concat(optionListToArray(row.game_genre))
       if (legacyGenre) obj.legacyGenre = _(legacyGenre).compact().uniq().value()
-      if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = row.game_format
+      if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = gameFormatMapper(row.game_format)
       if (row.created_by) {
         var user = userMap[row.created_by]
         obj.createdBy = { _id: user._id, name: user.name, username: user.username, role: user.role }
@@ -93,6 +94,13 @@ function programs(callback) {
       return obj
     }
   })
+
+  function gameFormatMapper(s) {
+    if (s == 'PC (PC)') return 'PC'
+    if (s == 'COIN (Kolikkopeli)') return 'Kolikkopeli'
+    if (s == 'DVDTV (DVD TV-Games)') return 'DVD TV-peli'
+    return s
+  }
 }
 
 function names(callback) {
@@ -634,6 +642,10 @@ function deleteTrainingUsers(callback) {
     if (err) return callback(err)
     schema.Account.update({}, { $pull: { users: { username: /^L.*$/ } } }, { multi: true }, callback)
   })
+}
+
+function deleteLegacyGames(callback) {
+  schema.Program.remove({ programType: 7, 'classifications.0.registrationDate': { $exists: false } }, callback)
 }
 
 function markUnclassifiedProgramsDeleted(callback) {

@@ -428,6 +428,7 @@ label {
 .select2-drop.select2-drop-above.select2-drop-active.required { border-top: 1px solid #00BB88; border-bottom: none; }
 
 .select2-results .grey { color: #d3d3d3; }
+.select2-results .space-below { margin-bottom: 10px; }
 .select2-choice .grey, .select2-search-choice .grey { color: #bbb; }
 
 input[type=text].required,

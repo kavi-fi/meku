@@ -5,6 +5,7 @@ exports.mongoose = mongoose
 
 exports.connectMongoose = function() {
   mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost/meku')
+  return this
 }
 
 exports.progressMonitor = function(num) {

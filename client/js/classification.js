@@ -581,7 +581,13 @@ function classificationFormUtils() {
       },
       format: {
         $el: $form.find('input[name="classification.format"]'),
-        data: enums.format.map(function(f) { return { id: f, text: f }})
+        data: enums.format.map(function(f) { return { id: f, text: f }}),
+        formatResult: function(obj, $container, query) {
+          if (query.term == '' && obj.text == 'Verkkoaineisto') {
+            $container.addClass('space-below')
+          }
+          return obj.text
+        }
       },
       authorOrg: {
         $el: $form.find('input[name="classification.authorOrganization"]'),

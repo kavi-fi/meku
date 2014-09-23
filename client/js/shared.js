@@ -81,8 +81,10 @@ function closeDialog() {
 }
 
 function showRevisionMismatchDialog() {
-  var html = '<h2>Järjestelmä on päivitetty.</h2><span>Lataa sivu uudelleen <a href="javascript:window.location.reload(true)">tästä</a>.</span>'
-  showDialog($('<div>').addClass('dialog revision-mismatch-dialog').html(html))
+  if (!$('.revision-mismatch-dialog').is(':visible')) {
+    var html = '<h2>Järjestelmä on päivitetty.</h2><span>Lataa sivu uudelleen <a href="javascript:window.location.reload(true)">tästä</a>.</span>'
+    showDialog($('<div>').addClass('dialog revision-mismatch-dialog').html(html))
+  }
 }
 
 function registerRevisionMismatchAjaxErrorHandler() {

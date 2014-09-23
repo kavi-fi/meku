@@ -26,7 +26,7 @@ p.help { font-size: 15px; margin: 3px 0; }
 
 #login-overlay, #error-overlay, #conflict-overlay { z-index: 2; }
 #login, #error-dialog, #conflict-dialog { z-index: 3; display: none; position: fixed; top:0;bottom:0;left:0;right:0; box-sizing: border-box; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
-#login > div, #error-dialog > div, #conflict-dialog > div { background-color: #f8f8f8; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; }
+#login > div, #error-dialog > div, #conflict-dialog > div { background-color: #f8f8f8; width: 350px; padding: 20px; border-radius: 5px; border: 5px solid #00BB88; text-align: center; line-height: 20px; }
 #login label, #reset-password label { text-align: left; font-weight: normal; }
 #login input, #reset-password input { width: 330px; font-weight: normal; margin: 10px 0; }
 #login input.invalid, #reset-password input.invalid { background-color: #fff; }

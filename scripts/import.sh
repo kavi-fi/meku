@@ -20,4 +20,4 @@ if [ "$NODE_ENV" != "training" ]; then
   node scripts/sql-import.js deleteTrainingPrograms deleteTrainingUsers
 fi
 
-node scripts/sql-import.js linkTvSeries linkCustomersIds metadataIndex nameIndex
+node scripts/sql-import.js deleteLegacyGames linkTvSeries linkCustomersIds metadataIndex nameIndex

@@ -19,7 +19,7 @@ var conn = mysql.createConnection({ host: 'localhost', user:'root', database: 'e
    metadata before metadataIndex
 
  There are some memory issues, so run in parts, eg:
-   node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications deleteTrainingPrograms markUnclassifiedProgramsDeleted deleteTrainingUsers linkTvSeries linkCustomersIds metadataIndex nameIndex
+   node scripts/sql-import.js wipe && node scripts/sql-import.js sequences && node scripts/sql-import.js accounts && node scripts/sql-import.js programs && node scripts/sql-import.js names && node scripts/sql-import.js metadata classifications deleteTrainingPrograms markUnclassifiedProgramsDeleted deleteTrainingUsers deleteLegacyGames linkTvSeries linkCustomersIds metadataIndex nameIndex
 
  Pre-deployment: Check that sequence start numbers are ok.
 */
@@ -34,6 +34,7 @@ var tasks = {
   wipeMetadataIndex: wipeMetadataIndex, metadataIndex: metadataIndex,
   deleteTrainingPrograms: deleteTrainingPrograms,
   deleteTrainingUsers: deleteTrainingUsers,
+  deleteLegacyGames: deleteLegacyGames,
   markUnclassifiedProgramsDeleted: markUnclassifiedProgramsDeleted,
   linkCustomersIds: linkCustomersIds,
   linkTvSeries: linkTvSeries
@@ -634,6 +635,10 @@ function deleteTrainingUsers(callback) {
     if (err) return callback(err)
     schema.Account.update({}, { $pull: { users: { username: /^L.*$/ } } }, { multi: true }, callback)
   })
+}
+
+function deleteLegacyGames(callback) {
+  schema.Program.remove({ programType: 7, 'classifications.0.registrationDate': { $exists: false } }, callback)
 }
 
 function markUnclassifiedProgramsDeleted(callback) {

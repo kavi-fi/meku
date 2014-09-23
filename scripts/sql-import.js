@@ -86,7 +86,7 @@ function programs(callback) {
         .concat(optionListToArray(row.tv_program_genre).map(function(g) { return enums.legacyTvGenres[g] }))
         .concat(optionListToArray(row.game_genre))
       if (legacyGenre) obj.legacyGenre = _(legacyGenre).compact().uniq().value()
-      if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = row.game_format
+      if (row.program_type == '11' || row.program_type == '08') obj.gameFormat = gameFormatMapper(row.game_format)
       if (row.created_by) {
         var user = userMap[row.created_by]
         obj.createdBy = { _id: user._id, name: user.name, username: user.username, role: user.role }
@@ -94,6 +94,13 @@ function programs(callback) {
       return obj
     }
   })
+
+  function gameFormatMapper(s) {
+    if (s == 'PC (PC)') return 'PC'
+    if (s == 'COIN (Kolikkopeli)') return 'Kolikkopeli'
+    if (s == 'DVDTV (DVD TV-Games)') return 'DVD TV-peli'
+    return s
+  }
 }
 
 function names(callback) {

@@ -46,6 +46,7 @@ function warningIcons(summary) {
 }
 
 function hasRole(role) {
+  if (!window.utils) return false
   return utils.hasRole(window.user, role)
 }
 
@@ -67,4 +68,25 @@ function parseLocationHash() {
 
 function spinner() {
   return $('<div>', { class:'spinner' }).html('<span/><span/><span/>')
+}
+
+function showDialog($html) {
+  $('#overlay').show()
+  $('#dialog').attr('style', 'display: -webkit-flex; display: flex;').append($html)
+}
+
+function closeDialog() {
+  $('#dialog').empty().hide()
+  $('#overlay').hide()
+}
+
+function showRevisionMismatchDialog() {
+  var html = '<h2>Järjestelmä on päivitetty.</h2><span>Lataa sivu uudelleen <a href="javascript:window.location.reload(true)">tästä</a>.</span>'
+  showDialog($('<div>').addClass('dialog revision-mismatch-dialog').html(html))
+}
+
+function registerRevisionMismatchAjaxErrorHandler() {
+  $(document).ajaxError(function(e, req) {
+    if (req.status == 418) showRevisionMismatchDialog()
+  })
 }

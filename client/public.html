@@ -19,6 +19,7 @@
   </script>
   <script>
     $(function() {
+      registerRevisionMismatchAjaxErrorHandler()
       loadTemplates(function() {
         publicSearchPage()
         var hash = parseLocationHash()
@@ -40,5 +41,7 @@
   <div id="search-page" class="page"></div>
 </div>
 <div id="templates"></div>
+<div id="overlay"></div>
+<div id="dialog"></div>
 </body>
 </html>

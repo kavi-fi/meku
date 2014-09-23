@@ -79,6 +79,8 @@ function setup() {
       login.show()
     } else if (req.status == 409) {
       conflict.show()
+    } else if (req.status == 418) {
+      showRevisionMismatchDialog()
     } else if (req.statusText != 'abort') {
       error.show()
     }
@@ -260,16 +262,6 @@ function validate(f) {
 function validateTextChange($el, validatorFn) {
   var validator = validate(validatorFn)
   $el.on('input change validate', validator).on('blur', function() { $(this).addClass('touched') })
-}
-
-function showDialog($html) {
-  $('#overlay').show()
-  $('#dialog').attr('style', 'display: -webkit-flex; display: flex;').append($html)
-}
-
-function closeDialog() {
-  $('#dialog').empty().hide()
-  $('#overlay').hide()
 }
 
 function switchLatestDeferred() {

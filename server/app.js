@@ -1,4 +1,5 @@
 var express = require('express')
+var fs = require('fs')
 var _ = require('lodash')
 var async = require('async')
 var path = require('path')
@@ -25,6 +26,7 @@ var providerUtils = require('./provider-utils')
 var multer  = require('multer')
 var providerImport = require('./provider-import')
 var csrf = require('csurf')
+var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -36,6 +38,7 @@ app.use(express.compress())
 app.use(express.json())
 app.use(setupUrlEncodedBodyParser())
 app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
+app.use(buildRevisionCheck)
 app.use(setupCsrfMiddleware())
 app.use(setCsrfTokenCookie)
 app.use(authenticate)
@@ -1299,6 +1302,19 @@ function forceSSL(req, res, next) {
   } else {
     return next()
   }
+}
+
+function buildRevisionCheck(req, res, next) {
+  var entryPoints = ['/', '/public.html', '/index.html', '/register-provider.html', '/reset-password.html']
+  if (_.contains(entryPoints, req.path)) {
+    res.cookie('build.revision', buildRevision)
+  } else if (req.xhr && req.path != '/templates.html') {
+    var clientRevision = req.cookies['build.revision']
+    if (!clientRevision || clientRevision != buildRevision) {
+      return res.send(418)
+    }
+  }
+  next()
 }
 
 function setupUrlEncodedBodyParser() {

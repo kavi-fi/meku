@@ -606,7 +606,7 @@ function searchPage() {
   }
 
   function render(p, query) {
-    var queryParts = (query || '').trim().toLowerCase().split(/\s+/)
+    var hilites = highlights(query)
     var showRegistrationDate = !!window.user
     return $('<div>', { class:'result', 'data-id': p._id }).data('program', p).append(series(p)).append(row(p))
 
@@ -614,12 +614,12 @@ function searchPage() {
       if (!enums.util.isTvEpisode(p)) return undefined
       return $('<div>').addClass('series')
         .text(_.compact([p.series && p.series.name, utils.seasonEpisodeCode(p)]).join(' '))
-        .highlight(queryParts, { beginningsOnly: true, caseSensitive: false })
+        .highlight(hilites, { beginningsOnly: true, caseSensitive: false })
     }
 
     function row(p) {
       return $('<div>').addClass('items')
-        .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(queryParts, { beginningsOnly: true, caseSensitive: false }))
+        .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(hilites, { beginningsOnly: true, caseSensitive: false }))
         .append($('<span>', { class: 'country-year-date' }).text(countryAndYearAndDate(p)))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
         .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
@@ -636,5 +636,13 @@ function searchPage() {
       var date = utils.getProperty(p, 'classifications.0.registrationDate')
       return date ? moment(date).format('D.M.YYYY') : undefined
     }
+  }
+
+  function highlights(query) {
+    var parts = (query || '').trim().toLowerCase().match(/"[^"]*"|[^ ]+/g) || ['']
+    return _.map(parts, function(s) {
+      return s[0] == '"' && s[s.length-1] == '"' ? s.substring(1, s.length - 1) : s
+    })
+
   }
 }

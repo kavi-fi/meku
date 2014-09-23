@@ -38,6 +38,7 @@ var ProgramSchema = new Schema({
   sequenceId: { type: Number, index: { unique: true } },
   customersId: { account: ObjectId, id: String },
   allNames: { type: [String], index: true },
+  fullNames: { type:[String], index: true },
   name: { type: [String], index: true },
   nameFi: [String],
   nameSv: [String],
@@ -159,9 +160,11 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
   }
 
   function populate(p, extraNames) {
-    var words = _.reject(concatNames(p).concat([utils.seasonEpisodeCode(p)]).concat(extraNames), _.isEmpty)
+    var initialNames = _.reject(concatNames(p), _.isEmpty)
+    var words = _.reject(initialNames.concat([utils.seasonEpisodeCode(p)]).concat(extraNames), _.isEmpty)
     words = words.map(function(s) { return (s + ' ' + s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1')).split(/\s+/) })
     p.allNames = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
+    p.fullNames = _(initialNames).invoke('toLowerCase').uniq().sort().value()
   }
   function concatNames(p) {
     return p.name.concat(p.nameFi || []).concat(p.nameSv || []).concat(p.nameOther || [])
@@ -170,10 +173,10 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
 
 var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 
-Program.excludedChangeLogPaths = ['allNames']
+Program.excludedChangeLogPaths = ['allNames', 'fullNames']
 
 Program.publicFields = {
-  emekuId:0, customersId:0, allNames:0, draftsBy: 0, draftClassifications:0,
+  emekuId:0, customersId:0, allNames:0, fullNames:0, draftsBy: 0, draftClassifications:0,
   createdBy:0, sentRegistrationEmailAddresses:0, deletedClassifications: 0,
   'classifications.emekuId':0, 'classifications.author':0,
   'classifications.billing': 0, 'classifications.buyer': 0, 'classifications.registrationEmailAddresses':0,

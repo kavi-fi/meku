@@ -257,7 +257,8 @@ app.get('/programs/search/:q?', function(req, res, next) {
 })
 
 app.get('/episodes/:seriesId', function(req, res, next) {
-  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }).sort({ season:1, episode:1 }).lean().exec(respond(res, next))
+  var fields = utils.hasRole(req.user, 'kavi') ? {} : {'classifications.comments': 0}
+  Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }, fields).sort({ season:1, episode:1 }).lean().exec(respond(res, next))
 })
 
 app.get('/programs/drafts', function(req, res, next) {

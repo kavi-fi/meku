@@ -27,6 +27,7 @@ var multer  = require('multer')
 var providerImport = require('./provider-import')
 var csrf = require('csurf')
 var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
+var validation = require('./validation')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -345,6 +346,11 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     var newClassification = program.draftClassifications[req.user._id]
     if (!newClassification) return res.send(409)
+
+    var valid = validation.registration(program.toObject(), newClassification, req.user)
+    if (!valid.valid) {
+      return res.send(403, "Invalid program: field " + valid.field)
+    }
 
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'

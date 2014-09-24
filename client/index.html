@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script type="text/javascript">
+    // Check for modern browsers. Modern is defined as supporting flex box.
+    (function() {
+      var e = document.createElement('test')
+      if (e.style['flexWrap'] === undefined && e.style['webkitFlexWrap'] === undefined) {
+        window.location = '/upgrade-browser.html'
+        // Stop executing further JS
+        throw true
+      }
+    })()
+  </script>
   <link href="vendor/normalize-3.0.1.css" media="all" rel="stylesheet" />
   <link href="vendor/select2-3.4.6/select2.css" rel="stylesheet"/>
   <link href="vendor/font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet"/>

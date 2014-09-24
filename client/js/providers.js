@@ -328,7 +328,7 @@ function providerPage() {
     })
 
     var k18Counts = _(registeredProviders).map(countAdultContentLocations).compact().value()
-    $rows.push($row('Tarjolla K-18 ohjelmia', k18Counts.length, k18Counts.reduce(sum)).addClass('last'))
+    $rows.push($row('Tarjolla luokittelemattomia K-18 ohjelmia', k18Counts.length, k18Counts.reduce(sum)).addClass('last'))
 
     $page.find('.statistics-rows').html($rows)
 

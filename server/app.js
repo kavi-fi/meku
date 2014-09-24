@@ -241,12 +241,12 @@ app.get('/programs/search/:q?', function(req, res, next) {
       var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
       var and = []
       if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
-      var nameQuery = toMongoArrayQuery(terms)
-      if (nameQuery) {
-        if (nameQuery.$all.length == 1 && parseInt(terms) == terms) {
-          and.push({$or: [{ allNames:nameQuery }, { sequenceId: terms }]})
+      var nameQueries = toSearchTermQuery(terms)
+      if (nameQueries) {
+        if (parseInt(terms) == terms) {
+          and.push({$or: [nameQueries, { sequenceId: terms }]})
         } else {
-          and.push({allNames: nameQuery})
+          and.push(nameQueries)
         }
       }
       if (filters.length > 0) q.programType = { $in: filters }
@@ -254,7 +254,32 @@ app.get('/programs/search/:q?', function(req, res, next) {
       return q
     }
   }
+
+  function toSearchTermQuery(string) {
+    var lowerString = (string || '').trim().toLowerCase()
+    var parts = lowerString.match(/"[^"]*"|[^ ]+/g)
+    if (!parts) return undefined
+    return parts.reduce(function(result, s) {
+      if (/^".+"$/.test(s)) {
+        var withoutQuotes = s.substring(1, s.length - 1)
+        if (s.indexOf(' ') == -1) {
+          return addToAll(result, 'fullNames', withoutQuotes)
+        } else {
+          return addToAll(result, 'fullNames', new RegExp(utils.escapeRegExp(withoutQuotes)))
+        }
+      } else {
+        return addToAll(result, 'allNames', new RegExp('^' + utils.escapeRegExp(s)))
+      }
+    }, {})
+
+    function addToAll(obj, key, value) {
+      if (!obj[key]) obj[key] = { $all: [] }
+      obj[key].$all.push(value)
+      return obj
+    }
+  }
 })
+
 
 app.get('/episodes/:seriesId', function(req, res, next) {
   var fields = utils.hasRole(req.user, 'kavi') ? {} : {'classifications.comments': 0}
@@ -1407,7 +1432,7 @@ function queryNameIndex(schemaName) {
 
 function toMongoArrayQuery(string) {
   var words = (string || '').trim().toLowerCase()
-  return words ? { $all: words.split(/\s+/).map(toTerm) } : undefined
+  return words ? { $all: words.match(/"[^"]*"|[^ ]+/g).map(toTerm) } : undefined
 
   function toTerm(s) {
     if (/^".+"$/.test(s)) {

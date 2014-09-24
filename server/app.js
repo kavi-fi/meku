@@ -241,6 +241,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
       var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
       var and = []
       if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
+      if (utils.getProperty(req, 'user.role') === 'user') and.push({ 'createdBy.role': { $ne: 'trainee' }})
       var nameQueries = toSearchTermQuery(terms)
       if (nameQueries) {
         if (parseInt(terms) == terms) {

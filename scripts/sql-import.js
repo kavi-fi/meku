@@ -388,7 +388,7 @@ function accounts(callback) {
     var q = 'select id, name, customer_type, sic_code, date_entered, ' +
       ' bills_text, billing_address_street, billing_address_city, billing_address_postalcode, ' +
       ' e_invoice, e_invoice_operator, shipping_address_street, shipping_address_city, shipping_address_postalcode, shipping_address_country,' +
-      ' ownership, phone_office, phone_alternate, provider_status, customer_lang' +
+      ' ownership, phone_office, phone_alternate, provider_status, customer_lang, description' +
       ' from accounts where customer_type LIKE "%Provider%" and deleted != "1"'
     function onRow(row) {
       var address = { street: trim1line(row.shipping_address_street), city: trim(row.shipping_address_city), zip: trim(row.shipping_address_postalcode), country: legacyCountryToCode(trim(row.shipping_address_country)) }
@@ -418,7 +418,8 @@ function accounts(callback) {
         deleted: false,
         active: active,
         locations: [],
-        sequenceId: providerSeq++
+        sequenceId: providerSeq++,
+        message: trim(row.description)
       }
     }
     batchInserter(q, onRow, 'Provider', callback)

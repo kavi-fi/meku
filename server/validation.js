@@ -5,15 +5,77 @@ var classificationUtils = require('../shared/classification-utils')
 
 var validation = {}
 
-var Fail = validation.Fail = function Fail(field) {
+validation.registration = function(program, classification, user) {
+  function isReclassification() {
+    return classificationUtils.isReclassification(program, classification)
+  }
+
+  function hasSomeRegistrationEmailAddresses(p) {
+    if (_.reject(p.sentRegistrationEmailAddresses, function(x) { return x == user.email }).length > 0) {
+      return Ok()
+    } else {
+      return Fail('sentRegistrationEmailAddresses')
+    }
+  }
+
+  return all(
+    when(not(isReclassification), programV(user)),
+    all(requiredArray('sentRegistrationEmailAddresses'), hasSomeRegistrationEmailAddresses),
+    function() { return classificationV(program, user)(classification) }
+  )(program)
+}
+
+function programV(user) {
+  return all(
+    requiredArray('name'),
+    requiredArray('nameFi'),
+    requiredString('year'),
+    requiredArray('country'),
+    requiredArray('productionCompanies'),
+    when(not(enums.util.isGameType), requiredArray('directors')),
+    when(enums.util.isGameType, requiredString('gameFormat')),
+    when(enums.util.isTvEpisode, requiredNumber('episode')),
+    when(enums.util.isTvEpisode, or(requiredRef('series'), newSeries)),
+    requiredString('synopsis')
+  )
+}
+
+function classificationV(p, user) {
+  return all(
+    when(function(c) {
+      return !isInternalReclassification(c) || enums.isOikaisupyynto(c.reason)
+    }, all(
+      requiredRef('buyer'),
+      requiredRef('billing')
+    )),
+    arrayEach('registrationEmailAddresses', utils.isEmail),
+    when(isInternalReclassification, all(requiredNumber('authorOrganization'), requiredNumber('reason'))),
+    when(or(isKavi, not(isGame)), all(requiredString('duration'), check('duration', utils.isValidDuration))),
+    when(not(isGame), requiredString('format'))
+  )
+
+  function isGame() {
+    return enums.util.isGameType(p)
+  }
+
+  function isKavi() {
+    return utils.hasRole(user, 'kavi')
+  }
+
+  function isInternalReclassification(c) {
+    return classificationUtils.isReclassification(p, c) && isKavi()
+  }
+}
+
+function Fail(field) {
   return {valid: false, field: field}
 }
 
-var Ok = validation.Ok = function Ok() {
+function Ok() {
   return {valid: true}
 }
 
-var bind = validation.bind = function bind(v, v2) {
+function bind(v, v2) {
   return function(p) {
     var res = v(p)
     if (!res.valid) return res
@@ -21,31 +83,31 @@ var bind = validation.bind = function bind(v, v2) {
   }
 }
 
-var all = validation.all = function(vs) {
+function all(vs) {
   return _.reduce(arguments, bind, ok())
 }
 
-var ok = validation.ok = function ok() {
+function ok() {
   return function(p) {
     return Ok()
   }
 }
 
-var requiredString = validation.requiredString = function requiredString(name) {
+function requiredString(name) {
   return function(p) {
     if (p[name] && p[name].length > 0) return Ok()
     else return Fail(name)
   }
 }
 
-var requiredNumber = validation.requiredNumber = function requiredNumber(name) {
+function requiredNumber(name) {
   return function(p) {
     if (_.has(p, name)) return Ok()
     else return Fail(name)
   }
 }
 
-var requiredArray = validation.requiredArray = function requiredArray(name) {
+function requiredArray(name) {
   return function(p) {
     var val = p[name]
     if (_.isArray(val) && !_.isEmpty(val) && val[0].length > 0) return Ok()
@@ -60,7 +122,7 @@ function arrayEach(name, f) {
   }
 }
 
-var requiredRef = validation.requiredRef = function(name) {
+function requiredRef(name) {
   return function(p) {
     if (p[name] && p[name]._id) return Ok()
     else return Fail(name)
@@ -100,67 +162,5 @@ function newSeries(p) {
 }
 
 function not(f) { return function(p) { return !f(p) }}
-
-validation.program = function(user) {
-  return all(
-    requiredArray('name'),
-    requiredArray('nameFi'),
-    requiredString('year'),
-    requiredArray('country'),
-    requiredArray('productionCompanies'),
-    when(not(enums.util.isGameType), requiredArray('directors')),
-    when(enums.util.isGameType, requiredString('gameFormat')),
-    when(enums.util.isTvEpisode, requiredNumber('episode')),
-    when(enums.util.isTvEpisode, or(requiredRef('series'), newSeries)),
-    requiredString('synopsis')
-  )
-}
-
-validation.classification = function(p, user) {
-  return all(
-    when(function(c) {
-      return !isInternalReclassification(c) || enums.isOikaisupyynto(c.reason)
-    }, all(
-      requiredRef('buyer'),
-      requiredRef('billing')
-    )),
-    arrayEach('registrationEmailAddresses', utils.isEmail),
-    when(isInternalReclassification, all(requiredNumber('authorOrganization'), requiredNumber('reason'))),
-    when(or(isKavi, not(isGame)), all(requiredString('duration'), check('duration', utils.isValidDuration))),
-    when(not(isGame), requiredString('format'))
-  )
-
-  function isGame() {
-    return enums.util.isGameType(p)
-  }
-
-  function isKavi() {
-    return utils.hasRole(user, 'kavi')
-  }
-
-  function isInternalReclassification(c) {
-    return classificationUtils.isReclassification(p, c) && isKavi()
-  }
-}
-
-validation.registration = function(program, classification, user) {
-  function isReclassification() {
-    return classificationUtils.isReclassification(program, classification)
-  }
-
-  function hasSomeRegistrationEmailAddresses(p) {
-    if (_.reject(p.sentRegistrationEmailAddresses, function(x) { return x == user.email }).length > 0) {
-      return Ok()
-    } else {
-      return Fail('sentRegistrationEmailAddresses')
-    }
-  }
-
-  return all(
-    when(not(isReclassification), validation.program(user)),
-    all(requiredArray('sentRegistrationEmailAddresses'), hasSomeRegistrationEmailAddresses),
-    function() { return validation.classification(program, user)(classification) }
-  )(program)
-}
 
 module.exports = validation

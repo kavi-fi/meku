@@ -1183,8 +1183,9 @@ app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next)
   ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).lean().exec(respond(res, next))
 })
 
-app.get('/environment', function(req, res, next) {
-  res.json({ environment: app.get('env') })
+app.get('/environment', function(req, res) {
+  res.set('Content-Type', 'text/javascript')
+  res.send('var APP_ENVIRONMENT = "' + app.get('env') + '";')
 })
 
 app.post('/files/provider-import', function(req, res, next) {

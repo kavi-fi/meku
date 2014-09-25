@@ -67,6 +67,13 @@ var requiredRef = validation.requiredRef = function(name) {
   }
 }
 
+function check(name, f) {
+  return function(p) {
+    if (f(p[name])) return Ok()
+    else return Fail(name)
+  }
+}
+
 function when(f, v) {
   return function(p) {
     if (f(p)) return v(p)
@@ -119,7 +126,7 @@ validation.classification = function(p, user) {
     )),
     arrayEach('registrationEmailAddresses', utils.isEmail),
     when(isInternalReclassification, all(requiredNumber('authorOrganization'), requiredNumber('reason'))),
-    when(or(isKavi, not(isGame)), requiredString('duration')),
+    when(or(isKavi, not(isGame)), all(requiredString('duration'), check('duration', utils.isValidDuration))),
     when(not(isGame), requiredString('format'))
   )
 

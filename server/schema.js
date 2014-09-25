@@ -15,7 +15,7 @@ var classification = {
   buyer: {_id: ObjectId, name: String},
   billing: {_id: ObjectId, name: String},
   format: String,
-  duration: String, // for now matches a regexp in the client
+  duration: String, // matches a regexp on the client and server
   safe: Boolean,
   criteria: [Number],
   criteriaComments: {},

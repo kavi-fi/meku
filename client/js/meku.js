@@ -136,7 +136,7 @@ function stringDateRange(range) {
 function errorDialog() {
   var $overlay = $('#error-overlay')
   var $dialog = $('#error-dialog')
-  $dialog.find('a').one('click', function(e) { e.preventDefault(); location.reload() })
+  $dialog.find('a[href=#]').one('click', function(e) { e.preventDefault(); location.reload() })
   return { show: function() { $dialog.attr('style', 'display: -webkit-flex; display: flex;'); $overlay.show() }}
 }
 

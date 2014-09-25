@@ -361,7 +361,7 @@ app.post('/programs/:id/register', function(req, res, next) {
       if (err) return next(err)
       var valid = validation.registration(program.toObject(), newClassification, req.user)
       if (!valid.valid) {
-        return res.send(403, "Invalid program. Field: " + valid.field)
+        return res.send(400, "Invalid program. Field: " + valid.field)
       }
       verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)

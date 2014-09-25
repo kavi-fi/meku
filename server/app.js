@@ -1387,12 +1387,13 @@ function logErrorOrSendEmail(user) {
 }
 
 function sendEmail(opts, user, callback) {
-  var email = new sendgrid.Email({ from: 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
+  var email = new sendgrid.Email({ from: opts.from || 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
   if (process.env.EMAIL_TO != undefined) {
     email.to = process.env.EMAIL_TO
   } else if (process.env.NODE_ENV === 'training') {
     email.to = user.email || user.emails[0]
   } else {
+    email.bcc = opts.bcc || []
     opts.recipients.forEach(function(to) { email.addTo(to) })
   }
 

@@ -109,6 +109,7 @@ validation.classification = function(p, user) {
       requiredRef('billing')
     )),
     when(isInternalReclassification, all(requiredNumber('authorOrganization'), requiredNumber('reason'))),
+    when(or(isKavi, not(isGame)), requiredString('duration')),
     when(not(_.curry(classificationUtils.isReclassification)(p)), requiredArray('registrationEmailAddresses')),
     when(not(isGame), requiredString('format'))
   )
@@ -117,8 +118,12 @@ validation.classification = function(p, user) {
     return enums.util.isGameType(p)
   }
 
+  function isKavi() {
+    return utils.hasRole(user, 'kavi')
+  }
+
   function isInternalReclassification(c) {
-    return classificationUtils.isReclassification(p, c) && utils.hasRole(user, 'kavi')
+    return classificationUtils.isReclassification(p, c) && isKavi()
   }
 }
 

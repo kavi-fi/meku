@@ -64,6 +64,7 @@ var ProgramSchema = new Schema({
   sentRegistrationEmailAddresses: [String],
   createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
+ProgramSchema.set('versionKey', false)
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))
 

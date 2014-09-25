@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node server/app.js",
-    "postinstall": "date +%s > build.revision"
+    "postinstall": "date +%s > build.revision",
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha"
   },
   "engines": {
     "node": "0.10.x"
@@ -29,6 +30,10 @@
   "devDependencies": {
     "express-livereload": "~0.0.24",
     "node-dev": "~2.3.0",
-    "mysql": "~2.4.3"
+    "mysql": "~2.4.3",
+    "webdriverio": "~2.2.3",
+    "mocha": "~1.21.4",
+    "request": "~2.44.0",
+    "chai": "~1.9.1"
   }
 }

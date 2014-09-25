@@ -98,17 +98,8 @@ validation.program = function(user) {
     when(enums.util.isGameType, requiredString('gameFormat')),
     when(enums.util.isTvEpisode, requiredNumber('episode')),
     when(enums.util.isTvEpisode, or(requiredRef('series'), newSeries)),
-    requiredString('synopsis'),
-    all(requiredArray('sentRegistrationEmailAddresses'), hasSomeRegistrationEmailAddresses)
+    requiredString('synopsis')
   )
-
-  function hasSomeRegistrationEmailAddresses(p) {
-    if (_.reject(p.sentRegistrationEmailAddresses, function(x) { return x == user.email }).length > 0) {
-      return Ok()
-    } else {
-      return Fail('sentRegistrationEmailAddresses')
-    }
-  }
 }
 
 validation.classification = function(p, user) {
@@ -142,9 +133,19 @@ validation.registration = function(program, classification, user) {
     return classificationUtils.isReclassification(program, classification)
   }
 
-  return bind(when(not(isReclassification), validation.program(user)), function() {
-    return validation.classification(program, user)(classification)
-  })(program)
+  function hasSomeRegistrationEmailAddresses(p) {
+    if (_.reject(p.sentRegistrationEmailAddresses, function(x) { return x == user.email }).length > 0) {
+      return Ok()
+    } else {
+      return Fail('sentRegistrationEmailAddresses')
+    }
+  }
+
+  return all(
+    when(not(isReclassification), validation.program(user)),
+    all(requiredArray('sentRegistrationEmailAddresses'), hasSomeRegistrationEmailAddresses),
+    function() { return validation.classification(program, user)(classification) }
+  )(program)
 }
 
 module.exports = validation

@@ -32,6 +32,13 @@ var envs = {
     sendEmail: false,
     forceSSL: false,
     mongoUrl: 'mongodb://localhost/meku-test'
+  },
+  'manual-test': {
+    port: 3000,
+    hostname: 'http://localhost:3000',
+    sendEmail: false,
+    forceSSL: false,
+    mongoUrl: 'mongodb://localhost/meku-test'
   }
 }
 

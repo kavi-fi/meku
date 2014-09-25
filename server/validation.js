@@ -53,6 +53,13 @@ var requiredArray = validation.requiredArray = function requiredArray(name) {
   }
 }
 
+function arrayEach(name, f) {
+  return function(p) {
+    if (_.all(p[name], f)) return Ok()
+    else return Fail(name)
+  }
+}
+
 var requiredRef = validation.requiredRef = function(name) {
   return function(p) {
     if (p[name] && p[name]._id) return Ok()
@@ -110,6 +117,7 @@ validation.classification = function(p, user) {
       requiredRef('buyer'),
       requiredRef('billing')
     )),
+    arrayEach('registrationEmailAddresses', utils.isEmail),
     when(isInternalReclassification, all(requiredNumber('authorOrganization'), requiredNumber('reason'))),
     when(or(isKavi, not(isGame)), requiredString('duration')),
     when(not(isGame), requiredString('format'))

@@ -221,7 +221,8 @@ var ProviderLocationSchema = new Schema({
   isPayer: Boolean,
   adultContent: Boolean,
   gamesWithoutPegi: Boolean,
-  url: String
+  url: String,
+  message: String
 })
 
 ProviderLocationSchema.pre('save', ensureSequenceId('Provider'))

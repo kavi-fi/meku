@@ -426,7 +426,13 @@ var ProductionCompany = exports.ProductionCompany = mongoose.model('productionCo
 var SequenceSchema = new Schema({ _id:String, seq:Number }, { _id: false, versionKey: false })
 SequenceSchema.statics.next = function(seqName, callback) {
   this.findOneAndUpdate({ _id: seqName }, { $inc: { seq: 1 } }, { new: true }, function(err, doc) {
-    return callback(err, err ? null : doc.seq)
+    if (!doc) {
+      new Sequence({ _id: seqName, seq: 0 }).save(function(err, doc) {
+        return callback(err, err ? null : 0)
+      })
+    } else {
+      return callback(err, err ? null : doc.seq)
+    }
   })
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)

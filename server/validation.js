@@ -87,18 +87,29 @@ function newSeries(p) {
 
 function not(f) { return function(p) { return !f(p) }}
 
-validation.program = all(
-  requiredArray('name'),
-  requiredArray('nameFi'),
-  requiredString('year'),
-  requiredArray('country'),
-  requiredArray('productionCompanies'),
-  when(not(enums.util.isGameType), requiredArray('directors')),
-  when(enums.util.isGameType, requiredString('gameFormat')),
-  when(enums.util.isTvEpisode, requiredNumber('episode')),
-  when(enums.util.isTvEpisode, or(requiredRef('series'), newSeries)),
-  requiredString('synopsis')
-)
+validation.program = function(user) {
+  return all(
+    requiredArray('name'),
+    requiredArray('nameFi'),
+    requiredString('year'),
+    requiredArray('country'),
+    requiredArray('productionCompanies'),
+    when(not(enums.util.isGameType), requiredArray('directors')),
+    when(enums.util.isGameType, requiredString('gameFormat')),
+    when(enums.util.isTvEpisode, requiredNumber('episode')),
+    when(enums.util.isTvEpisode, or(requiredRef('series'), newSeries)),
+    requiredString('synopsis'),
+    all(requiredArray('sentRegistrationEmailAddresses'), hasSomeRegistrationEmailAddresses)
+  )
+
+  function hasSomeRegistrationEmailAddresses(p) {
+    if (_.reject(p.sentRegistrationEmailAddresses, function(x) { return x == user.email }).length > 0) {
+      return Ok()
+    } else {
+      return Fail('sentRegistrationEmailAddresses')
+    }
+  }
+}
 
 validation.classification = function(p, user) {
   return all(
@@ -110,7 +121,6 @@ validation.classification = function(p, user) {
     )),
     when(isInternalReclassification, all(requiredNumber('authorOrganization'), requiredNumber('reason'))),
     when(or(isKavi, not(isGame)), requiredString('duration')),
-    when(not(_.curry(classificationUtils.isReclassification)(p)), requiredArray('registrationEmailAddresses')),
     when(not(isGame), requiredString('format'))
   )
 
@@ -132,7 +142,7 @@ validation.registration = function(program, classification, user) {
     return classificationUtils.isReclassification(program, classification)
   }
 
-  return bind(when(not(isReclassification), validation.program), function() {
+  return bind(when(not(isReclassification), validation.program(user)), function() {
     return validation.classification(program, user)(classification)
   })(program)
 }

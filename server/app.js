@@ -347,11 +347,6 @@ app.post('/programs/:id/register', function(req, res, next) {
     var newClassification = program.draftClassifications[req.user._id]
     if (!newClassification) return res.send(409)
 
-    var valid = validation.registration(program.toObject(), newClassification, req.user)
-    if (!valid.valid) {
-      return res.send(403, "Invalid program: field " + valid.field)
-    }
-
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
     newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
@@ -364,6 +359,10 @@ app.post('/programs/:id/register', function(req, res, next) {
 
     program.populateSentRegistrationEmailAddresses([req.user.email], function(err, program) {
       if (err) return next(err)
+      var valid = validation.registration(program.toObject(), newClassification, req.user)
+      if (!valid.valid) {
+        return res.send(403, "Invalid program. Field: " + valid.field)
+      }
       verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)
         program.save(function(err) {

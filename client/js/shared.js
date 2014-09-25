@@ -6,7 +6,9 @@ $.fn.throttledInput = function(fn) {
       var txt = $input.val()
       var that = this
       if (timeout) clearTimeout(timeout)
+      $input.addClass('throttled').trigger('throttled')
       timeout = setTimeout(function() {
+        $input.removeClass('throttled').trigger('throttled')
         if (prev == txt) return
         prev = txt
         fn.call(that, txt)
@@ -20,7 +22,7 @@ $.fn.throttledInput = function(fn) {
 
     function reset() {
       if (timeout) clearTimeout(timeout)
-      prev = $input.val()
+      prev = $input.removeClass('throttled').trigger('throttled').val()
     }
   })
 }

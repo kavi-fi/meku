@@ -13,20 +13,27 @@ exports.fullSummary = function(program) {
 
 var summary = exports.summary = function(classification) {
   if (!classification) return undefined
-  if (classification.safe) return { age:0, warnings:[] }
+  if (classification.safe) return { age:0, warnings:[], allWarnings:[] }
   var maxAgeLimit = ageLimit(classification)
   var warnings = _(classification.criteria)
     .map(function(id) { return enums.classificationCriteria[id - 1] })
     .filter(function(c) { return c.age > 0 && c.age == maxAgeLimit })
     .map(function(c) { return {id: c.id, category: c.category} })
     .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
+  var allWarnings = _.map(classification.criteria, function(id) { return enums.classificationCriteria[id - 1] })
   if (classification.warningOrder && classification.warningOrder.length > 0) {
     var order = classification.warningOrder
-    warnings = warnings.sort(function(a, b) {
-      return order.indexOf(a.category) - order.indexOf(b.category)
-    })
+    sortWarnings(warnings)
+    sortWarnings(allWarnings)
+
+    function sortWarnings(ws) {
+      ws.sort(function(a, b) {
+        return order.indexOf(a.category) - order.indexOf(b.category)
+      })
+    }
   }
-  return { age: maxAgeLimit, warnings: warnings }
+
+  return { age: maxAgeLimit, warnings: warnings, allWarnings: allWarnings }
 }
 
 var tvSeriesClassification = exports.tvSeriesClassification = function(episodes) {
@@ -183,23 +190,23 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function classificationText(summary) {
     if (summary.age == 0) {
       return 'Kuvaohjelma on sallittu.'
-    } else if (summary.warnings.length == 0) {
+    } else if (summary.allWarnings.length === 0) {
       return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age) + '.'
     } else {
       return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age)
-        + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
-        + criteriaText(summary.warnings) + '.'
+        + ' ja ' + (summary.allWarnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+        + criteriaText(summary.allWarnings) + '.'
     }
   }
 
   function previousClassificationText(summary) {
     if (summary.age == 0) {
       return 'sallituksi.'
-    } else if (summary.warnings.length == 0) {
+    } else if (summary.allWarnings.length === 0) {
       return 'ikärajaksi ' + ageAsText(summary.age) + '.'
     } else {
-      return 'ikärajaksi ' + ageAsText(summary.age) + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
-        + criteriaText(summary.warnings) + '.'
+      return 'ikärajaksi ' + ageAsText(summary.age) + ' ja ' + (summary.allWarnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
+        + criteriaText(summary.allWarnings) + '.'
     }
   }
 

@@ -60,7 +60,7 @@ var ProgramSchema = new Schema({
   gameFormat: String, // in programType == game(7)
   season: Number, episode: Number, // in programType == episode(3)
   series: { _id: { type: ObjectId, index:true }, name: String, draft: { name: String, nameFi: String, nameSv: String, nameOther: String } }, // in programType == episode(3)
-  episodes: { count: Number, criteria: [Number], legacyAgeLimit: Number, agelimit:Number, warnings:[String] }, // in programType == series(2)
+  episodes: { count: Number, criteria: [Number], legacyAgeLimit: Number, agelimit:Number, warnings:[String], warningOrder: [String] }, // in programType == series(2)
   sentRegistrationEmailAddresses: [String],
   createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
@@ -120,7 +120,7 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
     var summary = classificationUtils.summary(data)
     var episodeSummary = {
       count: programs.length, criteria: data.criteria, legacyAgeLimit: data.legacyAgeLimit,
-      agelimit: summary.age, warnings: _.pluck(summary.warnings, 'category')
+      agelimit: summary.age, warnings: _.pluck(summary.warnings, 'category'), warningOrder: data.warningOrder
     }
     Program.update({ _id: seriesId }, { episodes: episodeSummary }, callback)
   })

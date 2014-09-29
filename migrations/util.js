@@ -4,7 +4,7 @@ var mongoose = require('mongoose')
 exports.mongoose = mongoose
 
 exports.connectMongoose = function() {
-  mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost/meku')
+  mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/meku')
   return this
 }
 

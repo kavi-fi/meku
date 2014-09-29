@@ -28,6 +28,7 @@ var providerImport = require('./provider-import')
 var csrf = require('csurf')
 var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 var validation = require('./validation')
+var srvUtils = require('./server-utils')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -97,31 +98,27 @@ app.post('/forgot-password', function(req, res, next) {
       console.log(user.username + ' has no email address')
       return res.send(500)
     }
-    var subject = 'Salasanan uusiminen'
-    var text = '<p>Hei,<br/>' +
-      'uusiaksesi salasanasi seuraa oheista linkkiä <a href="<%- link %>"><%- link %></a>, ' +
-      'ja kirjoita mieleisesi salasana sille annettuihin kenttiin ja paina "tallenna salasana"-painiketta.</p>' +
-      '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
-      'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
-      '<p>Terveisin,<br/>KAVI</p>'
-
-    if (user.resetHash) {
-      sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
-    } else {
-      createAndSaveHash(user, function(err) {
-        if (err) return next(err)
-        sendHashLinkViaEmail(user, subject, text, respond(res, next, {}))
-      })
-    }
+    var subject = 'Salasanan uusiminen / Samma på svenska'
+    srvUtils.getTemplate('reset-password-email.tpl.html', function(err, tpl) {
+      if (err) return next(err)
+      if (user.resetHash) {
+        sendHashLinkViaEmail(user, subject, tpl, respond(res, next, {}))
+      } else {
+        createAndSaveHash(user, function(err) {
+          if (err) return next(err)
+          sendHashLinkViaEmail(user, subject, tpl, respond(res, next, {}))
+        })
+      }
+    })
   })
 })
 
-function sendHashLinkViaEmail(user, subject, text, callback) {
+function sendHashLinkViaEmail(user, subject, template, callback) {
   var url = getHostname() + '/reset-password.html#' + user.resetHash
   var emailData = {
     recipients: user.emails,
     subject: subject,
-    body: _.template(text, { link: url })
+    body: _.template(template, { link: url, username: user.username })
   }
   sendEmail(emailData, user, callback)
 }
@@ -942,20 +939,11 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
     createAndSaveHash(user, function(err) {
       if (err) return next(err)
       logCreateOperation(req.user, user)
-      var subject = 'Käyttäjätunnuksen aktivointi'
-      var text = '<p>Hei,<br/>' +
-        'Sinulle on luotu käyttäjätunnus ' +
-        '<span style="font-weight: bold;">' + _.escape(req.body.username) + '</span> ' +
-        'Kuvaohjelmien luokittelu- ja rekisteröintijärjestelmään.</p>' +
-        '<p>Aktivoi käyttäjätunnus oheisesta linkistä <a href="<%- link %>"><%- link %></a>, ' +
-        'ja kirjoita mieleisesi salasana sille annettuihin kenttiin.<br/>' +
-        'Salasanan tallentamisen jälkeen kirjaudut automaattisesti sisään järjestelmään.</p>' +
-        '<p>Jos unohdat salasanasi, voit uusia sen sisäänkirjautumisikkunan kautta:<br/>' +
-        'Anna käyttäjätunnus ja paina "unohdin salasanani" -painiketta.</p>' +
-        '<p>Jos sinulla on ongelmia salasanan tai käyttäjätunnuksen kanssa, ' +
-        'ota yhteyttä Kuvaohjelmien luokittelujärjestelmän ylläpitoon: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
-        '<p>Terveisin,<br/>KAVI</p>'
-      sendHashLinkViaEmail(user, subject, text, respond(res, next, user))
+      var subject = 'Käyttäjätunnuksen aktivointi / Samma på svenska'
+      srvUtils.getTemplate('user-created-email.tpl.html', function(err, tpl) {
+        if (err) return next(err)
+        sendHashLinkViaEmail(user, subject, tpl, respond(res, next, user))
+      })
     })
   })
 })

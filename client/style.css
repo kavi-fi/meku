@@ -7,6 +7,11 @@ body {
 }
 
 .i18n-fail { color: red !important; }
+
+.toggleLanguage { float: right; text-decoration: underline; text-transform: uppercase; color: #F8F8F8; cursor: pointer; font-size: 12px; }
+#login .toggleLanguage { color: #00BB88; }
+#header .toggleLanguage { padding: 5px 5px 0 0; }
+
 .pika-single { width: 248px; }
 
 .hide { display: none !important; }

@@ -125,3 +125,11 @@ function registerRevisionMismatchAjaxErrorHandler() {
     if (req.status == 418) showRevisionMismatchDialog()
   })
 }
+
+function registerLanguageChangers() {
+  var lang = langCookie()
+  $('.toggleLanguage').text(lang == 'fi' ? 'På svenska' : 'Suomeksi').one('click', function() {
+    $.cookie('lang', lang == 'fi' ? 'sv' : 'fi')
+    window.location.reload(true)
+  })
+}

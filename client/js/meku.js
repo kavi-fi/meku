@@ -15,6 +15,7 @@ $(function() {
 function setup() {
   user = parseUserCookie()
   localize()
+  registerLanguageChangers()
   $.fn.select2.defaults.formatNoMatches = i18nText('Ei tuloksia')
   $.fn.select2.defaults.formatSearching = i18nText('Haetaan...')
   $.fn.select2.defaults.adaptDropdownCssClass = function(c) {  return c == 'required' ? c : null }

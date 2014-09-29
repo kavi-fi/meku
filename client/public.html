@@ -22,6 +22,7 @@
   <script>
     $(function() {
       registerRevisionMismatchAjaxErrorHandler()
+      registerLanguageChangers()
       loadTemplates(function() {
         localize()
         publicSearchPage()
@@ -37,6 +38,7 @@
   <div id="header">
     <div class="content">
       <div>
+        <div class="toggleLanguage"></div>
         <h1 data-i18n>Kuvaohjelmien ikärajahaku</h1>
       </div>
     </div>

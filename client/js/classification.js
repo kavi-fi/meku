@@ -302,12 +302,13 @@ function classificationFormUtils() {
   }
 
   function renderClassificationCriteria($form) {
+    var lang = langCookie()
     enums.criteriaCategories.map(function(category) {
       var criteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
-          .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
-          .append($('<p>').text(c.description))
+          .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text('(' + c.id + ')')))
+          .append($('<p>').text(c[lang].description))
           .append($('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:i18nText('Kommentit...'), class:'throttledInput' }))
       })
       $form.find('.category-container .' + category).append($criteria)

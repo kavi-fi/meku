@@ -168,11 +168,12 @@ function programBox() {
 
   function renderClassificationCriteria(c) {
     if (!c.criteria || c.safe) return ''
+    var lang = langCookie()
     return c.criteria.map(function(id) {
       var cr = enums.classificationCriteria[id - 1]
       var category = enums.classificationCategoriesFI[cr.category]
       return $('<div>')
-        .append($('<label>', { title: cr.description }).text(category + ' ('+cr.id+')'))
+        .append($('<label>', { title: cr[lang].title+': '+cr[lang].description }).text(i18nText(category) + ' ('+cr.id+')'))
         .append($('<p>').text(renderCriteriaComments()))
 
       function renderCriteriaComments() {

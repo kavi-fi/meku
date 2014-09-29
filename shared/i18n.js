@@ -10,6 +10,13 @@ var i18n = {
     'draft-notice': 'Luokittelu kesken käyttäjällä <b></b>. Luonnos tallennettu <span></span>.',
     'register-provider-info': 'Ilmoittaudu kuvaohjelmatarjoajaksi täyttämällä Excel-taulukko tarjoajan tiedoista sekä tarjoamispaikoista, ja lähettämällä se alla olevalla lomakkeella. Lataa ilmoittautumislomake <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">tästä</a>.',
 
+  // Criteria:
+
+    'väkivalta': 'Våld',
+    'seksi': 'Sexuellt innehåll',
+    'ahdistus': 'Ångest',
+    'päihteet': 'Droger',
+
   // Program types:
 
     '?': '?',

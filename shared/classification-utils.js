@@ -37,7 +37,7 @@ var summary = exports.summary = function(classification) {
 }
 
 var tvSeriesClassification = exports.tvSeriesClassification = function(episodes) {
-  return { criteria: episodes.criteria, legacyAgeLimit: episodes.legacyAgeLimit, warningOrder:[] }
+  return { criteria: episodes.criteria, legacyAgeLimit: episodes.legacyAgeLimit, warningOrder: episodes.warningOrder }
 }
 
 var aggregateClassification = exports.aggregateClassification = function(programs) {
@@ -45,7 +45,17 @@ var aggregateClassification = exports.aggregateClassification = function(program
   var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
   var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
   if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
-  return { criteria: criteria, legacyAgeLimit: legacyAgeLimit, warningOrder: [] }
+  var warningOrder = aggregateWarningOrder(classifications)
+  return { criteria: criteria, legacyAgeLimit: legacyAgeLimit, warningOrder: warningOrder }
+}
+
+function aggregateWarningOrder(classifications) {
+  var criteria = _(classifications).pluck('criteria').flatten().value()
+  var counts = _.reduce(criteria, function(order, id) {
+    var category = enums.classificationCriteria[id - 1].category
+    return utils.merge(order, utils.keyValue(category, order[category] + 1))
+  }, {violence: 0, fear: 0, sex: 0, drugs: 0})
+  return _(counts).omit(function(c) { return c === 0}).pairs().sortBy(utils.snd).reverse().map(utils.fst).value()
 }
 
 exports.aggregateSummary = function(programs) {

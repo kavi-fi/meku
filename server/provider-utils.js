@@ -43,13 +43,11 @@ exports.registrationEmail = function (provider, hostName, callback) {
   }
 
   emailHtml(provider, function(err, html) {
-    callback(null, {
+    callback(null, providerEmail({
       recipients: provider.emailAddresses,
       subject: 'Tarjoajarekisteriin ilmoittautuminen (' + provider.name + ')',
-      from: 'noreply@kavi.fi',
-      replyto: 'mirja.kosonen@kavi.fi',
       body: html
-    })
+    }))
   })
 }
 
@@ -74,13 +72,11 @@ exports.registrationEmailProviderLocation = function (location, hostName, callba
   }
 
   emailHtml(location, function(err, html) {
-    callback(null, {
+    callback(null, providerEmail({
       recipients: location.emailAddresses,
       subject: 'Tarjoajarekisteriin ilmoittautuminen (' + location.name + ')',
-      from: 'noreply@kavi.fi',
-      replyto: 'mirja.kosonen@kavi.fi',
       body: html
-    })
+    }))
   })
 }
 
@@ -118,13 +114,11 @@ exports.yearlyBillingProviderEmail = function(provider, hostName, callback) {
 
   emailHtml(provider, function(err, html) {
     if (err) return callback(err)
-    callback(null, {
+    callback(null, providerEmail({
       recipients: provider.emailAddresses,
       subject: 'Tarjoajan vuosilaskutuksen vahvistus (' + provider.name + ')',
-      from: 'noreply@kavi.fi',
-      replyto: 'mirja.kosonen@kavi.fi',
       body: html
-    })
+    }))
   })
 }
 
@@ -148,13 +142,11 @@ exports.yearlyBillingProviderLocationEmail = function(location, hostName, callba
 
   emailHtml(location, function(err, html) {
     if (err) return callback(err)
-    callback(null, {
+    callback(null, providerEmail({
       recipients: location.emailAddresses,
       subject: 'Tarjoamispaikan vuosilaskutuksen vahvistus (' + location.name + ')',
-      from: 'noreply@kavi.fi',
-      replyto: 'mirja.kosonen@kavi.fi',
       body: html
-    })
+    }))
   })
 }
 
@@ -164,6 +156,13 @@ exports.payingLocationsWithEmail = function(locations) {
 
 exports.payingLocationsWithoutEmail = function(locations) {
   return _.select(locations, function(l) { return !l.deleted && l.isPayer && l.active && _.isEmpty(l.emailAddresses) })
+}
+
+function providerEmail(fields) {
+  return utils.merge({
+    bcc: ['tarjoajarekisteri@kavi.fi'],
+    from: 'tarjoajarekisteri@kavi.fi'
+  }, fields)
 }
 
 function totalPrice(xs) {

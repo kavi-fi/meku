@@ -8,6 +8,7 @@ var i18n = {
     'error-reload': 'Lataa sivu uudelleen <a href="#">tästä</a>,<br/>tai palaa etusivulle tästä <a href="/">tästä</a>.',
     'conflict-reload': 'Palaa etusivulle <a href="/">tästä</a>.',
     'draft-notice': 'Luokittelu kesken käyttäjällä <b></b>. Luonnos tallennettu <span></span>.',
+    'register-provider-info': 'Ilmoittaudu kuvaohjelmatarjoajaksi täyttämällä Excel-taulukko tarjoajan tiedoista sekä tarjoamispaikoista, ja lähettämällä se alla olevalla lomakkeella. Lataa ilmoittautumislomake <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">tästä</a>.',
 
   // Program types:
 
@@ -118,10 +119,26 @@ var i18n = {
     'Vastaanottajat': 0,
     'Aihe': 0,
     'Rekisteröi': 0,
+
+  // public.html:
+
     'Kuvaohjelmien ikärajahaku': 0,
+
+  // reset-password:
+
     'Anna uusi salasana': 0,
     'Salasana uudelleen': 0,
     'Tallenna salasana': 0,
+
+  // register-provider:
+
+    'Tarjoajaksi ilmoittautuminen': 0,
+    'Viesti Kaville': 0,
+    'Tähän kenttään voit tarvittaessa kirjoittaa kommentit tai pyynnöt Kaville. Esim. Milloin kuvaohjelmien tarjonta aloitetaan?': 0,
+    'Valitse taulukko-tiedosto': 0,
+    'Lähetä tiedosto': 0,
+    'Tiedoston lähettäminen ei onnistunut.': 0,
+    'Tarjoajan tai tarjoajan tiedoista puuttui pakollisia tietoja. Ole hyvä, täytä puuttuvat tiedot ja lähetä tiedosto uudelleen.': 0,
 
   // Dynamic UI-texts:
 

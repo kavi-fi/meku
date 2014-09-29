@@ -244,13 +244,8 @@ function isNotEmpty(val) {
   return (val.trim().length) > 0
 }
 
-function isEmail(txt) {
-  var regexp = /^([A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+(\.[A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+)*)@(([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63})(\.([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63}))*\.[a-zA-Z0-9]{2,63})$/
-  return regexp.test(txt)
-}
-
 function isMultiEmail(xs) {
-  return _.all(xs.split(','), isEmail)
+  return _.all(xs.split(','), utils.isEmail)
 }
 
 function validate(f) {

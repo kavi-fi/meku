@@ -53,6 +53,11 @@ utils.isValidDuration = function(txt) {
   }
 }
 
+utils.isEmail = function(txt) {
+  var regexp = /^([A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+(\.[A-Za-z0-9\x27\x2f!#$%&*+=?^_`{|}~-]+)*)@(([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63})(\.([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]|[a-zA-Z0-9]{1,63}))*\.[a-zA-Z0-9]{2,63})$/
+  return regexp.test(txt)
+}
+
 utils.isValidYear = function(txt) {
   return /^\d{4}$/.test(txt) && parseInt(txt) > 1889
 }

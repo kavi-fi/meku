@@ -77,7 +77,8 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   var data = generateData()
   return {
     recipients: _.filter(program.sentRegistrationEmailAddresses, function(x) { return x != user.email }),
-    from: "no-reply@kavi.fi",
+    from: 'no-reply@kavi.fi',
+    bcc: ['kirjaamo@kavi.fi'],
     subject: _.template("Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>", data),
     body: _.template(generateText(), data)
   }

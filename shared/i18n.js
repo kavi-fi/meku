@@ -13,8 +13,8 @@ var i18n = {
 
     '?': '?',
     'Elokuva': 'Film',
-    'TV-sarjan nimi': 'TV-serie',
-    'TV-sarjan jakso': 'TV-serienamn',
+    'TV-sarjan nimi': 'TV-serienamn',
+    'TV-sarjan jakso': 'TV-serie',
     'Muu TV-ohjelma': 'Annat TV-program',
     'Extra': 'Extra',
     'Traileri': 'Trailer',

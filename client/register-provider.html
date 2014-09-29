@@ -5,12 +5,15 @@
   <link href="style.css" media="all" rel="stylesheet" />
   <script src="vendor/jquery-2.1.1.min.js"></script>
   <script src="vendor/lodash-2.4.1.min.js"></script>
+  <script src="vendor/jquery.cookie-1.4.1.js"></script>
   <script src="js/shared.js"></script>
+  <script src="shared/i18n.js"></script>
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
   <script>
     $(function() {
+      localize()
       registerRevisionMismatchAjaxErrorHandler()
 
       var $form = $('form')
@@ -70,38 +73,38 @@
   <title>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</title>
 </head>
 <body id="register-provider-page">
-  <div class="training-ribbon"><span>Koulutusympäristö</span></div>
+  <div class="training-ribbon"><span data-i18n>Koulutusympäristö</span></div>
   <div id="header">
     <div class="content">
       <div>
-        <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
+        <h1 data-i18n>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
       </div>
     </div>
   </div>
   <form enctype="multipart/form-data">
-    <h2>Tarjoajaksi ilmoittautuminen</h2>
+    <h2 data-i18n>Tarjoajaksi ilmoittautuminen</h2>
     <div class="fields">
-      <p>
+      <p data-i18n="register-provider-info">
         Ilmoittaudu kuvaohjelmatarjoajaksi täyttämällä Excel-taulukko tarjoajan
         tiedoista sekä tarjoamispaikoista, ja lähettämällä se alla olevalla lomakkeella.
         Lataa ilmoittautumislomake <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">tästä</a>.
       </p>
       <div>
-        <label for="message">Viesti Kaville</label>
-        <p class="help">Tähän kenttään voit tarvittaessa kirjoittaa kommentit tai pyynnöt
+        <label for="message" data-i18n>Viesti Kaville</label>
+        <p class="help" data-i18n>Tähän kenttään voit tarvittaessa kirjoittaa kommentit tai pyynnöt
         Kaville. Esim. Milloin kuvaohjelmien tarjonta aloitetaan?</p>
         <textarea name="message" id="message"></textarea></label>
-        <label>Valitse taulukko-tiedosto <input type="file" name="providerFile" /></label>
+        <label><span data-i18n>Valitse taulukko-tiedosto</span><input type="file" name="providerFile" /></label>
       </div>
       <div>
-        <button class="button" disabled>Lähetä tiedosto</button>
+        <button class="button" disabled data-i18n>Lähetä tiedosto</button>
       </div>
     </div>
     <div class="feedback">
       <p class="success hidden"></p>
-      <p class="error hidden">Tiedoston lähettäminen ei onnistunut.</p>
+      <p class="error hidden" data-i18n>Tiedoston lähettäminen ei onnistunut.</p>
       <div class="invalid hidden">
-        <p>Tarjoajan tai tarjoajan tiedoista puuttui pakollisia tietoja. Ole
+        <p data-i18n>Tarjoajan tai tarjoajan tiedoista puuttui pakollisia tietoja. Ole
         hyvä, täytä puuttuvat tiedot ja lähetä tiedosto uudelleen.</p>
         <ul></ul>
       </div>

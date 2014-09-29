@@ -30,6 +30,38 @@ $.fn.labeledText = function(txt) {
   return this
 }
 
+$.fn.i18nText = function(key) {
+  var txt = i18nText(key)
+  return this.text(txt || key).toggleClass('i18n-fail', !txt)
+}
+$.fn.i18nHtml = function(key, fallback) {
+  var lang = langCookie()
+  var html = lang == 'fi' ? undefined : i18n[lang][key]
+  return this.html(html || fallback).toggleClass('i18n-fail', (lang != 'fi' && !html))
+}
+
+function i18nText(key) {
+  var lang = langCookie()
+  return lang == 'fi' ? key : i18n[lang][key]
+}
+
+function langCookie() {
+  return $.cookie('lang') == 'sv' ? 'sv' : 'fi'
+}
+
+function localize() {
+  $('[data-i18n]').each(function() {
+    var $e = $(this)
+    var key = $e.data('i18n')
+    key ? $e.i18nHtml(key, $e.html()) : $e.i18nText($e.text())
+  })
+  $('[data-i18n-placeholder]').each(function() {
+    var $e = $(this)
+    var key = $e.prop('placeholder')
+    $e.prop('placeholder', i18nText(key) || key)
+  })
+}
+
 function renderWarningSummary(summary) {
   if (!summary) return undefined
   return $('#templates > .warning-summary').clone()
@@ -82,7 +114,8 @@ function closeDialog() {
 
 function showRevisionMismatchDialog() {
   if (!$('.revision-mismatch-dialog').is(':visible')) {
-    var html = '<h2>Järjestelmä on päivitetty.</h2><span>Lataa sivu uudelleen <a href="javascript:window.location.reload(true)">tästä</a>.</span>'
+    var html = $('<h2>').i18nText('Järjestelmä on päivitetty.')
+      .add($('<span>').html(i18nText('upgrade-reload') || 'Lataa sivu uudelleen <a href="javascript:window.location.reload(true)">tästä</a>.'))
     showDialog($('<div>').addClass('dialog revision-mismatch-dialog').html(html))
   }
 }

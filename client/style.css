@@ -6,6 +6,7 @@ body {
   color: #444444;
 }
 
+.i18n-fail { color: red !important; }
 .pika-single { width: 248px; }
 
 .hide { display: none !important; }
@@ -50,6 +51,7 @@ p.help { font-size: 15px; margin: 3px 0; }
 #register-provider-page .feedback { padding: 10px; }
 #register-provider-page textarea { width: 550px; height: 60px; }
 #register-provider-page a { color: #00BB88; }
+#register-provider-page input[type=file] { padding-left: 7px; }
 
 .classification-criteria .category, [draggable] {
   -moz-user-select: none;
@@ -313,6 +315,7 @@ label.top { vertical-align: top; }
   width: 280px;
 }
 .program-details-form .back-to-search { margin-top: -40px; color: #00BB88; float: left; }
+.program-details-form .back-to-search i { padding-right: 7px; }
 .program-details-form .program-info button[name=save] { display: none; float: right; }
 
 .form select {width: 300px;}

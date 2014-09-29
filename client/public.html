@@ -7,10 +7,12 @@
   <script src="vendor/jquery-2.1.1.min.js"></script>
   <script src="vendor/lodash-2.4.1.min.js"></script>
   <script src="vendor/jquery.highlight-3-custom.js"></script>
+  <script src="vendor/jquery.cookie-1.4.1.js"></script>
   <script src="vendor/moment-2.8.2.min.js"></script>
   <script src="shared/enums.js"></script>
   <script src="shared/classification-utils.js"></script>
   <script src="shared/utils.js"></script>
+  <script src="shared/i18n.js"></script>
   <script src="js/shared.js"></script>
   <script src="js/program-box.js"></script>
   <script src="js/search.js"></script>
@@ -21,6 +23,7 @@
     $(function() {
       registerRevisionMismatchAjaxErrorHandler()
       loadTemplates(function() {
+        localize()
         publicSearchPage()
         var hash = parseLocationHash()
         if (hash) hash.shift()
@@ -28,13 +31,13 @@
       })
     })
   </script>
-  <title>Kuvaohjelmien ikärajahaku</title>
+  <title data-i18n>Kuvaohjelmien ikärajahaku</title>
 </head>
 <body>
   <div id="header">
     <div class="content">
       <div>
-        <h1>Kuvaohjelmien ikärajahaku</h1>
+        <h1 data-i18n>Kuvaohjelmien ikärajahaku</h1>
       </div>
     </div>
   </div>

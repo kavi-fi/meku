@@ -33,6 +33,7 @@
   <script src="shared/enums.js"></script>
   <script src="shared/classification-utils.js"></script>
   <script src="shared/utils.js"></script>
+  <script src="shared/i18n.js"></script>
   <script src="js/shared.js"></script>
   <script src="js/program-box.js"></script>
   <script src="js/meku.js"></script>
@@ -46,46 +47,46 @@
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
-  <title>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</title>
+  <title data-i18n>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</title>
 </head>
 <body>
-  <div class="training-ribbon"><span>Koulutusympäristö</span></div>
+  <div class="training-ribbon"><span data-i18n>Koulutusympäristö</span></div>
   <div id="error-overlay"></div>
   <div id="error-dialog">
     <div>
-      <h2>Verkko- tai järjestelmävirhe.</h2>
-      <p>Lataa sivu uudelleen <a href="#">tästä</a>,<br/>tai palaa etusivulle tästä <a href="/">tästä</a>.</p>
-      <p>Jos vikatilanne jatkuu, ota yhteys ylläpitoon.</p>
+      <h2 data-i18n>Verkko- tai järjestelmävirhe.</h2>
+      <p data-i18n="error-reload">Lataa sivu uudelleen <a href="#">tästä</a>,<br/>tai palaa etusivulle tästä <a href="/">tästä</a>.</p>
+      <p data-i18n>Jos vikatilanne jatkuu, ota yhteys ylläpitoon.</p>
     </div>
   </div>
   <div id="conflict-overlay"></div>
   <div id="conflict-dialog">
     <div>
-      <h2>Editointikonflikti.</h2>
-      <p>Käsittelemäsi kuvaohjelman luokittelun on samanaikaisesti rekisteröinyt toinen käyttäjä.</p>
-      <p>Palaa etusivulle <a href="/">tästä</a>.</p>
+      <h2 data-i18n>Editointikonflikti.</h2>
+      <p data-i18n>Käsittelemäsi kuvaohjelman luokittelun on samanaikaisesti rekisteröinyt toinen käyttäjä.</p>
+      <p data-i18n="conflict-reload">Palaa etusivulle <a href="/">tästä</a>.</p>
     </div>
   </div>
   <div id="login-overlay"></div>
   <form id="login">
     <div>
-      <h2>Tervetuloa!</h2>
-      <label>Käyttäjätunnus<input type="text" name="username" class="invalid"/></label>
-      <label>Salasana<input type="password" name="password" class="invalid" /></label>
+      <h2 data-i18n>Tervetuloa!</h2>
+      <label><div data-i18n>Käyttäjätunnus</div><input type="text" name="username" class="invalid"/></label>
+      <label><div data-i18n>Salasana</div><input type="password" name="password" class="invalid" /></label>
       <div class="feedback"></div>
-      <button class="button login">Kirjaudu</button>
-      <button disabled class="button forgot-password">Unohdin salasanani</button>
+      <button class="button login" data-i18n>Kirjaudu</button>
+      <button disabled class="button forgot-password" data-i18n>Unohdin salasanani</button>
     </div>
   </form>
 
   <div id="header">
     <div class="content">
       <div>
-        <div class="user-info"><span class="name"></span> <span class="username"></span> / <a href="#" class="logout">Kirjaudu ulos</a></div>
-        <h1>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
+        <div class="user-info"><span class="name"></span> <span class="username"></span> / <a href="#" class="logout" data-i18n>Kirjaudu ulos</a></div>
+        <h1 data-i18n>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</h1>
       </div>
       <ul class="navi">
-        <li><a href="#haku" data-href="#search-page">Luokittelu</a></li>
+        <li><a href="#haku" data-href="#search-page" data-i18n>Luokittelu</a></li>
         <li class="hide"><a href="#luokittelu" data-href="#classification-page">Luokittelu</a></li>
         <li><a href="#tilaajat" data-href="#subscriber-management-page">Tilaajat</a></li>
         <li><a href="#laskutus" data-href="#billing-page">Laskutus</a></li>

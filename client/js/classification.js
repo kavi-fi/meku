@@ -134,8 +134,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         showDialog($('<div>', {class: 'registration-confirmation dialog'})
           .append($('<span>', {class: 'name'}).text(savedProgram.name))
           .append(renderWarningSummary(classificationUtils.fullSummary(savedProgram)))
-          .append($('<p>', {class: 'registration-date'}).text('Rekisteröity ' + utils.asDateTime(savedProgram.classifications[0].registrationDate)))
-          .append($('<p>', {class: 'buttons'}).html($('<button>', { click: closeDialog, class: 'button' }).text('Sulje'))))
+          .append($('<p>', {class: 'registration-date'}).text(i18nText('Rekisteröity') + ' ' + utils.asDateTime(savedProgram.classifications[0].registrationDate)))
+          .append($('<p>', {class: 'buttons'}).html($('<button>', { click: closeDialog, class: 'button' }).i18nText('Sulje'))))
         $(window).scrollTop(0)
       })
     })
@@ -308,7 +308,7 @@ function classificationFormUtils() {
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
           .append($('<h5>').text(c.title + ' ').append($('<span>').text('(' + c.id + ')')))
           .append($('<p>').text(c.description))
-          .append($('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:'Kommentit...', class:'throttledInput' }))
+          .append($('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:i18nText('Kommentit...'), class:'throttledInput' }))
       })
       $form.find('.category-container .' + category).append($criteria)
     })
@@ -321,15 +321,16 @@ function classificationFormUtils() {
     var isGame = enums.util.isGameType(program)
 
     var programInfoTitle = (editMode || isReclassification) ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
+    $form.find('.program-info h2.main span:eq(0)').i18nText(programInfoTitle)
+    $form.find('.program-info h2.main span:eq(1)').i18nText(enums.util.programTypeName(program.programType))
+
     var classificationTitle = (editMode || !isReclassification) ? 'Luokittelu' : 'Uudelleenluokittelu'
-    var programTypeName = enums.util.programTypeName(program.programType)
-    $form.find('.program-info h2.main').text(programInfoTitle + ' - ' + (programTypeName || '?'))
-    $form.find('.classification-details h2.main').text(classificationTitle)
+    $form.find('.classification-details h2.main').i18nText(classificationTitle)
 
     if (isTvEpisode) {
-      $form.find('input[name="name.0"]').prev().text('Jakson alkuperäinen nimi')
-      $form.find('input[name="nameFi.0"]').prev().text('Jakson suomalainen nimi')
-      $form.find('input[name="nameSv.0"]').prev().text('Jakson ruotsinkielinen nimi')
+      $form.find('input[name="name.0"]').prev().i18nText('Jakson alkuperäinen nimi')
+      $form.find('input[name="nameFi.0"]').prev().i18nText('Jakson suomalainen nimi')
+      $form.find('input[name="nameSv.0"]').prev().i18nText('Jakson ruotsinkielinen nimi')
     }
     if (!isTvEpisode) $form.find('.tv-episode-field').remove()
     if (isGame) $form.find('.non-game-field').remove()
@@ -337,7 +338,7 @@ function classificationFormUtils() {
 
     var showDuration = !enums.util.isGameType(program) || hasRole('kavi')
     if (!showDuration) $form.find('.duration-field').remove()
-    if (showDuration && enums.util.isGameType(program)) $form.find('.duration-field label').text('Luokittelun kesto')
+    if (showDuration && enums.util.isGameType(program)) $form.find('.duration-field label').i18nText('Luokittelun kesto')
 
     if (isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)

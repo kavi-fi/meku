@@ -5,7 +5,7 @@ function programBox() {
     tvSeries: $('#templates > .program-box-tv-series-classification-details').clone(),
     empty: $('#templates > .program-box-empty-classification-details').clone()
   }
-  var $draftTemplate = $('<div>').html('Luokittelu kesken käyttäjällä <b></b>. Luonnos tallennettu <span></span>.')
+  var $draftTemplate = $('#templates > .draft-notice').clone()
 
   return { render: render }
 
@@ -57,7 +57,7 @@ function programBox() {
         $episodeHeader.click(function() { toggleEpisodesOpen(true) })
       } else {
         var $spinner = spinner()
-        $episodeHeader.append(' '+p.episodes.count + ' kpl').append($spinner).one('click', function() {
+        $episodeHeader.append(' '+p.episodes.count + ' ' + i18nText('kpl')).append($spinner).one('click', function() {
           $spinner.addClass('active')
           $.get('/episodes/'+ p._id).done(function(allEpisodes) {
             $spinner.remove()
@@ -68,7 +68,7 @@ function programBox() {
         })
       }
     } else {
-      $episodeHeader.empty().addClass('disabled').text('Ei jaksoja.')
+      $episodeHeader.empty().addClass('disabled').i18nText('Ei jaksoja.')
       $episodes.remove()
     }
 
@@ -97,7 +97,7 @@ function programBox() {
       seasons.forEach(function(season) {
         var episodes = grouped[season]
         $episodes.append($('<div>').addClass('season-header')
-          .append($('<span>').text(season == 'undefined' ? 'Tuntematon tuotantokausi' : 'Tuotantokausi '+season))
+          .append($('<span>').text(season == 'undefined' ? i18nText('Tuntematon tuotantokausi') : i18nText('Tuotantokausi')+' '+season))
           .append($('<span>').append(renderWarningSummary(classificationUtils.aggregateSummary(episodes)))))
           .append(episodes.map(function(p) {
             return $('<div>').addClass('result').data('id', p._id).data('program', p)
@@ -134,7 +134,7 @@ function programBox() {
 
     function classificationLinks() {
       return p.classifications.map(function(c, index) {
-        var registrationDate = utils.asDate(c.registrationDate) || 'Tuntematon rekisteröintiaika'
+        var registrationDate = utils.asDate(c.registrationDate) || i18nText('Tuntematon rekisteröintiaika')
         return $('<span>', { 'data-id': c._id }).addClass('classification').toggleClass('selected', index == 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
       })
     }

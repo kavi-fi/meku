@@ -3,13 +3,7 @@ var pikadayDefaults = {
   defaultDate: new Date(),
   firstDay: 1,
   format: utils.dateFormat,
-  i18n: {
-    previousMonth: 'Edellinen kuukausi',
-    nextMonth: 'Seuraava kuukausi',
-    months: ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
-    weekdays: ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'],
-    weekdaysShort: ['Su', 'Ma', 'Ti', 'Ke', 'To', 'Pe', 'La']
-  },
+  i18n: i18nPikaday[langCookie()],
   setDefaultDate: true,
   showWeekNumber: true
 }
@@ -20,41 +14,12 @@ $(function() {
 
 function setup() {
   user = parseUserCookie()
-  $.fn.select2.defaults.formatNoMatches = 'Ei tuloksia'
-  $.fn.select2.defaults.formatSearching = 'Haetaan...'
+  localize()
+  $.fn.select2.defaults.formatNoMatches = i18nText('Ei tuloksia')
+  $.fn.select2.defaults.formatSearching = i18nText('Haetaan...')
   $.fn.select2.defaults.adaptDropdownCssClass = function(c) {  return c == 'required' ? c : null }
-  $.dateRangePickerLanguages.fi = {
-    'selected': 'Valittu:',
-    'day':'Päivä',
-    'days': ' päivää',
-    'apply': 'Sulje',
-    'week-1' : 'MA',
-    'week-2' : 'TI',
-    'week-3' : 'KE',
-    'week-4' : 'TO',
-    'week-5' : 'PE',
-    'week-6' : 'LA',
-    'week-7' : 'SU',
-    'month-name': ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu','Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
-    'shortcuts' : 'Valitse',
-    'past': 'Past',
-    'following':'Seuraavat',
-    'previous' : 'edellinen',
-    'prev-week' : 'viikko',
-    'prev-month' : 'kuukausi',
-    'prev-year' : 'vuosi',
-    'next':'seuraava',
-    'next-week':'viikko',
-    'next-month':'kuukausi',
-    'next-year':'vuosi',
-    'less-than' : 'Date range should not be more than %d days',
-    'more-than' : 'Date range should not be less than %d days',
-    'default-more' : 'Please select a date range longer than %d days',
-    'default-single' : 'Please select a date',
-    'default-less' : 'Please select a date range less than %d days',
-    'default-range' : 'Please select a date range between %d and %d days',
-    'default-default': 'Ole hyvä ja valitse alku- ja loppupäivä'
-  }
+  $.dateRangePickerLanguages.fi = i18nDateRangePicker.fi
+  $.dateRangePickerLanguages.sv = i18nDateRangePicker.sv
 
   var login = loginPage()
   var error = errorDialog()
@@ -103,7 +68,7 @@ function setup() {
 
 function setupDatePicker($datePicker, opts, onChange) {
   var defaults = {
-    language: 'fi',
+    language: langCookie(),
     format: 'DD.MM.YYYY',
     separator: ' - ',
     startOfWeek: 'monday',
@@ -173,7 +138,7 @@ function loginPage() {
       .fail(function(jqXHR) {
         if (jqXHR.status == 403) {
           $password.val('').trigger('input').focus()
-          $feedback.text('Väärä käyttäjätunnus tai salasana.').slideDown()
+          $feedback.i18nText('Väärä käyttäjätunnus tai salasana.').slideDown()
         }
       })
   })
@@ -183,11 +148,11 @@ function loginPage() {
     $forgotPasswordButton.prop('disabled', true)
     $.post('/forgot-password', JSON.stringify({ username: $username.val() }))
       .done(function() {
-        $feedback.text('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.').slideDown()
+        $feedback.i18nText('Lähetimme sähköpostilla ohjeet salasanan vaihtamista varten.').slideDown()
         $username.val('')
       })
       .fail(function() {
-        $feedback.text('Käyttäjätunnusta ei ole olemassa.').slideDown()
+        $feedback.i18nText('Käyttäjätunnusta ei ole olemassa.').slideDown()
       })
   })
 
@@ -312,7 +277,7 @@ function select2Autocomplete(opts, onChangeFn) {
       return callback(val)
     },
     multiple: opts.multiple,
-    placeholder: 'Valitse...',
+    placeholder: i18nText('Valitse...'),
     allowClear: opts.allowClear,
     formatSelection: opts.formatSelection,
     formatResultCssClass: opts.formatResultCssClass,
@@ -333,7 +298,7 @@ function select2Autocomplete(opts, onChangeFn) {
 function select2EnumAutocomplete(opts, onChangeFn) {
   opts = _.merge({
     data: opts.data,
-    placeholder: 'Valitse...',
+    placeholder: i18nText('Valitse...'),
     multiple: opts.multiple || false,
     initSelection: function(e, callback) { callback() },
     fromOption: function(x) { return x.id }

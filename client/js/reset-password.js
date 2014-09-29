@@ -1,4 +1,5 @@
 function resetPassword() {
+  localize()
   $.ajaxSetup({ dataType: 'json', processData: false, contentType: 'application/json' })
 
   var $form = $('#reset-password').submit(function(e) { e.preventDefault() })
@@ -18,15 +19,15 @@ function resetPassword() {
     var feedback = []
 
     if (tooShortPassword) {
-      feedback.push('Salasanan tulee olla vähintään kuusi merkkiä pitkä.')
+      feedback.push($('<div>').i18nText('Salasanan tulee olla vähintään kuusi merkkiä pitkä.'))
     }
 
     if (notSamePasswords) {
-      feedback.push('Salasanat eivät täsmää.')
+      feedback.push($('<div>').i18nText('Salasanat eivät täsmää.'))
     }
 
     if (feedback.length > 0) {
-      $feedback.text(feedback.join(' '))
+      $feedback.html(feedback)
       $feedback.slideDown()
     } else {
       $feedback.slideUp()
@@ -40,7 +41,7 @@ function resetPassword() {
         window.location = '/'
       })
       .fail(function() {
-        $feedback.text('Virhe salasanan vaihtamisessa.').slideDown()
+        $feedback.i18nText('Virhe salasanan vaihtamisessa.').slideDown()
       })
   })
 

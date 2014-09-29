@@ -10,8 +10,8 @@ function publicSearchPage() {
   $page.find('.controls h2.main').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    var body = encodeURIComponent('Ohjelma: '+program.name[0]+ ' [id:'+program.sequenceId+']')
-    var subject = encodeURIComponent('Kuvaohjelman uudelleenluokittelupyyntö')
+    var body = encodeURIComponent(i18nText('Ohjelma:')+' '+program.name[0]+ ' [id:'+program.sequenceId+']')
+    var subject = encodeURIComponent(i18nText('Kuvaohjelman uudelleenluokittelupyyntö'))
     var q = '?subject='+subject+'&body='+body
     $(this).find('.request-reclassification').attr('href', 'mailto:kavi@kavi.fi'+q).show()
   })
@@ -29,12 +29,12 @@ function internalSearchPage() {
 
   var programTypesSelect2 = {
     data: [
-      {id: 1, text: 'Elokuva'},
-      {id: 3, text: 'TV-sarjan jakso'},
-      {id: 4, text: 'Muu TV-ohjelma'},
-      {id: 5, text: 'Extra'},
-      {id: 6, text: 'Trailer'},
-      {id: 7, text: 'Peli'}
+      {id: 1, text: i18nText('Elokuva') },
+      {id: 3, text: i18nText('TV-sarjan jakso') },
+      {id: 4, text: i18nText('Muu TV-ohjelma') },
+      {id: 5, text: i18nText('Extra') },
+      {id: 6, text: i18nText('Traileri') },
+      {id: 7, text: i18nText('Peli') }
     ]
   }
 
@@ -137,7 +137,7 @@ function internalSearchPage() {
     var $row = $programBox.prev('.result')
     var program = $row.data('program')
     var classification = $programBox.find('.classification.selected').data('classification')
-    var registrationDate = utils.asDate(classification.registrationDate) || 'Tuntematon rekisteröintiaika'
+    var registrationDate = utils.asDate(classification.registrationDate) || i18nText('Tuntematon rekisteröintiaika')
     showDialog($('#templates').find('.remove-classification-dialog').clone()
       .find('.registration-date').text(registrationDate).end()
       .find('.program-name').text(program.name).end()
@@ -159,7 +159,7 @@ function internalSearchPage() {
       drafts.forEach(function(draft) {
         var $date = $('<span>', {class: 'creationDate'}).text(utils.asDateTime(draft.creationDate))
         var $link = $('<span>', {class: 'name'}).text(draft.name)
-        var $remove = $('<div>', {class: 'remove'}).append($('<button>', { class: 'button' }).text('Poista'))
+        var $remove = $('<div>', {class: 'remove'}).append($('<button>', { class: 'button' }).i18nText('Poista'))
         var $draft = $('<div>', {class: 'result draft'}).data('id', draft._id).append($date).append($link).append($remove)
         $drafts.find('> div').append($draft)
       })
@@ -180,12 +180,12 @@ function internalSearchPage() {
     })
 
     function renderRecentRow(p, c) {
-      var registrationDate = utils.asDateTime(c.registrationDate) || 'Tuntematon rekisteröintiaika'
+      var registrationDate = utils.asDateTime(c.registrationDate) || i18nText('Tuntematon rekisteröintiaika')
       return $('<div>', { 'data-id': p._id }).addClass('result').data('program', p)
         .append($('<span>', { class: 'registrationDate' }).text(registrationDate))
         .append($('<span>', { class: 'name' }).text(p.name[0]))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.durationAsText(c.duration)))
-        .append($('<span>', { class: 'program-type' }).text(enums.util.programTypeName(p.programType)))
+        .append($('<span>', { class: 'program-type' }).i18nText(enums.util.programTypeName(p.programType)))
         .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.summary(c)) || ' - '))
         .data('renderer', rerenderRecentRow)
     }
@@ -622,7 +622,7 @@ function searchPage() {
         .append($('<span>', { class: 'name' }).text(p.name[0]).highlight(hilites, { beginningsOnly: true, caseSensitive: false }))
         .append($('<span>', { class: 'country-year-date' }).text(countryAndYearAndDate(p)))
         .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.programDurationAsText(p)))
-        .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : enums.util.programTypeName(p.programType)))
+        .append($('<span>', { class: 'program-type' }).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : i18nText(enums.util.programTypeName(p.programType))))
         .append($('<span>').append(renderWarningSummary(classificationUtils.fullSummary(p)) || ' - '))
     }
 

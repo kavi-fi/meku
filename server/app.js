@@ -29,6 +29,7 @@ var csrf = require('csurf')
 var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 var validation = require('./validation')
 var env = require('./env').get()
+var testEnvEmailQueue = []
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -1207,6 +1208,10 @@ app.get('/report/:name', requireRole('root'), function(req, res, next) {
   reports[req.params.name](range, respond(res, next))
 })
 
+if (env.isTest) {
+  app.get('/emails/latest', function(req, res) { res.send(_.last(testEnvEmailQueue)) })
+}
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
@@ -1393,6 +1398,9 @@ function sendEmail(opts, user, callback) {
 
   if (env.sendEmail || process.env.EMAIL_TO != undefined) {
     sendgrid.send(email, callback)
+  } else if (env.isTest) {
+    testEnvEmailQueue.push(email)
+    return callback()
   } else {
     console.log('email (suppressed) to: ', opts.recipients, email)
     return callback()
@@ -1603,7 +1611,8 @@ function isWhitelisted(req) {
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
-    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/upgrade-browser.html'
+    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/upgrade-browser.html',
+    'GET:/emails/latest'
   ]
   var url = req.method + ':' + req.path
   return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

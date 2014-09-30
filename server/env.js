@@ -27,6 +27,7 @@ var envs = {
     mongoUrl: 'mongodb://localhost/meku'
   },
   test: {
+    isTest: true,
     port: 4000,
     hostname: 'http://localhost:4000',
     sendEmail: false,
@@ -34,6 +35,7 @@ var envs = {
     mongoUrl: 'mongodb://localhost/meku-test'
   },
   'manual-test': {
+    isTest: true,
     port: 3000,
     hostname: 'http://localhost:3000',
     sendEmail: false,

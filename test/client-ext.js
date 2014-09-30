@@ -1,6 +1,7 @@
-var assert = require('assert')
 var _ = require('lodash')
+var request = require('request')
 var webdriverio = require('webdriverio')
+var assert = require('chai').assert
 var keys = exports.keys = { enter: '\ue006' }
 
 /*
@@ -73,7 +74,7 @@ function extend(client) {
   client.addCommand('waitForLogin', function(userName, callback) {
     check()
     function check() {
-      client.execute(function() { return $('#header .user-info .name').text() }, function(err, result) {
+      client.execute(function() { return window.$ ? $('#header .user-info .name').text() : '' }, function(err, result) {
         if (err) return callback(err)
         if (result.value == userName) return callback()
         setTimeout(check, 50)
@@ -83,10 +84,10 @@ function extend(client) {
 
   client.addCommand('login', function(username, password, name, callback) {
     this.waitForVisible('#login', 2000)
-      .setValue('#login input[name="username"]', 'kavi')
-      .setValue('#login input[name="password"]', 'kavi')
+      .setValue('#login input[name="username"]', username)
+      .setValue('#login input[name="password"]', password)
       .click('#login button.login')
-      .waitForLogin('kavi')
+      .waitForLogin(name)
       .waitForAjax()
       .call(callback)
   })
@@ -111,15 +112,51 @@ function extend(client) {
 
   client.addCommand('assertVisible', function(selector, callback) {
     this.isVisible(selector, function(err, res) {
-      assert(res)
+      var msg = 'Excepted '+selector+' to be visible'
+      _.isArray(res) ? assert.ok(_.every(res), msg) : assert.ok(res, msg)
+      callback(err)
+    })
+  })
+  client.addCommand('assertHidden', function(selector, callback) {
+    this.isVisible(selector, function(err, res) {
+      var msg = 'Excepted '+selector+' to be hidden'
+      _.isArray(res) ? assert.ok(_.every(res, function(x) { return !x }), msg) : assert.ok(res, msg)
       callback(err)
     })
   })
 
   client.addCommand('assertEnabled', function(selector, callback) {
     this.isEnabled(selector, function(err, res) {
-      assert(res)
+      assert.ok(res)
       callback(err)
+    })
+  })
+
+  client.addCommand('assertDisabled', function(selector, callback) {
+    this.isEnabled(selector, function(err, res) {
+      assert.ok(!res)
+      callback(err)
+    })
+  })
+  client.addCommand('assertValue', function(selector, expected, callback) {
+    this.getValue(selector, function(err, res) {
+      assert.equal(res, expected)
+      callback(err)
+    })
+  })
+
+  client.addCommand('assertSelect2OneValue', function(selector, value, callback) {
+    this.assertText(selector + ' .select2-chosen', value)
+      .call(callback)
+  })
+
+  client.addCommand('assertSelect2Value', function(selector, expectedValues, callback) {
+    this.execute(function(selector) {
+      return $(selector + ' .select2-search-choice').map(function() { return $.trim($(this).text()) }).toArray()
+    }, selector, function(err, result) {
+      if (err) return callback(err)
+      assert.deepEqual(result.value, expectedValues)
+      return callback()
     })
   })
 
@@ -129,16 +166,14 @@ function extend(client) {
 
   client.addCommand('select2one', function(selector, query, expectedValue, callback) {
     if (expectedValue === true) expectedValue = query
-
-  this.click(selector + ' a')
-    .waitForVisible('#select2-drop')
-    .setValue('#select2-drop input[type=text]', query)
-    .waitForText('#select2-drop .select2-highlighted', expectedValue)
-    .addValue('#select2-drop input[type=text]', keys.enter)
-    .assertText(selector + ' .select2-chosen', expectedValue)
-  this.call(callback)
-
-})
+    this.click(selector + ' a')
+      .waitForVisible('#select2-drop')
+      .setValue('#select2-drop input[type=text]', query)
+      .waitForText('#select2-drop .select2-highlighted', expectedValue)
+      .addValue('#select2-drop input[type=text]', keys.enter)
+      .assertText(selector + ' .select2-chosen', expectedValue)
+      .call(callback)
+  })
 
   // .select2(x, 'su', 'Suomi') == enter 'su', expect 'Suomi'
   // .select2(x, 'Suomi', true) == enter 'Suomi', expect 'Suomi'
@@ -198,6 +233,23 @@ function extend(client) {
       .assertVisible('#search-page .program-box')
       .assertProgramBox('#search-page .program-box', program)
       .call(callback)
+  })
+
+  // expectedEmail: { to, subject, body }
+  client.addCommand('assertLatestEmail', function(expectedEmail, callback) {
+    this.call(function() {
+      request('http://localhost:4000/emails/latest', function(error, response, body) {
+        var email = JSON.parse(body)
+        assert.sameMembers(email.smtpapi.header.to, _.isArray(expectedEmail.to) ? expectedEmail.to : [expectedEmail.to])
+        assert.equal(email.subject, expectedEmail.subject)
+        assert.equal(stripTags(email.html), expectedEmail.body)
+        callback()
+      })
+    })
+
+    function stripTags(emailHtml) {
+      return emailHtml.replace(/(<([^>]+)>)/ig,"\n").replace(/\n+/g, '\n').replace(/(^\n)|(\n$)/g, '')
+    }
   })
 
   return client

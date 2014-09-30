@@ -159,7 +159,10 @@ function loginPage() {
   $info.find('.name').text(user ? user.name : '')
   $info.find('.username').text('(' + (user ? user.username : '') + ')')
   $info.find('.logout').one('click', function() {
-    $.post('/logout').done(function() { location.reload() })
+    $.post('/logout').done(function() {
+      setLocation('')
+      location.reload()
+    })
   })
 
   $form.on('validate', function() {

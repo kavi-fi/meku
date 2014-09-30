@@ -51,6 +51,15 @@ var locationFieldMap = [
   'adultContent'
 ]
 
+var i18n = {
+  sv: {
+    'Tarjoaja': 'Tarjoaja',
+    'Lasku eri osoitteeseen kuin Tarjoajan osoite': 0,
+    'TAI verkkolasku': 0,
+    'Tarjoamispaikkojen tiedot ja tarjoamistavat': 0
+  }
+}
+
 exports.import = function(file, callback) {
   var parser = false
 
@@ -58,7 +67,21 @@ exports.import = function(file, callback) {
   else if (file.search(/.xlsx$/) > 1) parser = xlsx
   else return callback({ message: '.xlsx or .xls required' })
 
-  getProviderAndLocationsFromSpreadSheet(parser.readFile(file).Sheets['Tarjoajaksi ilmoittautuminen'], function(err, providerAndLocations) {
+  var allSheets = parser.readFile(file)
+
+  function chooseSheet() {
+    var sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
+    var sheetSv = allSheets.Sheets['Svenska']
+    return isEmptySheet(sheetSv, i18n.sv['Tarjoaja']) ? sheetFi : sheetSv
+
+    function isEmptySheet(s, heading) {
+      var rowNumber = findColumnRowByValue(s, heading)
+      var row = toObject(s, rowNumber + 2, providerFieldMap)
+      return _.isEmpty(row)
+    }
+  }
+
+  getProviderAndLocationsFromSpreadSheet(chooseSheet(), function(err, providerAndLocations) {
     if (err) return callback(err)
     var provider = createProvider(providerAndLocations.provider, providerAndLocations.billing)
     provider.locations = createLocations(providerAndLocations.locations)
@@ -196,20 +219,6 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
     }
   }
 
-  function findColumnRowByValue(from, value) {
-    var columnRowNumber = undefined
-
-    _.find(from, function(field, key) {
-      if (field.v && (field.v.trim().toLowerCase() == value.toLowerCase())) {
-        columnRowNumber = parseRowNumber(key)
-        return true
-      }
-    })
-
-    return columnRowNumber
-
-    function parseRowNumber(key) { return parseInt(key.substring(key.search(/\d/))) }
-  }
 
   function validate(values, requiredFields, index, fieldMap) {
     var present = _.keys(values)
@@ -228,31 +237,47 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
     })
   }
 
-  function toObject(from, row, fields) {
-    var fst = function(x) { return x[0] }
-    var snd = function(x) { return x[1] }
-    
-    var ob = _.reduce(from, function(result, field, key) {
-      if (key.match(new RegExp('.' + row))) {
-        return utils.merge(result, utils.keyValue(key.substr(0, 1), field.v))
-      }
-      else return result
-    }, emptyRow(fields.length))
+}
 
-    var values = _(ob).pairs().sortBy(fst).map(snd).value()
+function findColumnRowByValue(from, value) {
+  var columnRowNumber = undefined
 
-    return _(_.pairs(_.zipObject(fields, values))).filter(function(x) {
-      return x[1] !== null
-    }).object().value()
+  _.find(from, function(field, key) {
+    if (field.v && (field.v.trim().toLowerCase() == value.toLowerCase())) {
+      columnRowNumber = parseRowNumber(key)
+      return true
+    }
+  })
 
-    function parseColumnKey(key) { return key.substring(0, key.search(/\d/)) }
-  }
+  return columnRowNumber
 
-  function emptyRow(count) {
-    return _('BCDEFGHIJKLMNOPQRSTU'.split('')).take(count).reduce(function(ob, c) {
-      return utils.merge(ob, utils.keyValue(c, null)) 
-    }, {})
-  }
+  function parseRowNumber(key) { return parseInt(key.substring(key.search(/\d/))) }
+}
+
+function toObject(from, row, fields) {
+  var fst = function(x) { return x[0] }
+  var snd = function(x) { return x[1] }
+  
+  var ob = _.reduce(from, function(result, field, key) {
+    if (key.match(new RegExp('.' + row))) {
+      return utils.merge(result, utils.keyValue(key.substr(0, 1), field.v))
+    }
+    else return result
+  }, emptyRow(fields.length))
+
+  var values = _(ob).pairs().sortBy(fst).map(snd).value()
+
+  return _(_.pairs(_.zipObject(fields, values))).filter(function(x) {
+    return x[1] !== null
+  }).object().value()
+
+  function parseColumnKey(key) { return key.substring(0, key.search(/\d/)) }
+}
+
+function emptyRow(count) {
+  return _('BCDEFGHIJKLMNOPQRSTU'.split('')).take(count).reduce(function(ob, c) {
+    return utils.merge(ob, utils.keyValue(c, null)) 
+  }, {})
 }
 
 function createObjectAndSetValuesWithMap(object, map, enumProperties) {

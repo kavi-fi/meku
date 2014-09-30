@@ -23,17 +23,17 @@ var summary = exports.summary = function(classification) {
   var allWarnings = _.map(classification.criteria, function(id) { return enums.classificationCriteria[id - 1] })
   if (classification.warningOrder && classification.warningOrder.length > 0) {
     var order = classification.warningOrder
-    sortWarnings(warnings)
-    sortWarnings(allWarnings)
-
-    function sortWarnings(ws) {
-      ws.sort(function(a, b) {
-        return order.indexOf(a.category) - order.indexOf(b.category)
-      })
-    }
+    sortWarnings(order, warnings)
+    sortWarnings(order, allWarnings)
   }
 
   return { age: maxAgeLimit, warnings: warnings, allWarnings: allWarnings }
+}
+
+function sortWarnings(order, ws) {
+  ws.sort(function(a, b) {
+    return order.indexOf(a.category) - order.indexOf(b.category)
+  })
 }
 
 var tvSeriesClassification = exports.tvSeriesClassification = function(episodes) {

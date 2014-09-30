@@ -19,6 +19,12 @@ utils.showBoolean = function(b) {
   else return "Ei"
 }
 
+utils.showBooleanSv = function(b) {
+  if (b) return "Ja"
+  else return "Nej"
+}
+
+
 utils.escapeRegExp = function(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
 }

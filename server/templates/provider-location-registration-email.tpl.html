@@ -56,3 +56,61 @@
   <p>&nbsp;</p>
   <p>&nbsp;</p>
 </div>
+
+
+<div style="background-color: #ffffff;padding: 5px">
+  <p><strong><span style="font-size: 14pt; line-height: 21px"><%- header %></span></strong></p>
+  <p><font face="arial, helvetica, sans-serif" size="3"><strong>Ilmoitetun tarjoamispaikan tiedot</strong></font><strong>&nbsp;</strong></p>
+  <p>Olette rekisteröityneet Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön kuvaohjelmien tarjoajarekisteriin.</p>
+  <p><strong>Olkaa hyvä ja tarkistakaa tiedot</strong>. Jos tiedot ovat väärin tai niissä on korjattavaa, ottakaa yhteys Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön yhteyshenkilöihin <strong><em>viikon kuluessa</em></strong>. Valvontamaksu peritään ilmoitettujen tietojen perusteella vuosittain. Valvontamaksuvelvollisuus syntyy vain, jos kuvaohjelmia tarjotaan taloudellisessa tarkoituksessa ja tarjoaminen on säännöllistä. Tarjoamistietojen muuttuessa ilmoittakaa muutoksista viipymättä Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikölle.</p>
+  <p><strong><em>Yhteyshenkilö:</em></strong></p>
+
+  <p>Mirja Kosonen, puh. 0295 338&nbsp;003 tai <a href="mailto:mirja.kosonen@kavi.fi">mirja.kosonen@kavi.fi</a></p>
+  <p>Tarjoamistavat ja niistä perittävät maksut:</p>
+  <ul><% providingTypePrices.forEach(function(type) { %>
+    <li><%- sv(type.name) %> (<%- type.price %> euroa/vuosi)</li>
+  <% }) %></ul>
+
+  <p>&nbsp;</p>
+
+  <table border="0">
+    <tbody>
+      <tr><td><font face="arial, helvetica, sans-serif" size="4"><strong>TARJOAJA</strong></font></td><td>&nbsp;</td></tr>
+      <tr><td>Tarjoaja Yritys /<br>toiminimi:</td><td><%- location.provider.name %></td></tr>
+      <tr><td>Tarjoajan Y-tunnus:</td><td><%- location.provider.yTunnus %><br></td></tr>
+    </tbody>
+  </table>
+
+  <p>&nbsp;</p>
+
+  <table border="0">
+    <tbody>
+      <tr><td><font face="arial, helvetica, sans-serif" size="4"><strong>TARJOAMISPAIKKA</strong></font></td><td>&nbsp;</td></tr>
+      <tr><td>Tarjoamispaikan nimi:</td><td><%- location.name %></td></tr>
+      <tr><td>Tarjoamispaikan yhteyshenkilö:</td><td><%- location.contactName %></td></tr>
+      <tr><td>Käyntiosoite:</td><td><%- location.address.street %></td></tr>
+      <tr><td>Postinumero:</td><td><%- location.address.zip %><br></td></tr>
+      <tr><td>Postitoimipaikka:</td><td><%- location.address.city %><br></td></tr>
+      <tr><td>Sähköpostiosoite:</td><td><%- emailAddress %><br></td></tr>
+      <tr><td>Puhelinnumero:</td><td><%- location.phoneNumber %></td></tr>
+      <tr>
+        <td>Tarjoamistavat:</td>
+        <td><ul><% providingTypesSv.forEach(function(type) { %>
+          <li><%- type %></li>
+        <% }) %></ul></td>
+      </tr>
+
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+      <tr><td>Maksut yhteensä:<br>(Peritään vuosittain)</td><td><%- total %> €</td></tr>
+
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+      <tr><td>Tilausohjelmapalvelun/verkkokaupan www-osoite:</td><td><a href="<%- location.url %>"><%- location.url %></a></td></tr>
+      <tr><td>Tarjolla myös LUOKITTELEMATTOMIA K-18 ohjelmia:</td><td><%- utils.showBooleanSv(location.adultContent) %></td></tr>
+    </tbody>
+  </table>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+</div>

@@ -2,6 +2,9 @@ var fs = require('fs')
 var _ = require('lodash')
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
+var i18n = require('../shared/providers-i18n')
+
+function sv(txt) { return i18n.sv[txt] || txt  }
 
 exports.registrationEmail = function (provider, hostName, callback) {
   function emailHtml(provider, callback) {
@@ -11,7 +14,8 @@ exports.registrationEmail = function (provider, hostName, callback) {
         name: l.name,
         isPayer: l.isPayer,
         price: providingTypeTotalPrice(l.providingType),
-        providingTypes: l.providingType.map(enums.providingTypeName).join(', ')
+        providingTypes: l.providingType.map(enums.providingTypeName).join(', '),
+        providingTypesSv: l.providingType.map(enums.providingTypeName).map(sv).join(', ')
       }
     })
     var locations = _.select(allLocations, function(l) { return !l.isPayer })
@@ -36,7 +40,7 @@ exports.registrationEmail = function (provider, hostName, callback) {
 
     readTemplate('registration-email.tpl.html', function(err, tpl) {
       if (err) return callback(err)
-      var html =  _.template(tpl, vars)
+      var html =  _.template(tpl, vars, {imports: {sv: sv}})
       //fs.writeFileSync('./tmp/registration-email.html', html)
       callback(null, html)
     })
@@ -58,6 +62,7 @@ exports.registrationEmailProviderLocation = function (location, hostName, callba
       header: 'Ilmoittautuminen tarjoajaksi',
       emailAddress: location.emailAddresses.join(', '),
       providingTypes: location.providingType.map(enums.providingTypeName),
+      providingTypesSv: location.providingType.map(enums.providingTypeName).map(sv),
       providingTypePrices: providingTypes(),
       total: providingTypeTotalPrice(location.providingType),
       location: location
@@ -65,7 +70,7 @@ exports.registrationEmailProviderLocation = function (location, hostName, callba
 
     readTemplate('provider-location-registration-email.tpl.html', function(err, tpl) {
       if (err) return callback(err)
-      var html =  _.template(tpl, vars, {enums: enums, utils: utils})
+      var html =  _.template(tpl, vars, {imports: {enums: enums, utils: utils, sv: sv}})
       //fs.writeFileSync('./tmp/registration-email-location.html', html)
       callback(null, html)
     })
@@ -87,7 +92,7 @@ exports.yearlyBillingProviderEmail = function(provider, hostName, callback) {
         name: l.name,
         isPayer: l.isPayer,
         price: providingTypeTotalPrice(l.providingType),
-        providingTypes: l.providingType.map(enums.providingTypeName).join(', ')}})
+        providingTypes: l.providingType.map(enums.providingTypeName)}})
       .groupBy(function(l) { return l.isPayer ? 'payer' : 'notPayer'}).value()
     var vars = {
       hostName: hostName,

@@ -56,7 +56,7 @@ var ProgramSchema = new Schema({
   deletedClassifications: [classification],
   draftsBy: { type: [ObjectId], index: true },
   draftClassifications: {}, // { userId:classification, userId:classification2 }
-  programType: Number, // enums.programType
+  programType: { type: Number, index: true }, // enums.programType
   gameFormat: String, // in programType == game(7)
   season: Number, episode: Number, // in programType == episode(3)
   series: { _id: { type: ObjectId, index:true }, name: String, draft: { name: String, nameFi: String, nameSv: String, nameOther: String } }, // in programType == episode(3)

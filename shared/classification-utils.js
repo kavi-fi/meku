@@ -193,7 +193,10 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   }
 
   function classificationText(age, warnings) {
-    if (age == 0) {
+    if (age == 0 && warnings.length > 0) {
+      return 'Kuvaohjelma on sallittu ja ' + (warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+        + criteriaText(warnings) + '.'
+    } else if (age == 0) {
       return 'Kuvaohjelma on sallittu.'
     } else if (warnings.length === 0) {
       return 'Kuvaohjelman ikäraja on ' + ageAsText(age) + '.'

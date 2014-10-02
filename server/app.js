@@ -358,7 +358,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    program.populateSentRegistrationEmailAddresses([req.user.email], function(err, program) {
+    program.populateSentRegistrationEmailAddresses(function(err, program) {
       if (err) return next(err)
       var valid = validation.registration(program.toObject(), newClassification, req.user)
       if (!valid.valid) {
@@ -431,7 +431,7 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
     if (err) next(err)
     if (!classificationUtils.canReclassify(program, req.user)) return res.send(400)
     program.newDraftClassification(req.user)
-    program.populateSentRegistrationEmailAddresses([], function(err) {
+    program.populateSentRegistrationEmailAddresses(function(err) {
       program.save(respond(res, next))
     })
   })
@@ -558,7 +558,7 @@ app.delete('/programs/:programId/classification/:classificationId', requireRole(
     var classification = program.classifications.id(classificationId)
     program.classifications.pull(classificationId)
     program.deletedClassifications.push(classification)
-    program.populateSentRegistrationEmailAddresses([], function(err) {
+    program.populateSentRegistrationEmailAddresses(function(err) {
       if (err) return next(err)
       watcher.saveAndLogChanges(function(err) {
         if (err) return next(err)

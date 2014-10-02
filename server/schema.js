@@ -83,13 +83,12 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   return draft
 }
 
-ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(additionalEmailAddresses, callback) {
+ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback) {
   var program = this
   async.parallel([loadAuthorEmails, loadBuyerEmails], function(err, emails) {
     if (err) return callback(err)
     var manual = _.pluck(program.classifications, 'registrationEmailAddresses')
-    var all = emails.concat(manual).concat(additionalEmailAddresses)
-    program.sentRegistrationEmailAddresses = _(all).flatten().compact().uniq().value()
+    program.sentRegistrationEmailAddresses = _(emails.concat(manual)).flatten().compact().uniq().value()
     callback(null, program)
   })
 

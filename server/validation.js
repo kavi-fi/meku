@@ -10,22 +10,13 @@ validation.registration = function(program, classification, user) {
     return classificationUtils.isReclassification(program, classification)
   }
 
-  function hasSomeRegistrationEmailAddresses(p) {
-    if (_.reject(p.sentRegistrationEmailAddresses, function(x) { return x == user.email }).length > 0) {
-      return Ok()
-    } else {
-      return Fail('sentRegistrationEmailAddresses')
-    }
-  }
-
   return all(
-    when(not(isReclassification), programV(user)),
-    all(requiredArray('sentRegistrationEmailAddresses'), hasSomeRegistrationEmailAddresses),
+    when(not(isReclassification), programV()),
     function() { return classificationV(program, user)(classification) }
   )(program)
 }
 
-function programV(user) {
+function programV() {
   return all(
     requiredArray('name'),
     requiredArray('nameFi'),

@@ -1398,7 +1398,6 @@ function sendEmail(opts, user, callback) {
   } else if (process.env.NODE_ENV === 'training') {
     email.to = user.email || user.emails[0]
   } else {
-    email.bcc = opts.bcc || []
     opts.recipients.forEach(function(to) { email.addTo(to) })
   }
 

@@ -390,7 +390,7 @@ function providerPage() {
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
-      .find('.locations-total').text(provider.locations.length).end()
+      .find('.locations-total').text(provider ? provider.locations.length : 0).end()
       .find('.locations').replaceWith(renderProviderLocations($providerDetails, provider))
 
 

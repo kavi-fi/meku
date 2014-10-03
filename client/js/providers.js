@@ -390,6 +390,7 @@ function providerPage() {
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
+      .find('.locations-total').text(provider.locations.length).end()
       .find('.locations').replaceWith(renderProviderLocations($providerDetails, provider))
 
 
@@ -489,6 +490,7 @@ function providerPage() {
           $providers.find('[data-id='+provider._id+']').data('provider', provider)
           $locations.find('.location-details').slideUp(function() {
             $locations.prepend(renderLocation(l))
+            $providerDetails.find('.locations-total').text(provider.locations.length)
             updateStatistics()
           })
         })
@@ -548,6 +550,7 @@ function providerPage() {
           $providers.find('[data-id='+provider._id+']').data('provider', p)
           $selected.slideUp(function() {
             $(this).remove()
+            $providerDetails.find('.locations-total').text(provider.locations.length - 1)
             updateStatistics()
           })
         })

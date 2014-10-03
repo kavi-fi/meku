@@ -159,7 +159,8 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function programName() {
     var name = program.name.join(', ')
     if (enums.util.isTvEpisode(program) && program.series && program.episode) {
-      return program.series.name + ': jakso ' + program.episode + ' ' + name
+      var season = (program.season ? 'kausi ' + program.season + ', ' : '')
+      return program.series.name + ': ' + season + 'jakso ' + program.episode + ', ' + name
     } else {
       return name
     }

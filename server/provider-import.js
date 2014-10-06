@@ -67,6 +67,7 @@ var fieldNames = {
   'phoneNumber': 'puhelinnumero'
 }
 
+// These need to match exactly with the labels in the provider Excel file
 var i18n = {
   sv: {
     'Tarjoaja': 'Tarjoaja ruotsiksi',

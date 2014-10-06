@@ -219,7 +219,6 @@ var ProviderLocationSchema = new Schema({
   active: Boolean,
   isPayer: Boolean,
   adultContent: Boolean,
-  gamesWithoutPegi: Boolean,
   url: String,
   message: String
 })

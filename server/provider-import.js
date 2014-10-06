@@ -51,13 +51,29 @@ var locationFieldMap = [
   'adultContent'
 ]
 
+var fieldNames = {
+  'name': 'Nimi',
+  'yTunnus': 'Y-tunnus',
+  'address.street': 'lähiosoite',
+  'address.zip': 'postinro',
+  'address.city': 'postitoimipaikka',
+  'language': 'asiointikieli',
+  'contactName': 'yhteyshenkilö',
+  'emailAddresses': 'sähköposti',
+  'phoneNumber': 'puhelinnumero'
+}
+
 var i18n = {
   sv: {
-    'Tarjoaja': 'Tarjoaja',
-    'Lasku eri osoitteeseen kuin Tarjoajan osoite': 0,
-    'TAI verkkolasku': 0,
-    'Tarjoamispaikkojen tiedot ja tarjoamistavat': 0
+    'Tarjoaja': 'Tarjoaja ruotsiksi',
+    'Lasku eri osoitteeseen kuin Tarjoajan osoite': 'Lasku eri osoitteeseen kuin Tarjoajan osoite ruotsiksi',
+    'TAI verkkolasku': 'TAI verkkolasku ruotsiksi',
+    'Tarjoamispaikkojen tiedot ja tarjoamistavat': 'Tarjoamispaikkojen tiedot ja tarjoamistavat ruotsiksi'
   }
+}
+
+function sv(txt) {
+  return i18n.sv[txt] || txt
 }
 
 exports.import = function(file, callback) {
@@ -69,19 +85,11 @@ exports.import = function(file, callback) {
 
   var allSheets = parser.readFile(file)
 
-  function chooseSheet() {
-    var sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
-    var sheetSv = allSheets.Sheets['Svenska']
-    return isEmptySheet(sheetSv, i18n.sv['Tarjoaja']) ? sheetFi : sheetSv
+  var sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
+  var sheetSv = allSheets.Sheets['Svenska']
+  var useFi = isEmptySheet(sheetSv, i18n.sv['Tarjoaja'])
 
-    function isEmptySheet(s, heading) {
-      var rowNumber = findColumnRowByValue(s, heading)
-      var row = toObject(s, rowNumber + 2, providerFieldMap)
-      return _.isEmpty(row)
-    }
-  }
-
-  getProviderAndLocationsFromSpreadSheet(chooseSheet(), function(err, providerAndLocations) {
+  getProviderAndLocationsFromSpreadSheet(useFi ? sheetFi : sheetSv, useFi ? identity : sv, function(err, providerAndLocations) {
     if (err) return callback(err)
     var provider = createProvider(providerAndLocations.provider, providerAndLocations.billing)
     provider.locations = createLocations(providerAndLocations.locations)
@@ -127,7 +135,7 @@ exports.import = function(file, callback) {
   function stringXToBoolean(x) { return _.isString(x) ? x.toLowerCase() === 'x' : false }
 }
 
-function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
+function getProviderAndLocationsFromSpreadSheet(providerSheet, text, callback) {
   var requiredProviderFields = {
     name: 'Tarjoajan tiedot:',
     values: ['name', 'yTunnus', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber', 'language']
@@ -142,10 +150,10 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
 
   var errors = []
 
-  var providerData = parseFieldRowAndValueRowAfterColumn('Tarjoaja', providerFieldMap, requiredProviderFields)
-  var billingData = parseFieldRowAndValueRowAfterColumn('Lasku eri osoitteeseen kuin Tarjoajan osoite', billingFieldMap, noRequiredFields)
-  var eInvoiceData = parseFieldRowAndValueRowAfterColumn('TAI verkkolasku', eInvoiceFieldMap, noRequiredFields)
-  var locationsData = parseFieldRowAndValueRowsAfterColumn('Tarjoamispaikkojen tiedot ja tarjoamistavat', locationFieldMap, requiredLocationFields)
+  var providerData = parseFieldRowAndValueRowAfterColumn(text('Tarjoaja'), providerFieldMap, requiredProviderFields)
+  var billingData = parseFieldRowAndValueRowAfterColumn(text('Lasku eri osoitteeseen kuin Tarjoajan osoite'), billingFieldMap, noRequiredFields)
+  var eInvoiceData = parseFieldRowAndValueRowAfterColumn(text('TAI verkkolasku'), eInvoiceFieldMap, noRequiredFields)
+  var locationsData = parseFieldRowAndValueRowsAfterColumn(text('Tarjoamispaikkojen tiedot ja tarjoamistavat'), locationFieldMap, requiredLocationFields)
 
   if (locationsData.length === 0) errors.push('Tarjoamispaikkojen tiedot puuttuvat')
 
@@ -231,7 +239,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, callback) {
       var errorString = 'Rivillä <%- row %>. <%- name %> pakollinen kenttä "<%- field %>" puuttuu'
       return _.template(errorString, {
         name: requiredFields.name,
-        field: fieldMap[field],
+        field: fieldNames[field],
         row: index
       })
     })
@@ -279,6 +287,14 @@ function emptyRow(count) {
     return utils.merge(ob, utils.keyValue(c, null)) 
   }, {})
 }
+
+function isEmptySheet(s, heading) {
+  var rowNumber = findColumnRowByValue(s, heading)
+  var row = toObject(s, rowNumber + 2, providerFieldMap)
+  return _.isEmpty(row)
+}
+
+function identity(x) { return x }
 
 function createObjectAndSetValuesWithMap(object, map, enumProperties) {
   var enumProps = _.reduce(_.pairs(enumProperties), function(ob, x) {

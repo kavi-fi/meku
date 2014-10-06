@@ -4,6 +4,7 @@ function providerPage() {
   var $unapproved = $page.find('.unapproved .results')
   var $allProviders = $providers.add($unapproved)
   var $providerNameQuery = $page.find('#provider-name-query')
+  var $search = $page.find('.search')
   var $onlyK18 = $page.find('.k18-label input')
   var $yearlyBilling = $page.find('.yearly-billing')
   var $billing = $page.find('.billing')
@@ -82,6 +83,7 @@ function providerPage() {
       var matchesK18 = onlyK18 ? _.any(providerLocations, 'adultContent'): true
       $(this).toggle(matchesName && matchesK18)
     })
+    $search.find('.result-count .num').text($providers.find('.result:visible').length)
     closeDetails()
   })
 

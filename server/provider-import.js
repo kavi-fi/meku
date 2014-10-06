@@ -7,6 +7,7 @@ var xls = require('xlsjs')
 var async = require('async')
 var enums = require('../shared/enums')
 
+// NOTE: field order matters
 var providerFieldMap = [
   'name',
   'yTunnus',
@@ -20,6 +21,7 @@ var providerFieldMap = [
   'address.country'
 ]
 
+// NOTE: field order matters
 var billingFieldMap = [
   'billing.address.street',
   'billing.address.zip',
@@ -27,11 +29,13 @@ var billingFieldMap = [
   'billing.invoiceText'
 ]
 
+// NOTE: field order matters
 var eInvoiceFieldMap = [
   'eInvoice.address',
   'eInvoice.operator'
 ]
 
+// NOTE: field order matters
 var locationFieldMap = [
   'name',
   'address.street',

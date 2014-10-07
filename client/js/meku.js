@@ -294,7 +294,8 @@ function select2Autocomplete(opts, onChangeFn) {
 
   function createSearchChoice(term, data) {
     var id = term.replace(/,/g, '&#44;')
-    if (_.indexOf(data, id) === -1) {
+    var found = _.find(data, function(d) { return d.text === id })
+    if (!found) {
       return {id: id, text: term, isNew: true }
     }
   }

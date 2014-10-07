@@ -106,6 +106,17 @@ function flatMap(validator, f) {
   }
 }
 
+function flatMapAnd(validator, f) {
+  return function(xml) {
+    var res = validator(xml)
+    if (res.errors.length == 0) {
+      return f(res.program)(xml)
+    } else {
+      return res
+    }
+  }
+}
+
 function map(validator, f) {
   return function(xml) {
     var res = validator(xml)
@@ -242,7 +253,7 @@ function attrInList(attr, list) {
 }
 
 function node(name, toField, validators) {
-  return flatMap(requiredNode(name, toField), function(p) {
+  return flatMapAnd(requiredNode(name, toField), function(p) {
     return function (xml) {
       return _.reduce(validators, function(acc, f) {
         return flatMap(acc, function(_) { return map(f, function(p) { return utils.keyValue(toField, p)}) })

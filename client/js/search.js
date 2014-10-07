@@ -13,7 +13,7 @@ function publicSearchPage() {
     var body = encodeURIComponent(i18nText('Ohjelma:')+' '+program.name[0]+ ' [id:'+program.sequenceId+']')
     var subject = encodeURIComponent(i18nText('Kuvaohjelman uudelleenluokittelupyyntö'))
     var q = '?subject='+subject+'&body='+body
-    $(this).find('.request-reclassification').attr('href', 'mailto:kavi@kavi.fi'+q).show()
+    $(this).find('.request-reclassification').attr('href', 'mailto:luokittelupalaute@kavi.fi'+q).show()
   })
 }
 

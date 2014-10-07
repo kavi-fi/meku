@@ -459,7 +459,7 @@ function classificationFormUtils() {
     $el.on('dragstart', '.warnings .warning', function(e) {
       var $e = $(this)
       e.originalEvent.dataTransfer.effectAllowed = 'move'
-      e.originalEvent.dataTransfer.setData('text/plain', this.outerHTML)
+      e.originalEvent.dataTransfer.setData('text', this.outerHTML)
       $el.find('.drop-target').not($e.next()).addClass('valid')
       setTimeout(function() { $e.add($e.next()).addClass('dragging') }, 0)
     })
@@ -486,7 +486,7 @@ function classificationFormUtils() {
       $el.find('.dragging').remove()
       $(this).replaceWith([
         $('<span>', { class:'drop-target' }),
-        $(e.originalEvent.dataTransfer.getData('text/plain')),
+        $(e.originalEvent.dataTransfer.getData('text')),
         $('<span>', { class:'drop-target' })
       ])
       var newOrder = $el.find('.warnings .warning').map(function() { return $(this).data('id') }).get()

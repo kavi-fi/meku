@@ -4,6 +4,7 @@ function providerPage() {
   var $unapproved = $page.find('.unapproved .results')
   var $allProviders = $providers.add($unapproved)
   var $providerNameQuery = $page.find('#provider-name-query')
+  var $search = $page.find('.search')
   var $onlyK18 = $page.find('.k18-label input')
   var $yearlyBilling = $page.find('.yearly-billing')
   var $billing = $page.find('.billing')
@@ -82,6 +83,7 @@ function providerPage() {
       var matchesK18 = onlyK18 ? _.any(providerLocations, 'adultContent'): true
       $(this).toggle(matchesName && matchesK18)
     })
+    $search.find('.result-count .num').text($providers.find('.result:visible').length)
     closeDetails()
   })
 
@@ -390,6 +392,7 @@ function providerPage() {
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
       .find('input[name="language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
+      .find('.locations-total').text(provider ? provider.locations.length : 0).end()
       .find('.locations').replaceWith(renderProviderLocations($providerDetails, provider))
 
 
@@ -489,6 +492,7 @@ function providerPage() {
           $providers.find('[data-id='+provider._id+']').data('provider', provider)
           $locations.find('.location-details').slideUp(function() {
             $locations.prepend(renderLocation(l))
+            $providerDetails.find('.locations-total').text(provider.locations.length)
             updateStatistics()
           })
         })
@@ -548,6 +552,7 @@ function providerPage() {
           $providers.find('[data-id='+provider._id+']').data('provider', p)
           $selected.slideUp(function() {
             $(this).remove()
+            $providerDetails.find('.locations-total').text(provider.locations.length - 1)
             updateStatistics()
           })
         })

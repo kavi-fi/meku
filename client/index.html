@@ -176,7 +176,7 @@
             <input type="hidden" name="_csrf">
             <table>
               <thead>
-                <th></th><th>Rekisteröity</th><th>Hinta</th>
+                <tr><th></th><th>Rekisteröity</th><th>Hinta</th></tr>
               </thead>
               <tbody class="new-providers-list"></tbody>
             </table>
@@ -225,7 +225,10 @@
       <div class="search">
         <label for="provider-name-query" class="search-label">Nimi</label>
         <input class="query" type="search" id="provider-name-query" placeholder="Hae nimellä...">
-        <label class="k18-label"><input type="checkbox" />Vain K-18 ohjelmien tarjoajat</label>
+        <div>
+          <div class="result-count"><label>Hakutuloksia</label> <span class="num"></span></div>
+          <label class="k18-label"><input type="checkbox" />Vain K-18 ohjelmien tarjoajat</label>
+        </div>
       </div>
     </div>
     <div class="providers-list results"></div>

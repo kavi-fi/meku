@@ -583,7 +583,7 @@ function accounts(callback) {
     schema.Account.update({ emekuId: accountEmekuId }, { apiToken: mongoose.Types.ObjectId().toString() }, callback)
   }
 
-  function langCode(lang) { return lang == 'Swedish' ? 'SE' : 'FI' }
+  function langCode(lang) { return lang == 'Swedish' ? 'SV' : 'FI' }
 
   function legacyCountryToCode(country) {
     if (!country) return 'FI'

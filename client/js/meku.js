@@ -125,7 +125,10 @@ function loginPage() {
   $info.find('.name').text(user ? user.name : '')
   $info.find('.username').text('(' + (user ? user.username : '') + ')')
   $info.find('.logout').one('click', function() {
-    $.post('/logout').done(function() { location.reload() })
+    $.post('/logout').done(function() {
+      setLocation('')
+      location.reload()
+    })
   })
 
   $form.on('validate', function() {
@@ -256,9 +259,9 @@ function select2Autocomplete(opts, onChangeFn) {
   var $select = opts.$el
 
   function createSearchChoice(term, data) {
-    var id = term.replace(/,/g, '&#44;')
-    if (_.indexOf(data, id) === -1) {
-      return {id: id, text: term, isNew: true }
+    var found = _.find(data, function(d) { return d.text === term })
+    if (!found) {
+      return {id: term, text: term, isNew: true }
     }
   }
 

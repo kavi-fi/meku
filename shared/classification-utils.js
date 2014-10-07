@@ -20,17 +20,19 @@ var summary = exports.summary = function(classification) {
     .filter(function(c) { return c.age > 0 && c.age == maxAgeLimit })
     .map(function(c) { return {id: c.id, category: c.category} })
     .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
-  if (classification.warningOrder && classification.warningOrder.length > 0) {
-    var order = classification.warningOrder
-    warnings = warnings.sort(function(a, b) {
-      return order.indexOf(a.category) - order.indexOf(b.category)
-    })
-  }
+  sortWarnings(classification.warningOrder, warnings)
   return { age: maxAgeLimit, warnings: warnings }
 }
 
+function sortWarnings(order, warnings) {
+  if (!order || order.length == 0) return warnings
+  return warnings.sort(function(a, b) {
+    return order.indexOf(a.category) - order.indexOf(b.category)
+  })
+}
+
 var tvSeriesClassification = exports.tvSeriesClassification = function(episodes) {
-  return { criteria: episodes.criteria, legacyAgeLimit: episodes.legacyAgeLimit, warningOrder:[] }
+  return { criteria: episodes.criteria, legacyAgeLimit: episodes.legacyAgeLimit, warningOrder: episodes.warningOrder }
 }
 
 var aggregateClassification = exports.aggregateClassification = function(programs) {
@@ -38,7 +40,17 @@ var aggregateClassification = exports.aggregateClassification = function(program
   var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
   var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
   if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
-  return { criteria: criteria, legacyAgeLimit: legacyAgeLimit, warningOrder: [] }
+  var warningOrder = aggregateWarningOrder(classifications)
+  return { criteria: criteria, legacyAgeLimit: legacyAgeLimit, warningOrder: warningOrder }
+}
+
+function aggregateWarningOrder(classifications) {
+  var criteria = _(classifications).pluck('criteria').flatten().value()
+  var counts = _.reduce(criteria, function(order, id) {
+    var category = enums.classificationCriteria[id - 1].category
+    return utils.merge(order, utils.keyValue(category, order[category] + 1))
+  }, {violence: 0, fear: 0, sex: 0, drugs: 0})
+  return _(counts).omit(function(c) { return c === 0}).pairs().sortBy(utils.snd).reverse().map(utils.fst).value()
 }
 
 exports.aggregateSummary = function(programs) {
@@ -76,7 +88,7 @@ var ageLimit = exports.ageLimit = function(classification) {
 exports.registrationEmail = function(program, classification, user, hostName) {
   var data = generateData()
   return {
-    recipients: _.filter(program.sentRegistrationEmailAddresses, function(x) { return x != user.email }),
+    recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(user.email)),
     from: 'no-reply@kavi.fi',
     bcc: ['kirjaamo@kavi.fi'],
     subject: _.template("Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>", data),
@@ -91,7 +103,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       name: programName(),
       nameLink: programLink(),
       year: program.year || '',
-      classification: classificationText(classificationSummary),
+      classification: classificationText(classificationSummary.age, sortAllWarnings(classification)),
       classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
       publicComments: classification.publicComments || 'ei määritelty.',
       classifier: classifierName(),
@@ -147,7 +159,8 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function programName() {
     var name = program.name.join(', ')
     if (enums.util.isTvEpisode(program) && program.series && program.episode) {
-      return program.series.name + ': jakso ' + program.episode + ' ' + name
+      var season = (program.season ? 'kausi ' + program.season + ', ' : '')
+      return program.series.name + ': ' + season + 'jakso ' + program.episode + ', ' + name
     } else {
       return name
     }
@@ -158,7 +171,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     if (!previous) return {}
     return {
       author: previousClassificationAuthor(previous),
-      criteriaText: previousClassificationText(summary(previous)),
+      criteriaText: previousClassificationText(summary(previous).age, sortAllWarnings(previous)),
       date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : 'aiemmin'
     }
   }
@@ -180,27 +193,35 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
   }
 
-  function classificationText(summary) {
-    if (summary.age == 0) {
+  function classificationText(age, warnings) {
+    if (age == 0 && warnings.length > 0) {
+      return 'Kuvaohjelma on sallittu ja ' + (warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+        + criteriaText(warnings) + '.'
+    } else if (age == 0) {
       return 'Kuvaohjelma on sallittu.'
-    } else if (summary.warnings.length == 0) {
-      return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age) + '.'
+    } else if (warnings.length === 0) {
+      return 'Kuvaohjelman ikäraja on ' + ageAsText(age) + '.'
     } else {
-      return 'Kuvaohjelman ikäraja on ' + ageAsText(summary.age)
-        + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
-        + criteriaText(summary.warnings) + '.'
+      return 'Kuvaohjelman ikäraja on ' + ageAsText(age)
+        + ' ja ' + (warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+        + criteriaText(warnings) + '.'
     }
   }
 
-  function previousClassificationText(summary) {
-    if (summary.age == 0) {
+  function previousClassificationText(age, warnings) {
+    if (age == 0) {
       return 'sallituksi.'
-    } else if (summary.warnings.length == 0) {
-      return 'ikärajaksi ' + ageAsText(summary.age) + '.'
+    } else if (warnings.length === 0) {
+      return 'ikärajaksi ' + ageAsText(age) + '.'
     } else {
-      return 'ikärajaksi ' + ageAsText(summary.age) + ' ja ' + (summary.warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
-        + criteriaText(summary.warnings) + '.'
+      return 'ikärajaksi ' + ageAsText(age) + ' ja ' + (warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
+        + criteriaText(warnings) + '.'
     }
+  }
+
+  function sortAllWarnings(classification) {
+    var warnings = _.map(classification.criteria, function(id) { return enums.classificationCriteria[id - 1] })
+    return sortWarnings(classification.warningOrder, warnings)
   }
 
   function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }

@@ -14,6 +14,9 @@ utils.keyValue = function(key, value) {
   return data
 }
 
+utils.fst = function fst(x) { return x[0] }
+utils.snd = function snd(x) { return x[1] }
+
 utils.showBoolean = function(b) {
   if (b) return "Kyllä"
   else return "Ei"

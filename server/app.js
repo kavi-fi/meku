@@ -355,7 +355,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    program.populateSentRegistrationEmailAddresses([req.user.email], function(err, program) {
+    program.populateSentRegistrationEmailAddresses(function(err, program) {
       if (err) return next(err)
       var valid = validation.registration(program.toObject(), newClassification, req.user)
       if (!valid.valid) {
@@ -428,7 +428,7 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
     if (err) next(err)
     if (!classificationUtils.canReclassify(program, req.user)) return res.send(400)
     program.newDraftClassification(req.user)
-    program.populateSentRegistrationEmailAddresses([], function(err) {
+    program.populateSentRegistrationEmailAddresses(function(err) {
       program.save(respond(res, next))
     })
   })
@@ -555,7 +555,7 @@ app.delete('/programs/:programId/classification/:classificationId', requireRole(
     var classification = program.classifications.id(classificationId)
     program.classifications.pull(classificationId)
     program.deletedClassifications.push(classification)
-    program.populateSentRegistrationEmailAddresses([], function(err) {
+    program.populateSentRegistrationEmailAddresses(function(err) {
       if (err) return next(err)
       watcher.saveAndLogChanges(function(err) {
         if (err) return next(err)
@@ -1386,7 +1386,6 @@ function sendEmail(opts, user, callback) {
   } else if (process.env.NODE_ENV === 'training') {
     email.to = user.email || user.emails[0]
   } else {
-    email.bcc = opts.bcc || []
     opts.recipients.forEach(function(to) { email.addTo(to) })
   }
 
@@ -1597,7 +1596,7 @@ function getIpAddress(req) {
 
 function getHostname() {
   if (isDev()) return 'http://localhost:3000'
-  else if (process.env.NODE_ENV === 'training') return 'https://meku-training.herokuapp.com'
+  else if (process.env.NODE_ENV === 'training') return 'https://luokittelu-koulutus.kavi.fi'
   else return 'https://luokittelu.kavi.fi'
 }
 
@@ -1612,7 +1611,8 @@ function isWhitelisted(req) {
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
-    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/upgrade-browser.html'
+    'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls',
+    'GET:/upgrade-browser.html'
   ]
   var url = req.method + ':' + req.path
   return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

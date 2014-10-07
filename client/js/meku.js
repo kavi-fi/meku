@@ -293,10 +293,9 @@ function select2Autocomplete(opts, onChangeFn) {
   var $select = opts.$el
 
   function createSearchChoice(term, data) {
-    var id = term.replace(/,/g, '&#44;')
-    var found = _.find(data, function(d) { return d.text === id })
+    var found = _.find(data, function(d) { return d.text === term })
     if (!found) {
-      return {id: id, text: term, isNew: true }
+      return {id: term, text: term, isNew: true }
     }
   }
 

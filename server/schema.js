@@ -56,7 +56,7 @@ var ProgramSchema = new Schema({
   deletedClassifications: [classification],
   draftsBy: { type: [ObjectId], index: true },
   draftClassifications: {}, // { userId:classification, userId:classification2 }
-  programType: Number, // enums.programType
+  programType: { type: Number, index: true }, // enums.programType
   gameFormat: String, // in programType == game(7)
   season: Number, episode: Number, // in programType == episode(3)
   series: { _id: { type: ObjectId, index:true }, name: String, draft: { name: String, nameFi: String, nameSv: String, nameOther: String } }, // in programType == episode(3)
@@ -84,13 +84,12 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   return draft
 }
 
-ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(additionalEmailAddresses, callback) {
+ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback) {
   var program = this
   async.parallel([loadAuthorEmails, loadBuyerEmails], function(err, emails) {
     if (err) return callback(err)
     var manual = _.pluck(program.classifications, 'registrationEmailAddresses')
-    var all = emails.concat(manual).concat(additionalEmailAddresses)
-    program.sentRegistrationEmailAddresses = _(all).flatten().compact().uniq().value()
+    program.sentRegistrationEmailAddresses = _(emails.concat(manual)).flatten().compact().uniq().value()
     callback(null, program)
   })
 
@@ -221,7 +220,6 @@ var ProviderLocationSchema = new Schema({
   active: Boolean,
   isPayer: Boolean,
   adultContent: Boolean,
-  gamesWithoutPegi: Boolean,
   url: String,
   message: String
 })

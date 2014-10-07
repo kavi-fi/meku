@@ -159,10 +159,12 @@ exports.payingLocationsWithoutEmail = function(locations) {
 }
 
 function providerEmail(fields) {
-  return utils.merge({
-    bcc: ['tarjoajarekisteri@kavi.fi'],
-    from: 'tarjoajarekisteri@kavi.fi'
-  }, fields)
+  return {
+    recipients: ['tarjoajarekisteri@kavi.fi'].concat(fields.recipients),
+    from: 'tarjoajarekisteri@kavi.fi',
+    subject: fields.subject,
+    body: fields.body
+  }
 }
 
 function totalPrice(xs) {

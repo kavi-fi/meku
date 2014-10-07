@@ -88,7 +88,7 @@ var ageLimit = exports.ageLimit = function(classification) {
 exports.registrationEmail = function(program, classification, user, hostName) {
   var data = generateData()
   return {
-    recipients: _.filter(program.sentRegistrationEmailAddresses, function(x) { return x != user.email }),
+    recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(user.email)),
     from: 'no-reply@kavi.fi',
     bcc: ['kirjaamo@kavi.fi'],
     subject: _.template("Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>", data),
@@ -159,7 +159,8 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function programName() {
     var name = program.name.join(', ')
     if (enums.util.isTvEpisode(program) && program.series && program.episode) {
-      return program.series.name + ': jakso ' + program.episode + ' ' + name
+      var season = (program.season ? 'kausi ' + program.season + ', ' : '')
+      return program.series.name + ': ' + season + 'jakso ' + program.episode + ', ' + name
     } else {
       return name
     }
@@ -193,7 +194,10 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   }
 
   function classificationText(age, warnings) {
-    if (age == 0) {
+    if (age == 0 && warnings.length > 0) {
+      return 'Kuvaohjelma on sallittu ja ' + (warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
+        + criteriaText(warnings) + '.'
+    } else if (age == 0) {
       return 'Kuvaohjelma on sallittu.'
     } else if (warnings.length === 0) {
       return 'Kuvaohjelman ikäraja on ' + ageAsText(age) + '.'

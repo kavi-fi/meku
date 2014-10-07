@@ -98,7 +98,7 @@ app.post('/forgot-password', function(req, res, next) {
       console.log(user.username + ' has no email address')
       return res.send(500)
     }
-    var subject = 'Salasanan uusiminen / Samma på svenska'
+    var subject = 'Salasanan uusiminen / Förnya lösenordet'
     srvUtils.getTemplate('reset-password-email.tpl.html', function(err, tpl) {
       if (err) return next(err)
       if (user.resetHash) {
@@ -939,7 +939,7 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
     createAndSaveHash(user, function(err) {
       if (err) return next(err)
       logCreateOperation(req.user, user)
-      var subject = 'Käyttäjätunnuksen aktivointi / Samma på svenska'
+      var subject = 'Käyttäjätunnuksen aktivointi / Aktivering av användarnamn'
       srvUtils.getTemplate('user-created-email.tpl.html', function(err, tpl) {
         if (err) return next(err)
         sendHashLinkViaEmail(user, subject, tpl, respond(res, next, user))

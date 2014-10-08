@@ -2,6 +2,7 @@ var fs = require('fs')
 var _ = require('lodash')
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
+var moment = require('moment')
 var i18n = require('../shared/providers-i18n')
 
 function sv(txt) { return i18n.sv[txt] || txt  }
@@ -23,6 +24,7 @@ exports.registrationEmail = function (provider, hostName, callback) {
     var vars = {
       hostName: hostName,
       header: 'Ilmoittautuminen tarjoajaksi',
+      year: moment().year(),
       emailAddress: provider.emailAddresses.join(', '),
       locations: locations,
       useEInvoice: provider.billingPreference == 'eInvoice',
@@ -97,6 +99,7 @@ exports.yearlyBillingProviderEmail = function(provider, hostName, callback) {
     var vars = {
       hostName: hostName,
       header: 'Tarjoajan vuosilaskutuksen vahvistus',
+      year: moment().year(),
       emailAddress: provider.emailAddresses.join(', '),
       locations: locations.notPayer,
       useEInvoice: provider.billingPreference == 'eInvoice',

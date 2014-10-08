@@ -2,7 +2,7 @@
   <p><img src="<%- hostName %>/images/logo.png" alt="MEKU/KAVI" title="undefined" width="306" height="60" style="padding: 20px 0 15px 20px;"></p>
   <p><strong><span style="font-size: 14pt; line-height: 21px"><%- header %><br></span></strong></p>
   <p><font face="arial, helvetica, sans-serif" size="3"><strong>Ilmoitetun tarjoajan tiedot</strong></font><strong>&nbsp;</strong></p>
-  <p>Olette rekisteröityneet Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön kuvaohjelmien tarjoajarekisteriin vuodelle 2014. </p>
+  <p>Olette rekisteröityneet Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön kuvaohjelmien tarjoajarekisteriin vuodelle <%- year %>.</p>
   <p><strong>Olkaa hyvä ja tarkistakaa tiedot</strong>. Jos tiedot ovat väärin tai niissä on korjattavaa, ottakaa yhteys Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön yhteyshenkilöihin <strong><em>viikon kuluessa</em></strong>. Valvontamaksu peritään ilmoitettujen tietojen perusteella vuosittain. Valvontamaksuvelvollisuus syntyy vain, jos kuvaohjelmia tarjotaan taloudellisessa tarkoituksessa ja tarjoaminen on säännöllistä. Tarjoamistietojen muuttuessa ilmoittakaa muutoksista viipymättä Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikölle.</p>
   <p><strong><em>Yhteyshenkilö:</em></strong></p>
 
@@ -66,37 +66,37 @@
 </div>
 
 <div style="background-color: #ffffff;padding: 5px">
-  <p><strong><span style="font-size: 14pt; line-height: 21px"><%- header %><br></span></strong></p>
-  <p><font face="arial, helvetica, sans-serif" size="3"><strong>Ilmoitetun tarjoajan tiedot</strong></font><strong>&nbsp;</strong></p>
-  <p>Olette rekisteröityneet Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön kuvaohjelmien tarjoajarekisteriin vuodelle 2014. </p>
-  <p><strong>Olkaa hyvä ja tarkistakaa tiedot</strong>. Jos tiedot ovat väärin tai niissä on korjattavaa, ottakaa yhteys Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikön yhteyshenkilöihin <strong><em>viikon kuluessa</em></strong>. Valvontamaksu peritään ilmoitettujen tietojen perusteella vuosittain. Valvontamaksuvelvollisuus syntyy vain, jos kuvaohjelmia tarjotaan taloudellisessa tarkoituksessa ja tarjoaminen on säännöllistä. Tarjoamistietojen muuttuessa ilmoittakaa muutoksista viipymättä Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikölle.</p>
-  <p><strong><em>Yhteyshenkilö:</em></strong></p>
+  <p><strong><span style="font-size: 14pt; line-height: 21px"><% sv(header) %><br></span></strong></p>
+  <p><font face="arial, helvetica, sans-serif" size="3"><strong>Information om anmäld leverantör </strong></font><strong>&nbsp;</strong></p>
+  <p>Ni har registrerat er i leverantörsregistret vid Nationella audiovisuella institutets enhet för mediefostran och bildprogram för <%- year %>.</p>
+  <p><strong>Var vänlig och kontrollera informationens riktighet</strong>. Om informationen är fel eller måste ändras, kontakta kontaktpersonerna på Nationella audiovisuella institutets enhet för mediefostran och bildprogram .<strong><em>inom en vecka</em></strong>. Tillsynsavgiften faktureras årligen utgående från den anmälda informationen. Bara för leverantörer som tillhandahåller bildprogram regelbundet och i ekonomiskt syfte är skyldiga att betala tillsynsavgift. Om informationen om tillhandahållning ändras, underrätta Nationella audiovisuella institutets enhet för mediefostran och bildprogram omgående om ändringarna.</p>
+  <p><strong><em>Kontaktperson:</em></strong></p>
 
-  <p>Mirja Kosonen, puh. 0295 338&nbsp;003 tai <a href="mailto:mirja.kosonen@kavi.fi">mirja.kosonen@kavi.fi</a></p>
-  <p>Tarjoamistavat ja niistä perittävät maksut:</p>
+  <p>Mirja Kosonen, tfn 0295 338&nbsp;003 eller <a href="mailto:mirja.kosonen@kavi.fi">mirja.kosonen@kavi.fi</a></p>
+  <p>Sätt och avgifter för tillhandahållning:</p>
   <ul><% providingTypePrices.forEach(function(type) { %>
-    <li><%- sv(type.name) %> (<%- type.price %> euroa/vuosi)</li>
+    <li><%- sv(type.name) %> (<%- type.price %> euro / år)</li>
   <% }) %></ul>
 
   <p>&nbsp;</p>
 
-  <p>Olemme vastaanottaneet seuraavat tiedot:&nbsp; </p>
+  <p>Vi har mottagit följande information:&nbsp; </p>
   <table border="0">
     <tbody>
-      <tr><td><font face="arial, helvetica, sans-serif" size="4"><strong>TARJOAJA</strong></font></td><td>&nbsp;</td></tr>
-      <tr><td>Tarjoaja Yritys / toiminimi:</td><td><%- provider.name %></td></tr>
-      <tr><td>Tarjoajan Y-tunnus:</td><td><%- provider.yTunnus %><br></td></tr>
-      <tr><td>Tarjoajan yhteyshenkilö:</td><td><%- provider.contactName %></td></tr>
-      <tr><td>Käyntiosoite:</td><td><%- provider.address.street %></td></tr>
-      <tr><td>Postinumero:</td><td><%- provider.address.zip %><br></td></tr>
-      <tr><td>Postitoimipaikka:</td><td><%- provider.address.city %><br></td></tr>
-      <tr><td>Sähköpostiosoite:</td><td><%- emailAddress %><br></td></tr>
-      <tr><td>Puhelinnumero:</td><td><%- provider.phoneNumber %></td></tr>
-      <tr><td>Asiointikieli:</td><td><%- language %></td></tr>
-      <tr><td>Maa:</td><td><%- country %></td></tr>
+      <tr><td><font face="arial, helvetica, sans-serif" size="4"><strong>LEVERANTÖR</strong></font></td><td>&nbsp;</td></tr>
+      <tr><td>Leverantör Företag / firma:</td><td><%- provider.name %></td></tr>
+      <tr><td>Leverantörens F-nummer:</td><td><%- provider.yTunnus %><br></td></tr>
+      <tr><td>Leverantörens kontaktperson:</td><td><%- provider.contactName %></td></tr>
+      <tr><td>Adress:</td><td><%- provider.address.street %></td></tr>
+      <tr><td>Postnummer:</td><td><%- provider.address.zip %><br></td></tr>
+      <tr><td>Postort:</td><td><%- provider.address.city %><br></td></tr>
+      <tr><td>E-postadress:</td><td><%- emailAddress %><br></td></tr>
+      <tr><td>Telefonnummer:</td><td><%- provider.phoneNumber %></td></tr>
+      <tr><td>Kontaktspråk:</td><td><%- language %></td></tr>
+      <tr><td>Land:</td><td><%- country %></td></tr>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
       <tr>
-        <td>Tarjoajan maksamat paikat ja tavat:</td>
+        <td>Ställen och sätt som betalas av leverantören:</td>
         <td></td>
         <td><ul><% locations.forEach(function(l) { %>
           <li><%- l.name %> (<%- l.providingTypesSv %>) <%- l.price %> €</li>
@@ -105,7 +105,7 @@
       <tr><td>&nbsp;</td><td><%- totalProvider %> €</td></tr>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
       <tr>
-        <td>Tarjoamispaikkojen maksamat tavat:</td>
+        <td>Sätt som betalas av stället för tillhandahållning:</td>
         <td></td>
         <td><ul><% payerLocations.forEach(function(l) { %>
           <li><%- l.name %> (<%- l.providingTypesSv %>) <%- l.price %> €</li>
@@ -113,14 +113,14 @@
       </tr>
       <tr><td>&nbsp;</td><td>&nbsp;<%- totalLocations %> €</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td></tr>
       <% if (useEInvoice) { %>
-        <tr><td>Verkkolaskuosoite: </td><td><%- provider.eInvoice.address %><br></td></tr>
-        <tr><td>Välittäjätunnus: </td><td><%- provider.eInvoice.operator %><br></td></tr>
+        <tr><td>Nätfaktureringsadress: </td><td><%- provider.eInvoice.address %><br></td></tr>
+        <tr><td>Förmedlarkod: </td><td><%- provider.eInvoice.operator %><br></td></tr>
       <% } else { %>
-        <tr><td>Laskutusosoite:</td><td><%- billing.street %><br> <br></td></tr>
-        <tr><td>Postinumero:</td><td><%- billing.zip %><br></td></tr>
-        <tr><td>Postitoimipaikka:</td><td><%- billing.city %><br></td></tr>
+        <tr><td>Faktureringsadress:</td><td><%- billing.street %><br> <br></td></tr>
+        <tr><td>Postnummer:</td><td><%- billing.zip %><br></td></tr>
+        <tr><td>Postort:</td><td><%- billing.city %><br></td></tr>
         <% if (invoiceText != '') { %>
-          <tr><td>Laskulle haluttava teksti: </td><td><%- invoiceText %></td></tr>
+          <tr><td>Text som önskas på fakturan: </td><td><%- invoiceText %></td></tr>
         <% } %>
       <% } %>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>

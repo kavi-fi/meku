@@ -98,9 +98,9 @@ textarea { resize: vertical; }
 .detail-box .column { display:inline-block; width: 266px; vertical-align:top; margin-right: 10px; }
 
 .filters { font-size: 14px; color: #444444; }
-.filters label { padding-right: 12px; font-weight: normal; min-width: 124px; }
+.filters label { padding-right: 12px; font-weight: normal; min-width: 128px; }
 .filters label.first { min-width: 85px; }
-.filters label.second { min-width: 75px; }
+.filters label.second { min-width: 105px; }
 .filters input { margin-right: 7px; margin-bottom: 10px; }
 
 .warning-summary { display: inline-block; }
@@ -237,7 +237,7 @@ label.top { vertical-align: top; }
 #search-page .recent .result .program-type { flex: 0 0 auto; font-size: 12px; width: 100px; }
 #search-page .recent .result .classification { flex: 0 0 auto; width: 140px; text-align: right; }
 
-#search-page .new-classification { float: right; width: 265px; }
+#search-page .new-classification { float: right; }
 #search-page .new-classification label { display: block; padding: 0 0 20px 0; }
 #search-page .new-classification button { margin-left: 15px; }
 #search-page .new-classification .select2-container { width: 180px; margin-bottom: 0; }
@@ -516,7 +516,7 @@ textarea.invalid:disabled,
 .classification-criteria .safe-container span { cursor: pointer; }
 .classification-criteria .safe-container input { margin: 0 7px 0 0; vertical-align: text-top; }
 
-.classification-criteria .warning-order { float: right; width: 620px; margin-top: -15px; }
+.classification-criteria .warning-order { float: right; width: 580px; margin-top: -15px; }
 .classification-criteria .warning-order img { margin: 20px 0; }
 .classification-criteria .warning-order .warnings .warning { cursor: move; transition: width 0.3s; margin: 20px 0; }
 .classification-criteria .warning-order .warnings .warning.dragging { opacity: 0.3; }

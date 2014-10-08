@@ -227,7 +227,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }
 
   function criteriaText(warnings) {
-    return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + '(' + x.id + ')' }).join(', ')
+    return warnings.map(function(x) { return enums.classificationCategoriesFI[x.category] + ' (' + x.id + ')' }).join(', ')
   }
 
   function iconHtml(summary) {

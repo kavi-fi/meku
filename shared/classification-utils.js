@@ -156,7 +156,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
     function criteriaText(warnings) {
       var categories = isFi ? enums.classificationCategoriesFI : enums.classificationCategoriesSV
-      return warnings.map(function(x) { return categories[x.category] + '(' + x.id + ')' }).join(', ')
+      return warnings.map(function(x) { return categories[x.category] + ' (' + x.id + ')' }).join(', ')
     }
 
     function classifierName() {

@@ -143,7 +143,7 @@ exports.import = function(file, callback) {
 function getProviderAndLocationsFromSpreadSheet(providerSheet, text, callback) {
   var requiredProviderFields = {
     name: 'Tarjoajan tiedot:',
-    values: ['name', 'yTunnus', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber', 'language']
+    values: ['name', 'yTunnus', 'contactName', 'address.street', 'address.zip', 'address.city', 'address.country', 'phoneNumber', 'language']
   }
 
   var requiredLocationFields = {

@@ -27,7 +27,7 @@ function programBox() {
       .find('.nameFi').labeledText(names.fi).end()
       .find('.nameSv').labeledText(names.sv).end()
       .find('.nameOther').labeledText(names.other).end()
-      .find('.series').labeledText(series).end()
+      .find('.series').text(series).attr('href', '/#haku/' + p.sequenceId + '//').prev('label').toggleClass('hide', !series).end().end()
       .find('.episode').labeledText(episode).end()
       .find('.country').labeledText(enums.util.toCountryString(p.country)).end()
       .find('.year').labeledText(p.year).end()

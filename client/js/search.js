@@ -393,7 +393,11 @@ function searchPage() {
   $input.throttledInput(function() {
     queryChanged($input.val().trim())
     updateLocationHash()
-    load()
+    load(function() {
+      if ($results.find('.result').length == 1) {
+        openDetail($results.find('.result:first'), false)
+      }
+    })
   })
 
   $page.on('click', '.results .result, .recent .result', function() {
@@ -404,6 +408,12 @@ function searchPage() {
       closeDetail()
       openDetail($(this), true)
     }
+  })
+
+  $page.on('click', '.results .program-box a.series', function() {
+    var selectedProgramId = $(this).parents('.program-box').data('id')
+    var sequenceId = $results.find('.result[data-id='+selectedProgramId+']').data('program').sequenceId
+    $page.trigger('show', sequenceId).show()
   })
 
   return { programDataUpdated: programDataUpdated, programDeleted: programDeleted,

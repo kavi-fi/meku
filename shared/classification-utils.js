@@ -2,6 +2,7 @@ if (typeof module !== 'undefined' && module.exports) {
   _ = require('lodash')
   enums = require('./enums')
   utils = require('./utils')
+  i18n = require('./i18n')
 }
 
 (function(exports) {
@@ -92,11 +93,11 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(user.email)),
     from: 'no-reply@kavi.fi',
     bcc: ['kirjaamo@kavi.fi'],
-    subject: _.template("Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %> / ", fiData) +
-      _.template("Klassificeringsbeslut: <%= name %>, <%- year %>, <%- classificationShort %>", svData),
+    subject: _.template('Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>', fiData),
     body: '<div style="text-align: right; margin-top: 8px;"><img src="' + hostName + '/images/logo.png" /></div>' +
+      _.template('<p><%- date %><br/><%- buyer %></p>', fiData) +
       _.template(generateText('fi'), fiData) + '<br>' +  _.template(generateText('sv'), svData) +
-      '<p>Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)<br>' +
+      '<br><p>Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)<br>' +
       'Mediakasvatus- ja kuvaohjelmayksikkö / Enheten för mediefostran och bildprogram</p>'
   }
 
@@ -121,11 +122,17 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       reclassification: isReclassification(program, classification)
     }
 
+    function t(text) {
+      var translation = isFi ? text : i18n.sv[text]
+      if (translation === undefined) return text
+      return translation
+    }
+
     function programName() {
       var name = program.name.join(', ')
       if (enums.util.isTvEpisode(program) && program.series && program.episode) {
-        var season = program.season ? (isFi ? 'kausi ' : 'säsong ') + program.season + ', ' : ''
-        return program.series.name + ': ' + season + (isFi ? 'jakso ' : 'avsnitt ') + program.episode + ', ' + name
+        var season = program.season ? t('kausi') + ' ' + program.season + ', ' : ''
+        return program.series.name + ': ' + season + t('jakso') + ' ' + program.episode + ', ' + name
       } else {
         return name
       }
@@ -160,17 +167,15 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     }
 
     function classifierName() {
-      if (enums.authorOrganizationIsKHO(classification)) return isFi ? 'Korkein hallinto-oikeus' : 'Högsta förvaltningsdomstolen'
-      if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return isFi ? 'Kuvaohjelmalautakunta' : 'Bildprogramsnämnden'
-      if (utils.hasRole(user, 'kavi')) return isFi
-        ? "Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö"
-        : 'Nationella audiovisuella institutets (KAVI) enhet för mediefostran och bildprogram'
+      if (enums.authorOrganizationIsKHO(classification)) return t('Korkein hallinto-oikeus')
+      if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return t('Kuvaohjelmalautakunta')
+      if (utils.hasRole(user, 'kavi')) return t('Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö')
       return _([user.employerName, user.name]).compact().join(', ')
     }
 
     function extraInfoLink() {
       if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification) || enums.authorOrganizationIsKHO(classification)) return ''
-      if (utils.hasRole(user, 'kavi')) return '<p>' + (isFi ? 'Lisätietoja' : 'Mera information') + ': <a href="mailto:' + user.email + '">' + user.email + '</a></p>'
+      if (utils.hasRole(user, 'kavi')) return '<p>' + t('Lisätietoja') + ': <a href="mailto:' + user.email + '">' + user.email + '</a></p>'
       return ''
     }
 
@@ -179,15 +184,57 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
       var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
       var link = (user.role == 'kavi') ? linkKavi : linkOther
-      return '<p>' + (isFi ? 'Liitteet' : 'Bilaga') + ':<br/><a href="' + link.url + '">' + link.name + '</a></p>'
+      return '<p>' + t('Liitteet') + ':<br/><a href="' + link.url + '">' + link.name + '</a></p>'
+    }
+
+    function previous() {
+      var previous = previousClassification()
+      if (!previous) return {}
+      return {
+        author: previousClassificationAuthor(previous),
+        criteriaText: previousClassificationText(summary(previous).age, sortAllWarnings(previous)),
+        date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : 'aiemmin'
+      }
+    }
+
+    function previousClassification() {
+      if (program.classifications.length == 0) return
+      var index = _.findIndex(program.classifications, { _id: classification._id })
+      if (index == -1) {
+        return program.classifications[0]
+      } else {
+        return program.classifications[index + 1]
+      }
+    }
+
+    function previousClassificationAuthor(classification) {
+      if (enums.authorOrganizationIsKHO(classification)) return t('Korkein hallinto-oikeus')
+      if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return t('Kuvaohjelmalautakunta')
+      return t('Kuvaohjelmaluokittelija')
+
+    }
+
+    function previousClassificationText(age, warnings) {
+      if (age == 0) {
+        return isFi ? 'sallituksi.' : 'bedömt bildprogrammet som tillåtet.'
+      } else if (warnings.length === 0) {
+        return isFi
+          ? 'ikärajaksi ' + ageAsText(age) + '.'
+          : 'som åldergräns för bildprogrammet bedömt ' + ageAsText(age) + '.'
+      } else {
+        var s = isFi
+          ? 'ikärajaksi ' + ageAsText(age) + ' ja ' + (warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
+          : 'som åldergräns för bildprogrammet bedömt ' + ageAsText(age) + ' och som skadligt innehåll '
+        return s
+          + criteriaText(warnings) + '.'
+      }
     }
   }
 
   function generateText(lang) {
     var reclassification = isReclassification(program, classification)
     if (lang === 'fi') {
-      return '<p><%- date %><br/><%- buyer %></p>' +
-        '<p>'+(reclassification ? 'Ilmoitus kuvaohjelman uudelleenluokittelusta' : 'Ilmoitus kuvaohjelman luokittelusta') + '</p>' +
+      return '<p>'+(reclassification ? 'Ilmoitus kuvaohjelman uudelleenluokittelusta' : 'Ilmoitus kuvaohjelman luokittelusta') + '</p>' +
         '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%= nameLink %>. <%- classification %></p>' +
         '<%= icons %>' +
         '<p>'+(reclassification ? ' <%- previous.author %> oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
@@ -195,52 +242,13 @@ exports.registrationEmail = function(program, classification, user, hostName) {
         '<%= extraInfoLink %>' +
         '<%= appendixLink %>'
     } else if (lang === 'sv') {
-      return '<p><%- date %><br/><%- buyer %></p>' +
-        '<p>Meddelande om ' + (reclassification ? 'om' : '') + 'klassificering av bildprogram</p>' +
+      return '<p>Meddelande om ' + (reclassification ? 'om' : '') + 'klassificering av bildprogram</p>' +
         '<p><%- classifier %> har <%- date %> ' + (reclassification ? 'om' : '') + 'klassificerat bildprogrammet <%= nameLink %>. <%- classification %></p>' +
         '<%= icons %>' +
-        '<p>' + (reclassification ? ' <%- previous.author %> hade <%- previous.date %> bedömt bildprogrammet <%- previous.criteriaText %>' : '') + '</p>' +
+        '<p>' + (reclassification ? ' <%- previous.author %> hade <%- previous.date %> <%- previous.criteriaText %>' : '') + '</p>' +
         ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Orsak till omklassificering: <%- reason %>.<br/>Grunder: <%- publicComments %></p>' : '') +
         '<%= extraInfoLink %>' +
         '<%= appendixLink %>'
-    }
-  }
-
-  function previous() {
-    var previous = previousClassification()
-    if (!previous) return {}
-    return {
-      author: previousClassificationAuthor(previous),
-      criteriaText: previousClassificationText(summary(previous).age, sortAllWarnings(previous)),
-      date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : 'aiemmin'
-    }
-  }
-
-  function previousClassification() {
-    if (program.classifications.length == 0) return
-    var index = _.findIndex(program.classifications, { _id: classification._id })
-    if (index == -1) {
-      return program.classifications[0]
-    } else {
-      return program.classifications[index + 1]
-    }
-  }
-
-  function previousClassificationAuthor(classification) {
-    if (enums.authorOrganizationIsKHO(classification)) return 'Korkein hallinto-oikeus'
-    if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return 'Kuvaohjelmalautakunta'
-    return 'Kuvaohjelmaluokittelija'
-
-  }
-
-  function previousClassificationText(age, warnings) {
-    if (age == 0) {
-      return 'sallituksi.'
-    } else if (warnings.length === 0) {
-      return 'ikärajaksi ' + ageAsText(age) + '.'
-    } else {
-      return 'ikärajaksi ' + ageAsText(age) + ' ja ' + (warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
-        + criteriaText(warnings) + '.'
     }
   }
 

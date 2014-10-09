@@ -200,6 +200,16 @@ var i18n = {
     // Software upgrade -dialog
     'Järjestelmä on päivitetty.': 'Systemet har uppdaterats',
 
+    // Classification mail
+    'Korkein hallinto-oikeus': 'Högsta förvaltningsdomstolen',
+    'Kuvaohjelmalautakunta': 'Bildprogramsnämnden',
+    'Kuvaohjelmaluokittelija': 'Bildprogramsklassificeraren',
+    'Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö': 'Nationella audiovisuella institutets (KAVI) enhet för mediefostran och bildprogram',
+    'Lisätietoja': 'Mera information',
+    'Liitteet': 'Bilaga',
+    'kausi': 'säsong',
+    'jakso': 'avsnitt',
+
     // Manual addition:
     'Kuvaohjelmien luokittelu- ja valvontajärjestelmä ei toimi selainversiollasi. Tuettuja selaimia ovat: ': 'Systemet för klassificering och övervakning av bildprogram fungerar inte med din webbläsare. Webbläsare som vi stödjer är bl.a.'
   }
@@ -288,3 +298,7 @@ var i18nPikaday = {
     weekdaysShort: ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör']
   }
 }
+
+if (isNodeJs()) module.exports = i18n
+
+function isNodeJs() { return typeof module !== 'undefined' && module.exports }

@@ -146,6 +146,18 @@ var i18n = {
     'Tiedoston lähettäminen ei onnistunut.': 'Sändning av fil misslyckades',
     'Tarjoajan tai tarjoajan tiedoista puuttui pakollisia tietoja. Ole hyvä, täytä puuttuvat tiedot ja lähetä tiedosto uudelleen.': 'Obligatorisk information om leverantör eller ställe för tillhandahållning saknades. Fyll i informationen och sänd på nytt.',
 
+    'Ilmoittautuminen tarjoajaksi': 'Leverantörsanmälan',
+    'Tarjoajan vuosilaskutuksen vahvistus': 'Bekräftelse på levenrantörens årliga fakturing',
+    'Tarjoamispaikan vuosilaskutuksen vahvistus':  'Bekräftelse på den årliga fakturingen av ställe för tillhandahållning',
+
+  // Providing types
+    'Tallenteiden tarjoaminen': 'Tillhandahållning av upptagningar',
+    'Julkinen esittäminen': 'Offentligt framförande',
+    'Valtakunnallinen televisio-ohjelmisto': 'Riksomfattande tv-programutbud',
+    'Alueellinen televisio-ohjelmisto': 'Regionalt tv-programutbud',
+    'Ulkomailta välitetty ohjelmisto': 'Programutbud förmdelat från utlandet',
+    'Tilausohjelmapalvelu': 'Beställ-tv',
+
   // Dynamic UI-texts:
 
     // Generic buttons:

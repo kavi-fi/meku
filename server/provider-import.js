@@ -70,10 +70,10 @@ var fieldNames = {
 // These need to match exactly with the labels in the provider Excel file
 var i18n = {
   sv: {
-    'Tarjoaja': 'Tarjoaja ruotsiksi',
-    'Lasku eri osoitteeseen kuin Tarjoajan osoite': 'Lasku eri osoitteeseen kuin Tarjoajan osoite ruotsiksi',
-    'TAI verkkolasku': 'TAI verkkolasku ruotsiksi',
-    'Tarjoamispaikkojen tiedot ja tarjoamistavat': 'Tarjoamispaikkojen tiedot ja tarjoamistavat ruotsiksi'
+    'Tarjoaja': 'Leverantör',
+    'Lasku eri osoitteeseen kuin Tarjoajan osoite': 'Faktura till annan adress än Leverantörens',
+    'TAI verkkolasku': 'ELLER nätfaktura',
+    'Tarjoamispaikkojen tiedot ja tarjoamistavat': 'Information om ställen och sätt för tillhandahållning'
   }
 }
 
@@ -91,7 +91,7 @@ exports.import = function(file, callback) {
   var allSheets = parser.readFile(file)
 
   var sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
-  var sheetSv = allSheets.Sheets['Svenska']
+  var sheetSv = allSheets.Sheets['Leverant&#xF6;rsanm&#xE4;lan']
   var useFi = isEmptySheet(sheetSv, i18n.sv['Tarjoaja'])
 
   getProviderAndLocationsFromSpreadSheet(useFi ? sheetFi : sheetSv, useFi ? identity : sv, function(err, providerAndLocations) {

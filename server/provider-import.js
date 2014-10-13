@@ -106,7 +106,7 @@ exports.import = function(file, callback) {
     provider.active = false
     provider.creationDate = new Date()
     provider.language = (provider.language && provider.language.toLowerCase() == 'svenska') ? 'SV' : 'FI'
-    provider.address.country = enums.getCountryCode(provider.address.country) || provider.address.country
+    provider.address.country = enums.getCountryCode(provider.address.country) || 'FI'
 
     var billing = createObjectAndSetValuesWithMap(billingData, billingFieldMap)
 

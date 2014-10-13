@@ -89,9 +89,8 @@ exports.import = function(file, callback) {
   else return callback({ message: '.xlsx or .xls required' })
 
   var allSheets = parser.readFile(file)
-
   var sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
-  var sheetSv = allSheets.Sheets['Leverant&#xF6;rsanm&#xE4;lan']
+  var sheetSv = allSheets.Sheets['Leverant&#xF6;rsanm&#xE4;lan'] || allSheets.Sheets['Leverantörsanmälan']
   var useFi = isEmptySheet(sheetSv, i18n.sv['Tarjoaja'])
 
   getProviderAndLocationsFromSpreadSheet(useFi ? sheetFi : sheetSv, useFi ? identity : sv, function(err, providerAndLocations) {

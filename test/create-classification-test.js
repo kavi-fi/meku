@@ -90,7 +90,7 @@ describe('create-classification-test', function() {
       criteria: ['Väkivalta (12)','Komediaväkivaltaa...','Seksi (19)']
     }
     var expectedEmail = {
-      to: 'demo.1@email.org',
+      to: ['kavi@fake-meku.fi', 'demo.1@email.org'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta(12), seksi(19)',
       body: [
         date,
@@ -132,7 +132,7 @@ describe('create-classification-test', function() {
 
         .assertDisabled('#classification-page input[name="classification.buyer"]')
         .assertDisabled('#classification-page input[name="classification.billing"]')
-        .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org'])
+        .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org', 'root@fake-meku.fi'])
 
         .select2one('#classification-page .select2-container.x-classificationReason', 'pal', 'Palaute')
         .select2one('#classification-page .select2-container.x-classificationAuthorOrganization', 'kuva', 'Kuvaohjelmalautakunta')
@@ -179,7 +179,7 @@ describe('create-classification-test', function() {
     }
 
     var expectedEmail = {
-      to: ['kavi@fake-meku.fi', 'demo.1@email.org'],
+      to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'root@fake-meku.fi'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, S ',
       body: [
         date,

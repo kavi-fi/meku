@@ -16,7 +16,7 @@
     <button class="button save-category">Tallenna</button>
     <div class="category-select-container">
       <label>Valitse kuvaohjelman tyyppi</label>
-      <input name="category-select" type="hidden" class="required"/>
+      <input name="category-select" type="hidden" class="required x-category-select"/>
     </div>
     <div class="categorization-form-tv-episode hide">
       <div><label>Sarjan isäntäohjelman nimi</label><input name="series" class="required" type="hidden" /></div>
@@ -551,7 +551,7 @@
         </div>
         <label class="select2-label">Maat</label><input name="country" class="country required" type="hidden" />
         <label>Valmistumisvuosi</label><input name="year" type="text" class="required throttledInput" />
-        <label class="select2-label">Tuotantoyhtiöt</label><input name="productionCompanies" class="required" type="hidden"/>
+        <label class="select2-label">Tuotantoyhtiöt</label><input name="productionCompanies" class="required x-productionCompanies" type="hidden"/>
       </div>
       <div class="right">
         <div class="tv-episode-field season-episode-fields">
@@ -559,10 +559,10 @@
           <label>Jakso</label><input name="episode" type="number" class="required throttledInput" min="0" />
         </div>
         <div class="game-field"><label class="select2-label">Peliformaatti</label><input name="gameFormat" class="required" type="hidden" /></div>
-        <label class="select2-label">Genre</label><input name="genre" type="hidden" />
+        <label class="select2-label">Genre</label><input name="genre" type="hidden" class="x-genre"/>
         <div class="non-game-field">
-          <label class="select2-label">Ohjaajat</label><input name="directors" class="required" type="hidden"/>
-          <label class="select2-label">Näyttelijät</label><input name="actors" class="" type="hidden"/>
+          <label class="select2-label">Ohjaajat</label><input name="directors" class="required x-directors" type="hidden"/>
+          <label class="select2-label">Näyttelijät</label><input name="actors" class="x-actors" type="hidden"/>
         </div>
         <label class="text-area-label">Synopsis</label><textarea class="required throttledInput" name="synopsis"></textarea>
       </div>
@@ -574,14 +574,14 @@
           <label>Luokittelijan nimi</label><span class="author textified-field"></span>
         </div>
         <div class="left author-and-reason-fields">
-          <label class="select2-label">Peruste</label><input name="classification.reason" class="required" type="hidden"/>
+          <label class="select2-label">Peruste</label><input name="classification.reason" class="required x-classificationReason" type="hidden"/>
         </div>
         <div class="right author-and-reason-fields">
-          <label class="select2-label">Luokittelija</label><input name="classification.authorOrganization" class="required" type="hidden"/>
+          <label class="select2-label">Luokittelija</label><input name="classification.authorOrganization" class="required x-classificationAuthorOrganization" type="hidden"/>
         </div>
         <div class="left">
-          <label class="select2-label">Luokittelun tilaaja</label><input name="classification.buyer" class="required" type="hidden" />
-          <label class="select2-multiline-label">Rekisteröinnistä laskutetaan</label><input name="classification.billing" class="required" type="hidden" />
+          <label class="select2-label">Luokittelun tilaaja</label><input name="classification.buyer" class="required x-buyer" type="hidden" />
+          <label class="select2-multiline-label">Rekisteröinnistä laskutetaan</label><input name="classification.billing" class="required x-billing" type="hidden" />
         </div>
         <div class="right">
           <div class="non-game-field">
@@ -640,7 +640,7 @@
         <h3 class="main">Lähetä luokittelupäätös</h3>
         <div class="email-preview box">
           <dl>
-            <dt class="recipients">Vastaanottajat</dt><dd><input name="classification.registrationEmailAddresses" class="required" type="hidden" /></dd>
+            <dt class="recipients">Vastaanottajat</dt><dd><input name="classification.registrationEmailAddresses" class="required x-registrationEmails" type="hidden" /></dd>
             <dt>Aihe</dt><dd class="subject"></dd>
           </dl>
           <div class="body"></div>

@@ -6,6 +6,7 @@
   <script src="vendor/jquery-2.1.1.min.js"></script>
   <script src="vendor/lodash-2.4.1.min.js"></script>
   <script src="js/shared.js"></script>
+  <script src="/environment"></script>
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
@@ -20,12 +21,10 @@
       var $error = $feedback.find('.error')
       var $success = $feedback.find('.success')
 
-      $.get('/environment', function(res) {
-        if (res.environment === 'training') {
-          $('.training-ribbon').show()
-          $('a.xls').prop('href', 'KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls')
-        }
-      })
+      if (APP_ENVIRONMENT === 'training') {
+        $('.training-ribbon').show()
+        $('a.xls').prop('href', 'KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls')
+      }
 
       $button.on('click', function(e) {
         e.preventDefault()

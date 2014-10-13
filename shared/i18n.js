@@ -8,7 +8,7 @@ var i18n = {
     'error-reload': 'Ladda sidan på nytt <a href="#">här</a>,<br/>eller gå tillbaka till förstasidan <a href="/">här</a>.',
     'conflict-reload': 'Gå tillbaka till förstasidan <a href="/">här</a>.',
     'draft-notice': 'Klassificeringen inte klar hos användaren <b></b>. Utkastet sparat <span></span>.',
-    'register-provider-info': 'Anmäl dig som leverantör av bildprogram genom att i Excel-tabellen fylla i informationen om leverantör samt ställen för tillhandahållning, och skicka den med blanketten nedan. Ladda ner anmälningsblanketten <a class="xls" href="Anmäl som KAVI-leverantör.xls">här</a>.',
+    'register-provider-info': 'Anmäl dig som leverantör av bildprogram genom att i Excel-tabellen fylla i informationen om leverantör samt ställen för tillhandahållning, och skicka den med blanketten nedan. Ladda ner anmälningsblanketten <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">här</a>.',
 
   // Criteria:
 

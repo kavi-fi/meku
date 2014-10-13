@@ -222,6 +222,10 @@ var i18n = {
     'kausi': 'säsong',
     'jakso': 'avsnitt',
     'aiemmin': 'tidigare',
+    'Yleisön pyyntö': 'Begäran från publiken',
+    'KAVI:n oma aloite': 'KAVI:s eget initiativ',
+    'Valitusosoitus': 'Besvärsanvisning',
+    'Oikaisupyyntö': 'Rättelseyrkande',
 
     // Manual addition:
     'Kuvaohjelmien luokittelu- ja valvontajärjestelmä ei toimi selainversiollasi. Tuettuja selaimia ovat: ': 'Systemet för klassificering och övervakning av bildprogram fungerar inte med din webbläsare. Webbläsare som vi stödjer är bl.a.'

@@ -91,20 +91,28 @@ describe('create-classification-test', function() {
     }
     var expectedEmail = {
       to: ['kavi@fake-meku.fi', 'demo.1@email.org'],
-      subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta(12), seksi(19)',
+      subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta (12), seksi (19)',
       body: [
         date,
         'DEMO tilaaja 1',
         'Ilmoitus kuvaohjelman luokittelusta',
           'Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on '+date+'  luokitellut kuvaohjelman ',
         'Ghostbusters XVI',
-        '. Kuvaohjelman ikäraja on 7 ja haitallisuuskriteerit väkivalta(12), seksi(19).',
+        '. Kuvaohjelman ikäraja on 7 ja haitallisuuskriteerit väkivalta (12), seksi (19).',
         'Lisätietoja: ',
         'kavi@fake-meku.fi',
         'Liitteet:',
         'Valitusosoitus',
-        'Kansallinen audiovisuaalinen instituutti (KAVI)',
-        'Mediakasvatus- ja kuvaohjelmayksikkö'
+        'Meddelande om klassificering av bildprogram',
+        'Nationella audiovisuella institutets (KAVI) enhet för mediefostran och bildprogram har '+date+' klassificerat bildprogrammet ',
+        'Ghostbusters XVI',
+        '. Bildprogrammet har åldersgränsen 7 och det skadliga innehållet våld (12), sexuellt innehåll (19).',
+        'Mera information: ',
+        'kavi@fake-meku.fi',
+        'Bilaga:',
+        'Valitusosoitus',
+        'Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)',
+        'Mediakasvatus- ja kuvaohjelmayksikkö / Enheten för mediefostran och bildprogram'
       ].join('\n')
     }
   })
@@ -187,13 +195,22 @@ describe('create-classification-test', function() {
         'Kuvaohjelmalautakunta on '+date+' uudelleenluokitellut kuvaohjelman ',
         'Ghostbusters XVI',
         '. Kuvaohjelma on sallittu.',
-        ' Kuvaohjelmaluokittelija oli '+date+' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta(12), seksi(19).',
+        ' Kuvaohjelmaluokittelija oli '+date+' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta (12), seksi (19).',
         'Syy uudelleenluokittelulle: Yleisön pyyntö.',
         'Perustelut: PUBLIC COMMENTS',
         'Liitteet:',
         'Oikaisuvaatimusohje',
-        'Kansallinen audiovisuaalinen instituutti (KAVI)',
-        'Mediakasvatus- ja kuvaohjelmayksikkö'
+        'Meddelande om omklassificering av bildprogram',
+        'Bildprogramsnämnden har '+date+' omklassificerat bildprogrammet ',
+        'Ghostbusters XVI',
+        '. Bildprogrammet är tillåtet.',
+        ' Bildprogramsklassificeraren hade '+date+' som åldergräns för bildprogrammet bedömt 7 och som skadligt innehåll våld (12), sexuellt innehåll (19).',
+        'Orsak till omklassificering: Begäran från publiken.',
+        'Grunder: PUBLIC COMMENTS',
+        'Bilaga:',
+        'Oikaisuvaatimusohje',
+        'Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)',
+        'Mediakasvatus- ja kuvaohjelmayksikkö / Enheten för mediefostran och bildprogram'
       ].join('\n')
     }
   })

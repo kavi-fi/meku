@@ -44,8 +44,9 @@
   <script src="js/subscriber-management.js"></script>
   <script src="js/providers.js"></script>
   <script src="js/reports.js"></script>
+  <script src="/environment"></script>
   <script>
-    if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
+    if (APP_ENVIRONMENT == 'development') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
   <title data-i18n>Kuvaohjelmien luokittelu- ja valvontajärjestelmä</title>
 </head>

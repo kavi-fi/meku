@@ -8,6 +8,7 @@
   <script src="vendor/jquery.cookie-1.4.1.js"></script>
   <script src="js/shared.js"></script>
   <script src="shared/i18n.js"></script>
+  <script src="/environment"></script>
   <script>
     if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
@@ -24,11 +25,9 @@
       var $error = $feedback.find('.error')
       var $success = $feedback.find('.success')
 
-      $.get('/environment', function(res) {
-        if (res.environment === 'training') {
-          $('.training-ribbon').show()
-        }
-      })
+      if (APP_ENVIRONMENT === 'training') {
+        $('.training-ribbon').show()
+      }
 
       $button.on('click', function(e) {
         e.preventDefault()

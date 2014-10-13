@@ -34,11 +34,7 @@ function setup() {
     }
   })
 
-  $.get('/environment', function(res) {
-    if (res.environment === 'training') {
-      $('.training-ribbon').show()
-    }
-  })
+  if (APP_ENVIRONMENT === 'training') $('.training-ribbon').show()
 
   $(document).ajaxError(function(e, req) {
     if (req.status == 403) {

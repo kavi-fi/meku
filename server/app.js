@@ -18,7 +18,7 @@ var utils = require('../shared/utils')
 var proe = require('../shared/proe')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
-var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD)
 var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
 var CronJob = require('cron').CronJob
@@ -29,6 +29,8 @@ var csrf = require('csurf')
 var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 var validation = require('./validation')
 var srvUtils = require('./server-utils')
+var env = require('./env').get()
+var testEnvEmailQueue = []
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -47,8 +49,6 @@ app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
 app.use(multer({ dest: '/tmp/', limits: { fileSize:5000000, files:1 } }))
-
-mongoose.connect(process.env.MONGOHQ_URL || 'mongodb://localhost/meku')
 
 app.post('/login', function(req, res, next) {
   var username = req.body.username
@@ -114,7 +114,7 @@ app.post('/forgot-password', function(req, res, next) {
 })
 
 function sendHashLinkViaEmail(user, subject, template, callback) {
-  var url = getHostname() + '/reset-password.html#' + user.resetHash
+  var url = env.hostname + '/reset-password.html#' + user.resetHash
   var emailData = {
     recipients: user.emails,
     subject: subject,
@@ -369,7 +369,7 @@ app.post('/programs/:id/register', function(req, res, next) {
             if (err) return next(err)
             addInvoicerows(newClassification, function(err) {
               if (err) return next(err)
-              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, getHostname()), req.user, function(err) {
+              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, env.hostname), req.user, function(err) {
                 if (err) return next(err)
                 updateMetadataIndexesForNewProgram(program, function() {
                   logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
@@ -654,7 +654,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
         var provider = saved.toObject()
         var providerHasEmails = !_.isEmpty(provider.emailAddresses)
         if (providerHasEmails) {
-          providerUtils.registrationEmail(provider, getHostname(), logErrorOrSendEmail(req.user))
+          providerUtils.registrationEmail(provider, env.hostname, logErrorOrSendEmail(req.user))
         }
         sendProviderLocationEmails(provider)
         var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
@@ -675,7 +675,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     _.select(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
-      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), getHostname(), logErrorOrSendEmail(req.user))
+      providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), env.hostname, logErrorOrSendEmail(req.user))
     })
   }
 })
@@ -761,10 +761,10 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
     if (err) return next(err)
 
     _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
-      providerUtils.yearlyBillingProviderEmail(p, getHostname(), logErrorOrSendEmail(req.user))
+      providerUtils.yearlyBillingProviderEmail(p, env.hostname, logErrorOrSendEmail(req.user))
     })
     _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
-      providerUtils.yearlyBillingProviderLocationEmail(l, getHostname(), logErrorOrSendEmail(req.user))
+      providerUtils.yearlyBillingProviderLocationEmail(l, env.hostname, logErrorOrSendEmail(req.user))
     })
 
     ProviderMetadata.setYearlyBillingReminderSent(new Date(), respond(res, next))
@@ -836,13 +836,13 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
   function sendRegistrationEmails(provider, location, callback) {
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
-      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), getHostname(), logErrorOrSendEmail(req.user))
+      providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), env.hostname, logErrorOrSendEmail(req.user))
       callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
       // email the provider
       var providerData = _.clone(provider)
       providerData.locations = [location]
-      providerUtils.registrationEmail(providerData, getHostname(), logErrorOrSendEmail(req.user))
+      providerUtils.registrationEmail(providerData, env.hostname, logErrorOrSendEmail(req.user))
       callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else {
       // location is the payer, but the location has no email addresses
@@ -1171,8 +1171,9 @@ app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next)
   ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).lean().exec(respond(res, next))
 })
 
-app.get('/environment', function(req, res, next) {
-  res.json({ environment: app.get('env') })
+app.get('/environment', function(req, res) {
+  res.set('Content-Type', 'text/javascript')
+  res.send('var APP_ENVIRONMENT = "' + app.get('env') + '";')
 })
 
 app.post('/files/provider-import', function(req, res, next) {
@@ -1195,6 +1196,10 @@ app.get('/report/:name', requireRole('root'), function(req, res, next) {
   reports[req.params.name](range, respond(res, next))
 })
 
+if (env.isTest) {
+  app.get('/emails/latest', function(req, res) { res.send(_.last(testEnvEmailQueue)) })
+}
+
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
@@ -1214,15 +1219,6 @@ function createParentProgram(program, data, user, callback) {
     })
   })
 }
-
-if (isDev()) {
-  var liveReload = require('express-livereload')
-  liveReload(app, { watchDir: path.join(__dirname, '../client') })
-}
-
-var server = app.listen(process.env.PORT || 3000, function() {
-  console.log('Listening on port ' + server.address().port)
-})
 
 var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
   User.find({ $and: [
@@ -1246,7 +1242,6 @@ var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
     })
   })
 })
-checkExpiredCerts.start()
 
 var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
   User.find({ $and: [
@@ -1273,7 +1268,6 @@ var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
     })
   })
 })
-checkCertsExpiringSoon.start()
 
 function nocache(req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
@@ -1315,7 +1309,7 @@ function authenticateXmlApi(req, res, next) {
 
 function forceSSL(req, res, next) {
   // trust the proxy (Heroku) about X-Forwarded-Proto
-  if (!isDev() && req.headers['x-forwarded-proto'] !== 'https') {
+  if (env.forceSSL && req.headers['x-forwarded-proto'] !== 'https') {
     if (req.method === 'GET') {
       return res.redirect(301, 'https://' + req.get('host') + req.originalUrl)
     } else {
@@ -1347,7 +1341,7 @@ function setupUrlEncodedBodyParser() {
 }
 
 function setupCsrfMiddleware() {
-  var csrfMiddleware = csrf({ cookie: { httpOnly: true, secure: !isDev(), signed: true } })
+  var csrfMiddleware = csrf({ cookie: { httpOnly: true, secure: env.forceSSL, signed: true } })
   return function(req, res, next) {
     if (isWhitelisted(req)) {
       return next()
@@ -1389,16 +1383,15 @@ function sendEmail(opts, user, callback) {
     opts.recipients.forEach(function(to) { email.addTo(to) })
   }
 
-  if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'training' || process.env.EMAIL_TO != undefined) {
+  if (env.sendEmail || process.env.EMAIL_TO != undefined) {
     sendgrid.send(email, callback)
+  } else if (env.isTest) {
+    testEnvEmailQueue.push(email)
+    return callback()
   } else {
     console.log('email (suppressed) to: ', opts.recipients, email)
     return callback()
   }
-}
-
-function isDev() {
-  return process.env.NODE_ENV == undefined || process.env.NODE_ENV == 'development'
 }
 
 function updateActorAndDirectorIndexes(program, callback) {
@@ -1594,12 +1587,6 @@ function getIpAddress(req) {
   return ipAddr
 }
 
-function getHostname() {
-  if (isDev()) return 'http://localhost:3000'
-  else if (process.env.NODE_ENV === 'training') return 'https://luokittelu-koulutus.kavi.fi'
-  else return 'https://luokittelu.kavi.fi'
-}
-
 function isUrlEncodedBody(req) {
   var paths = ['POST:/proe', 'POST:/providers/billing/proe', 'POST:/providers/yearlyBilling/proe']
   return _.contains(paths, req.method + ':' + req.path)
@@ -1612,8 +1599,37 @@ function isWhitelisted(req) {
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
     'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls',
-    'GET:/upgrade-browser.html'
+    'GET:/upgrade-browser.html', 'GET:/emails/latest'
   ]
   var url = req.method + ':' + req.path
   return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
+}
+
+if (env.isDev) {
+  var liveReload = require('express-livereload')
+  liveReload(app, { watchDir: path.join(__dirname, '../client') })
+}
+
+var server
+
+var start = exports.start = function(callback) {
+  mongoose.connect(process.env.MONGOHQ_URL || env.mongoUrl)
+  checkExpiredCerts.start()
+  checkCertsExpiringSoon.start()
+  server = app.listen(process.env.PORT || env.port, callback)
+}
+
+var shutdown = exports.shutdown = function(callback) {
+  mongoose.disconnect(function() {
+    server.close(function() {
+      callback()
+    })
+  })
+}
+
+if (!module.parent) {
+  start(function(err) {
+    if (err) throw err
+    console.log('['+env.name+'] Listening on port ' + server.address().port)
+  })
 }

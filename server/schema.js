@@ -64,6 +64,7 @@ var ProgramSchema = new Schema({
   sentRegistrationEmailAddresses: [String],
   createdBy: { _id: ObjectId, name: String, username: String, role: String }
 })
+ProgramSchema.set('versionKey', false)
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))
 
@@ -423,7 +424,13 @@ var ProductionCompany = exports.ProductionCompany = mongoose.model('productionCo
 var SequenceSchema = new Schema({ _id:String, seq:Number }, { _id: false, versionKey: false })
 SequenceSchema.statics.next = function(seqName, callback) {
   this.findOneAndUpdate({ _id: seqName }, { $inc: { seq: 1 } }, { new: true }, function(err, doc) {
-    return callback(err, err ? null : doc.seq)
+    if (!doc) {
+      new Sequence({ _id: seqName, seq: 0 }).save(function(err, doc) {
+        return callback(err, err ? null : 0)
+      })
+    } else {
+      return callback(err, err ? null : doc.seq)
+    }
   })
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)

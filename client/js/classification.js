@@ -104,7 +104,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   }
 
   function configureValidation() {
-    $form.on('validation', function() {
+    $form.on('validation throttled', function() {
       // For select2's, we only care about the original element from which the invalid class has been removed
       var required = $form.find('.required.invalid')
         .not('.select2-container.required.invalid')
@@ -112,7 +112,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         .not('input:disabled, textarea:disabled')
       // Enable to log validation:
       // required.length == 0 ? console.log('valid.') : console.log('invalid: ', required.map(function() { return $(this).prop('name') }).toArray())
-      $form.find('button[name=register]').prop('disabled', required.length > 0)
+      var throttled = $form.find('.throttled')
+      $form.find('button[name=register]').prop('disabled', required.length > 0 || throttled.length > 0)
     })
     validateTextChange($form.find('.required'), isNotEmpty)
     validateTextChange($form.find('input[name=year]'), utils.isValidYear)

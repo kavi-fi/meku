@@ -221,6 +221,7 @@ var i18n = {
     'Liitteet': 'Bilaga',
     'kausi': 'säsong',
     'jakso': 'avsnitt',
+    'aiemmin': 'tidigare',
 
     // Manual addition:
     'Kuvaohjelmien luokittelu- ja valvontajärjestelmä ei toimi selainversiollasi. Tuettuja selaimia ovat: ': 'Systemet för klassificering och övervakning av bildprogram fungerar inte med din webbläsare. Webbläsare som vi stödjer är bl.a.'

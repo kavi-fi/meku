@@ -193,7 +193,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       return {
         author: previousClassificationAuthor(previous),
         criteriaText: previousClassificationText(summary(previous).age, sortAllWarnings(previous)),
-        date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : 'aiemmin'
+        date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : t('aiemmin')
       }
     }
 

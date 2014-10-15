@@ -181,8 +181,8 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
     function appendixLink() {
       if (enums.authorOrganizationIsKHO(classification)) return ''
-      var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: "Oikaisuvaatimusohje" }
-      var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: "Valitusosoitus" }
+      var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: t('Oikaisuvaatimusohje') }
+      var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: t('Valitusosoitus') }
       var link = (user.role == 'kavi') ? linkKavi : linkOther
       return '<p>' + t('Liitteet') + ':<br/><a href="' + link.url + '">' + link.name + '</a></p>'
     }

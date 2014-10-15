@@ -91,8 +91,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   var svData = generateData('sv')
   return {
     recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(user.email)),
-    from: 'no-reply@kavi.fi',
-    bcc: ['kirjaamo@kavi.fi'],
+    from: 'kirjaamo@kavi.fi',
     subject: _.template('Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>', fiData),
     body: '<div style="text-align: right; margin-top: 8px;"><img src="' + hostName + '/images/logo.png" /></div>' +
       _.template('<p><%- date %><br/><%- buyer %></p>', fiData) +

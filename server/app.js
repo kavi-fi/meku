@@ -355,12 +355,8 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
 
-    program.populateSentRegistrationEmailAddresses(function(err, program) {
+    populateSentRegistrationEmailAddresses(program, function (err, program) {
       if (err) return next(err)
-      var valid = validation.registration(program.toObject(), newClassification, req.user)
-      if (!valid.valid) {
-        return res.send(400, "Invalid program. Field: " + valid.field)
-      }
       verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
         if (err) return next(err)
         program.save(function(err) {
@@ -369,7 +365,7 @@ app.post('/programs/:id/register', function(req, res, next) {
             if (err) return next(err)
             addInvoicerows(newClassification, function(err) {
               if (err) return next(err)
-              sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, env.hostname), req.user, function(err) {
+              sendRegistrationEmail(function(err) {
                 if (err) return next(err)
                 updateMetadataIndexesForNewProgram(program, function() {
                   logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
@@ -388,6 +384,8 @@ app.post('/programs/:id/register', function(req, res, next) {
     }
 
     function addInvoicerows(currentClassification, callback) {
+      if (utils.hasRole(req.user, 'root')) return process.nextTick(callback)
+
       var seconds = classificationUtils.durationToSeconds(currentClassification.duration)
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
@@ -410,6 +408,23 @@ app.post('/programs/:id/register', function(req, res, next) {
           }
         })
       }
+    }
+
+    function populateSentRegistrationEmailAddresses(program, callback) {
+      if (utils.hasRole(req.user, 'root')) return process.nextTick(callback.bind(null, null, program))
+      program.populateSentRegistrationEmailAddresses(function(err, program) {
+        if (err) return callback(err)
+        var valid = validation.registration(program.toObject(), newClassification, req.user)
+        if (!valid.valid) {
+          return res.send(400, "Invalid program. Field: " + valid.field)
+        }
+        callback(null, program)
+      })
+    }
+
+    function sendRegistrationEmail(callback) {
+      if (utils.hasRole(req.user, 'root')) return process.nextTick(callback)
+      sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, env.hostname), req.user, callback)
     }
   })
 })

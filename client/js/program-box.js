@@ -141,7 +141,7 @@ function programBox() {
     function drafts() {
       return _.values(p.draftClassifications || {}).map(function(draft) {
         return $draftTemplate.clone().attr('data-userId', draft.author._id)
-          .find('b').text(draft.author.name + ' ('+draft.author.username+')').end()
+          .find('b').text(draft.author.name + (utils.hasRole(window.user, 'kavi') ? ' ('+draft.author.username+')' : '')).end()
           .find('span').text(utils.asDateTime(draft.creationDate)).end()
       })
     }
@@ -152,7 +152,7 @@ function programBox() {
     $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
       .find('.warnings').html(warningIcons(summary)).end()
       .find('.reason').labeledText(utils.getProperty(enums.reclassificationReason[c.reason], 'uiText')).end()
-      .find('.author').labeledText(c.author ? c.author.name + ' (' + c.author.username + ')' : '').end()
+      .find('.author').labeledText(c.author ? c.author.name + (utils.hasRole(window.user, 'kavi') ? ' (' + c.author.username + ')' : '') : '').end()
       .find('.authorOrganization').labeledText(enums.authorOrganization[c.authorOrganization]).end()
       .find('.buyer').labeledText(c.buyer && c.buyer.name || '').end()
       .find('.billing').labeledText(c.billing && c.billing.name || '').end()

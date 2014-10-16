@@ -227,6 +227,8 @@ var i18n = {
     'Valitusosoitus': 'Besvärsanvisning',
     'Oikaisupyyntö': 'Rättelseyrkande',
     'Oikaisuvaatimusohje': 'Anvisning om rättelseyrkande',
+    'Luokittelija valinnut myös alempiin ikärajoihin liittyvät kriteerit': 'Klassificeraren har valt även kriterier som hör till lägre åldersgränser',
+    'ei määritelty': 'inte fastslagna',
 
     // Manual addition:
     'Kuvaohjelmien luokittelu- ja valvontajärjestelmä ei toimi selainversiollasi. Tuettuja selaimia ovat: ': 'Systemet för klassificering och övervakning av bildprogram fungerar inte med din webbläsare. Webbläsare som vi stödjer är bl.a.'

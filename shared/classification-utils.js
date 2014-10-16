@@ -16,13 +16,17 @@ var summary = exports.summary = function(classification) {
   if (!classification) return undefined
   if (classification.safe) return { age:0, warnings:[] }
   var maxAgeLimit = ageLimit(classification)
-  var warnings = _(classification.criteria)
-    .map(function(id) { return enums.classificationCriteria[id - 1] })
-    .filter(function(c) { return c.age > 0 && c.age == maxAgeLimit })
-    .map(function(c) { return {id: c.id, category: c.category} })
-    .reduce(function(accum, c) { if (!_.some(accum, { category: c.category })) accum.push(c); return accum }, [])
+  var warnings = _.uniq(significantCriteria(classification), 'category')
   sortWarnings(classification.warningOrder, warnings)
   return { age: maxAgeLimit, warnings: warnings }
+}
+
+var significantCriteria = exports.significantCriteria = function(classification) {
+  var maxAgeLimit = ageLimit(classification)
+  return _(classification.criteria)
+    .map(function(id) { return enums.classificationCriteria[id - 1] })
+    .filter(function(c) { return c.age > 0 && c.age == maxAgeLimit })
+    .map(function(c) { return { id: c.id, category: c.category } }).value()
 }
 
 function sortWarnings(order, warnings) {
@@ -102,6 +106,10 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
   function generateData(lang) {
     var classificationSummary = summary(classification)
+    var significantWarnings = sortWarnings(classification.warningOrder, significantCriteria(classification))
+    var extraCriteria = _.reject(sortAllWarnings(classification), function(w) {
+      return _.find(significantWarnings, { id: w.id })
+    })
     var isFi = lang === 'fi'
     return {
       date: dateFormat(classification.registrationDate ? new Date(classification.registrationDate) : new Date()),
@@ -109,11 +117,11 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       name: programName(),
       nameLink: programLink(),
       year: program.year || '',
-      classification: classificationText(classificationSummary.age, sortAllWarnings(classification)),
-      classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(classificationSummary.warnings),
-      publicComments: classification.publicComments || (isFi ? 'ei määritelty.' : 'inte fastslagna.'),
+      classification: classificationText(classificationSummary.age, significantWarnings, extraCriteria),
+      classificationShort: ageAsText(classificationSummary.age) + ' ' + criteriaText(significantWarnings),
+      publicComments: classification.publicComments || t('ei määritelty') + '.',
       classifier: classifierName(),
-      reason: classification.reason !== undefined ? t(enums.reclassificationReason[classification.reason].emailText) : (isFi ? 'ei määritelty' : 'inte fastslagna'),
+      reason: classification.reason !== undefined ? t(enums.reclassificationReason[classification.reason].emailText) : t('ei määritelty'),
       extraInfoLink: extraInfoLink(),
       appendixLink: appendixLink(),
       previous: previous(),
@@ -142,12 +150,12 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       return '<a href="'+link+'">'+programName()+'</a>'
     }
 
-    function classificationText(age, warnings) {
+    function classificationText(age, warnings, extra) {
       if (age == 0 && warnings.length > 0) {
         var s = isFi
           ? 'Kuvaohjelma on sallittu ja ' + (warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
           : 'Bildprogrammet är tillåtet och det skadliga innehållet '
-        return s + criteriaText(warnings) + '.'
+        return s + criteriaText(warnings) + '. ' + extraCriteriaText(extra)
       } else if (age == 0) {
         return (isFi ? 'Kuvaohjelma on sallittu.' : 'Bildprogrammet är tillåtet.')
       } else if (warnings.length === 0) {
@@ -156,13 +164,18 @@ exports.registrationEmail = function(program, classification, user, hostName) {
         var s = isFi
           ? 'Kuvaohjelman ikäraja on ' + ageAsText(age) + ' ja ' + (warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
           : 'Bildprogrammet har åldersgränsen ' + ageAsText(age) + ' och det skadliga innehållet '
-        return s + criteriaText(warnings) + '.'
+        return s + criteriaText(warnings) + '. ' + extraCriteriaText(extra)
       }
     }
 
     function criteriaText(warnings) {
       var categories = isFi ? enums.classificationCategoriesFI : enums.classificationCategoriesSV
       return warnings.map(function(x) { return categories[x.category] + ' (' + x.id + ')' }).join(', ')
+    }
+
+    function extraCriteriaText(warnings) {
+      if (warnings.length === 0) return ''
+      return t('Luokittelija valinnut myös alempiin ikärajoihin liittyvät kriteerit') + ': ' + criteriaText(warnings)
     }
 
     function classifierName() {
@@ -189,9 +202,13 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     function previous() {
       var previous = previousClassification()
       if (!previous) return {}
+      var significantWarnings = sortWarnings(previous.warningOrder, significantCriteria(previous))
+      var extraCriteria = _.reject(sortAllWarnings(previous), function(w) {
+        return _.find(significantWarnings, { id: w.id })
+      })
       return {
         author: previousClassificationAuthor(previous),
-        criteriaText: previousClassificationText(summary(previous).age, sortAllWarnings(previous)),
+        criteriaText: previousClassificationText(summary(previous).age, significantWarnings, extraCriteria),
         date: previous.registrationDate ? dateFormat(new Date(previous.registrationDate)) : t('aiemmin')
       }
     }
@@ -213,7 +230,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
     }
 
-    function previousClassificationText(age, warnings) {
+    function previousClassificationText(age, warnings, extra) {
       if (age == 0) {
         return isFi ? 'sallituksi.' : 'bedömt bildprogrammet som tillåtet.'
       } else if (warnings.length === 0) {
@@ -225,7 +242,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
           ? 'ikärajaksi ' + ageAsText(age) + ' ja ' + (warnings.length > 1 ? 'haitallisuuskriteereiksi' : 'haitallisuuskriteeriksi') + ' '
           : 'som åldergräns för bildprogrammet bedömt ' + ageAsText(age) + ' och som skadligt innehåll '
         return s
-          + criteriaText(warnings) + '.'
+          + criteriaText(warnings) + '. ' + extraCriteriaText(extra)
       }
     }
   }

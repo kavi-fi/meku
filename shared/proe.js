@@ -151,12 +151,12 @@ function header(id, code) {
 
 function pad(s, length, asPrice) {
   if (!s) s = ''
-  var fill = length - s.length + 1
+  var fill = length - s.length
   if (fill == 0) return s
   if (fill < 0) {
     return s.substring(0, length)
   } else {
-    var padding = new Array(fill).join(asPrice ? '0' : ' ')
+    var padding = new Array(fill + 1).join(asPrice ? '0' : ' ')
     return asPrice ? padding + s : s + padding
   }
 }

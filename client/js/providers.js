@@ -81,7 +81,7 @@ function providerPage() {
       name += _.map(providerLocations, function(l) { return l.name.toLowerCase() }).join(' ')
       var matchesName = _.contains(name, searchString)
       var matchesK18 = onlyK18 ? _.any(providerLocations, 'adultContent'): true
-      $(this).toggle(matchesName && matchesK18)
+      $(this).parent('.provider-row').toggle(matchesName && matchesK18)
     })
     $search.find('.result-count .num').text($providers.find('.result:visible').length)
     closeDetails()
@@ -210,7 +210,9 @@ function providerPage() {
         $.ajax('/providers/' + provider._id, { type: 'PUT', data: JSON.stringify(providerData) })
           .done(function(provider) {
             var $parent = $row.parent()
-            $row.replaceWith(renderProvider(provider).addClass('selected'))
+            var $newRow = renderProvider(provider)
+            $parent.replaceWith($newRow)
+            $newRow.find('.result').addClass('selected').after($providerDetails)
             $providerDetails.find('.touched').removeClass('touched')
             $providerDetails.find('form').trigger('validate')
             $providerDetails.find('.buttons .save-success:first').fadeIn(500).delay(5000).fadeOut()
@@ -256,7 +258,7 @@ function providerPage() {
         $.ajax('/providers/' + provider._id, { type: 'DELETE' }).done(function() {
           closeDialog()
           closeDetails()
-          $selected.slideUp(function() {
+          $selected.parent('.provider-row').slideUp(function() {
             $(this).remove()
             updateStatistics()
           })
@@ -319,7 +321,7 @@ function providerPage() {
   }
 
   function updateStatistics() {
-    var providers = $providers.find('> .result').map(function() { return $(this).data('provider') }).toArray()
+    var providers = $providers.find('.provider-row > .result').map(function() { return $(this).data('provider') }).toArray()
     var registeredProviders = _.filter(providers, function(p) { return !!p.active })
     var registeredLocationCount = _.reduce(registeredProviders, function(acc, p) { return acc + _.filter(p.locations, function(l) { return !!l.active }).length }, 0)
     var $rows = [$row('Rekisterissä', registeredProviders.length, registeredLocationCount).addClass('first')]
@@ -365,19 +367,23 @@ function providerPage() {
   }
 
   function renderApproved(provider) {
-    return $('<div>', { class: 'result', 'data-id': provider._id })
-      .data('provider', provider)
+    var $providerRow = $('#templates').find('.provider-row').clone()
+    return $providerRow.find('div:first-child').attr('data-id', provider._id).addClass('result')
       .toggleClass('inactive', !provider.active)
-      .append($('<span>', { class: 'name' }).text(provider.name))
-      .append($('<span>').text(provider.address.street + ', ' + provider.address.city))
-      .append($('<span>', { class: 'date'}).text(utils.asDate(provider.registrationDate)))
+      .data('provider', provider)
+      .find('.name').text(provider.name).end()
+      .find('.address').text(provider.address.street + ', ' + provider.address.city).end()
+      .find('.date').text(utils.asDate(provider.registrationDate)).end().end()
+      .find('.locations').replaceWith(renderProviderLocations($providerRow, provider)).end()
   }
 
   function renderUnapproved(provider) {
-    return $('<div>', { class: 'result unapproved', 'data-id': provider._id })
+    var $providerRow = $('#templates').find('.provider-row').clone()
+    return $providerRow.find('div:first-child').attr('data-id', provider._id).addClass('result unapproved')
       .data('provider', provider)
-      .append($('<span>', { class: 'name' }).text(provider.name))
-      .append($('<span>', { class: 'date' }).text(utils.asDate(provider.creationDate)))
+      .find('.name').text(provider.name).end()
+      .find('.date').text(utils.asDate(provider.registrationDate)).end().end()
+      .find('.locations').replaceWith(renderProviderLocations($providerRow, provider)).end()
   }
 
   function renderProviderDetails(provider) {
@@ -393,7 +399,6 @@ function providerPage() {
       .find('input[name="language"]').select2({ data: select2DataFromEnumObject(enums.billingLanguages) }).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
       .find('.locations-total').text(provider ? provider.locations.length : 0).end()
-      .find('.locations').replaceWith(renderProviderLocations($providerDetails, provider))
 
 
     toggleBillingExtra($providerDetails)
@@ -480,7 +485,7 @@ function providerPage() {
       })
     }
 
-    $providerDetails.find('button[name=new-location]').on('click', function() {
+    $providerDetails.on('click', 'button[name=new-location]',  function() {
       closeLocationDetails()
 
       var $locationDetails = renderLocationDetails()
@@ -509,7 +514,7 @@ function providerPage() {
       closeLocationDetails()
       if (!wasSelected) {
         var location = $this.data('location')
-        var provider = findSelected().data('provider')
+        var provider = $this.parents('.provider-row').find('.result').data('provider')
         var $locationDetails = renderLocationDetails(location)
 
         if (hasRole('root')) $locationDetails.append(changeLog(location).render())
@@ -539,7 +544,7 @@ function providerPage() {
     $locations.on('click', 'button[name=remove]', function() {
       var $selected = $locations.find('.selected')
       var location = $selected.data('location')
-      var provider = findSelected().data('provider')
+      var provider = $selected.parents('.provider-row').find('.result').data('provider')
       showDialog($('#templates').find('.remove-location-dialog').clone()
         .find('.location-name').text(location.name).end()
         .find('button[name=remove]').click(removeLocation).end()
@@ -581,7 +586,7 @@ function providerPage() {
     function toggleActiveButton(newState) {
       var $selected = $locations.find('.location-row.selected')
       var location = $selected.data('location')
-      var provider = findSelected().data('provider')
+      var provider = $selected.parents('.provider-row').find('.result').data('provider')
       var data = JSON.stringify({ active: newState === 'on' })
       $.ajax('/providers/' + provider._id + '/locations/' + location._id + '/active', { type: 'PUT' }).done(function(activation) {
         location.active = activation.active

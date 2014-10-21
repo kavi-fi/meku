@@ -348,6 +348,9 @@ app.post('/programs/:id/register', function(req, res, next) {
     newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
     newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
+    if (newClassification.isReclassification && !utils.hasRole(req.user, 'kavi')) {
+      newClassification.reason = 4
+    }
     Program.updateClassificationSummary(newClassification)
 
     program.draftClassifications = {}

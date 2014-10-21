@@ -210,7 +210,8 @@ enums.reclassificationReason = {
   0: { emailText: 'KAVI:n oma aloite', uiText: 'KAVI:n oma aloite' },
   1: { emailText: 'Yleisön pyyntö', uiText: 'Palaute' },
   2: { emailText: 'Valitusosoitus', uiText: 'Valitus' },
-  3: { emailText: 'Oikaisupyyntö', uiText: 'Oikaisuvaatimus' }
+  3: { emailText: 'Oikaisupyyntö', uiText: 'Oikaisuvaatimus' },
+  4: { emailText: 'Ikärajakriteereiden muutos 2012', uiText: 'Ikärajakriteereiden muutos 2012' }
 }
 
 enums.isOikaisupyynto = function(val) { return val == 3 }
@@ -219,7 +220,8 @@ enums.authorOrganization = {
   0: 'Ulkopuolinen',
   1: 'KAVI',
   2: 'Kuvaohjelmalautakunta',
-  3: 'KHO'
+  3: 'KHO',
+  4: '-'
 }
 
 enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }

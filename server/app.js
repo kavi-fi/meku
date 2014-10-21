@@ -950,7 +950,8 @@ app.post('/users/new', requireRole('root'), function(req, res, next) {
 
 app.post('/users/:id', requireRole('root'), function(req, res, next) {
   User.findById(req.params.id, function (err, user) {
-    updateAndLogChanges(user, req.body, req.user, function(err, saved) {
+    var updates = _.omit(req.body, 'username', 'emekuId', 'role', 'password', 'resetHash', 'certExpiryReminderSent')
+    updateAndLogChanges(user, updates, req.user, function(err, saved) {
       if (err) return next(err)
       var cleaned = saved.toObject()
       User.privateFields.forEach(function(key) { delete cleaned[key] })

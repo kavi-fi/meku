@@ -175,7 +175,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
     function extraCriteriaText(warnings) {
       if (warnings.length === 0) return ''
-      return t('Luokittelija valinnut myös alempiin ikärajoihin liittyvät kriteerit') + ': ' + criteriaText(warnings)
+      return t('Kuvaohjelma sisältää myös alempiin ikärajoihin liittyvät kriteerit') + ': ' + criteriaText(warnings)
     }
 
     function classifierName() {

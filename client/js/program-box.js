@@ -167,7 +167,7 @@ function programBox() {
   }
 
   function renderClassificationCriteria(c) {
-    if (!c.criteria || c.safe || (!window.user && c.agelimit === 0)) return ''
+    if (!c.criteria || c.safe || !window.user) return ''
     var lang = langCookie()
     return c.criteria.map(function(id) {
       var cr = enums.classificationCriteria[id - 1]

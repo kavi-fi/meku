@@ -67,6 +67,10 @@ var ProgramSchema = new Schema({
 ProgramSchema.set('versionKey', false)
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
 ProgramSchema.pre('save', ensureSequenceId('Program'))
+ProgramSchema.pre('save', function(done) {
+  if (this.season === null) this.season = undefined
+  done()
+})
 
 ProgramSchema.methods.newDraftClassification = function(user) {
   var draft = {

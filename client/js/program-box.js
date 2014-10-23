@@ -19,7 +19,7 @@ function programBox() {
     var names = { n: join(p.name), fi: join(p.nameFi), sv: join(p.nameSv), other: join(p.nameOther) }
     var series = p.series && p.series.name || undefined
     var episode = utils.seasonEpisodeCode(p)
-    return $detailTemplate.clone()
+    var $details = $detailTemplate.clone()
       .data('id', p._id)
       .find('.sequenceId').text(p.sequenceId).end()
       .find('.primary-name').text(p.name[0]).end()
@@ -27,7 +27,7 @@ function programBox() {
       .find('.nameFi').labeledText(names.fi).end()
       .find('.nameSv').labeledText(names.sv).end()
       .find('.nameOther').labeledText(names.other).end()
-      .find('.series').text(series).attr('href', '/#haku/' + p.sequenceId + '//').prev('label').toggleClass('hide', !series).end().end()
+      .find('.series').labeledText(series).end()
       .find('.episode').labeledText(episode).end()
       .find('.country').labeledText(enums.util.toCountryString(p.country)).end()
       .find('.year').labeledText(p.year).end()
@@ -36,6 +36,12 @@ function programBox() {
       .find('.directors').labeledText(p.directors.join(', ')).end()
       .find('.actors').labeledText(p.actors.join(', ')).end()
       .find('.synopsis').labeledText(p.synopsis).end()
+
+    if (utils.getProperty(p, 'series._id')) $.get('/programs/' + p.series._id, function(series) {
+      $details.find('.series').attr('href', '#haku/' + series.sequenceId + '//')
+    })
+
+    return $details
   }
 
   function join(arr) { return _.reject(arr, _.isEmpty).join(', ') }

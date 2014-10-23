@@ -411,9 +411,9 @@ function searchPage() {
   })
 
   $page.on('click', '.results .program-box a.series', function() {
-    var selectedProgramId = $(this).parents('.program-box').data('id')
-    var sequenceId = $results.find('.result[data-id='+selectedProgramId+']').data('program').sequenceId
-    $page.trigger('show', sequenceId).show()
+    setLocation($(this).attr('href'))
+    var sequenceId = parseLocationHash()
+    $page.trigger('show', sequenceId[1]).show()
   })
 
   return { programDataUpdated: programDataUpdated, programDeleted: programDeleted,
@@ -527,7 +527,7 @@ function searchPage() {
 
   function setFilters(filterString) {
     $filters.each(function() {
-      $(this).prop('checked', filterString && filterString.indexOf($(this).data('id')) >= 0)
+      $(this).prop('checked', !!(filterString && filterString.indexOf($this.data('id')) >= 0))
     })
   }
 

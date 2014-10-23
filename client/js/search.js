@@ -373,6 +373,9 @@ function searchPage() {
     setFilters(filters)
     queryChanged($input.val().trim())
     loadUntil(programId, function() {
+      if ($results.find('.result').length == 1) {
+        openDetail($results.find('.result:first'), false)
+      }
       if ($('#login').is(':hidden')) $input.focus()
     })
   })

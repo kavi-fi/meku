@@ -102,7 +102,7 @@ function accountHeaderRow(id, account) {
     + pad(concat(address.zip, address.city), 30)
     + ws(105) // puhelin/fax/yhteysHenkilö/pankki/pankkiTili
     + ws(1) // asiakastyyppi, default = 0
-    + languageCode(account.billingLanguage)
+    + languageCode(utils.getProperty(account, 'billing.language'))
     + ws(3) // maksukehoituslupa/maksutapa/maksuhäiriökoodi
     + 'K' // tulostustapa: tulostetaan normaali lasku
     + ws(72) // Laskupvm/Eräpvm/Kirjauspvm/Viivästysmaksut/Hyvityslaskunumero/Laskunumero/Viitenumero
@@ -170,7 +170,7 @@ function concat(args) {
 }
 
 function languageCode(lang) {
-  return [0, 'FI', 'SE', 'EN'].indexOf(lang || 'FI')
+  return [0, 'FI', 'SV', 'EN'].indexOf(lang || 'FI')
 }
 
 function useEInvoice(account) {

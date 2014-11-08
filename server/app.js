@@ -1353,7 +1353,7 @@ function buildRevisionCheck(req, res, next) {
 }
 
 function setupUrlEncodedBodyParser() {
-  var parser = express.urlencoded()
+  var parser = express.urlencoded({ parameterLimit: Infinity, arrayLimit: Infinity })
   return function(req, res, next) {
     return isUrlEncodedBody(req) ? parser(req, res, next) : next()
   }

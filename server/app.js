@@ -1371,7 +1371,7 @@ function setupCsrfMiddleware() {
 }
 
 function setCsrfTokenCookie(req, res, next) {
-  if (!req.cookies._csrf_token && req.csrfToken) {
+  if (req.csrfToken && req.method === 'GET') {
     var csrf = req.csrfToken()
     res.cookie('_csrf_token', csrf)
   }

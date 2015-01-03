@@ -36,6 +36,7 @@ express.static.mime.define({ 'text/xml': ['xsd'] })
 
 var app = express()
 
+app.use(rejectNonHttpMethods)
 app.use(nocache)
 app.use(forceSSL)
 app.use(express.compress())
@@ -1324,6 +1325,11 @@ function authenticateXmlApi(req, res, next) {
       res.send(403)
     }
   })
+}
+
+function rejectNonHttpMethods(req, res, next) {
+  if (['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'].indexOf(req.method) === -1) res.send(405)
+  else next()
 }
 
 function forceSSL(req, res, next) {

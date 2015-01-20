@@ -637,7 +637,12 @@ app.get('/providers/unapproved', requireRole('kavi'), function(req, res, next) {
 })
 
 app.get('/providers', requireRole('kavi'), function(req, res, next) {
-  Provider.find({deleted: false, registrationDate: { $exists: true }}, '', respond(res, next))
+  Provider.aggregate([
+    {$match: {deleted: false, registrationDate: { $exists: true }}},
+    {$redact: {$cond: {
+      if: {$and: [{$not: '$locations'}, {$eq: ['$deleted', true]}]},
+      then: '$$PRUNE', else: '$$DESCEND'}}}
+  ], respond(res, next))
 })
 
 app.post('/providers', requireRole('kavi'), function(req, res, next) {

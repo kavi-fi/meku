@@ -15,7 +15,7 @@ var i18n = {
     'väkivalta': 'Våld',
     'seksi': 'Sex',
     'ahdistus': 'Ångest',
-    'päihteet': 'Droger',
+    'päihteet': 'Rusmedel',
 
   // Program types:
 
@@ -118,7 +118,7 @@ var i18n = {
     'Väkivalta': 'Våld',
     'Ahdistus': 'Ångest',
     'Seksi': 'Sex',
-    'Päihteet': 'Droger',
+    'Päihteet': 'Rusmedel',
     'Ikärajat.fi-näkymä': 'Sidan Ikärajat.fi',
     'Lähetä luokittelupäätös': 'Skicka beslut om klassificering',
     'Vastaanottajat': 'Mottagare',

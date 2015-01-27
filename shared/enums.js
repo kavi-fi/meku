@@ -3,7 +3,7 @@ enums.util = {}
 
 enums.criteriaCategories = ['violence', 'sex', 'fear', 'drugs']
 enums.classificationCategoriesFI = {violence: 'väkivalta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
-enums.classificationCategoriesSV = {violence: 'våld', fear: 'ångest', sex: 'sexuellt innehåll', drugs: 'droger'}
+enums.classificationCategoriesSV = {violence: 'våld', fear: 'ångest', sex: 'sexuellt innehåll', drugs: 'rusmedel'}
 
 enums.format = [
   'Blu-ray Disc',

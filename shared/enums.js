@@ -375,152 +375,152 @@ enums.warnings = { violence: 'Väkivalta', sex: 'Seksi', fear: 'Ahdistus', drugs
 
 enums.classificationCriteria = [
   { id:1,  category: 'violence', age: 18,
-    fi: { title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa" },
-    sv: { title: 'Mycket kraftigt våld', description:'Bildprogrammet innehåller fiktivt, realistiskt och mycket blodigt och detaljerat eller mycket utdraget och detaljerat eller mycket utdraget och sadistiskt våld som riktar sig mot människor eller djur.' }
+    fi: { title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
+    sv: { title: 'Mycket kraftigt våld', description:'Fiktivt, realistiskt och mycket blodigt och detaljerat eller mycket långdraget och detaljerat, eller mycket långdraget och sadistiskt våld riktat mot människor eller djur.' }
   },
   { id:2,  category: 'violence', age: 18,
     fi: { title:  "Erittäin voimakasta väkivaltaa", description: "Aitoa ja yksityiskohtaisesti tai selväpiirteisesti sekä viihteellisesti tai ihannoiden esitettyä ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-    sv: { title: 'Mycket kraftigt våld', description:'Bildprogrammet innehåller äkta och detaljerat eller tydligt samt presenterat på ett underhållande eller idealiserat sätt våld som riktar sig mot människor eller djur.'}
+    sv: { title: 'Mycket kraftigt våld', description:'Äkta och detaljerat eller tydligt samt på ett underhållande eller idealiserat sätt presenterat våld som riktar sig mot människor eller djur.'}
   },
   { id:3,  category: 'violence', age: 18,
-    fi: { title:  "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, selväpiirteisesti ja pitkäkestoisesti esitettyä seksiin liittyvää väkivaltaa (raiskaus, insesti, pedofilia)" },
-    sv: { title: 'Mycket kraftigt våld', description:'Bildprogrammet innehåller fiktivt, tydligt och utdraget presenterat våld (våldtäkt, incest, pedofili) som hänför sig till sex.'}
+    fi: { title:  "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, selväpiirteisesti ja pitkäkestoisesti esitettyä seksiin liittyvää väkivaltaa (raiskaus, insesti, pedofilia)." },
+    sv: { title: 'Mycket kraftigt våld', description:'Fiktivt, tydligt och utdraget presenterat våld (våldtäkt, incest, pedofili) som hänför sig till sex.'}
   },
   { id:4,  category: 'violence', age: 16,
     fi: { title:  "Voimakasta väkivaltaa", description: "Fiktiivistä tai aitoa yksityiskohtaista ja realistista tai hallitsevaa tai pitkäkestoista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-    sv: { title: 'Kraftigt våld', description:'Bildprogrammet innehåller fiktivt eller äkta detaljerat och realistiskt eller dominerande eller utdraget våld som riktar sig mot människor eller djur' }
+    sv: { title: 'Kraftigt våld', description:'Fiktivt eller äkta detaljerat och realistiskt eller dominerande eller utdraget våld som riktar sig mot människor eller djur.' }
   },
   { id:5,  category: 'violence', age: 16,
-    fi: { title:  "Voimakasta väkivaltaa", description: "Fiktiivistä tai aitoa yksityiskohtaisesti ja korostetusti tai yksityiskohtaisesti ja viihteellistetysti esitettyä ihmisiin tai eläimiin kohdistuvaa väkivallan tai onnettomuuksien seurausten kuvausta." },
-    sv: { title: 'Kraftigt våld', description:'Bildprogrammet innehåller fiktivt eller äkta detaljerad och framhävande eller detaljerad och på ett populariserat sätt presenterad skildring av påföljder av olyckor eller våld som riktar sig mot människor eller djur.' }
+    fi: { title:  "Voimakasta väkivaltaa", description: "Fiktiivistä tai aitoa, yksityiskohtaisesti ja korostetusti tai yksityiskohtaisesti ja viihteellistetysti esitettyä ihmisiin tai eläimiin kohdistuvaa väkivallan tai onnettomuuksien seurausten kuvausta." },
+    sv: { title: 'Kraftigt våld', description:'Fiktiv eller äkta, detaljerad och framhävd eller detaljerad och på ett underhållande sätt presenterad skildring av påföljder av olyckor eller våld som riktar sig mot människor eller djur.' }
   },
   { id:6,  category: 'violence', age: 16,
     fi: { title:  "Voimakasta väkivaltaa", description: "Fiktiivistä, esitystavaltaan selvästi yliampuvaa tai parodista, veristä ja yksityiskohtaista tai pitkäkestoista ja yksityiskohtaista tai pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },
-    sv: { title: 'Kraftigt våld', description:'Bildprogrammet innehåller fiktivt, till sitt framförande tydligt överdrivet eller parodiskt blodigt och detaljerat eller utdraget och detaljerat eller utdraget och sadistiskt våld som riktar sig mot människor eller djur' }
+    sv: { title: 'Kraftigt våld', description:'Fiktivt, till sitt framförande tydligt överdrivet eller parodiskt, blodigt och detaljerat eller utdraget och detaljerat, eller utdraget och sadistiskt våld som riktar sig mot människor eller djur.' }
   },
   { id:7,  category: 'violence', age: 16,
-    fi: { title:  "Voimakasta väkivaltaa", description: "Aitoa yksityiskohtaisesti ta selväpiirteisesti esitettyä väkivaltaa, jossa uhrin kärsimykset tai väkivallan seuraukset tuodaan realistisesti esille." },
-    sv: { title: 'Kraftigt våld', description:'Bildprogrammet innehåller äkta detaljerat eller tydligt presenterat våld, där offrets lidande eller våldets påföljder presenteras realistiskt.' }
+    fi: { title:  "Voimakasta väkivaltaa", description: "Aitoa yksityiskohtaisesti tai selväpiirteisesti esitettyä väkivaltaa, jossa uhrin kärsimykset tai väkivallan seuraukset tuodaan realistisesti esille." },
+    sv: { title: 'Kraftigt våld', description:'Äkta detaljerat eller tydligt presenterat våld där offrets lidande eller våldets påföljder presenteras på ett realistiskt sätt.' }
   },
   { id:8,  category: 'violence', age: 16,
-    fi: { title:  "Voimakasta väkivaltaa", description: "Seksiin liittyvää fiktiivistä väkivaltaa, jossa uhrin kärsimys tulee selvästi esiin ja väkivalta on tarinan kannalta perusteltua tai voimakkaita viittauksia alaikäisiin kohdistuvaan seksuaaliseen väkivaltaan tai hyväksikäyttöön." },
-    sv: { title: 'Kraftigt våld', description:'Bildprogrammet innehåller fiktivt våld som hänför sig till sex, där offrets lidande klart kommer fram och våldet är motiverat med tanke på historien eller starka hänvisningar till sexuellt våld eller utnyttjande som riktar sig mot minderåriga.' }
+    fi: { title:  "Voimakasta väkivaltaa", description: "Seksiin liittyvää fiktiivistä väkivaltaa, jossa uhrin kärsimys tulee selvästi esiin ja väkivalta on tarinan kannalta perusteltua, tai voimakkaita viittauksia alaikäisiin kohdistuvaan seksuaaliseen väkivaltaan tai hyväksikäyttöön." },
+    sv: { title: 'Kraftigt våld', description:'Fiktivt våld som hänför sig till sex, där offrets lidande klart kommer fram och våldet är motiverat med tanke på skildringen, eller starka hänvisningar till sexuellt våld eller utnyttjande som riktar sig mot minderåriga.' }
   },
   { id:9,  category: 'violence', age: 12,
     fi: { title:  "Väkivaltaa", description: "Ei erityisen yksityiskohtaista tai ei hallitsevasti lapsiin, eläimiin tai lapsi-päähenkilön perheenjäseniin kohdistuvaa tai tarinan kannalta perusteltu yksittäinen, yksityiskohtainen ihmisiin tai eläimiin kohdistuva väkivaltakohtaus." },
-    sv: { title: 'Våld', description:'Bildprogrammet innehåller våld som inte är speciellt detaljerat, eller riktar sig inte i huvudsak mot barn, djur eller barn-huvudpersonens familjemedlemmar eller med tanke på intrigen motiverat enskild, detaljerad våldscen som riktar sig mot människor eller djur.' }
+    sv: { title: 'Våld', description:'Inte speciellt detaljerat våld, riktar sig inte i huvudsak mot barn, djur eller barn-huvudpersonens familjemedlemmar, eller med tanke på intrigen en motiverad enskild, detaljerad våldsscen där våldet riktar sig mot människor eller djur.' }
   },
   { id:10, category: 'violence', age: 12,
-    fi: { title:  "Väkivaltaa", description: "Epärealistisessa, etäännytetyssä yhteydessä esitettyä (joko epärealistinen väkivalta ihmis- tai eläinmäisiä hahmoja kohtaan tai realistinen väkivalta selkeän kuvitteellisia hahmoja kohtaan tai historiallinen, kulttuurinen jne. etäännytys!)" },
-    sv: { title: 'Våld', description:'Bildprogrammet innehåller våld presenterad i ett orealistiskt, distanserat samband.' }
+    fi: { title:  "Väkivaltaa", description: "Epärealistisessa, etäännytetyssä yhteydessä esitettyä väkivaltaa." },
+    sv: { title: 'Våld', description:'Våld presenterat i ett orealistiskt, distanserat samband.' }
   },
   { id:11, category: 'violence', age: 12,
     fi: { title:  "Väkivaltaa", description: "Seksuaaliseen väkivaltaan viittaavaa (raiskaus, insesti, pedofilia)." },
-    sv: { title: 'Våld', description:'Bildprogrammet innehåller våld som hänvisar till sexuellt våld (våldtäkt, incest, pedofili).' }
+    sv: { title: 'Våld', description:'Våld som hänvisar till sexuellt våld (våldtäkt, incest, pedofili).' }
   },
   { id:12, category: 'violence', age: 7,
     fi: { title:  "Lievää väkivaltaa", description: "Epärealistista tai komediallista tai animaatio- tai slapstick-komediassa esitettyä yliampuvaa tai vähäistä väkivaltaa." },
-    sv: { title: 'Lindrigt våld', description:'Bildprogrammet innehåller våld som är orealistiskt eller komedimässigt eller presenterat i animations- eller slapstick-komedi överdrivet eller i liten omfattning.' }
+    sv: { title: 'Lindrigt våld', description:'Orealistiskt eller komedimässigt våld, våld presenterat i form av överdriven animations- eller slapstick-komedi, eller våld i liten omfattning.' }
   },
   { id:13, category: 'violence', age: 7,
     fi: { title:  "Lievää väkivaltaa", description: "Yksittäinen, lievähkö ja lyhytkestoinen realistinen väkivaltakohtaus tai selkeät, mutta lievät tai lyhytkestoiset väkivaltaviitteet." },
-    sv: { title: 'Lindrigt våld', description:'Bildprogrammet innehåller enskild, tämligen lindrig och kortvarig realistisk våldsscen eller tydliga, men lindriga eller kortvariga hänvisningar om våld.' }
+    sv: { title: 'Lindrigt våld', description:'En enskild, tämligen lindrig och kortvarig realistisk våldsscen eller tydliga, men lindriga eller kortvariga våldsreferenser.' }
   },
   { id:14, category: 'violence', age: 0,
-    fi: { title:  "Väkivaltaa tai vain hyvin lievää väkivaltaa", description: "Kuvaohjelmassa ei ole lainkaan väkivaltaa tai se on vain hyvin lievää." },
-    sv: { title: 'Mycket lindrigt våld', description:'Bildprogrammet innehåller inte alls något våld eller innehåller bara mycket lindrigt våld.' }
+    fi: { title:  "Hyvin lievää väkivaltaa", description: "Kuvaohjelmassa ei ole lainkaan väkivaltaa tai se on vain hyvin lievää." },
+    sv: { title: 'Mycket lindrigt våld', description:'Bildprogrammet innehåller inte alls något våld eller enbart mycket lindrigt våld.' }
   },
   { id:15, category: 'sex',      age: 18,
-    fi: { title:  "Erittäin yksityiskohtaista seksuaalista sisältöä", description: "Hallitsevaa ja seksikohtauksissa sukuelimiä selväpiirteisesti näyttävää." },
-    sv: { title: 'Mycket explicit sexuellt innehåll', description:'Bildprogrammet innehåller dominerande och i sexscener könsorganen tydligt presenterade.' }
+    fi: { title:  "Erittäin yksityiskohtaista seksuaalista sisältöä", description: "Seksuaalinen sisältö on hallitsevaa ja seksikohtauksissa sukuelimet näkyvät selväpiirteisesti." },
+    sv: { title: 'Mycket explicit sexuellt innehåll', description:'Det sexuella innehållet dominerar, och i sexscener är könsorganen tydligt presenterade.' }
   },
   { id:16, category: 'sex',      age: 16,
-    fi: { title:  "Avointa seksuaalista sisältöä", description: "Avointa, mutta yksityiskohdiltaan peiteltyä kuvausta tai yksityiskohtainen, yksittäinen ja lyhyt seksikohtaus." },
-    sv: { title: 'Öppet sexuellt innehåll', description:'Bildprogrammet innehåller öppen, men till sina detaljer dold skildring eller en detaljerad, enskild och kort sexscen.' }
+    fi: { title:  "Avointa seksuaalista sisältöä", description: "Avointa, mutta yksityiskohdiltaan peiteltyä seksuaalista sisältöä tai yksityiskohtainen, yksittäinen ja lyhyt seksikohtaus." },
+    sv: { title: 'Öppet sexuellt innehåll', description:'Öppet, men till sina detaljer dolt sexuellt innehåll, eller en detaljerad, enskild och kort sexscen' }
   },
   { id:17, category: 'sex',      age: 12,
-    fi: { title:  "Seksuaalista sisältöä", description: "Peiteltyjä seksikohtauksia tai runsaasti selkeitä seksiviitteitä." },
-    sv: { title: 'Sexuellt innehåll', description:'Bildprogrammet innehåller dolda sexscener eller rikligt med tydliga hänvisningar till sex.' }
+    fi: { title:  "Seksuaalista sisältöä", description: "Yksi tai useampia peiteltyjä seksikohtauksia tai runsaasti selkeitä seksiviitteitä." },
+    sv: { title: 'Sexuellt innehåll', description:'En eller flera dolda sexscener, eller rikligt med tydliga hänvisningar till sex.' }
   },
   { id:18, category: 'sex',      age: 12,
-    fi: { title:  "Seksuaalista sisältöä", description: "Yksittäinen avoin, mutta yksityiskohdiltaan peitelty seksikuvaus (seksikohtaus)." },
-    sv: { title: 'Sexuellt innehåll', description:'Bildprogrammet innehåller enskild öppen, men till sina detaljer dold sexskildring (sexscen).' }
+    fi: { title:  "Seksuaalista sisältöä", description: "Yksittäinen avoin, mutta yksityiskohdiltaan peitelty seksikohtaus." },
+    sv: { title: 'Sexuellt innehåll', description:'Enskild och öppen, men till sina detaljer dold sexscen.' }
   },
   { id:19, category: 'sex',      age: 7,
     fi: { title:  "Lievää seksuaalista sisältöä", description: "Lieviä seksuaalisia viittauksia tai yksittäisiä verhotusti esitettyjä eroottissävyisiä kohtauksia." },
     sv: { title: 'Lindrigt sexuellt innehåll', description:'Bildprogrammet innehåller lindriga sexuella hänvisningar eller enskilda dolt framförda erotiska scener.' }
   },
   { id:20, category: 'sex',      age: 0,
-    fi: { title:  "Vain hyvin lievää seksuaalista sisältöä", description: "Halailua, syleilyä tai suudelmia tai alastomuutta muussa kuin seksuaalisessa kontekstissa." },
-    sv: { title: 'Mycket lindrigt sexuellt innehåll', description:'Bildprogrammet innehåller kramande, omfamning eller kyssar eller nakenhet i annat än sexuell kontext.' }
+    fi: { title:  "Hyvin lievää seksuaalista sisältöä", description: "Halailua, syleilyä tai suudelmia tai alastomuutta muussa kuin seksuaalisessa kontekstissa." },
+    sv: { title: 'Mycket lindrigt sexuellt innehåll', description:'Kramande, omfamningar, kyssar eller nakenhet i annan än sexuell kontext.' }
   },
   { id:21, category: 'fear',     age: 18,
-    fi: { title:  "Erittäin voimakasta ahdistusta herättävää sisältöä", description: "Hallitsevaa, erittäin järkyttävää, yksityiskohtaista kuvausta ihmisiin tai eläimiin kohdistuvista julmuuksista tai perversioista." },
-    sv: { title: 'Innehåll som väcker mycket stark ångest', description:'Bildprogrammet innehåller dominerande, mycket uppskakande, detaljerad skildring av brutalitet eller perversioner som riktar sig mot människor eller djur.' }
+    fi: { title:  "Erittäin voimakasta ahdistusta aiheuttavaa sisältöä", description: "Hallitsevaa, erittäin järkyttävää, yksityiskohtaista kuvausta ihmisiin tai eläimiin kohdistuvista julmuuksista tai perversioista." },
+    sv: { title: 'Innehåll som orsakar mycket stark ångest', description:'Dominerande, mycket uppskakande, detaljerad skildring av brutalitet eller perversioner som riktar sig mot människor eller djur.' }
   },
   { id:22, category: 'fear',     age: 18,
-    fi: { title:  "Erittäin voimakasta ahdistusta herättävää sisältöä", description: "Aitoa ongelmattomana tai ihannoiden esitettyä itseä tai muita vahingoittavaa, vakavasti henkeä uhkaavaa ja hengenvaarallista käyttäytymistä." },
-    sv: { title:'Innehåll som väcker mycket stark ångest', description:'beteende som presenteras dokumentariskt på ett oproblematiskt eller idealiserat sätt som skadar personen själv eller andra, allvarligt livshotande och livsfarligt beteende.' }
+    fi: { title:  "Erittäin voimakasta ahdistusta aiheuttavaa sisältöä", description: "Aitoa ongelmattomana tai ihannoiden esitettyä itseä tai muita vahingoittavaa, vakavasti henkeä uhkaavaa ja hengenvaarallista käyttäytymistä." },
+    sv: { title:'Innehåll som orsakar mycket stark ångest', description:'Äkta beteende som presenteras på ett oproblematiskt eller idealiserat sätt, som skadar personen själv eller andra och som är allvarligt livshotande och livsfarligt.' }
   },
   { id:23, category: 'fear',     age: 16,
-    fi: { title:  "Voimakasta ahdistusta herättävää sisältöä", description: "Ihmisiin tai eläimiin kohdistuvaa järkyttävää ja ahdistusta herättävää, pitkäkestoista ja intensiivistä kuoleman, vakavan väkivallan tai psyykkisen hajoamisen uhkaa. Myös itsemurhan ihannointi. Yliluonnolliseen liittyvää voimakasta ahdistavuutta. Yliluonnolliseen liittyvää voimakasta ahdistavuutta." },
-    sv: { title: 'Innehåll som väcker stark ångest', description:'Bildprogrammet innehåller hot som riktar sig mot människor eller djur och som uppskakar och väcker ångest, utdraget och intensivt hot om död, brutalt våld eller psykisk upplösning. Även idealisering av självmord. Stark ångest som hänför sig till det övernaturliga.' }
+    fi: { title:  "Voimakasta ahdistusta aiheuttavaa sisältöä", description: "Ihmisiin tai eläimiin kohdistuvaa järkyttävää ja ahdistusta herättävää, pitkäkestoista ja intensiivistä kuoleman, vakavan väkivallan tai psyykkisen hajoamisen uhkaa. Myös itsemurhan ihannointi. Yliluonnolliseen liittyvää voimakasta ahdistavuutta." },
+    sv: { title: 'Innehåll som orsakar stark ångest', description:'Hot som riktar sig mot människor eller djur och som uppskakar och väcker ångest, utdraget och intensivt hot om död, brutalt våld eller psykisk nedbrytning. Även idealisering av självmord. Stark ångest som hänför sig till det övernaturliga.' }
   },
   { id:24, category: 'fear',     age: 16,
-    fi: { title:  "Voimakasta ahdistusta herättävää sisältöä", description: "Runsaasti realistisia ja yksityiskohtaisia (makaabereja) kuvia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
-    sv: { title: 'Innehåll som väcker stark ångest', description:'Bildprogrammet innehåller rikligt med realistiska och detaljerade (makabra) bilder av stympade, svårt skadade eller ruttna lik eller offer för våld.' }
+    fi: { title:  "Voimakasta ahdistusta aiheuttavaa sisältöä", description: "Runsaasti realistisia ja yksityiskohtaisia (makaabereja) kuvia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
+    sv: { title: 'Innehåll som orsakar stark ångest', description:'Rikligt med realistiska och detaljerade (makabra) bilder av stympade, svårt skadade eller ruttna lik eller offer för våld.' }
   },
   { id:25, category: 'fear',     age: 16,
-    fi: { title:  "Voimakasta ahdistusta herättävää sisältöä", description: "Aitoa, ihannoivasti esitettyä itseä tai muita vahingoittavaa käyttäytymistä." },
-    sv: { title: 'Innehåll som väcker stark ångest', description:'Bildprogrammet innehåller äkta, på ett idealiserat sätt presenterat beteende som skadar personen själv eller andra.' }
+    fi: { title:  "Voimakasta ahdistusta aiheuttavaa sisältöä", description: "Aitoa, ihannoivasti esitettyä itseä tai muita vahingoittavaa käyttäytymistä." },
+    sv: { title: 'Innehåll som orsakar stark ångest', description:'Äkta, på ett idealiserat sätt presenterat beteende som skadar personen själv eller andra.' }
   },
   { id:26, category: 'fear',     age: 12,
-    fi: { title:  "Melko voimakasta ahdistusta herättävää sisältöä", description: "Ihmisiin tai eläimiin kohdistuvaa lyhytkestoista tai ei-hallitsevaa väkivallan tai kuoleman uhkaa tai kaltoin kohtelun tai psyykkisen kärsimyksen kuvausta. Menetysten, esim. perheenjäsenten sairauden tai kuoleman, voimakkaan surun, sekavuustilan tai itsemurhan kuvauksia." },
-    sv: { title: 'Innehåll som väcker tämligen stark ångest', description:'Bildprogrammet innehåller hot om våld eller död som riktar sig mot människor eller djur och som är kortvarigt eller icke-dominerande eller skildring av illabehandling eller psykiskt lidande. Skildringar av förlustelser, t.ex. familjemedlemmars sjukdomar eller död och andra starka beskrivningar av sorg, förvirringstillstånd eller självmord.' }
+    fi: { title:  "Melko voimakasta ahdistusta aiheuttavaa sisältöä", description: "Ihmisiin tai eläimiin kohdistuvaa lyhytkestoista tai ei-hallitsevaa väkivallan tai kuoleman uhkaa tai kaltoin kohtelun tai psyykkisen kärsimyksen kuvausta. Menetysten, esimerkiksi perheenjäsenten sairauden tai kuoleman, voimakkaan surun, sekavuustilan tai itsemurhan kuvauksia." },
+    sv: { title: 'Innehåll som orsakar tämligen stark ångest', description:'Hot om våld eller död som riktar sig mot människor eller djur och som är kortvarigt eller icke-dominerande eller skildring av illabehandling eller psykiskt lidande. Skildringar av förlustelser, t.ex. familjemedlemmars sjukdomar eller död och andra beskrivningar av stark sorg, förvirringstillstånd eller självmord.' }
   },
   { id:27, category: 'fear',     age: 12,
-    fi: { title:  "Melko voimakasta ahdistusta herättävää sisältöä", description: "Ahdistusta herättäviä luonnonmullistusten, onnettomuuksien, katastrofien tai konfliktien ja niihin kytkeytyvän kuoleman uhan tai uhrien kuvauksia." },
-    sv: { title: 'Innehåll som väcker tämligen stark ångest', description:'Bildprogrammet innehåller skildringar av ångestväckande naturkatastrofer, olyckor, katastrofer eller konflikter samt till dessa sammankopplade dödshot och offer.' }
+    fi: { title:  "Melko voimakasta ahdistusta aiheuttavaa sisältöä", description: "Ahdistusta aiheuttavia luonnonmullistusten, onnettomuuksien, katastrofien tai konfliktien ja niihin kytkeytyvän kuolemanuhan tai uhrien kuvauksia." },
+    sv: { title: 'Innehåll som orsakar tämligen stark ångest', description:'Skildringar som orsakar ångest, såsom naturkatastrofer, olyckor, katastrofer eller konflikter samt till dessa sammankopplade dödshot och offer. ' }
   },
   { id:28, category: 'fear',     age: 12,
-    fi: { title:  "Melko voimakasta ahdistusta herättävää sisältöä", description: "Voimakkaita, äkillisiä ja yllättäviä ahdistusta, pelkoa tai kauhua herättäviä ääni- ja kuvatehosteita tai pitkäkestoista piinaavaa uhkaa. Yliluonnolliseen liittyvää melko voimakasta ahdistavuutta." },
-    sv: { title: 'Innehåll som väcker tämligen stark ångest', description:'Bildprogrammet innehåller starka, plötsliga och överraskande ljud- och bildeffekter som väcker ångest, rädsla eller skräck eller utdraget pinande hot. Tämligen stark ångest som hänför sig till det övernaturliga.' }
+    fi: { title:  "Melko voimakasta ahdistusta aiheuttavaa sisältöä", description: "Voimakkaita, äkillisiä ja yllättäviä ahdistusta, pelkoa tai kauhua herättäviä ääni- ja kuvatehosteita tai pitkäkestoista piinaavaa uhkaa. Yliluonnolliseen liittyvää melko voimakasta ahdistavuutta." },
+    sv: { title: 'Innehåll som orsakar tämligen stark ångest', description:'Starka, plötsliga och överraskande ljud- och bildeffekter som väcker ångest, rädsla eller skräck, eller utdraget pinande hot. Tämligen stark ångest som hänför sig till det övernaturliga.' }
   },
   { id:29, category: 'fear',     age: 12,
-    fi: { title:  "Melko voimakasta ahdistusta herättävää sisältöä", description: "Yksittäisiä realistisia ja yksityiskohtaisia kuvauksia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
-    sv: { title: 'Innehåll som väcker tämligen stark ångest', description:'Bildprogrammet innehåller enskilda realistiska och detaljerade skildringar om sönderslitna, svårt skadade eller ruttna lik eller offer för våld.' }
+    fi: { title:  "Melko voimakasta ahdistusta aiheuttavaa sisältöä", description: "Yksittäisiä realistisia ja yksityiskohtaisia kuvauksia silpoutuneista, pahoin vahingoittuneista tai mädäntyneistä ruumiista tai väkivallan uhreista." },
+    sv: { title: 'Innehåll som orsakar tämligen stark ångest', description:'Enskilda realistiska och detaljerade skildringar om sönderslitna, svårt skadade eller ruttna lik eller offer för våld.' }
   },
   { id:30, category: 'fear',     age: 12,
-    fi: { title:  "Melko voimakasta ahdistusta herättävää sisältöä", description: "Aitoa, itseä tai muita vahingoittavaa käyttäytymistä." },
-    sv: { title: 'Innehåll som väcker tämligen stark ångest', description:'Bildprogrammet innehåller äkta beteende som skadar personen själv eller andra' }
+    fi: { title:  "Melko voimakasta ahdistusta aiheuttavaa sisältöä", description: "Aitoa, itseä tai muita vahingoittavaa käyttäytymistä." },
+    sv: { title: 'Innehåll som orsakar tämligen stark ångest', description:'Äkta beteende som skadar personen själv eller andra.' }
   },
   { id:31, category: 'fear',     age: 7,
-    fi: { title:  "Lievää ahdistusta herättävää sisältöä", description: "Melko lieviä ja lyhytkestoisia kauhuelementtejä, pientä pelottavuutta tai jännittävyyttä tai väkivallan uhkaa esimerkiksi animaatiossa tai fantasiassa (hirviöhahmoja, muodonmuutoksia, synkähköä visuaalista kuvastoa, lyhytkestoisia takaa-ajoja tai kohtalaisia äänitehosteita)." },
-    sv: { title: 'Innehåll som väcker mycket lindrigt ångest', description:'Bildprogrammet innehåller tämligen lindriga och kortvariga skräckelement, litet skrämmande eller spännande eller hot om våld till exempel i en animation eller fantasi (monsterfigurer, transformationer, dystert visuellt bildmaterial, kortvariga förföljelser eller måttliga ljudeffekter).' }
+    fi: { title:  "Lievää ahdistusta aiheuttavaa sisältöä", description: "Melko lieviä ja lyhytkestoisia kauhuelementtejä, pientä pelottavuutta tai jännittävyyttä tai väkivallan uhkaa esimerkiksi animaatiossa tai fantasiassa (hirviöhahmoja, muodonmuutoksia, synkähköä visuaalista kuvastoa, lyhytkestoisia takaa-ajoja tai kohtalaisia äänitehosteita)." },
+    sv: { title: 'Innehåll som orsakar tämligen lindrig ångest', description:'Bildprogrammet innehåller tämligen lindriga och kortvariga skräckelement, litet skrämmande eller spännande eller hot om våld till exempel i en animation eller fantasi (monsterfigurer, transformationer, dystert visuellt bildmaterial, kortvariga förföljelser eller måttliga ljudeffekter).' }
   },
   { id:32, category: 'fear',     age: 7,
-    fi: { title:  "Lievää ahdistusta herättävää sisältöä", description: "Lasten universaaleja pelkoja käsitteleviä kuvauksia tai tilanteita (esimerkiksi yksin jääminen, vanhemmista eroon joutuminen, pimeä, eksyminen tai läheisen menettäminen)." },
-    sv: { title: 'Innehåll som väcker mycket lindrigt ångest', description:'Bildprogrammet innehåller skildringar eller situationer som behandlar barns universella rädsla (till exempel att lämnas ensa, separeras från föräldrarna, mörker, att gå vilse eller att förlora en närstående).' }
+    fi: { title:  "Lievää ahdistusta aiheuttavaa sisältöä", description: "Lasten universaaleja pelkoja käsitteleviä kuvauksia tai tilanteita (esimerkiksi yksin jääminen, vanhemmista eroon joutuminen, pimeä, eksyminen tai läheisen menettäminen)." },
+    sv: { title: 'Innehåll som orsakar tämligen lindrig ångest', description:'Skildringar eller situationer som behandlar barns universella rädsla (till exempel att lämnas ensam, separeras från föräldrarna, mörker, att gå vilse eller att förlora en närstående).' }
   },
   { id:33, category: 'fear',     age: 7,
-    fi: { title:  "Lievää ahdistusta herättävää sisältöä", description: "Dokumentaarista ihmisiin/eläimiin kohdistuvaa  lyhytkestoista uhkaa ilman tehosteita." },
-    sv: { title: 'Innehåll som väcker mycket lindrigt ångest', description:'Bildprogrammet innehåller dokumentariskt, kortvarigt hot utan effekter som riktar sig mot människor/djur.' }
+    fi: { title:  "Lievää ahdistusta aiheuttavaa sisältöä", description: "Dokumentaarista ihmisiin tai eläimiin kohdistuva lyhytkestoista uhkaa ilman tehosteita." },
+    sv: { title: 'Innehåll som orsakar tämligen lindrig ångest', description:'Dokumentariskt, kortvarigt hot utan effektmedel som riktar sig mot människor/djur.' }
   },
   { id:34, category: 'fear',     age: 0,
-    fi: { title:  "Vain hyvin lievää ahdistavaa sisältöä", description: "Hyvin lieviä ja lyhytkestoisia pelottavia tai jännittäviä elementtejä, jotka ratkeavat hyvin nopeasti positiiviseen suuntaan." },
-    sv: { title: 'Mycket lindrigt ångestfullt innehåll', description:'Bildprogrammet innehåller mycket lindriga och kortvariga skrämmande eller spännande element som mycket snabbt får en positiv lösning.' }
+    fi: { title:  "Hyvin lievää ahdistusta aiheuttavaa sisältöä", description: "Hyvin lieviä ja lyhytkestoisia pelottavia tai jännittäviä elementtejä, jotka ratkeavat hyvin nopeasti positiiviseen suuntaan." },
+    sv: { title: 'Innehåll som orsakar mycket lindrig ångest', description:'Mycket lindriga och kortvariga skrämmande eller spännande element som mycket snabbt får en positiv lösning.' }
   },
   { id:35, category: 'drugs',    age: 18,
     fi: { title:  "Ihannoivaa erittäin vaarallisten huumeiden käyttöä", description: "Hallitsevaa ja ihannoivassa valossa yksityiskohtaisesti esitettyä erittäin vaarallisten huumeiden käyttöä." },
-    sv: { title: 'Idealiserad användning av (mycket farliga) droger', description:'Bildprogrammet innehåller dominerande och på ett idealiserat sätt i detalj presenterad användning av mycket farliga droger.' }
+    sv: { title: 'Idealiserad användning av mycket farliga droger', description:'Dominerande och på ett idealiserat sätt i detalj presenterad användning av mycket farliga droger.' }
   },
   { id:36, category: 'drugs',    age: 16,
-    fi: { title:  "Huumeiden käyttöä", description: "Huumeiden realistista ja yksityiskohtaista ongelmakäyttöä tai yksittäisiä ongelmattomia tai ihannoivia huumeiden käytön kuvauksia." },
-    sv: { title: 'Användning av droger', description:'Bildprogrammet innehåller realistisk och detaljerad problemanvändning av droger eller skildringar av enskild problemfri eller idealiserad användning av droger.' }
+    fi: { title:  "Huumeiden käyttöä", description: "Huumeiden realistista ja yksityiskohtaista ongelmakäyttöä tai yksittäisiä, ongelmattomia tai ihannoivia huumeiden käytön kuvauksia." },
+    sv: { title: 'Drogbruk', description:'Realistiskt och detaljerat missbruk av droger eller enskilda skildringar av problemfri eller idealiserad drogandvändning.' }
   },
   { id:37, category: 'drugs',    age: 12,
-    fi: { title:  "Huumeiden ei-hallitsevaa käyttöä / alaikäisten alkoholin käyttöä", description: "Tällä tarkoitetaan huumeiden viitteellistä tai vähäistä käyttöä tai alaikäisten korostettua, viihteellistä tai ongelmatonta alkoholin käyttöä." },
-    sv: { title: 'Icke-dominerande användning av droger/minderårigas bruk av alkohol', description:'Bildprogrammet innehåller hänvisande eller obetydlig användning av droger eller minderårigas framhävda användning av alkohol som är presenterat som problemfritt eller och problemfri användning av alkohol eller minderårigas framhävda nöjesbruk av alkohol.' }
+    fi: { title:  "Huumeiden ei-hallitsevaa käyttöä tai alaikäisten alkoholin käyttöä ", description: "Huumeiden viitteellistä tai vähäistä käyttöä tai alaikäisten korostettua ja ihannoivaa tai ongelmatonta alkoholin käyttöä." },
+    sv: { title: 'Icke-dominerande användning av droger eller minderårigas framhävda användning av alkohol som är presenterat som problemfritt', description:'Hänvisande eller obetydlig användning av droger eller minderårigas framhävda användning av alkohol som är presenterat som problemfritt.' }
   }
 ]
 

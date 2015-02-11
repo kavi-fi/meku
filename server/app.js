@@ -15,7 +15,7 @@ var Provider = schema.Provider
 var ProviderMetadata = schema.ProviderMetadata
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
-var proe = require('../shared/proe')
+var kieku = require('./kieku')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD)
@@ -726,9 +726,9 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
   Provider.getForBilling(function(err, data) {
     var year = moment().year()
     var accountRows = getProviderBillingRows(data)
-    var result = proe.createYearlyProviderRegistration(year, accountRows)
-    res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.txt')
-    res.setHeader('Content-Type', 'text/plain')
+    var result = kieku.createYearlyProviderRegistration(year, accountRows)
+    res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.xlsx')
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     ProviderMetadata.setYearlyBillingProeCreated(new Date(), function() {
       res.send(result)
     })
@@ -754,10 +754,10 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
     data.locations = _.filter(data.locations, function(l) { return utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
 
     var accountRows = getProviderBillingRows(data)
-    var result = proe.createProviderRegistration(accountRows)
-    var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.txt'
+    var result = kieku.createProviderRegistration(accountRows)
+    var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.xlsx'
     res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
-    res.setHeader('Content-Type', 'text/plain')
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     ProviderMetadata.setPreviousMidYearBilling(new Date(), dates.begin, dates.end, function() {
       res.send(result)
     })
@@ -1054,9 +1054,9 @@ app.post('/proe', requireRole('kavi'), function(req, res, next) {
       function accountName(tuple) { return tuple.account.name }
 
       var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
-      var result = proe.createClassificationRegistrationProe(dates, data)
-      res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.txt')
-      res.setHeader('Content-Type', 'text/plain')
+      var result = kieku.createClassificationRegistrationProe(dates, data)
+      res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.xlsx')
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       res.send(result)
     })
   })

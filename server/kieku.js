@@ -27,7 +27,7 @@ function providerBillingFooter(accountRows, invoice) {
   return 'Lasku yhteensä ' + price(account.rows) + ' EUR'
 }
 
-exports.createClassificationRegistrationProe = function createClassificationRegistrationProe(dateRange, accountRows) {
+exports.createClassificationRegistration = function createClassificationRegistration(dateRange, accountRows) {
   function billingHeader(invoice) {
     var period = dateRange.begin + ' - ' + dateRange.end
     return 'KOONTILASKUTUS ' + period

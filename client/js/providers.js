@@ -312,7 +312,7 @@ function providerPage() {
   function updateMetadata() {
     $.get('/providers/metadata', function(metadata) {
       $yearlyBilling.find('.most-recent .sent').text(metadata.yearlyBillingReminderSent ? utils.asDateTime(metadata.yearlyBillingReminderSent) : undefined)
-      $yearlyBilling.find('.most-recent .created').text(metadata.yearlyBillingProeCreated ? utils.asDateTime(metadata.yearlyBillingProeCreated) : undefined)
+      $yearlyBilling.find('.most-recent .created').text(metadata.yearlyBillingCreated ? utils.asDateTime(metadata.yearlyBillingCreated) : undefined)
       if (metadata.previousMidYearBilling) {
         $billingContainer.find('.most-recent .created').text(utils.asDateTime(metadata.previousMidYearBilling.created))
         $billingContainer.find('.most-recent .dates').text(utils.asDate(metadata.previousMidYearBilling.begin) + ' - ' + utils.asDate(metadata.previousMidYearBilling.end))

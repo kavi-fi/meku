@@ -729,7 +729,7 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
     var result = kieku.createYearlyProviderRegistration(year, accountRows)
     res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    ProviderMetadata.setYearlyBillingProeCreated(new Date(), function() {
+    ProviderMetadata.setYearlyBillingCreated(new Date(), function() {
       res.send(result)
     })
   })
@@ -1054,7 +1054,7 @@ app.post('/proe', requireRole('kavi'), function(req, res, next) {
       function accountName(tuple) { return tuple.account.name }
 
       var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
-      var result = kieku.createClassificationRegistrationProe(dates, data)
+      var result = kieku.createClassificationRegistration(dates, data)
       res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.xlsx')
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       res.send(result)

@@ -111,12 +111,12 @@
       <div class="content">
         <div class="date-selection"><span>Rekisteröinnit ja luokittelut väliltä </span><span class="datepicker"><span></span><i class="fa fa-calendar"></i></span></div>
         <div class="no-results">Ajanjaksolla ei ole laskutettavaa</div>
-        <form method="POST" action="/proe">
+        <form method="POST" action="/kieku">
           <input type="hidden" name="begin" />
           <input type="hidden" name="end" />
           <input type="hidden" name="_csrf">
           <div class="accounts"></div>
-          <button class="button">Luo Proe-tiedosto</button>
+          <button class="button">Luo Kieku-tiedosto</button>
         </form>
       </div>
     </div>
@@ -172,7 +172,7 @@
         <div class="date-selection"><span>Uudet rekisteröinnit ajalta </span><span class="datepicker"><span></span> <i class="fa fa-calendar"></i></span></div>
         <div class="no-results">Ajanjaksolla ei ole ollut uusia rekisteröintejä</div>
         <div class="billing-container">
-          <form method="post" action="/providers/billing/proe">
+          <form method="post" action="/providers/billing/kieku">
             <input type="hidden" name="begin">
             <input type="hidden" name="end">
             <input type="hidden" name="_csrf">
@@ -183,7 +183,7 @@
               <tbody class="new-providers-list"></tbody>
             </table>
             <div class="billing-buttons">
-              <button class="button" name="create-proe" type="submit">Luo Proe</button>
+              <button class="button" name="create-kieku" type="submit">Luo Kieku-tiedosto</button>
             </div>
             <div class="most-recent">
               Viimeksi luotu: <span class="created">-</span><br/>
@@ -198,9 +198,9 @@
       <h3><i class="rotating fa fa-play"></i>Vuosilaskutus</h3>
       <div class="yearly-billing-content">
         <button class="button yearly-billing-reminder">Vuosilaskutus tilausvahvistuksen lähettäminen</button>
-        <form method="post" action="/providers/yearlyBilling/proe" class="yearly-billing-proe-form">
+        <form method="post" action="/providers/yearlyBilling/kieku" class="yearly-billing-kieku-form">
           <input type="hidden" name="_csrf">
-          <button class="button yearly-billing-proe" type="submit">Luo vuosilaskutus Proe-tiedosto</button>
+          <button class="button yearly-billing-kieku" type="submit">Luo vuosilaskutus Kieku-tiedosto</button>
         </form>
         <div class="most-recent">
           Viimeksi lähetetty: <span class="sent">Ei koskaan</span>

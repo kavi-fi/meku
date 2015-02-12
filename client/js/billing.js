@@ -1,7 +1,7 @@
 function billingPage() {
   var $page = $('#billing-page')
   var $datePicker = $page.find('.datepicker')
-  var $proeButton = $page.find('button')
+  var $kiekuButton = $page.find('button')
   var $accounts = $page.find('.accounts')
   var $noResults = $page.find('.no-results')
   var detailRenderer = programBox()
@@ -36,8 +36,8 @@ function billingPage() {
   })
 
   $page.find('form').submit(function() {
-    $proeButton.prop('disabled', true)
-    setTimeout(function() { $proeButton.prop('disabled', false) }, 4000)
+    $kiekuButton.prop('disabled', true)
+    setTimeout(function() { $kiekuButton.prop('disabled', false) }, 4000)
   })
 
   setupDatePicker($datePicker, datePickerOpts, fetchInvoiceRows)
@@ -74,7 +74,7 @@ function billingPage() {
   }
 
   function toggleLoadButton() {
-    $proeButton.toggle($page.find('.rows input[type=checkbox]:checked').length > 0)
+    $kiekuButton.toggle($page.find('.rows input[type=checkbox]:checked').length > 0)
   }
 
   function updateSum($rows) {

@@ -722,12 +722,12 @@ app.get('/providers/metadata', requireRole('kavi'), function(req, res, next) {
   ProviderMetadata.getAll(respond(res, next))
 })
 
-app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res, next) {
+app.post('/providers/yearlyBilling/kieku', requireRole('kavi'), function(req, res, next) {
   Provider.getForBilling(function(err, data) {
     var year = moment().year()
     var accountRows = getProviderBillingRows(data)
     var result = kieku.createYearlyProviderRegistration(year, accountRows)
-    res.setHeader('Content-Disposition', 'attachment; filename=proe_valvontamaksut_vuosi' + moment().year() + '.xlsx')
+    res.setHeader('Content-Disposition', 'attachment; filename=kieku_valvontamaksut_vuosi' + moment().year() + '.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     ProviderMetadata.setYearlyBillingCreated(new Date(), function() {
       res.send(result)
@@ -735,7 +735,7 @@ app.post('/providers/yearlyBilling/proe', requireRole('kavi'), function(req, res
   })
 })
 
-app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next) {
+app.post('/providers/billing/kieku', requireRole('kavi'), function(req, res, next) {
   var dateFormat = 'DD.MM.YYYY'
   var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat), inclusiveEnd: moment(req.body.end, dateFormat).add(1, 'day') }
   var dateRangeQ = { $gte: dates.begin, $lt: dates.inclusiveEnd }
@@ -755,7 +755,7 @@ app.post('/providers/billing/proe', requireRole('kavi'), function(req, res, next
 
     var accountRows = getProviderBillingRows(data)
     var result = kieku.createProviderRegistration(accountRows)
-    var filename = 'proe_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.xlsx'
+    var filename = 'kieku_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.xlsx'
     res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     ProviderMetadata.setPreviousMidYearBilling(new Date(), dates.begin, dates.end, function() {
@@ -1040,7 +1040,7 @@ app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next
   InvoiceRow.find({registrationDate: {$gte: range.begin, $lt: range.end}}).sort('registrationDate').lean().exec(respond(res, next))
 })
 
-app.post('/proe', requireRole('kavi'), function(req, res, next) {
+app.post('/kieku', requireRole('kavi'), function(req, res, next) {
   var dates = { begin: req.body.begin, end: req.body.end }
   var invoiceIds = req.body.invoiceId
   if (!Array.isArray(invoiceIds)) invoiceIds = [invoiceIds]
@@ -1055,7 +1055,7 @@ app.post('/proe', requireRole('kavi'), function(req, res, next) {
 
       var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
       var result = kieku.createClassificationRegistration(dates, data)
-      res.setHeader('Content-Disposition', 'attachment; filename=proe-'+dates.begin+'-'+dates.end+'.xlsx')
+      res.setHeader('Content-Disposition', 'attachment; filename=kieku-'+dates.begin+'-'+dates.end+'.xlsx')
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       res.send(result)
     })
@@ -1626,7 +1626,7 @@ function getIpAddress(req) {
 }
 
 function isUrlEncodedBody(req) {
-  var paths = ['POST:/proe', 'POST:/providers/billing/proe', 'POST:/providers/yearlyBilling/proe']
+  var paths = ['POST:/kieku', 'POST:/providers/billing/kieku', 'POST:/providers/yearlyBilling/kieku']
   return _.contains(paths, req.method + ':' + req.path)
 }
 

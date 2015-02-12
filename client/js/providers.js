@@ -142,7 +142,7 @@ function providerPage() {
     })
   })
 
-  $yearlyBilling.on('click', 'button.yearly-billing-proe', function() {
+  $yearlyBilling.on('click', 'button.yearly-billing-kieku', function() {
     $yearlyBilling.find('.most-recent .created').text(utils.asDateTime(moment()))
     setTimeout(function() { updateMetadata() }, 10000)
   })
@@ -190,7 +190,7 @@ function providerPage() {
     })
   }
 
-  $billing.on('click', 'button[name="create-proe"]', function() {
+  $billing.on('click', 'button[name="create-kieku"]', function() {
     var begin = $billingContainer.find('input[name=begin]').val()
     var end = $billingContainer.find('input[name=end]').val()
     $billingContainer.find('.most-recent .created').text(utils.asDateTime(new Date()))

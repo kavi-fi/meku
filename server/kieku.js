@@ -15,7 +15,7 @@ exports.createYearlyProviderRegistration = function createYearlyProviderRegistra
 }
 
 function providerBillingHeader(year, invoice) {
-  return 'Valvontamaksu vuosi ' + (year ? year : invoice.registrationDate.getFullYear())
+  return 'Valvontamaksu, vuosi ' + (year ? year : invoice.registrationDate.getFullYear()) + '. ' + invoice.invoiceText
 }
 
 function providerRowDescription(invoice) {
@@ -30,7 +30,7 @@ function providerBillingFooter(accountRows, invoice) {
 exports.createClassificationRegistration = function createClassificationRegistration(dateRange, accountRows) {
   function billingHeader(invoice) {
     var period = dateRange.begin + ' - ' + dateRange.end
-    return 'KOONTILASKUTUS ' + period
+    return 'KOONTILASKUTUS ' + period + '. ' + invoice.invoiceText
   }
   function rowDescription(invoice) {
     return [
@@ -69,8 +69,9 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var account = ac.account
     var rows = ac.rows
     var first = _.first(rows)
+    var invoiceText = account.billing ? (account.billing.invoiceText || '').replace(/\n/g, ' ') : ''
     return _.map(rows, function (row) {
-      return _.extend(row, { first: row === first ? 1 : 0, accountName: account.name, accountContactName: account.contactName, euroPrice: row.price / 100 })
+      return _.extend(row, { first: row === first ? 1 : 0, accountName: account.name, accountContactName: account.contactName, invoiceText: invoiceText, euroPrice: row.price / 100 })
     })
   }))
   var columns = [

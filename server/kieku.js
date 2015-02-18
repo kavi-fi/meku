@@ -76,7 +76,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
   var columns = [
     { name: 'T', value: invoiceValue('first'), repeatable: true, width: 2 },
     { name: 'Tilauslaji', value: constantValue('Z001') },
-    { name: 'Myyntiorg', value: constantValue('??') },
+    { name: 'Myyntiorg', value: constantValue('6008') },
     { name: 'Jakelutie', value: constantValue('02') },
     { name: 'Sektori', value: constantValue('01') },
     { name: 'Myyntitsto', value: constantValue('') },

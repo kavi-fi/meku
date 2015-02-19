@@ -70,8 +70,18 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var rows = ac.rows
     var first = _.first(rows)
     var invoiceText = account.billing ? (account.billing.invoiceText || '').replace(/\n/g, ' ') : ''
+    var accountAddress = customerNumber ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
     return _.map(rows, function (row) {
-      return _.extend(row, { first: row === first ? 1 : 0, accountName: account.name, accountContactName: account.contactName, invoiceText: invoiceText, euroPrice: row.price / 100 })
+      return _.extend(row, {
+        first: row === first ? 1 : 0,
+        accountName: account.name,
+        accountContactName: account.contactName,
+        accountStreetAddress: accountAddress.street,
+        accountZipCode: accountAddress.zip,
+        accountCity: accountAddress.city,
+        invoiceText: invoiceText,
+        euroPrice: row.price / 100
+      })
     })
   }))
   var columns = [
@@ -84,9 +94,9 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Viitelasku', value: constantValue('') },
     { name: 'Asiakasnro', value: constantValue('??') },
     { name: 'Nimi', value: invoiceValue('accountName'), width: 30 },
-    { name: 'Lähiosoite', value: constantValue('') },
-    { name: 'PostiNo', value: constantValue('') },
-    { name: 'Toimipaikka', value: constantValue('') },
+    { name: 'Lähiosoite', value: invoiceValue('accountStreetAddress') },
+    { name: 'PostiNo', value: invoiceValue('accountZipCode') },
+    { name: 'Toimipaikka', value: invoiceValue('accountCity') },
     { name: 'Laskutusasiakasnro', value: constantValue('') },
     { name: 'Laskutusasiakas nimi', value: constantValue('') },
     { name: 'Maksaja-asiakasnro', value: constantValue('') },

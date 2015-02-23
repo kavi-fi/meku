@@ -79,6 +79,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
         accountStreetAddress: accountAddress.street,
         accountZipCode: accountAddress.zip,
         accountCity: accountAddress.city,
+        invoiceItemCode: enums.invoiceItemCode(row.providingType ? row.providingType : row.type, row.duration),
         invoiceText: invoiceText,
         euroPrice: row.price / 100
       })
@@ -108,7 +109,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Tilausnumero', value: constantValue('') },
     { name: 'Otsikkoteksti: Otsikkomuistio 1 (tekstilaji 0002) tulostuu ennen rivejä. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingDescription, width: 20 },
     { name: 'Otsikkoteksti: Maksuperusteteksti (tekstilaji Z000) tulostuu laskun loppuun. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingFooter, width: 20 },
-    { name: 'Nimike', value: constantValue('??'), repeatable: true },
+    { name: 'Nimike', value: invoiceValue('invoiceItemCode'), repeatable: true },
     { name: 'Määrä', value: constantValue(1), repeatable: true },
     { name: 'Määräyksikkö', value: constantValue('kpl'), repeatable: true },
     { name: 'Yksikköhinta', value: invoiceValue('euroPrice'), repeatable: true },

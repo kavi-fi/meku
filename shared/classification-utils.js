@@ -316,27 +316,14 @@ exports.gameClassificationPrice = function(duration) {
 }
 
 exports.classificationPrice = function(duration) {
-  // min, max, price €
-  var priceList = [
-    [0, 30, 55],
-    [30, 60, 109],
-    [60, 90, 164],
-    [90, 120, 217],
-    [120, 150, 272],
-    [150, 180, 326],
-    [180, 210, 381],
-    [210, 240, 435]
-  ]
-
-  if (duration == 0) return priceList[0][2] * 100
-
+  if (duration == 0) return enums.durationsWithCodeAndPrice[0].price
   if (duration > (240 * 60)) return Math.round(1.82 * (duration / 60))
 
-  var price = _.find(priceList, function(price) {
-    var min = (price[0] * 60), max = (price[1] * 60)
+  var dur = _.find(enums.durationsWithCodeAndPrice, function (d) {
+    var min = (d.min * 60), max = (d.max * 60)
     return duration > min && duration <= max
   })
-  return price[2] * 100
+  return dur.price
 }
 
 })(typeof exports === 'undefined'? this['classificationUtils']={}: exports)

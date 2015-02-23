@@ -73,6 +73,43 @@ enums.providingTypeName = function(type) {
   return enums.providingType[type] || 'Tuntematon'
 }
 
+enums.invoiceItemCodes = {
+  'registration': '1852',
+  'Recordings_provide': '1871',
+  'Public_presentation': '1872',
+  'National_TV': '1873',
+  'Regional_TV': '1874',
+  'Transmitted_abroad_program': '1875',
+  'Subscription_of_program': '1876'
+}
+
+enums.durationsWithCodeAndPrice = [
+  { min:0, max: 30, itemCode: '1855', price: 5500 },
+  { min: 30, max: 60, itemCode: '1856', price: 10900 },
+  { min: 60, max: 90, itemCode: '1857', price: 16400 },
+  { min: 90, max: 120, itemCode: '1857', price: 21700 },
+  { min: 120, max: 150, itemCode: '1859', price: 27200 },
+  { min: 150, max: 180, itemCode: '1860', price: 32600 },
+  { min: 180, max: 210, itemCode: '1861', price: 38100 },
+  { min: 210, max: 240, itemCode: '1862', price: 43500 }
+]
+
+enums.invoiceItemCode = function (type, duration) {
+  function classificationItemCode() {
+    if (duration <= 0) return enums.durationsWithCodeAndPrice[0].itemCode
+    if (duration > 240 * 60) return _.last(enums.durationsWithCodeAndPrice).itemCode
+    var dur = _.find(enums.durationsWithCodeAndPrice, function (d) {
+      var min = (d.min * 60), max = (d.max * 60)
+      return duration > min && duration <= max
+    })
+    return dur.itemCode
+  }
+
+  if (type === 'classification' || type === 'reclassification') return classificationItemCode()
+  return enums.invoiceItemCodes[type]
+}
+
+
 enums.providingTypePrices = {
   'Recordings_provide': 100,
   'Public_presentation': 200,

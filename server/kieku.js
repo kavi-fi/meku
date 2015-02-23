@@ -69,12 +69,14 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var account = ac.account
     var rows = ac.rows
     var first = _.first(rows)
+    var customerNumber = account.billingPreference == 'address' ? account.billing.customerNumber : account.customerNumber
     var billingLanguage = account.billingPreference == 'address' ? account.billing.language : account.language
     var invoiceText = account.billing ? (account.billing.invoiceText || '').replace(/\n/g, ' ') : ''
     var accountAddress = customerNumber ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
     return _.map(rows, function (row) {
       return _.extend(row, {
         first: row === first ? 1 : 0,
+        customerNumber: customerNumber,
         accountName: account.name,
         accountContactName: account.contactName,
         accountStreetAddress: accountAddress.street,
@@ -96,7 +98,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Sektori', value: constantValue('01') },
     { name: 'Myyntitsto', value: constantValue('') },
     { name: 'Viitelasku', value: constantValue('') },
-    { name: 'Asiakasnro', value: constantValue('??') },
+    { name: 'Asiakasnro', value: invoiceValue('customerNumber') },
     { name: 'Nimi', value: invoiceValue('accountName'), width: 30 },
     { name: 'Nimi2', value: constantValue('') },
     { name: 'Lähiosoite', value: invoiceValue('accountStreetAddress') },

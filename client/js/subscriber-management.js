@@ -93,6 +93,7 @@ function subscriberManagementPage() {
         roles: findInput('roles').filter(':checked').map(function() {
           return $(this).val()
         }).toArray(),
+        customerNumber: findInput('customerNumber').val(),
         name: findInput('name').val(),
         emailAddresses: _.pluck(findInput('emailAddresses').select2('data'), 'text'),
         yTunnus: findInput('yTunnus').val(),
@@ -103,6 +104,7 @@ function subscriberManagementPage() {
           country: findInput('address.country').val()
         },
         billing: {
+          customerNumber: findInput('billing.customerNumber').val(),
           invoiceText: $form.find('textarea[name="billing.invoiceText"]').val(),
           language: findInput('billing.language').val(),
           address: {

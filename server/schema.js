@@ -1,4 +1,3 @@
-var _ = require('lodash')
 var async = require('async')
 var utils = require('../shared/utils')
 var classificationUtils = require('../shared/classification-utils')
@@ -193,11 +192,12 @@ var address = { street: String, city: String, zip: String, country: String }
 var AccountSchema = new Schema({
   emekuId: String,
   sequenceId: { type: Number, index: { unique: true } },
+  customerNumber: String,
   name: {type: String, index: true},
   roles: [String],
   yTunnus: String,
   address: address,
-  billing: { address: address, language: String, invoiceText: String }, // lang in [FI,SV,EN]
+  billing: { address: address, language: String, invoiceText: String, customerNumber: String }, // lang in [FI,SV,EN]
   eInvoice: { address:String, operator:String },
   billingPreference: String, // '' || 'address' || 'eInvoice'
   emailAddresses: [String],
@@ -213,6 +213,7 @@ AccountSchema.pre('save', ensureSequenceId('Account'))
 
 var ProviderLocationSchema = new Schema({
   emekuId: String,
+  customerNumber: String,
   name: String,
   sequenceId: Number,
   address: { street: String, city: String, zip: String, country: String },
@@ -237,9 +238,10 @@ var ProviderSchema = new Schema({
   sequenceId: Number,
   registrationDate: Date,
   yTunnus: String,
+  customerNumber: String,
   name: String,
   address: { street: String, city: String, zip: String, country: String },
-  billing: { address: { street: String, city: String, zip: String }, invoiceText: String },
+  billing: { address: { street: String, city: String, zip: String }, invoiceText: String, customerNumber: String },
   eInvoice: { address:String, operator:String },
   billingPreference: String, // '' || 'address' || 'eInvoice'
   contactName: String,

@@ -10,10 +10,8 @@ function publicSearchPage() {
   $page.find('.controls h2.main').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    var body = encodeURIComponent(i18nText('Ohjelma:')+' '+program.name[0]+ ' [id:'+program.sequenceId+']')
-    var subject = encodeURIComponent(i18nText('Kuvaohjelman uudelleenluokittelupyyntö'))
-    var q = '?subject='+subject+'&body='+body
-    $(this).find('.request-reclassification').attr('href', 'mailto:luokittelupalaute@kavi.fi'+q).show()
+    var body = encodeURIComponent(program.sequenceId + ' ' + program.name[0])
+    $(this).find('.request-reclassification').attr('href', 'https://fi.surveymonkey.com/s/ikarajat2015?c=' + body).attr('target', '_blank').show()
   })
 }
 

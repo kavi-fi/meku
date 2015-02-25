@@ -211,10 +211,6 @@ var i18n = {
     'Kommentit...': 'Kommentarer...',
     'Rekisteröity': 'Registrerad',
 
-    // Request-reclassification -email
-    'Ohjelma:': 'Programmet:',
-    'Kuvaohjelman uudelleenluokittelupyyntö': 'Begäran om omklassificering av bildprogram',
-
     // Software upgrade -dialog
     'Järjestelmä on päivitetty.': 'Systemet har uppdaterats',
 

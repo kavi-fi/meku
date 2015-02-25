@@ -8,7 +8,11 @@ var i18n = {
     'error-reload': 'Ladda sidan på nytt <a href="#">här</a>,<br/>eller gå tillbaka till förstasidan <a href="/">här</a>.',
     'conflict-reload': 'Gå tillbaka till förstasidan <a href="/">här</a>.',
     'draft-notice': 'Klassificeringen inte klar hos användaren <b></b>. Utkastet sparat <span></span>.',
-    'register-provider-info': 'Anmäl dig som leverantör av bildprogram genom att i Excel-tabellen fylla i informationen om leverantör samt ställen för tillhandahållning, och skicka den med blanketten nedan. Ladda ner anmälningsblanketten <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">här</a>.',
+    'register-provider-info': 'Om en leverantör har över fem levereringsställen, görs anmälning på följande sätt:',
+    'register-provider-info-1': 'Ladda ner Excel-fil <a class="xls" href="KAVI-tarjoajaksi-ilmoittautuminen.xls">här</a>.',
+    'register-provider-info-2': 'Fyll i tillhandahållarens uppgifter samt uppgifter för alla levereringsställen och spara filen. Uppgifter på svenska fylls i på fliken Leverantöranmälan.',
+    'register-provider-info-3': 'Ladda upp filen till Välj tabellfil -fältet med Selaa... -knappen. Med den gröna Sänd fil -knappen sänds filen till KAVI.',
+    'register-provider-info-4': 'Om du får ett felmeddelande, fixa fel och sänd filen igen. Du får ett meddelande när sändningen lyckades.',
 
   // Criteria:
 
@@ -138,7 +142,8 @@ var i18n = {
 
   // register-provider:
 
-    'Tarjoajaksi ilmoittautuminen': 'Anmäl som leverantör',
+    'Tarjoajaksi ilmoittautuminen - jos tarjoamispaikkoja on yli viisi': 'Anmäl dig som leverantör - om du har över fem levereringsställen',
+    'Toimi näin:': ' ',
     'Viesti Kaville': 'Meddelande till KAVI',
     'Tähän kenttään voit tarvittaessa kirjoittaa kommentit tai pyynnöt Kaville. Esim. Milloin kuvaohjelmien tarjonta aloitetaan?': 'Här kan du vid behov skriva kommentarer eller frågor till KAVI. T.ex. När inleds tillhandahållandet av bildprogram?',
     'Valitse taulukko-tiedosto': 'Välj tabellfil',

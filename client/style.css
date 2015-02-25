@@ -94,6 +94,7 @@ a.button { text-decoration: none; }
 .button[disabled], .button.disabled { color: gray; cursor: not-allowed; }
 
 ol { list-style-type: none; margin: 0; }
+.fields ol { list-style-type: decimal; margin: 10px;}
 
 textarea { resize: vertical; }
 

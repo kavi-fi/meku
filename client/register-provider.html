@@ -25,9 +25,8 @@
       var $error = $feedback.find('.error')
       var $success = $feedback.find('.success')
 
-      if (APP_ENVIRONMENT === 'training') {
-        $('.training-ribbon').show()
-      }
+      if (APP_ENVIRONMENT === 'training') $('.training-ribbon').show()
+      else if (APP_ENVIRONMENT === 'development') $('.development-ribbon').show()
 
       $button.on('click', function(e) {
         e.preventDefault()
@@ -73,6 +72,7 @@
 </head>
 <body id="register-provider-page">
   <div class="training-ribbon"><span data-i18n>Koulutusympäristö</span></div>
+  <div class="development-ribbon"><span data-i18n>Kehitysympäristö</span></div>
   <div id="header">
     <div class="toggleLanguage"></div>
     <div class="content">

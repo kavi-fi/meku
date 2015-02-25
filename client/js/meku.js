@@ -35,6 +35,7 @@ function setup() {
   })
 
   if (APP_ENVIRONMENT === 'training') $('.training-ribbon').show()
+  else if (APP_ENVIRONMENT === 'development') $('.development-ribbon').show()
 
   $(document).ajaxError(function(e, req) {
     if (req.status == 403) {

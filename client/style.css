@@ -44,8 +44,9 @@ p.help { font-size: 15px; margin: 3px 0; }
 #error-dialog a, #conflict-dialog a, #dialog a { color: #00BB88; }
 .revision-mismatch-dialog { text-align: center; }
 
-.training-ribbon { display: none; position: fixed; left: -50px; top: 40px; -webkit-transform: rotate(-45deg); transform: rotate(-45deg); background-color: #a00; z-index: 10; }
-.training-ribbon span {
+.training-ribbon, .development-ribbon { display: none; position: fixed; left: -50px; top: 40px; -webkit-transform: rotate(-45deg); transform: rotate(-45deg); background-color: #a00; z-index: 10; }
+.development-ribbon { background-color: #aa0; }
+.training-ribbon span, .development-ribbon span {
   border: 1px solid #faa;
   color: #fff;
   display: block;

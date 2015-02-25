@@ -36,6 +36,7 @@ var i18n = {
 
     'Kuvaohjelmien luokittelu- ja valvontajärjestelmä': 'System för klassificering och övervakning av bildprogram',
     'Koulutusympäristö': 'Utbildningsmiljö',
+    'Kehitysympäristö': 'Utvecklingsmiljö',
     'Verkko- tai järjestelmävirhe.': 'Nät- eller systemfel',
     'Lataa sivu uudelleen tästä,tai palaa etusivulle tästä tästä.': 'Ladda sidan på nytt här, eller gå tillbaka till förstasidan här',
     'Jos vikatilanne jatkuu, ota yhteys ylläpitoon.': 'Om felsituationen fortsätter, kontaka underhållet ',

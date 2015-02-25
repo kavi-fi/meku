@@ -23,6 +23,7 @@
   <script>
     $(function() {
       if (APP_ENVIRONMENT == 'training') $('.training-ribbon').show()
+      else if (APP_ENVIRONMENT == 'development') $('.development-ribbon').show()
       registerRevisionMismatchAjaxErrorHandler()
       registerLanguageChangers()
       loadTemplates(function() {
@@ -37,7 +38,8 @@
   <title data-i18n>Kuvaohjelmien ikärajahaku</title>
 </head>
 <body>
-  <div class="training-ribbon"><span>Koulutusympäristö</span></div>
+  <div class="training-ribbon"><span data-i18n>Koulutusympäristö</span></div>
+  <div class="development-ribbon"><span data-i18n>Kehitysympäristö</span></div>
   <div id="header">
     <div class="content">
       <div>

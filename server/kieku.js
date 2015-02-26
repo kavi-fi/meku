@@ -69,6 +69,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var account = ac.account
     var rows = ac.rows
     var first = _.first(rows)
+    var billingLanguage = account.billingPreference == 'address' ? account.billing.language : account.language
     var invoiceText = account.billing ? (account.billing.invoiceText || '').replace(/\n/g, ' ') : ''
     var accountAddress = customerNumber ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
     return _.map(rows, function (row) {
@@ -79,9 +80,11 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
         accountStreetAddress: accountAddress.street,
         accountZipCode: accountAddress.zip,
         accountCity: accountAddress.city,
+        accountCountry: accountAddress.country,
         invoiceItemCode: enums.invoiceItemCode(row.providingType ? row.providingType : row.type, row.duration),
         invoiceText: invoiceText,
-        euroPrice: row.price / 100
+        euroPrice: row.price / 100,
+        billingLanguage: billingLanguage
       })
     })
   }))
@@ -95,18 +98,24 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Viitelasku', value: constantValue('') },
     { name: 'Asiakasnro', value: constantValue('??') },
     { name: 'Nimi', value: invoiceValue('accountName'), width: 30 },
+    { name: 'Nimi2', value: constantValue('') },
     { name: 'Lähiosoite', value: invoiceValue('accountStreetAddress') },
     { name: 'PostiNo', value: invoiceValue('accountZipCode') },
     { name: 'Toimipaikka', value: invoiceValue('accountCity') },
+    { name: 'Maakoodi', value: invoiceValue('accountCountry') },
+    { name: 'Kielikoodi', value: invoiceValue('billingLanguage') },
     { name: 'Laskutusasiakasnro', value: constantValue('') },
     { name: 'Laskutusasiakas nimi', value: constantValue('') },
     { name: 'Maksaja-asiakasnro', value: constantValue('') },
     { name: 'Maksaja-asiakas nimi', value: constantValue('') },
     { name: 'Toimitusasiakasnro', value: constantValue('') },
+    { name: 'Toimitusasiakas nimi', value: constantValue('') },
     { name: 'Palvelun luontipvm', value: constantValue('') },
+    { name: 'Hinnoittelupvm', value: constantValue('') },
     { name: 'Laskuttaja', value: constantValue('??') },
     { name: 'Asiaviite', value: invoiceValue('accountContactName'), width: 15 },
     { name: 'Tilausnumero', value: constantValue('') },
+    { name: 'Poikk. veron määrämaa', value: constantValue('') },
     { name: 'Otsikkoteksti: Otsikkomuistio 1 (tekstilaji 0002) tulostuu ennen rivejä. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingDescription, width: 20 },
     { name: 'Otsikkoteksti: Maksuperusteteksti (tekstilaji Z000) tulostuu laskun loppuun. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingFooter, width: 20 },
     { name: 'Nimike', value: invoiceValue('invoiceItemCode'), repeatable: true },
@@ -114,6 +123,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Määräyksikkö', value: constantValue('kpl'), repeatable: true },
     { name: 'Yksikköhinta', value: invoiceValue('euroPrice'), repeatable: true },
     { name: 'Brutto/Netto', value: constantValue('N'), repeatable: true },
+    { name: 'Rivityyppi', value: constantValue('') },
     { name: 'Tulosyksikkö', value: constantValue('') },
     { name: 'Nimikkeen nimitysteksti (laskutusaihe)', value: constantValue(''), width: 20 },
     { name: 'Riviteksti: Rivimuistio (tekstilaji 0002), tulostuu laskulle rivin jälkeen', value: rowDescription, width:30, repeatable: true },

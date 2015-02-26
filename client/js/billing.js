@@ -40,7 +40,7 @@ function billingPage() {
     setTimeout(function() { $kiekuButton.prop('disabled', false) }, 4000)
   })
 
-  setupDatePicker($datePicker, datePickerOpts, fetchInvoiceRows)
+  setupDatePicker($datePicker, datePickerOpts, fetchInvoiceRows, true)
 
   function fetchInvoiceRows(range) {
     setLocation('#laskutus/'+range.begin+'/'+range.end)

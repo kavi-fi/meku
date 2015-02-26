@@ -64,7 +64,7 @@ function setup() {
   navigation.start()
 }
 
-function setupDatePicker($datePicker, opts, onChange) {
+function setupDatePicker($datePicker, opts, onChange, forceUpdate) {
   var defaults = {
     language: langCookie(),
     format: 'DD.MM.YYYY',
@@ -75,7 +75,7 @@ function setupDatePicker($datePicker, opts, onChange) {
   }
   $datePicker.dateRangePicker(_.merge({}, defaults, opts)).bind('datepicker-change', function(event, obj) {
     var selection = stringDateRange({ begin: moment(obj.date1), end: moment(obj.date2) })
-    if (!_.isEqual(selection, $datePicker.data('selection'))) {
+    if (!_.isEqual(selection, $datePicker.data('selection')) || forceUpdate) {
       $datePicker.data('selection', selection)
       onChange(selection)
     }

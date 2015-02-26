@@ -387,6 +387,10 @@ InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, 
   return row
 }
 
+InvoiceSchema.statics.removeProgram = function (program, callback) {
+  this.remove({program: program._id}, callback)
+}
+
 var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', InvoiceSchema)
 
 var XmlDoc = exports.XmlDoc = mongoose.model('xmldocs', new Schema({

@@ -19,7 +19,7 @@ function reportsPage() {
     setDatePickerSelection($datePicker, range, update)
   })
 
-  setupDatePicker($datePicker, datePickerOpts, update)
+  setupDatePicker($datePicker, datePickerOpts, update, true)
 
   $reportSelection.find('div').click(function() {
     setSelectedReport($(this))

@@ -562,7 +562,10 @@ app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
     if (err) return next(err)
     softDeleteAndLog(program, req.user, function(err, program) {
       if (err) return next(err)
-      updateTvSeriesClassification(program, respond(res, next, program))
+      InvoiceRow.removeProgram(program, function (err) {
+        if (err) return next(err)
+        updateTvSeriesClassification(program, respond(res, next, program))
+      })
     })
   })
 })
@@ -579,7 +582,11 @@ app.delete('/programs/:programId/classification/:classificationId', requireRole(
       if (err) return next(err)
       watcher.saveAndLogChanges(function(err) {
         if (err) return next(err)
-        updateTvSeriesClassification(program, respond(res, next, program))
+        if (program.classifications.length === 0) InvoiceRow.removeProgram(program, function (err) {
+          if (err) return next(err)
+          updateTvSeriesClassification(program, respond(res, next, program))
+        })
+        else updateTvSeriesClassification(program, respond(res, next, program))
       })
     })
   })

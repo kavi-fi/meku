@@ -206,7 +206,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('input[name="classification.reason"]').on('change', function(e) {
       if (rootEditMode) return
       var $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
-      $buyerAndBilling.removeClass('touched').select2('enable', enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
+      $buyerAndBilling.removeClass('touched').select2('enable', hasRole('root') || enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
     })
     $form.on('click', '.category .criteria', function() {
       $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
@@ -342,7 +342,7 @@ function classificationFormUtils() {
     if (!showDuration) $form.find('.duration-field').remove()
     if (showDuration && enums.util.isGameType(program)) $form.find('.duration-field label').i18nText('Luokittelun kesto')
 
-    if (isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
+    if (!hasRole('root') && isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     }
     if (!isInternalReclassification) {
@@ -359,7 +359,9 @@ function classificationFormUtils() {
   }
 
   function configureRootEditMode($form, p, c) {
-    $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
+    if (!hasRole('root')) {
+      $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
+    }
     if (_.isEmpty(p.classifications)) {
       $form.find('.classification-details, .classification-summary, .classification-criteria, .classification-email').remove()
       if (!enums.util.isTvSeriesName(p)) {

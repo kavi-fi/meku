@@ -56,19 +56,86 @@ describe('create-classification-test', function() {
         .assertAgelimitAndWarnings('#dialog .registration-confirmation .warning-summary', '7 violence sex')
         .click('#dialog button')
 
-        .waitForVisible('#search-page .results .result')
-        .assertSearchResult('.result', expectedRow, expectedProgramBox)
-        .assertLatestEmail(expectedEmail)
+        .waitForVisible('#search-page .results .result', 5000)
+        .click('#search-page .results .result').waitForAnimations()
+        .assertSearchResult('.result', expectedClassificationRow, expectedProgramBox)
+        .assertLatestEmail(expectedClassificationEmail)
         .end(done)
     })
 
-    var expectedRow = {
+    it('registers a reclassification as KAVI', function(done) {
+      webdriver.client()
+        .login('kavi','kavi','kavi')
+        .waitForVisible('#search-page .results .result')
+        .ajaxClick('#search-page .program-box .reclassify')
+        .assertText('#classification-page .program-info h2', 'Kuvaohjelman tiedot - Elokuva')
+        .assertText('#classification-page .classification-details h2', 'Uudelleenluokittelu')
+        .assertValue('#classification-page input[name=name]', 'Ghostbusters XVI')
+        .assertValue('#classification-page input[name=nameFi]', 'Haamujengi 16')
+        .assertValue('#classification-page input[name=nameSv]', 'Spökgänget 16')
+        .assertValue('#classification-page input[name=nameOther]', 'webdriver-test')
+        .assertSelect2Value('#classification-page .select2-container.country', ['Suomi'])
+        .assertValue('#classification-page input[name=year]', '2014')
+        .assertSelect2Value('#classification-page .select2-container.x-productionCompanies', ['Warner Sisters Oy.'])
+        .assertSelect2Value('#classification-page .select2-container.x-genre', ['Komedia ja farssi'])
+        .assertSelect2Value('#classification-page .select2-container.x-directors', ['Ivan Reitman'])
+        .assertSelect2Value('#classification-page .select2-container.x-actors', ['Bill Murray', 'Harold Ramis', 'Dan Aykroyd', 'Sigourney Weaver'])
+        .assertValue('#classification-page textarea[name=synopsis]', 'The plot is unknown at this time.')
+
+        .assertDisabled('#classification-page input[name="classification.buyer"]')
+        .assertDisabled('#classification-page input[name="classification.billing"]')
+        .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org'])
+
+        .select2one('#classification-page .select2-container.x-classificationReason', 'pal', 'Palaute')
+        .select2one('#classification-page .select2-container.x-classificationAuthorOrganization', 'kuva', 'Kuvaohjelmalautakunta')
+        .select2one('#classification-page .select2-container.format', 'DVD', true)
+        .setValue('#classification-page input.duration', '02:22:22')
+
+        .setValue('#classification-page textarea[name="classification.publicComments"]', 'PUBLIC COMMENTS')
+        .setValue('#classification-page textarea[name="classification.comments"]', 'POW2! by Webdriverio+Selenium/WebDriver')
+        .click('#classification-page input[name="classification.safe"]').waitForAnimations()
+        .assertHidden('#classification-page .classification-criteria .criteria')
+
+        .waitForEnabled('#classification-page button[name=register]', 1000)
+        .ajaxClick('#classification-page button[name=register]')
+
+        .assertVisible('#dialog .registration-confirmation')
+        .assertAgelimitAndWarnings('#dialog .registration-confirmation .warning-summary', 'S')
+        .click('#dialog button')
+
+        .waitForVisible('#search-page .results .result')
+        .assertSearchResultRow('#search-page .results .result', expectedReclassificationRow)
+        .assertAgelimitAndWarnings('#search-page .program-box .warning-summary', 'S')
+        .assertText('#search-page .program-box .reason', 'Palaute')
+        .assertText('#search-page .program-box .current-duration', '02:22:22')
+        .assertText('#search-page .program-box .author', 'kavi (KAVI)')
+        .assertText('#search-page .program-box .publicComments', 'PUBLIC COMMENTS')
+        .assertText('#search-page .program-box .comments', 'POW2! by Webdriverio+Selenium/WebDriver')
+        .click('#search-page .program-box .classifications .classification:nth-child(2)')
+        .assertAgelimitAndWarnings('#search-page .program-box .warning-summary', '7 violence sex')
+        .assertText('#search-page .program-box .duration', '01:23:45')
+        .assertText('#search-page .program-box .format', 'DVD')
+        .assertText('#search-page .program-box .author', 'kavi (KAVI)')
+        .assertLatestEmail(expectedReclassificationEmail)
+        .end(done)
+    })
+
+    var expectedClassificationRow = {
       name: 'Ghostbusters XVI',
       duration: '1 t 23 min 45 s',
       ageAndWarnings: '7 violence sex',
       countryYearDate: '('+date+', Suomi, 2014)',
       type: 'Elokuva'
     }
+
+    var expectedReclassificationRow = {
+      name: 'Ghostbusters XVI',
+      duration: '2 t 22 min 22 s',
+      ageAndWarnings: 'S',
+      countryYearDate: '('+date+', Suomi, 2014)',
+      type: 'Elokuva'
+    }
+
     var expectedProgramBox = {
       name: 'Ghostbusters XVI',
       nameFi: 'Haamujengi 16',
@@ -89,7 +156,7 @@ describe('create-classification-test', function() {
       ageAndWarnings: '7 violence sex',
       criteria: ['Väkivalta (12)','Komediaväkivaltaa...','Seksi (19)']
     }
-    var expectedEmail = {
+    var expectedClassificationEmail = {
       to: ['kavi@fake-meku.fi', 'demo.1@email.org'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta (12), seksi (19)',
       body: [
@@ -98,7 +165,7 @@ describe('create-classification-test', function() {
         'Ilmoitus kuvaohjelman luokittelusta',
           'Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on '+date+'  luokitellut kuvaohjelman ',
         'Ghostbusters XVI',
-        '. Kuvaohjelman ikäraja on 7 ja haitallisuuskriteerit väkivalta (12), seksi (19).',
+        '. Kuvaohjelman ikäraja on 7 ja haitallisuuskriteerit väkivalta (12), seksi (19). ',
         'Lisätietoja: ',
         'kavi@fake-meku.fi',
         'Liitteet:',
@@ -106,113 +173,42 @@ describe('create-classification-test', function() {
         'Meddelande om klassificering av bildprogram',
         'Nationella audiovisuella institutets (KAVI) enhet för mediefostran och bildprogram har '+date+' klassificerat bildprogrammet ',
         'Ghostbusters XVI',
-        '. Bildprogrammet har åldersgränsen 7 och det skadliga innehållet våld (12), sexuellt innehåll (19).',
+        '. Bildprogrammet har åldersgränsen 7 och det skadliga innehållet våld (12), sexuellt innehåll (19). ',
         'Mera information: ',
         'kavi@fake-meku.fi',
         'Bilaga:',
-        'Valitusosoitus',
+        'Besvärsanvisning',
         'Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)',
         'Mediakasvatus- ja kuvaohjelmayksikkö / Enheten för mediefostran och bildprogram'
       ].join('\n')
     }
-  })
 
-  describe('reclassification', function() {
-    it('registers a reclassification as ROOT', function(done) {
-      webdriver.client()
-        .login('root','root','root')
-        .waitForVisible('#search-page .results .result')
-        .click('#search-page .results .result').waitForAnimations()
-        .ajaxClick('#search-page .program-box .reclassify')
-        .assertText('#classification-page .program-info h2', 'Kuvaohjelman tiedot - Elokuva')
-        .assertText('#classification-page .classification-details h2', 'Uudelleenluokittelu')
-        .assertValue('#classification-page input[name=name]', 'Ghostbusters XVI')
-        .assertValue('#classification-page input[name=nameFi]', 'Haamujengi 16')
-        .assertValue('#classification-page input[name=nameSv]', 'Spökgänget 16')
-        .assertValue('#classification-page input[name=nameOther]', 'webdriver-test')
-        .assertSelect2Value('#classification-page .select2-container.country', ['Suomi'])
-        .assertValue('#classification-page input[name=year]', '2014')
-        .assertSelect2Value('#classification-page .select2-container.x-productionCompanies', ['Warner Sisters Oy.'])
-        .assertSelect2Value('#classification-page .select2-container.x-genre', ['Komedia ja farssi'])
-        .assertSelect2Value('#classification-page .select2-container.x-directors', ['Ivan Reitman'])
-        .assertSelect2Value('#classification-page .select2-container.x-actors', ['Bill Murray', 'Harold Ramis', 'Dan Aykroyd', 'Sigourney Weaver'])
-        .assertValue('#classification-page textarea[name=synopsis]', 'The plot is unknown at this time.')
-
-        .assertDisabled('#classification-page input[name="classification.buyer"]')
-        .assertDisabled('#classification-page input[name="classification.billing"]')
-        .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org', 'root@fake-meku.fi'])
-
-        .select2one('#classification-page .select2-container.x-classificationReason', 'pal', 'Palaute')
-        .select2one('#classification-page .select2-container.x-classificationAuthorOrganization', 'kuva', 'Kuvaohjelmalautakunta')
-        .select2one('#classification-page .select2-container.format', 'DVD', true)
-        .setValue('#classification-page input.duration', '02:22:22')
-
-        .setValue('#classification-page textarea[name="classification.publicComments"]', 'PUBLIC COMMENTS')
-        .setValue('#classification-page textarea[name="classification.comments"]', 'POW2! by Webdriverio+Selenium/WebDriver')
-        .click('#classification-page input[name="classification.safe"]').waitForAnimations()
-        .assertHidden('#classification-page .classification-criteria .criteria')
-
-        .waitForEnabled('#classification-page button[name=register]', 1000)
-        .ajaxClick('#classification-page button[name=register]')
-
-        .assertVisible('#dialog .registration-confirmation')
-        .assertAgelimitAndWarnings('#dialog .registration-confirmation .warning-summary', 'S')
-        .click('#dialog button')
-
-        .waitForVisible('#search-page .results .result')
-        .assertSearchResultRow('#search-page .results .result', expectedRow)
-        .click('#search-page .results .result').waitForAnimations()
-        .assertAgelimitAndWarnings('#search-page .program-box .warning-summary', 'S')
-        .assertText('#search-page .program-box .reason', 'Palaute')
-        .assertText('#search-page .program-box .current-duration', '02:22:22')
-        .assertText('#search-page .program-box .author', 'root (ROOT)')
-        .assertText('#search-page .program-box .publicComments', 'PUBLIC COMMENTS')
-        .assertText('#search-page .program-box .comments', 'POW2! by Webdriverio+Selenium/WebDriver')
-        .click('#search-page .program-box .classifications .classification:nth-child(2)')
-        .assertAgelimitAndWarnings('#search-page .program-box .warning-summary', '7 violence sex')
-        .assertText('#search-page .program-box .duration', '01:23:45')
-        .assertText('#search-page .program-box .format', 'DVD')
-        .assertText('#search-page .program-box .author', 'kavi (KAVI)')
-        .assertLatestEmail(expectedEmail)
-
-        .end(done)
-    })
-
-    var expectedRow = {
-      name: 'Ghostbusters XVI',
-      duration: '2 t 22 min 22 s',
-      ageAndWarnings: 'S',
-      countryYearDate: '('+date+', Suomi, 2014)',
-      type: 'Elokuva'
-    }
-
-    var expectedEmail = {
-      to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'root@fake-meku.fi'],
+    var expectedReclassificationEmail = {
+      to: ['kavi@fake-meku.fi', 'demo.1@email.org'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, S ',
       body: [
         date,
         'Ilmoitus kuvaohjelman uudelleenluokittelusta',
-        'Kuvaohjelmalautakunta on '+date+' uudelleenluokitellut kuvaohjelman ',
+          'Kuvaohjelmalautakunta on '+date+' uudelleenluokitellut kuvaohjelman ',
         'Ghostbusters XVI',
         '. Kuvaohjelma on sallittu.',
-        ' Kuvaohjelmaluokittelija oli '+date+' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta (12), seksi (19).',
+          ' Kuvaohjelmaluokittelija oli '+date+' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta (12), seksi (19). ',
         'Syy uudelleenluokittelulle: Yleisön pyyntö.',
         'Perustelut: PUBLIC COMMENTS',
         'Liitteet:',
-        'Oikaisuvaatimusohje',
+        'Valitusosoitus',
         'Meddelande om omklassificering av bildprogram',
-        'Bildprogramsnämnden har '+date+' omklassificerat bildprogrammet ',
+          'Bildprogramsnämnden har '+date+' omklassificerat bildprogrammet ',
         'Ghostbusters XVI',
         '. Bildprogrammet är tillåtet.',
-        ' Bildprogramsklassificeraren hade '+date+' som åldergräns för bildprogrammet bedömt 7 och som skadligt innehåll våld (12), sexuellt innehåll (19).',
+          ' Bildprogramsklassificeraren hade '+date+' som åldergräns för bildprogrammet bedömt 7 och som skadligt innehåll våld (12), sexuellt innehåll (19). ',
         'Orsak till omklassificering: Begäran från publiken.',
         'Grunder: PUBLIC COMMENTS',
         'Bilaga:',
-        'Oikaisuvaatimusohje',
+        'Besvärsanvisning',
         'Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)',
         'Mediakasvatus- ja kuvaohjelmayksikkö / Enheten för mediefostran och bildprogram'
       ].join('\n')
     }
   })
-
 })

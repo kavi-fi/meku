@@ -28,7 +28,6 @@ describe('xml-interface-test', function() {
         .login('kavi','kavi','kavi')
         .waitForVisible('#search-page .results .result')
         .assertSearchResultRow('#search-page .results .result', expectedRow)
-        .click('#search-page .results .result')
         .waitForAnimations()
         .assertVisible('#search-page .program-box')
         .assertProgramBox('#search-page .program-box', expectedProgram)

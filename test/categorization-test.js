@@ -24,7 +24,6 @@ describe('categorization-test', function() {
       .login('user','user','user')
       .waitForVisible('#search-page .results .result')
       .assertSearchResultRow('.result', initialRow)
-      .click('#search-page .results .result').waitForAnimations()
       .click('#search-page .program-box button.categorize').waitForAnimations()
       .select2one('#search-page .categorization-form .select2-container.x-category-select', 'trai', 'Traileri')
       .click('#search-page .categorization-form button.save-category')

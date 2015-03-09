@@ -27,6 +27,7 @@ var client = null
 exports.client = function(url) {
   var options = process.env.BROWSER ? browsers[process.env.BROWSER] : browsers['chrome']
   client = extend(webdriverio.remote(options).init().url(url || 'http://localhost:4000/'))
+  client.windowHandleMaximize()
   return client
 }
 

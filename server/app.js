@@ -1110,11 +1110,11 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     }
 
     program.customersId = { account: req.account._id, id: program.externalId }
-    Program.findOne(utils.flattenObject({ customersId: program.customersId }), { _id: 1 }).lean().exec(function(err, duplicate) {
+    Program.findOne(utils.flattenObject({ customersId: program.customersId })).exec(function(err, existingProgram) {
       if (err) return callback(err)
 
-      if (duplicate) {
-        return writeErrAndReturn("Kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.externalId)
+      if (existingProgram && !existingProgram.deleted && existingProgram.classifications.length > 0) {
+        return writeErrAndReturn("Luokiteltu kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.externalId)
       }
 
       verifyValidAuthor(program, function (err) {
@@ -1123,6 +1123,14 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
           if (err) return callback(err)
           ele.ele('STATUS', 'OK')
           var p = new Program(program)
+          if (existingProgram) {
+            existingProgram.series = program.series
+            _.each(existingProgram.classifications, function (p) { existingProgram.deletedClassifications.push(p) })
+            existingProgram.classifications = program.classifications
+            existingProgram.createdBy = program.createdBy
+            existingProgram.deleted = false
+            p = existingProgram
+          }
           p.classifications[0].status = 'registered'
           p.classifications[0].creationDate = now
           p.classifications[0].registrationDate = now
@@ -1134,7 +1142,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
             if (err) return callback(err)
             p.save(function (err) {
               if (err) return callback(err)
-              logCreateOperation(req.user, p)
+              existingProgram ? logUpdateOperation(req.user, p, { 'classifications': { new: p.classifications } }) : logCreateOperation(req.user, p)
               updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
                 var seconds = classificationUtils.durationToSeconds(_.first(p.classifications).duration)

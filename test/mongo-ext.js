@@ -40,3 +40,11 @@ exports.reset = function(done) {
     async.forEachSeries(baseData(), function(obj, callback) { obj.save(callback) }, done)
   })
 }
+
+exports.deleteProgram = function (name, callback) {
+  schema.Program.update({ name: name }, { $set: { deleted: true } }, { multi: true }, callback)
+}
+
+exports.removeClassifications = function (name, callback) {
+  schema.Program.update({ name: name }, { $set: { classifications: [] } }, { multi: true }, callback)
+}

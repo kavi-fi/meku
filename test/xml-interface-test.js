@@ -35,6 +35,41 @@ describe('xml-interface-test', function() {
     })
   })
 
+  it('registers a classification for deleted program as KAVI', function(done) {
+    db.deleteProgram('Star Warx XVI', function (err) {
+      if (err) return done(err)
+      sendXML('movie-program.xml', function(err, resp) {
+        assert.include(resp, '<STATUS>OK</STATUS>')
+        if (err) return done(err)
+        webdriver.client()
+          .login('kavi','kavi','kavi')
+          .waitForVisible('#search-page .results .result')
+          .assertSearchResultRow('#search-page .results .result', expectedRow)
+          .waitForAnimations()
+          .assertVisible('#search-page .program-box')
+          .assertProgramBox('#search-page .program-box', expectedProgram)
+          .end(done)
+      })
+    })
+  })
+
+  it('registers a classification for program without any classifications as KAVI', function(done) {
+    db.removeClassifications('Star Warx XVI', function (err) {
+      if (err) return done(err)
+      sendXML('movie-program.xml', function(err, resp) {
+        assert.include(resp, '<STATUS>OK</STATUS>')
+        if (err) return done(err)
+        webdriver.client()
+          .login('kavi','kavi','kavi')
+          .waitForVisible('#search-page .results .result')
+          .assertSearchResultRow('#search-page .results .result', expectedRow)
+          .waitForAnimations()
+          .assertVisible('#search-page .program-box')
+          .assertProgramBox('#search-page .program-box', expectedProgram)
+          .end(done)
+      })
+    })
+  })
 
   function sendXML(filename, callback) {
     fs.createReadStream(__dirname + '/' + filename)

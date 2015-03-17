@@ -376,6 +376,7 @@ function searchPage() {
   var $page = $('#search-page').html($('#templates .search-page').clone())
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
+  var $showDeleted = $page.find('input[type=checkbox].showDeleted')
   var $filters = $page.find('.filters input[type=checkbox]')
   var $registrationDatePicker = $page.find('.public-query-filters .datepicker')
   var $clearRegistrationDatePicker = $page.find('.public-query-filters .clear-date-picker')
@@ -391,6 +392,7 @@ function searchPage() {
 
   setupPublicFilters()
   setupKaviFilters()
+  if (!hasRole('root')) $page.find('.root-query-filters').remove()
 
   $page.on('show', function(e, q, filters, programId) {
     if (q) $input.val(q).trigger('reset')
@@ -536,7 +538,8 @@ function searchPage() {
       reclassified: $reclassifiedToggle.prop('checked'),
       agelimits: currentAgelimits(),
       warnings: currentWarnings(),
-      ownClassificationsOnly: $ownClassificationsOnly.is(':checked')
+      ownClassificationsOnly: $ownClassificationsOnly.is(':checked'),
+      showDeleted: $showDeleted.is(':checked')
     })
     state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return

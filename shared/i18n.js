@@ -78,6 +78,7 @@ var i18n = {
     'Extrat': 'Extramaterial',
     'Kategorisoimattomat': 'Icke-kategoriserade',
     'Näytä vain omat luokittelut': 'Visa endast egna klassificeringar',
+    'Hae vain poistettuja ohjelmia': 'Sök endast raderade program',
     'Luokittelija': 'Klassificerare',
     'Uudelleenluokitellut': 'Omklassificerade',
     'Rekisteröintipäivä': 'Registreringsdatum',

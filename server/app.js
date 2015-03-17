@@ -168,6 +168,8 @@ app.get('/programs/search/:q?', function(req, res, next) {
     var isKavi = utils.hasRole(req.user, 'kavi')
     var query = isKavi ? constructKaviQuery() : constructUserQuery(req.user)
     if (req.query.ownClassificationsOnly === 'true') _.merge(query, { classifications: { $elemMatch: { 'author._id': req.user._id }}})
+    if (req.query.showDeleted == 'true') _.merge(query, { deleted: true })
+    else _.merge(query, { deleted: { $ne: true }})
     var fields = isKavi ? null : { 'classifications.comments': 0 }
     var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
     search(query, fields, sortBy, req, res, next)
@@ -262,10 +264,9 @@ app.get('/programs/search/:q?', function(req, res, next) {
       }
     })
 
-    function query(extraQueryTerms) {
+    function query(q) {
       var ObjectId = mongoose.Types.ObjectId
       var terms = req.params.q
-      var q = _.merge({ deleted: { $ne:true } }, extraQueryTerms)
       var and = []
       if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
       if (utils.getProperty(req, 'user.role') === 'user') and.push({ 'createdBy.role': { $ne: 'trainee' }})

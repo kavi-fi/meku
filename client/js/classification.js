@@ -3,7 +3,7 @@ function classificationPage() {
 
   $root.on('show', function (e, programId, rootEditMode, classificationId) {
     if (rootEditMode) {
-      setLocation('#luokittelu/' + programId + '/edit/' + classificationId)
+      setLocation('#luokittelu/' + programId + '/edit/' + (classificationId || ''))
       $.get('/programs/' + programId).done(function(program) {
         classificationForm(program, rootClassificationFinder(classificationId), true)
       })

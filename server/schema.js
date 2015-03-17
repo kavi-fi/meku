@@ -148,6 +148,7 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
   if (!callback) { callback = series; series = undefined }
   var program = this
   if (program.series._id) {
+    if (series && program.series.name !== series.name) program.series.name = series.name
     loadSeries(function(err, parent) {
       if (err) return callback(err)
       populate(program, concatNames(parent))

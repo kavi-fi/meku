@@ -202,7 +202,7 @@ function internalSearchPage() {
   function toggleDetailButtons($detail, p) {
     if (enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
-      $detail.find('button.reclassify').hide()
+      $detail.find('button.reclassify').toggle(classificationUtils.canReclassify(p, user))
       $detail.find('button.recategorize').hide()
     } else if (enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()

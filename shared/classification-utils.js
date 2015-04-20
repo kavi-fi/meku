@@ -64,11 +64,15 @@ exports.aggregateSummary = function(programs) {
 
 exports.canReclassify = function(program, user) {
   if (!program) return false
-  if (enums.util.isUnknown(program) || enums.util.isTvSeriesName(program)) return false
-  if (program.draftClassifications && program.draftClassifications[user._id]) return false
   var head = program.classifications[0]
   if (!head) return false
-  return !enums.authorOrganizationIsKHO(head) && (utils.hasRole(user, 'kavi') || (head.status != 'registered'))
+  if (enums.util.isTvSeriesName(program)) return false
+  if (head.registrationDate && new Date(head.registrationDate).getFullYear() >= 2012) {
+    if (!utils.hasRole(user, 'kavi')) return false
+    if (enums.util.isUnknown(program)) return false
+  }
+  if (program.draftClassifications && program.draftClassifications[user._id]) return false
+  return !enums.authorOrganizationIsKHO(head)
 }
 
 var isReclassification = exports.isReclassification = function(program, classification) {

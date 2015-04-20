@@ -528,7 +528,7 @@ function searchPage() {
 
   function setFilters(filterString) {
     $filters.each(function() {
-      $(this).prop('checked', !!(filterString && filterString.indexOf($this.data('id')) >= 0))
+      $(this).prop('checked', !!(filterString && filterString.indexOf($(this).data('id')) >= 0))
     })
   }
 

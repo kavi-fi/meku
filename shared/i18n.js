@@ -227,8 +227,12 @@ var i18n = {
     'Yleisön pyyntö': 'Begäran från publiken',
     'KAVI:n oma aloite': 'KAVI:s eget initiativ',
     'Valitusosoitus': 'Besvärsanvisning',
+    'https://kavi.fi/fi/meku/luokittelu/valitusosoitus': 'https://kavi.fi/fi/meku/luokittelu/valitusosoitus',
+    'Valitusosoitus KHO:lle': 'Besvärsanvisning till HFD',
+    'https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/valitusosoitus-korkeimmalle-hallinto-oikeudelle': 'https://kavi.fi/sv/om-kavi/enheten-mediefostran-och-bildprogram/aldersgranser/besvarsanvisning-hogsta',
     'Oikaisupyyntö': 'Rättelseyrkande',
     'Oikaisuvaatimusohje': 'Anvisning om rättelseyrkande',
+    'https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje': 'https://kavi.fi/sv/om-kavi/enheten-mediefostran-och-bildprogram/aldersgranser/anvisning-om-hur-man-begar-omprovning-om',
     'ei määritelty': 'inte fastslagna',
     'Kuvaohjelma sisältää myös alempiin ikärajoihin liittyvät kriteerit': 'Bildprogrammet innehåller även kriterier som hör till lägre åldersgränser',
 

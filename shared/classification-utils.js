@@ -197,10 +197,12 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
     function appendixLink() {
       if (enums.authorOrganizationIsKHO(classification)) return ''
-      var linkOther = { url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: t('Oikaisuvaatimusohje') }
-      var linkKavi = { url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: t('Valitusosoitus') }
-      var link = (user.role == 'kavi') ? linkKavi : linkOther
-      return '<p>' + t('Liitteet') + ':<br/><a href="' + link.url + '">' + link.name + '</a></p>'
+      if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification))
+        return '<p>' + t('Liitteet') + ':<br/><a href="' + t("https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/valitusosoitus-korkeimmalle-hallinto-oikeudelle") + '">'
+          + t('Valitusosoitus KHO:lle') + '</a></p>'
+      if (enums.authorOrganizationIsKavi(classification))
+        return '<p>' + t('Liitteet') + ':<br/><a href="' + t("https://kavi.fi/fi/meku/luokittelu/valitusosoitus") + '">' + t('Valitusosoitus') + '</a></p>'
+      return '<p>' + t('Liitteet') + ':<br/><a href="' + t("https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje") + '">' + t('Oikaisuvaatimusohje') + '</a></p>'
     }
 
     function previous() {

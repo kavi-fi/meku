@@ -75,6 +75,7 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   var draft = {
     _id: mongoose.Types.ObjectId(),
     creationDate: new Date(),
+    registrationDate: new Date(),
     status: 'in_process',
     author: { _id: user._id, name: user.name, username: user.username },
     warningOrder: [], criteria: [], criteriaComments: {}, registrationEmailAddresses: [],

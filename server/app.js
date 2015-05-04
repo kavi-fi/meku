@@ -361,7 +361,6 @@ app.post('/programs/:id/register', function(req, res, next) {
     var newClassification = program.draftClassifications[req.user._id]
     if (!newClassification) return res.send(409)
 
-    newClassification.registrationDate = new Date()
     newClassification.status = 'registered'
     newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
     if (newClassification.isReclassification && !utils.hasRole(req.user, 'kavi')) {
@@ -568,7 +567,7 @@ app.post('/programs/autosave/:id', function(req, res, next) {
 
   function allowedAutosaveFields(p, user) {
     var programFields = ['name', 'nameFi', 'nameSv', 'nameOther', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
-    var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationEmailAddresses', 'comments', 'criteriaComments*']
+    var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationDate', 'registrationEmailAddresses', 'comments', 'criteriaComments*']
     var kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
     if (p.classifications.length == 0) {
       return programFields.concat(classificationFields.map(asDraftField))

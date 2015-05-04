@@ -385,7 +385,10 @@ function classificationFormUtils() {
     if (hasRole('root')) {
       $form.find('.vet-container').removeClass('hide')
       $form.find('.preventSendingEmail').removeClass('hide')
-    } else if (isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
+    } else {
+      $form.find('input[name="classification.registrationDate"]').prop('disabled', true)
+    }
+    if (!hasRole('root') && isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     }
     if (!isInternalReclassification) {
@@ -550,7 +553,6 @@ function classificationFormUtils() {
     })
     sensitiveClassificationFields.forEach(function(f) { delete classificationClone[f] })
     if (!rootEditMode) {
-      classificationClone.registrationDate = new Date()
       programClone.classifications.unshift(classificationClone)
     }
     return programClone

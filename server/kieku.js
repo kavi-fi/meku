@@ -114,7 +114,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Toimitusasiakas nimi', value: constantValue('') },
     { name: 'Palvelun luontipvm', value: constantValue('') },
     { name: 'Hinnoittelupvm', value: constantValue('') },
-    { name: 'Laskuttaja', value: constantValue('??') },
+    { name: 'Laskuttaja', value: constantValue('') },
     { name: 'Asiaviite', value: invoiceValue('accountContactName'), width: 15 },
     { name: 'Tilausnumero', value: constantValue('') },
     { name: 'Poikk. veron määrämaa', value: constantValue('') },

@@ -168,6 +168,9 @@ function programBox() {
       .find('.comments').labeledText(c.comments).end()
       .find('.publicComments').labeledText(c.publicComments).end()
       .find('.commentHeader').toggle(!!(c.comments || c.publicComments)).end()
+    if (!window.user) {
+      $e.find('.program-classification-details').addClass('hide')
+    }
 
     function txtIfNotCurrent(txt) { return (p.classifications[0]._id == c._id) ? '' : txt }
   }

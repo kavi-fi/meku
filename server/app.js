@@ -586,7 +586,7 @@ app.delete('/programs/:programId/classification/:classificationId', requireRole(
 })
 
 app.get('/series/search', function(req, res, next) {
-  var q = { programType: 2 }
+  var q = { programType: 2, deleted: { $ne: true } }
   var parts = toMongoArrayQuery(req.query.q)
   if (parts) q.allNames = parts
   Program.find(q, { name: 1 }).lean().limit(20).sort('name').exec(function(err, data) {

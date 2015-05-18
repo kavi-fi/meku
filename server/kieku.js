@@ -15,7 +15,7 @@ exports.createYearlyProviderRegistration = function createYearlyProviderRegistra
 }
 
 function providerBillingHeader(year, invoice) {
-  return 'Valvontamaksu, vuosi ' + (year ? year : invoice.registrationDate.getFullYear()) + '. ' + invoice.invoiceText
+  return 'Valvontamaksu, vuosi ' + (year ? year : invoice.registrationDate.getFullYear())
 }
 
 function providerRowDescription(invoice) {
@@ -30,7 +30,7 @@ function providerBillingFooter(accountRows, invoice) {
 exports.createClassificationRegistration = function createClassificationRegistration(dateRange, accountRows) {
   function billingHeader(invoice) {
     var period = dateRange.begin + ' - ' + dateRange.end
-    return 'KOONTILASKUTUS ' + period + '. ' + invoice.invoiceText
+    return 'KOONTILASKUTUS ' + period
   }
   function rowDescription(invoice) {
     return [
@@ -115,7 +115,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Palvelun luontipvm', value: constantValue('') },
     { name: 'Hinnoittelupvm', value: constantValue('') },
     { name: 'Laskuttaja', value: constantValue('') },
-    { name: 'Asiaviite', value: invoiceValue('accountContactName'), width: 15 },
+    { name: 'Asiaviite', value: invoiceValue('invoiceText'), width: 15 },
     { name: 'Tilausnumero', value: constantValue('') },
     { name: 'Poikk. veron määrämaa', value: constantValue('') },
     { name: 'Otsikkoteksti: Otsikkomuistio 1 (tekstilaji 0002) tulostuu ennen rivejä. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingDescription, width: 20 },

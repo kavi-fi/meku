@@ -92,6 +92,7 @@ function reportsPage() {
         .find('.sequenceId').text(row.sequenceId).end()
         .find('.programType').text(enums.programType[row.programType].fi).end()
         .find('.date').text(moment(row.date).format(format)).end()
+        .find('.author').text(row.author).end()
         .find('.duration').text(row.duration).end()
         .find('.type').text(row.isReclassification ? 'Uudelleenluokittelu' : 'Luokittelu').end()
         .find('.comments').text(row.comments).end()

@@ -225,7 +225,7 @@ function kaviClassificationList(dateRange, callback) {
       .match(q)
       .project({
         name:1, sequenceId:1, programType:1,
-        duration: '$classifications.duration', date: '$classifications.registrationDate',
+        duration: '$classifications.duration', date: '$classifications.registrationDate', author: '$classifications.author.username',
         isReclassification: '$classifications.isReclassification', comments: '$classifications.comments' })
       .sort('date')
       .exec(callback)

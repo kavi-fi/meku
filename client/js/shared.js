@@ -135,3 +135,22 @@ function registerLanguageChangers() {
     window.location.reload(true)
   })
 }
+
+function yearShortcuts() {
+  var yearOffset = 0
+
+  function year(n) {
+    return function () {
+      startYear = moment().year()
+      yearOffset += n
+      return [ moment(startYear + yearOffset, 'YYYY').toDate() ]
+    }
+  }
+
+  return [
+    {name: '-10v', dates: year(-10) },
+    {name: '-1v', dates: year(-1) },
+    {name: '+1v', dates: year(1) },
+    {name: '+10v', dates: year(10) }
+  ]
+}

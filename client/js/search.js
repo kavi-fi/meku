@@ -451,6 +451,7 @@ function searchPage() {
 
     var datePickerOpts = {
       shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['week', 'month']},
+      customShortcuts: yearShortcuts(),
       getValue: function() { return $registrationDatePicker.find('span').text() },
       setValue: function(s) {
         $clearRegistrationDatePicker.toggle(!!s)

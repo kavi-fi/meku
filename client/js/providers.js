@@ -16,7 +16,7 @@ function providerPage() {
   var latestAjax = switchLatestDeferred()
 
   var datePickerOpts = {
-    shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']}
+    shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']}, customShortcuts: yearShortcuts()
   }
   setupDatePicker($datePicker, datePickerOpts, fetchNewProviders)
 

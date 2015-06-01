@@ -6,7 +6,7 @@ function reportsPage() {
   var $report = $page.find('.report')
 
   var format = 'DD.MM.YYYY'
-  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month', 'year'] } }
+  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month', 'year'] }, customShortcuts: yearShortcuts() }
   var latestAjax = switchLatestDeferred()
 
   $page.on('show', function(e, reportName, begin, end) {

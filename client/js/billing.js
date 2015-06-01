@@ -5,7 +5,7 @@ function billingPage() {
   var $accounts = $page.find('.accounts')
   var $noResults = $page.find('.no-results')
   var detailRenderer = programBox()
-  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']} }
+  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']}, customShortcuts: yearShortcuts() }
   var format = 'DD.MM.YYYY'
   var $spinner = spinner().appendTo($page.find('.date-selection'))
   var latestAjax = switchLatestDeferred()

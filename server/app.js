@@ -506,6 +506,7 @@ app.post('/programs/:id/classification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
     if (program.classifications.length > 0) return res.send(400)
+    program.deleted = false
     program.newDraftClassification(req.user)
     program.save(respond(res, next))
   })
@@ -515,6 +516,7 @@ app.post('/programs/:id/reclassification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
     if (!classificationUtils.canReclassify(program, req.user)) return res.send(400)
+    program.deleted = false
     program.newDraftClassification(req.user)
     program.populateSentRegistrationEmailAddresses(function(err) {
       program.save(respond(res, next))
@@ -527,7 +529,7 @@ app.post('/programs/:id/categorization', function(req, res, next) {
     if (err) return next(err)
     var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
-    var updates = _.pick(req.body, ['programType', 'series', 'episode', 'season'])
+    var updates = _.merge(_.pick(req.body, ['programType', 'series', 'episode', 'season']), {deleted: false})
     watcher.applyUpdates(updates)
     if (!enums.util.isTvEpisode(program)) {
       program.series = program.episode = program.season = undefined
@@ -553,7 +555,7 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
     if (err) return next(err)
     var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
-    watcher.applyUpdates(req.body)
+    watcher.applyUpdates(_.merge(req.body, {deleted: false}))
     program.classifications.forEach(function(c) {
       if (enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c)) {
         c.reason = undefined

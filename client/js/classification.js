@@ -250,10 +250,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       field = field.replace(/^classification/, 'draftClassifications.' + user._id)
       $form.find('button[name=register]').prop('disabled', true)
       $.post('/programs/autosave/' + program._id, JSON.stringify(utils.keyValue(field, value))).done(function(p) {
-        onProgramUpdated(p)
         if ($form.find('button[name=register]').is(':enabled') && $.active > 1) {
           $form.find('button[name=register]').prop('disabled', true)
         }
+        onProgramUpdated(p)
       })
     }
   }

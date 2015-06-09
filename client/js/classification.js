@@ -129,7 +129,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.on('submit', function(e) {
       $form.find('button[name=register]').prop('disabled', true)
       e.preventDefault()
-      $.post('/programs/' + program._id + '/register', function(savedProgram) {
+      $.post('/programs/' + program._id + '/register', JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})).done(function(savedProgram) {
         $form.hide()
         $("#search-page").trigger('show').show()
         showDialog($('<div>', {class: 'registration-confirmation dialog'})
@@ -342,7 +342,9 @@ function classificationFormUtils() {
     if (!showDuration) $form.find('.duration-field').remove()
     if (showDuration && enums.util.isGameType(program)) $form.find('.duration-field label').i18nText('Luokittelun kesto')
 
-    if (!hasRole('root') && isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
+    if (hasRole('root')) {
+      $form.find('.preventSendingEmail').removeClass('hide')
+    } else if (isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     }
     if (!isInternalReclassification) {

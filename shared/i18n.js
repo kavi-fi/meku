@@ -127,6 +127,7 @@ var i18n = {
     'Ikärajat.fi-näkymä': 'Sidan Ikärajat.fi',
     'Lähetä luokittelupäätös': 'Skicka beslut om klassificering',
     'Vastaanottajat': 'Mottagare',
+    'Älä lähetä': 'Sänd inte',
     'Aihe': 'Ämne',
     'Rekisteröi': 'Registrera',
     'Kirjaudu ulos': 'Logga ut',

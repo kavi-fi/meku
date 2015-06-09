@@ -359,6 +359,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.draftsBy = []
     program.classifications.unshift(newClassification)
     program.markModified('draftClassifications')
+    program.preventSendingEmail = req.body.preventSendingEmail
 
     populateSentRegistrationEmailAddresses(program, function (err, program) {
       if (err) return next(err)
@@ -416,7 +417,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     }
 
     function populateSentRegistrationEmailAddresses(program, callback) {
-      if (utils.hasRole(req.user, 'root')) return process.nextTick(callback.bind(null, null, program))
+      if (utils.hasRole(req.user, 'root') && program.preventSendingEmail) return process.nextTick(callback.bind(null, null, program))
       program.populateSentRegistrationEmailAddresses(function(err, program) {
         if (err) return callback(err)
         var valid = validation.registration(program.toObject(), newClassification, req.user)
@@ -428,7 +429,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     }
 
     function sendRegistrationEmail(callback) {
-      if (utils.hasRole(req.user, 'root')) return process.nextTick(callback)
+      if (utils.hasRole(req.user, 'root') && program.preventSendingEmail) return process.nextTick(callback)
       sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, env.hostname), req.user, callback)
     }
   })

@@ -38,7 +38,7 @@ var i18n = {
     'Koulutusympäristö': 'Utbildningsmiljö',
     'Kehitysympäristö': 'Utvecklingsmiljö',
     'Verkko- tai järjestelmävirhe.': 'Nät- eller systemfel',
-    'Lataa sivu uudelleen tästä,tai palaa etusivulle tästä tästä.': 'Ladda sidan på nytt här, eller gå tillbaka till förstasidan här',
+    'Lataa sivu uudelleen tästä,tai palaa etusivulle tästä.': 'Ladda sidan på nytt här, eller gå tillbaka till förstasidan här',
     'Jos vikatilanne jatkuu, ota yhteys ylläpitoon.': 'Om felsituationen fortsätter, kontaka underhållet ',
     'Editointikonflikti.': 'Editeringskonflikt',
     'Käsittelemäsi kuvaohjelman luokittelun on samanaikaisesti rekisteröinyt toinen käyttäjä.': 'Klassificeringen av bildprogrammet som du behandlar har registrerats samtidigt av en annan användare',

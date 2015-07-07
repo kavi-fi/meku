@@ -206,7 +206,8 @@ var AccountSchema = new Schema({
   contactName: String,
   phoneNumber: String,
   isKavi: Boolean,
-  deleted: Boolean
+  deleted: Boolean,
+  message: String
 })
 var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))

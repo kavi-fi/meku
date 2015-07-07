@@ -118,6 +118,7 @@ function subscriberManagementPage() {
           address: findInput('eInvoice.address').val(),
           operator: findInput('eInvoice.operator').val()
         },
+        message: $form.find('textarea[name="message"]').val(),
         contactName: findInput('contactName').val(),
         phoneNumber: findInput('phoneNumber').val(),
         users: findInput('classifiers').select2('data').map(select2OptionToUser),

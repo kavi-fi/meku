@@ -282,7 +282,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
 
 app.get('/episodes/:seriesId', function(req, res, next) {
-  var fields = !req.user ? {'classifications.author': 0, 'classifications.authorOrganisation': 0, 'classifications.buyer': 0, 'classifications.billing': 0 }
+  var fields = !req.user ? {'classifications.author': 0, 'classifications.authorOrganisation': 0, 'classifications.buyer': 0, 'classifications.billing': 0, 'classifications.comments': 0 }
     : utils.hasRole(req.user, 'kavi') ? {} : {'classifications.comments': 0}
   Program.find({ deleted: { $ne:true }, 'series._id': req.params.seriesId }, fields).sort({ season:1, episode:1 }).lean().exec(respond(res, next))
 })

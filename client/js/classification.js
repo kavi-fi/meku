@@ -71,6 +71,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function setClassificationFields(c) {
     var authorOrgVal = typeof c.authorOrganization == 'number' ? c.authorOrganization.toString() : ''
     var reasonVal = typeof c.reason == 'number' ? c.reason.toString() : ''
+    var isVetClassification =_.find(c.criteria.map(function(id) { return enums.classificationCriteria[id - 1].category === 'vet' })) != undefined
 
     $form
       .find('span.author').text(utils.getProperty(c, 'author.name') || '-').end()
@@ -78,7 +79,9 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('textarea[name="classification.comments"]').val(c.comments).end()
       .find('textarea[name="classification.publicComments"]').val(c.publicComments).end()
       .find('input[name="classification.safe"]').prop('checked', !!c.safe).end()
+      .find('input[name="classification.vet"]').prop('checked', isVetClassification).end()
       .find('.category-container').toggle(!c.safe).end()
+      .find('.vet').toggle(isVetClassification).end()
 
     select2Autocomplete(select2Opts.author, save).trigger('setVal', c.author)
     select2Autocomplete(select2Opts.buyer, save).trigger('setVal', c.buyer)
@@ -113,7 +116,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       // Enable to log validation:
       // required.length == 0 ? console.log('valid.') : console.log('invalid: ', required.map(function() { return $(this).prop('name') }).toArray())
       var throttled = $form.find('.throttled')
-      $form.find('button[name=register]').prop('disabled', required.length > 0 || throttled.length > 0)
+      $form.find('button[name=register]').prop('disabled', (required.length > 0 || throttled.length > 0) && !$('input[name="classification.vet"]').is(':checked'))
     })
     validateTextChange($form.find('.required'), isNotEmpty)
     validateTextChange($form.find('input[name=year]'), utils.isValidYear)
@@ -186,6 +189,15 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('.safe-container span').click(function() {
       $(this).prev().click()
     })
+    $form.find('input[name="classification.vet"]').change(function() {
+      $('.vet').toggle($(this).is(':checked'))
+      var ids = $form.find('.category .criteria.selected:visible').map(function(i, e) { return $(e).data('id') }).get()
+      save('classification.criteria', ids)
+      $form.find('.required').trigger('validate')
+    })
+    $form.find('.vet-container span').click(function() {
+      $(this).prev().click()
+    })
     $form.find('input[name="series"]').on('change', function() { onSeriesChanged(false) })
     onSeriesChanged(true)
 
@@ -209,7 +221,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $buyerAndBilling.removeClass('touched').select2('enable', hasRole('root') || enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
     })
     $form.on('click', '.category .criteria', function() {
-      $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val()))
+      $(this).toggleClass('selected').toggleClass('has-comment', isNotEmpty($(this).find('textarea').val() || ''))
       var ids = $form.find('.category .criteria.selected').map(function(i, e) { return $(e).data('id') }).get()
       if ($(this).hasClass('selected')) $(this).find('textarea').focus()
       save('classification.criteria', ids)
@@ -307,6 +319,11 @@ function classificationFormUtils() {
     enums.criteriaCategories.map(function(category) {
       var criteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = criteria.map(function(c) {
+        if (c.category === 'vet') {
+          return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
+            .append($('<h5>').text(c[lang].title + ' '))
+            .append($('<p>').text(''))
+        }
         return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
           .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text('(' + c.id + ')')))
           .append($('<p>').text(c[lang].description))
@@ -343,6 +360,7 @@ function classificationFormUtils() {
     if (showDuration && enums.util.isGameType(program)) $form.find('.duration-field label').i18nText('Luokittelun kesto')
 
     if (hasRole('root')) {
+      $form.find('.vet-container').removeClass('hide')
       $form.find('.preventSendingEmail').removeClass('hide')
     } else if (isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)

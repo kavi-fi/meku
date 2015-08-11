@@ -180,6 +180,7 @@ function programBox() {
     var lang = langCookie()
     return c.criteria.map(function(id) {
       var cr = enums.classificationCriteria[id - 1]
+      if (cr.category === 'vet') return ''
       var category = enums.classificationCategoriesFI[cr.category]
       return $('<div>')
         .append($('<label>', { title: cr[lang].title+': '+cr[lang].description }).text(i18nText(category) + ' ('+cr.id+')'))

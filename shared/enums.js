@@ -1,9 +1,9 @@
 enums = {}
 enums.util = {}
 
-enums.criteriaCategories = ['violence', 'sex', 'fear', 'drugs']
-enums.classificationCategoriesFI = {violence: 'väkivalta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet'}
-enums.classificationCategoriesSV = {violence: 'våld', fear: 'ångest', sex: 'sexuellt innehåll', drugs: 'rusmedel'}
+enums.criteriaCategories = ['violence', 'sex', 'fear', 'drugs', 'vet']
+enums.classificationCategoriesFI = {violence: 'väkivalta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet', vet: 'vet'}
+enums.classificationCategoriesSV = {violence: 'våld', fear: 'ångest', sex: 'sexuellt innehåll', drugs: 'rusmedel', vet: 'vet'}
 
 enums.format = [
   'Blu-ray Disc',
@@ -560,6 +560,22 @@ enums.classificationCriteria = [
   { id:37, category: 'drugs',    age: 12,
     fi: { title:  "Huumeiden ei-hallitsevaa käyttöä tai alaikäisten alkoholin käyttöä ", description: "Huumeiden viitteellistä tai vähäistä käyttöä tai alaikäisten korostettua ja ihannoivaa tai ongelmatonta alkoholin käyttöä." },
     sv: { title: 'Icke-dominerande användning av droger eller minderårigas framhävda användning av alkohol som är presenterat som problemfritt', description:'Hänvisande eller obetydlig användning av droger eller minderårigas framhävda användning av alkohol som är presenterat som problemfritt.' }
+  },
+  { id:38,  category: 'vet', age: 18,
+    fi: { title: "\u00a0", description: "" },
+    sv: { title: ' ', description:'' }
+  },
+  { id:39,  category: 'vet', age: 16,
+    fi: { title: "\u00a0", description: "" },
+    sv: { title: ' ', description:'' }
+  },
+  { id:40,  category: 'vet', age: 12,
+    fi: { title: "\u00a0", description: "" },
+    sv: { title: ' ', description:'' }
+  },
+  { id:41,  category: 'vet', age: 7,
+    fi: { title: "\u00a0", description: "" },
+    sv: { title: ' ', description:'' }
   }
 ]
 

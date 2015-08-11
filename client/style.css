@@ -258,6 +258,7 @@ label.top { vertical-align: top; }
 #search-page .result .items > span:nth-child(4) { flex: 0 0 auto; font-size: 12px; width: 100px; }
 #search-page .result .items > span:nth-child(5) { flex: 0 0 auto; text-align: right; width: 140px; }
 #search-page .result .agelimit, #search-page .result .warning { vertical-align: middle; margin-right: 3px; width: 25px; height: 25px; background-size: 25px; }
+#search-page .result .vet { width: 0px; height: 0px; }
 #search-page .result.selected { border-bottom: none; }
 #search-page .highlight { color: #00BB88; }
 
@@ -518,9 +519,9 @@ textarea.invalid:disabled,
   margin-right: 10px;
 }
 
-.classification-criteria .safe-container { font-weight: normal; font-size: 16px; color: #444444; }
-.classification-criteria .safe-container span { cursor: pointer; }
-.classification-criteria .safe-container input { margin: 0 7px 0 0; vertical-align: text-top; }
+.classification-criteria .safe-container, .classification-criteria .vet-container { font-weight: normal; font-size: 16px; color: #444444; }
+.classification-criteria .safe-container span, .classification-criteria .vet-container span { cursor: pointer; }
+.classification-criteria .safe-container input, .classification-criteria .vet-container input { margin: 0 7px 0 0; vertical-align: text-top; }
 
 .classification-criteria .warning-order { float: right; width: 580px; margin-top: -15px; }
 .classification-criteria .warning-order img { margin: 20px 0; }
@@ -553,6 +554,7 @@ textarea.invalid:disabled,
 .classification-criteria .category.fear .heading h3 { color: #44AAFF;}
 .classification-criteria .category.sex .heading h3 { color: #FF77AA;}
 .classification-criteria .category.drugs .heading h3 { color: #33BB33;}
+.classification-criteria .category.vet .heading h3 { color: #bbbbbb;}
 
 .classification-criteria .category.violence .heading {
   border-top: 5px solid #AA0050;
@@ -573,6 +575,11 @@ textarea.invalid:disabled,
   margin-top: 15px;
   border-top: 5px solid #33BB33;
   background-image: url('images/drugs.png');
+}
+
+.classification-criteria .category.vet .heading {
+  margin-top: 15px;
+  border-top: 5px solid #bbbbbb;
 }
 
 .classification-criteria .category .criteria {
@@ -642,7 +649,7 @@ textarea.invalid:disabled,
 .classification-criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
 .classification-criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
 
-.classification-criteria .category-container .category.sex, .classification-criteria .category-container .category.drugs {
+.classification-criteria .category-container .category.sex, .classification-criteria .category-container .category.drugs, .classification-criteria .category-container .category.vet {
   margin-right: 0;
 }
 

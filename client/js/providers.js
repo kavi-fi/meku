@@ -52,6 +52,7 @@ function providerPage() {
     }
     setDatePickerSelection($datePicker, range, fetchNewProviders)
     updateMetadata()
+    renderFilters()
     $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
   })
 
@@ -74,14 +75,22 @@ function providerPage() {
 
   $providerNameQuery.on('input', function() {
     var searchString = $(this).val().toLowerCase()
+    var providingTypes = _.map($('#provider-page .filters input').filter(':checked'), function (input) { return $(input).attr('data-providing-type') })
     var onlyK18 = $onlyK18.is(':checked')
-    $providers.find('.result').each(function() {
+    $providers.find('.result').each(function (i, result) {
       var name = $(this).children('.name').text().toLowerCase()
+      var matchesProviderName = searchString.length > 0 && _.contains(name, searchString)
       var providerLocations = $(this).data('provider').locations
-      name += _.map(providerLocations, function(l) { return l.name.toLowerCase() }).join(' ')
-      var matchesName = _.contains(name, searchString)
-      var matchesK18 = onlyK18 ? _.any(providerLocations, 'adultContent'): true
-      $(this).parent('.provider-row').toggle(matchesName && matchesK18)
+      var isLocationRowVisible = _.map(providerLocations, function (providerLocation) {
+        var matchesName = matchesProviderName || _.contains(providerLocation.name.toLowerCase(), searchString.toLowerCase())
+        var matchesK18 = onlyK18 ? providerLocation.adultContent : true
+        var matchesProvidingType = providingTypes.length === 0 || _.intersection(providingTypes, providerLocation.providingType).length > 0
+        return matchesName && matchesK18 && matchesProvidingType
+      })
+      $(result).next('.locations').find('.location-row').each(function (i, locationRow) {
+        $(locationRow).toggle(isLocationRowVisible[i])
+      })
+      $(this).parent('.provider-row').toggle(_.include(isLocationRowVisible, true))
     })
     $search.find('.result-count .num').text($providers.find('.result:visible').length)
     closeDetails()
@@ -301,7 +310,9 @@ function providerPage() {
 
   function closeDetails() {
     $allProviders.find('.result.selected').removeClass('selected')
+    $allProviders.find('.location-row.selected').removeClass('selected')
     $allProviders.find('.provider-details').slideUp(function() { $(this).remove() })
+    $allProviders.find('.location-details').slideUp(function() { $(this).remove() })
     updateLocationHash('')
   }
 
@@ -351,6 +362,19 @@ function providerPage() {
         .append($('<td>').text(c))
     }
     function sum(a, b) { return a + b }
+  }
+
+  function renderFilters() {
+    var $filters = $('#provider-page .filters')
+    var $providingTypes = _.map(Object.keys(enums.providingType), function (providingType) {
+      var $input = $('<input>').attr({'type': 'checkbox', 'data-providing-type': providingType})
+      $input.on('change', function() {
+        $providerNameQuery.trigger('input')
+      })
+      var $span = $('<span>').attr('data-i18n', '').text(enums.providingType[providingType])
+      return $('<label>').append($input, $span)
+    })
+    $filters.html($providingTypes)
   }
 
   function renderProviders(providers) {

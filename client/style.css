@@ -107,6 +107,7 @@ textarea { resize: vertical; }
 .filters label.first { min-width: 85px; }
 .filters label.second { min-width: 105px; }
 .filters input { margin-right: 7px; margin-bottom: 10px; }
+#provider-page .filters label { min-width: 220px; }
 
 .warning-summary { display: inline-block; }
 .warning-summary img { width: 40px; height: 40px;}
@@ -764,7 +765,7 @@ textarea.invalid:disabled,
 #provider-page .locations { background: #fff; padding: 20px 40px 20px 40px; font-size: 14px; color: #777; box-shadow: 0 5px 5px 0 rgba(0,0,0,.10); position: relative; line-height: 19px; }
 #provider-page .locations .location-details { padding: 20px 5px 5px 5px; box-shadow: none; }
 #provider-page .location-row { background-color: #F8F8F8; padding: 10px; }
-#provider-page .location-row > span { display: inline-block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 5px; }
+#provider-page .location-row > span { display: inline-block; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding-right: 4px; }
 #provider-page .location-row > i:nth-child(1) { float: left; }
 #provider-page .location-row > span:nth-child(2) { width: 300px; }
 #provider-page .location-row > span:nth-child(3) { width: 350px; }

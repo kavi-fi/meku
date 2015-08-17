@@ -332,7 +332,17 @@ app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
   var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.name, role: req.user.role}})
-  p.newDraftClassification(req.user)
+  var draftClassification = p.newDraftClassification(req.user)
+  var origProgram = req.body.origProgram
+  if (origProgram) {
+    var fieldsToCopy = ['series', 'country', 'year', 'productionCompanies', 'genre', 'directors', 'actors']
+    _.forEach(fieldsToCopy, function (field) { p[field] = origProgram[field] })
+    if (origProgram.classifications.length > 0) {
+      draftClassification.buyer = origProgram.classifications[0].buyer
+      draftClassification.billing = origProgram.classifications[0].billing
+      draftClassification.format = origProgram.classifications[0].format
+    }
+  }
   p.save(function(err, program) {
     if (err) return next(err)
     logCreateOperation(req.user, program)

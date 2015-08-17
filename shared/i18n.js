@@ -43,6 +43,7 @@ var i18n = {
     'Editointikonflikti.': 'Editeringskonflikt',
     'Käsittelemäsi kuvaohjelman luokittelun on samanaikaisesti rekisteröinyt toinen käyttäjä.': 'Klassificeringen av bildprogrammet som du behandlar har registrerats samtidigt av en annan användare',
     'Palaa etusivulle tästä.': 'Tillbaka till förstasidan här',
+    'Tee kopio': 'Kopia',
     'Luokittele uudelleen': 'Omklassificera',
     'Luokittele': 'Klassificera',
     'Jatka luokittelua': 'Fortsätt klassificeringen',

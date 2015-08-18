@@ -1188,7 +1188,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     function verifyParentProgram(program, callback) {
       if (!enums.util.isTvEpisode(program)) return callback()
       var parentName = program.parentTvSeriesName.trim()
-      Program.findOne({ programType: 2, name: parentName }, function(err, parent) {
+      Program.findOne({ programType: 2, name: parentName, deleted: { $ne: true } }, function(err, parent) {
         if (err) return callback(err)
         if (!parent) {
           var user = _.merge({ ip: req.user.ip }, program.createdBy)

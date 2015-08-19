@@ -258,12 +258,14 @@ enums.authorOrganization = {
   1: 'KAVI',
   2: 'Kuvaohjelmalautakunta',
   3: 'KHO',
-  4: '-'
+  4: '-',
+  5: 'Elokuvalautakunta'
 }
 
 enums.authorOrganizationIsKavi = function(c) { return c.authorOrganization === 1 }
 enums.authorOrganizationIsKuvaohjelmalautakunta = function(c) { return c.authorOrganization === 2 }
 enums.authorOrganizationIsKHO = function(c) { return c.authorOrganization === 3 }
+enums.authorOrganizationIsElokuvalautakunta = function(c) { return c.authorOrganization === 5 }
 
 enums.invoiceRowType = {
   registration: 'Kuvaohjelman rekisteröinti',

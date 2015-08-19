@@ -72,7 +72,7 @@ exports.canReclassify = function(program, user) {
     if (enums.util.isUnknown(program)) return false
   }
   if (program.draftClassifications && program.draftClassifications[user._id]) return false
-  return !enums.authorOrganizationIsKHO(head)
+  return !enums.authorOrganizationIsKHO(head) && !enums.authorOrganizationIsKuvaohjelmalautakunta(head) && !enums.authorOrganizationIsElokuvalautakunta(head)
 }
 
 var isReclassification = exports.isReclassification = function(program, classification) {

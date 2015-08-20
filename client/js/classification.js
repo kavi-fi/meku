@@ -211,6 +211,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       var date = val != '' ? moment(val, utils.dateFormat).toJSON() : ''
       save($(this).attr('name'), date)
     })
+    updateAuthorOrganizationDependantValidation()
+
     $form.find('input[name="classification.buyer"]').on('change', function() {
       var $billing = $form.find('input[name="classification.billing"]')
       if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate').trigger('change')
@@ -271,12 +273,33 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   }
 
   function onProgramUpdated(updatedProgram) {
-    var updatedClassification = classificationFinder(updatedProgram)
-    cfu.updateWarningOrdering($form, updatedClassification)
+    selectedClassification = classificationFinder(updatedProgram)
+    updateAuthorOrganizationDependantValidation()
+    cfu.updateWarningOrdering($form, selectedClassification)
     $form.find('.program-box-container').html(detailRenderer.render(cfu.cloneForProgramBox(updatedProgram, classificationFinder, rootEditMode)).show())
     $form.find('.program-box-container .buttons').remove()
-    if (rootEditMode) $form.find('.program-box-container .classifications .classification[data-id="'+updatedClassification._id+'"]').click()
-    emailRenderer.update(updatedProgram, updatedClassification, rootEditMode)
+    if (rootEditMode) $form.find('.program-box-container .classifications .classification[data-id="'+selectedClassification._id+'"]').click()
+    emailRenderer.update(updatedProgram, selectedClassification, rootEditMode)
+  }
+
+  function updateAuthorOrganizationDependantValidation() {
+    var isClassificationInfoRequired = !(enums.authorOrganizationIsElokuvalautakunta(selectedClassification) || enums.authorOrganizationIsKuvaohjelmalautakunta(selectedClassification) || enums.authorOrganizationIsKHO(selectedClassification))
+    var hiddenInputNames = ['classification.reason', 'classification.buyer', 'classification.billing']
+    var hiddenInputs = hiddenInputNames.map(function (name) { return $('input[name="' + name + '"]') })
+
+    if (isClassificationInfoRequired) {
+      hiddenInputs.forEach(function (input) {
+        $(input).addClass('required')
+        $(input).trigger('validate')
+        $(input).removeAttr('disabled')
+      })
+    } else {
+      hiddenInputs.forEach(function (input) {
+        $(input).trigger('setVal', '')
+        $(input).removeClass('required invalid')
+        $(input).attr('disabled', 'disabled')
+      })
+    }
   }
 }
 

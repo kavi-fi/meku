@@ -497,7 +497,13 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
     var oldSeries = program.toObject().series
     var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     watcher.applyUpdates(req.body)
-    program.classifications.forEach(function(c) { Program.updateClassificationSummary(c) })
+    program.classifications.forEach(function(c) {
+      if (enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c)) {
+        c.reason = undefined
+        c.buyer = undefined
+        c.billing = undefined
+      }
+      Program.updateClassificationSummary(c) })
     verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
       if (err) return next(err)
       program.populateAllNames(function(err) {

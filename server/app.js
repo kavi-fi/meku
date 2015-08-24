@@ -515,7 +515,10 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
             updateMetadataIndexes(program, function() {
               updateTvSeriesClassification(program, function(err) {
                 if (err) return next(err)
-                updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, respond(res, next, program))
+                updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, function (err) {
+                  if (err) return next(err)
+                  updateInvoicerows(program, respond(res, next, program))
+                })
               })
             })
           })
@@ -1515,6 +1518,27 @@ function updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, previou
   } else {
     callback()
   }
+}
+
+function updateInvoicerows(program, callback) {
+  InvoiceRow.find({'program': program._id}, function (err, invoiceRows) {
+    if (err) return next(err)
+    var billing = program.classifications.length > 0 ? program.classifications[0].billing : undefined
+    async.forEach(invoiceRows, function(invoiceRow, callback) {
+      if (invoiceRow.name !== program.name || (billing && invoiceRow.account.name !== billing.name)) {
+        invoiceRow.name = program.name
+        if (billing) {
+          invoiceRow.account._id = billing._id
+          invoiceRow.account.name = billing.name
+        }
+        invoiceRow.save(callback)
+      } else callback()
+    },function (err) {
+      if (err) return callback(err)
+      callback()
+    })
+  })
+
 }
 
 function updateTvSeriesClassification(program, callback) {

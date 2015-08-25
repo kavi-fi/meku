@@ -448,7 +448,24 @@ SequenceSchema.statics.next = function(seqName, callback) {
 }
 var Sequence = exports.Sequence = mongoose.model('sequences', SequenceSchema)
 
-var models = exports.models = [Program, Account, Provider, ProviderMetadata, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog]
+var ClassificationCriteriaSchema = new Schema({
+  id: Number,
+  category: String,
+  age: Number,
+  fi: {
+    title: String,
+    description: String
+  },
+  sv: {
+    title: String,
+    description: String
+  },
+  date: Date
+})
+
+var ClassificationCriteria = exports.ClassificationCriteria = mongoose.model('classificationCriteria', ClassificationCriteriaSchema)
+
+var models = exports.models = [Program, Account, Provider, ProviderMetadata, User, InvoiceRow, XmlDoc, Director, Actor, ProductionCompany, Sequence, ChangeLog, ClassificationCriteria]
 
 function ensureSequenceId(sequenceName) {
   return function(next) {

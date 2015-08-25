@@ -13,6 +13,7 @@ var InvoiceRow = schema.InvoiceRow
 var ChangeLog = schema.ChangeLog
 var Provider = schema.Provider
 var ProviderMetadata = schema.ProviderMetadata
+var ClassificationCriteria = schema.ClassificationCriteria
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var kieku = require('./kieku')
@@ -1279,6 +1280,17 @@ app.get('/report/:name', requireRole('root'), function(req, res, next) {
   reports[req.params.name](range, respond(res, next))
 })
 
+app.get('/classification/criteria', function (req, res, next) {
+  ClassificationCriteria.find({}, respond(res, next))
+})
+
+app.post('/classification/criteria/:id', requireRole('root'), function (req, res, next) {
+  var id = parseInt(req.params.id)
+  ClassificationCriteria.findOneAndUpdate({ id: id }, {
+    $set: {id: id, fi: req.body.fi, sv: req.body.sv, date: new Date() }
+  }, {upsert: true}, respond(res, next))
+})
+
 if (env.isTest) {
   app.get('/emails/latest', function(req, res) { res.send(_.last(testEnvEmailQueue)) })
 }
@@ -1409,7 +1421,7 @@ function forceSSL(req, res, next) {
 }
 
 function buildRevisionCheck(req, res, next) {
-  var entryPoints = ['/', '/public.html', '/index.html', '/register-provider.html', '/reset-password.html']
+  var entryPoints = ['/', '/public.html', '/index.html', '/register-provider.html', '/reset-password.html', 'classification-criteria/.html']
   if (_.contains(entryPoints, req.path)) {
     res.cookie('build.revision', buildRevision)
   } else if (req.xhr && req.path != '/templates.html') {

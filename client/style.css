@@ -588,6 +588,7 @@ textarea.invalid:disabled,
   margin-top: 15px;
   border: 1px solid #D3D3D3;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.10);
+  overflow: auto;
 }
 
 .classification-criteria .category .criteria:hover {
@@ -833,6 +834,25 @@ textarea.invalid:disabled,
 #provider-page .billing td { padding: 5px 5px 5px 10px; }
 #provider-page .billing .left-margin { margin-left: 10px; }
 #provider-page .billing td.empty-row { padding-bottom: 20px; }
+
+#criteria-page label {
+  display: block;
+  width: 940px;
+}
+#criteria-page label span {
+  width: 150px;
+  margin-top: 10px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#criteria-page input, #criteria-page textarea {
+  width: 700px;
+}
+
+#criteria-page button {
+  margin-bottom: 20px;
+}
 
 #reports-page .input .label { min-width: 140px; vertical-align: top; padding-top: 12px; }
 #reports-page .input td { padding-bottom: 25px; }

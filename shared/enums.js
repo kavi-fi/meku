@@ -415,6 +415,7 @@ enums.util.toCountryString = function(countries) { return countries.map(function
 
 enums.warnings = { violence: 'Väkivalta', sex: 'Seksi', fear: 'Ahdistus', drugs: 'Päihteet' }
 
+// Eventually classification criteria titles and descriptions should be retrieved from db
 enums.classificationCriteria = [
   { id:1,  category: 'violence', age: 18,
     fi: { title: "Erittäin voimakasta väkivaltaa", description: "Fiktiivistä, realistista ja erittäin veristä ja yksityiskohtaista tai erittäin pitkäkestoista ja yksityiskohtaista tai erittäin pitkäkestoista ja sadistista ihmisiin tai eläimiin kohdistuvaa väkivaltaa." },

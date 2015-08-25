@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="vendor/normalize-3.0.1.css" media="all" rel="stylesheet" />
+  <link href="vendor/font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet"/>
+  <link href="style.css" media="all" rel="stylesheet" />
+  <script src="vendor/jquery-2.1.1.min.js"></script>
+  <script src="vendor/lodash-2.4.1.min.js"></script>
+  <script src="vendor/jquery.highlight-3-custom.js"></script>
+  <script src="vendor/jquery.cookie-1.4.1.js"></script>
+  <script src="vendor/moment-2.8.2.min.js"></script>
+  <script src="shared/enums.js"></script>
+  <script src="shared/classification-utils.js"></script>
+  <script src="shared/utils.js"></script>
+  <!--script src="shared/i18n.js"></script-->
+  <script src="js/shared.js"></script>
+  <script src="js/program-box.js"></script>
+  <script src="js/classificationCriteria.js"></script>
+  <script src="/environment"></script>
+  <script>
+    if (APP_ENVIRONMENT == 'development') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
+  </script>
+  <script>
+    $(function() {
+      if (APP_ENVIRONMENT == 'training') $('.training-ribbon').show()
+      else if (APP_ENVIRONMENT == 'development') $('.development-ribbon').show()
+      registerRevisionMismatchAjaxErrorHandler()
+      loadTemplates(function() {
+        classificationCriteria()
+        $('#criteria-page').trigger('show').show()
+      })
+    })
+  </script>
+  <title>Kuvaohjelmien luokittelukriteerien muokkaustyökalu</title>
+</head>
+<body>
+  <div class="training-ribbon"><span>Koulutusympäristö</span></div>
+  <div class="development-ribbon"><span>Kehitysympäristö</span></div>
+  <div id="header">
+    <div class="content">
+      <div>
+        <div class="toggleLanguage"></div>
+        <h1>Kuvaohjelmien luokittelukriteerien muokkaustyökalu</h1>
+      </div>
+    </div>
+  </div>
+  <div id="criteria-page" class="page"></div>
+</div>
+<div id="templates"></div>
+<div id="overlay"></div>
+<div id="dialog"></div>
+</body>
+</html>

@@ -339,20 +339,20 @@ function classificationFormUtils() {
 
   function renderClassificationCriteria($form) {
     var lang = langCookie()
-    enums.criteriaCategories.map(function(category) {
-      var criteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
-      var $criteria = criteria.map(function(c) {
-        if (c.category === 'vet') {
-          return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
-            .append($('<h5>').text(c[lang].title + ' '))
-            .append($('<p>').text(''))
-        }
-        return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
-          .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text('(' + c.id + ')')))
-          .append($('<p>').text(c[lang].description))
-          .append($('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:i18nText('Kommentit...'), class:'throttledInput' }))
+    $.get('/classification/criteria').done(function (criteria) {
+      enums.criteriaCategories.map(function(category) {
+        var classificationCriteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
+        var $criteria = classificationCriteria.map(function(enumCriteria) {
+          var storedCriteria = _.find(criteria, function (c) { return c.id == enumCriteria.id})
+          var c = storedCriteria ? storedCriteria : enumCriteria
+          var isVet = enumCriteria.category === 'vet'
+          return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + enumCriteria.age, 'data-id': c.id})
+            .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + c.id + ')')))
+            .append($('<p>').html(isVet ? '' : c[lang].description))
+            .append(isVet ? '' : $('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:i18nText('Kommentit...'), class:'throttledInput' }))
+        })
+        $form.find('.category-container .' + category).append($criteria)
       })
-      $form.find('.category-container .' + category).append($criteria)
     })
   }
 

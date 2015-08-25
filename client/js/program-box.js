@@ -154,6 +154,12 @@ function programBox() {
   }
 
   function renderClassification($e, p, c) {
+    $.get('/classification/criteria').done(function (criteria) {
+      renderClassificationWithStoredCriteria($e, p, c, criteria)
+    })
+  }
+
+  function renderClassificationWithStoredCriteria($e, p, c, criteria) {
     var summary = classificationUtils.summary(c)
     var showAuthor = !(enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c))
     $e.find('.agelimit').attr('src', ageLimitIcon(summary)).end()
@@ -165,7 +171,7 @@ function programBox() {
       .find('.billing').labeledText(c.billing && c.billing.name || '').end()
       .find('.format').labeledText(txtIfNotCurrent(enums.util.isGameType(p) && p.gameFormat || c.format)).end()
       .find('.duration').labeledText(txtIfNotCurrent(c.duration)).end()
-      .find('.criteria').html(renderClassificationCriteria(c)).end()
+      .find('.criteria').html(renderClassificationCriteria(c, criteria)).end()
       .find('.comments').labeledText(c.comments).end()
       .find('.publicComments').labeledText(c.publicComments).end()
       .find('.commentHeader').toggle(!!(c.comments || c.publicComments)).end()
@@ -176,15 +182,18 @@ function programBox() {
     function txtIfNotCurrent(txt) { return (p.classifications[0]._id == c._id) ? '' : txt }
   }
 
-  function renderClassificationCriteria(c) {
+  function renderClassificationCriteria(c, criteria) {
     if (!c.criteria || c.safe || !window.user) return ''
     var lang = langCookie()
     return c.criteria.map(function(id) {
-      var cr = enums.classificationCriteria[id - 1]
-      if (cr.category === 'vet') return ''
-      var category = enums.classificationCategoriesFI[cr.category]
+      var enumCriteria = enums.classificationCriteria[id - 1]
+      if (enumCriteria.category === 'vet') return ''
+      var storedCriteria = _.find(criteria, function (c) { return c.id == enumCriteria.id})
+      var cr = storedCriteria ? storedCriteria : enumCriteria
+      var category = enums.classificationCategoriesFI[enumCriteria.category]
+
       return $('<div>')
-        .append($('<label>', { title: cr[lang].title+': '+cr[lang].description }).text(i18nText(category) + ' ('+cr.id+')'))
+        .append($('<label>', { title: cr[lang].title + ': ' + $('<div>').html(cr[lang].description).text() }).text(i18nText(category) + ' ('+cr.id+')'))
         .append($('<p>').text(renderCriteriaComments()))
 
       function renderCriteriaComments() {

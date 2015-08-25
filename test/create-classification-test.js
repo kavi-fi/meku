@@ -82,8 +82,6 @@ describe('create-classification-test', function() {
         .assertSelect2Value('#classification-page .select2-container.x-actors', ['Bill Murray', 'Harold Ramis', 'Dan Aykroyd', 'Sigourney Weaver'])
         .assertValue('#classification-page textarea[name=synopsis]', 'The plot is unknown at this time.')
 
-        .assertDisabled('#classification-page input[name="classification.buyer"]')
-        .assertDisabled('#classification-page input[name="classification.billing"]')
         .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org'])
 
         .select2one('#classification-page .select2-container.x-classificationReason', 'pal', 'Palaute')
@@ -108,7 +106,6 @@ describe('create-classification-test', function() {
         .assertAgelimitAndWarnings('#search-page .program-box .warning-summary', 'S')
         .assertText('#search-page .program-box .reason', 'Palaute')
         .assertText('#search-page .program-box .current-duration', '02:22:22')
-        .assertText('#search-page .program-box .author', 'kavi (KAVI)')
         .assertText('#search-page .program-box .publicComments', 'PUBLIC COMMENTS')
         .assertText('#search-page .program-box .comments', 'POW2! by Webdriverio+Selenium/WebDriver')
         .click('#search-page .program-box .classifications .classification:nth-child(2)')

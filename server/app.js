@@ -622,6 +622,16 @@ app.get('/series/search', function(req, res, next) {
   })
 })
 
+app.get('/accounts/access/:id', function(req, res, next) {
+  if (utils.hasRole(req.user, 'kavi')) {
+    res.send({access: true})
+  } else {
+    Account.findById(req.params.id, function(err, account) {
+      res.send({access: err === null && account.users.id(req.user._id) !== null})
+    })
+  }
+})
+
 app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
   if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
   Account.findById(req.params.id, function(err, account) {

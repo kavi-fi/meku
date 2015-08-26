@@ -83,8 +83,13 @@ function internalSearchPage() {
   $results.on('click', 'button.copy', function() {
     var id = $(this).closest('.program-box').data('id')
     $.get('/programs/' + id, function (origProgram) {
-      $.post('/programs/new', JSON.stringify({ programType: origProgram.programType, origProgram: origProgram })).done(function (program) {
-        showClassificationPage(program._id)
+      var _id = origProgram.classifications.length > 0 && origProgram.classifications[0].buyer ? origProgram.classifications[0].buyer._id : 0
+      $.get('/accounts/access/' + _id, function (res) {
+        if (res.access) {
+          $.post('/programs/new', JSON.stringify({ programType: origProgram.programType, origProgram: origProgram })).done(function (program) {
+            showClassificationPage(program._id)
+          })
+        } else showDialog($('#templates').find('.copy-forbidden-dialog').clone().find('.button').on('click', closeDialog).end())
       })
     })
   })

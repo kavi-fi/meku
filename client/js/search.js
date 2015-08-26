@@ -236,7 +236,7 @@ function internalSearchPage() {
       $detail.find('button.reclassify').toggle(classificationUtils.canReclassify(p, user))
       $detail.find('button.recategorize').toggle(hasRole('kavi'))
     }
-    $detail.find('button.copy').toggle(enums.util.isTvEpisode(p))
+    $detail.find('button.copy').toggle(enums.util.isTvEpisode(p) || enums.util.isTrailer(p))
     $detail.find('button.categorize').toggle(enums.util.isUnknown(p))
     $detail.find('button.edit').toggle(hasRole('root'))
     $detail.find('button.remove').toggle(hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count == 0))

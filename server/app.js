@@ -342,6 +342,10 @@ app.post('/programs/new', function(req, res, next) {
       draftClassification.billing = origProgram.classifications[0].billing
       draftClassification.format = origProgram.classifications[0].format
     }
+    if (enums.util.isTrailer(origProgram)) {
+      p.synopsis = origProgram.synopsis
+
+    }
   }
   p.save(function(err, program) {
     if (err) return next(err)

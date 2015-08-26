@@ -137,6 +137,7 @@ enums.util.programTypeName = function(programType) {
 
 enums.util.isTvEpisode = function(p) { return p.programType == 3 }
 enums.util.isOtherTv = function(p) { return p.programType == 4 }
+enums.util.isTrailer = function(p) { return p.programType == 6 }
 enums.util.isMovieType = function(p) { return p.programType == 1 || p.programType == 5 || p.programType == 6 }
 enums.util.isGameType = function(p) { return p.programType == 7 }
 enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 7 }

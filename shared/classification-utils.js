@@ -292,8 +292,9 @@ exports.durationToSeconds = function(duration) {
   if (!duration) return 0
   var trimmed = duration.trim && duration.trim() || $.trim(duration)
   var parts = /(?:(\d+)?:)?(\d+):(\d+)$/.exec(trimmed)
-    .slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
-  return (parts[0] * 60 * 60) + (parts[1] * 60) + parts[2]
+  if (parts === null) return 0
+  var intParts = parts.slice(1).map(function (x) { return x === undefined ? 0 : parseInt(x) })
+  return (intParts[0] * 60 * 60) + (intParts[1] * 60) + intParts[2]
 }
 
 exports.secondsToDuration = function(seconds) {

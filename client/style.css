@@ -856,6 +856,8 @@ textarea.invalid:disabled,
 #reports-page .report-kavi-durations-table .id { min-width: 400px; }
 #reports-page .report-kavi-durations-table .reclassifications { border-bottom: 1px solid #ddd; }
 
+#reports-page .report-durations-table .id { min-width: 400px; }
+
 .rotating.fa-play {
     margin-right: 7px;
     margin-left: 1px;

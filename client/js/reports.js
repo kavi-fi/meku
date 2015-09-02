@@ -45,7 +45,9 @@ function reportsPage() {
   }
 
   function render(reportName, report) {
-    if (reportName == 'kaviDurations') {
+    if (reportName == 'durations') {
+      renderDurations(report)
+    } else if (reportName == 'kaviDurations') {
       renderKaviDurations(report)
     } else if (reportName == 'kaviClassificationList') {
       renderKaviClassificationList(report)
@@ -54,6 +56,21 @@ function reportsPage() {
     }
   }
 
+  function renderDurations(report) {
+    var $table = $('#templates > .report-durations-table').clone()
+    var $rowTemplate = $table.find('tbody tr').clone()
+    $table.find('thead .id').text($reportSelection.find('.selected').text())
+    var $tbody = $table.find('tbody').empty()
+    $tbody.append((report || []).map(renderRow))
+
+    function renderRow(row) {
+      return $rowTemplate.clone()
+        .find('.id').text(enums.programType[row._id].fi).end()
+        .find('.count').text(row.count).end()
+        .find('.duration').text(classificationUtils.secondsToDuration(row.value)).end()
+    }
+    $report.html($table)
+  }
   function renderKaviDurations(report) {
     var $table = $('#templates > .report-kavi-durations-table').clone()
     $table.find('thead .id').text($reportSelection.find('.selected').text())

@@ -495,6 +495,33 @@ app.post('/programs/:id/categorization', function(req, res, next) {
   })
 })
 
+app.get('/programs/fix-trainees/:programName', requireRole('root'), function(req, res, next) {
+  if (process.env.NODE_ENV === 'production') return next('Do not use this in production')
+  var regex = new RegExp(req.params.programName + ' \(.*\)', 'g')
+  Program.find({name: {$regex: regex}, deleted: {$ne: true}}, function (err, programs) {
+    if (err) return next(err)
+    if (programs.length === 0) return next('Maintenance: No programs found to fix')
+    var filteredPrograms = _.filter(programs, function (program) {
+      var createdBy = program.createdBy ? program.createdBy : {}
+      return program.classifications.length > 0 && program.classifications[0].author && (createdBy.name !== program.classifications[0].author.name || createdBy.role !== 'trainee')
+    })
+    if (filteredPrograms.length === 0) return next('Maintenance: No programs found to fix (no changes in createdBy or unknown author)')
+    async.forEach(filteredPrograms, function(program, callback) {
+      var createdBy = program.createdBy ? program.createdBy : {}
+      if (createdBy.name !== program.classifications[0].author.name) {
+        var action = program.createdBy ? 'Replaced author ' + program.createdBy.name + ' with' : 'Added author'
+        program.createdBy = program.classifications[0].author
+        console.info('Maintenance: ' + action + ' ' + program.createdBy.name + ' for program "' + program.name + '"')
+      }
+      if (program.createdBy && program.createdBy.role !== 'trainee') {
+        program.createdBy.role = 'trainee'
+        console.info('Maintenance: Added role trainee for author of the program "' + program.name + '"')
+      }
+      program.save(callback)
+    }, respond(res, next))
+  })
+})
+
 app.post('/programs/:id', requireRole('root'), function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)

@@ -268,6 +268,8 @@ enums.authorOrganizationIsKuvaohjelmalautakunta = function(c) { return c.authorO
 enums.authorOrganizationIsKHO = function(c) { return c.authorOrganization === 3 }
 enums.authorOrganizationIsElokuvalautakunta = function(c) { return c.authorOrganization === 5 }
 
+enums.fixedKaviRecipients = ['leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'tuula.roos@kavi.fi']
+
 enums.invoiceRowType = {
   registration: 'Kuvaohjelman rekisteröinti',
   classification: 'KAVI:n luokittelu',

@@ -489,6 +489,7 @@ function classificationFormUtils() {
 
       var email = classificationUtils.registrationEmail(program, classification, user, location.protocol + '//' + location.host)
 
+      updateEmails('kavi', user.role === 'kavi' ? enums.fixedKaviRecipients : [])
       updateEmails('sent', email.recipients)
       updateEmails('manual', classification.registrationEmailAddresses)
 
@@ -496,10 +497,11 @@ function classificationFormUtils() {
         var current = getCurrentEmailSelection()
         var bySource = _.curry(function(source, e) { return e.source == source })
         var toOption = _.curry(function(source, locked, e) { return {id: e, text: e, locked: locked, source: source } })
+        var kavi = source == 'kavi' ? emails.map(toOption('kavi', true)) : current.filter(bySource('kavi'))
         var sent = source == 'sent' ? emails.map(toOption('sent', true)) : current.filter(bySource('sent'))
         var buyer = source == 'buyer' ? emails.map(toOption('buyer', true)) : current.filter(bySource('buyer'))
         var manual = source == 'manual' ? emails.map(toOption('manual', false)) : current.filter(bySource('manual'))
-        $input.select2('data', sent.concat(buyer).concat(manual)).trigger('validate')
+        $input.select2('data', sent.concat(buyer).concat(manual).concat(kavi)).trigger('validate')
       }
 
       function getCurrentEmailSelection() {

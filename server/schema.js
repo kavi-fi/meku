@@ -3,6 +3,7 @@ var utils = require('../shared/utils')
 var classificationUtils = require('../shared/classification-utils')
 var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
+var enums = require('../shared/enums')
 var ObjectId = mongoose.Schema.Types.ObjectId
 var Schema = mongoose.Schema
 var bcryptSaltFactor = 12
@@ -90,7 +91,7 @@ ProgramSchema.methods.newDraftClassification = function(user) {
 
 ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback) {
   var program = this
-  async.parallel([loadAuthorEmails, loadBuyerEmails], function(err, emails) {
+  async.parallel([loadAuthorEmails, loadBuyerEmails, loadFixedKaviUsers], function(err, emails) {
     if (err) return callback(err)
     var manual = _.pluck(program.classifications, 'registrationEmailAddresses')
     program.sentRegistrationEmailAddresses = _(emails.concat(manual)).flatten().compact().uniq().value()
@@ -102,6 +103,13 @@ ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback
   }
   function loadBuyerEmails(callback) {
     load(Account, uniqIds('buyer'), 'emailAddresses', 'emailAddresses', callback)
+  }
+  function loadFixedKaviUsers(callback) {
+    if (!program.classifications || program.classifications.length === 0 || !program.classifications[0].author) return callback(null, [])
+    load(User, [program.classifications[0].author._id], 'role', function(u) { return u.role }, function (err, roles) {
+      var emails = roles && roles.length > 0 && roles[0] === 'kavi' ? enums.fixedKaviRecipients : []
+      callback(null, emails)
+    })
   }
   function load(schema, ids, field, plucker, callback) {
     schema.find({ _id: { $in: ids } }, field).lean().exec(function(err, docs) {

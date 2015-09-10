@@ -40,7 +40,8 @@ function classificationV(p, user) {
       requiredRef('billing')
     )),
     arrayEach('registrationEmailAddresses', utils.isEmail),
-    when(isInternalReclassification, all(requiredNumber('authorOrganization'), requiredNumber('reason'))),
+    when(isInternalReclassification, requiredNumber('authorOrganization')),
+    when(and(isInternalReclassification, not(isAuthoredByEloKuvalautakuntaKuvaohjelmalautakuntaOrKHO)), requiredNumber('reason')),
     when(or(isKavi, not(isGame)), all(requiredString('duration'), check('duration', utils.isValidDuration))),
     when(not(isGame), requiredString('format'))
   )
@@ -55,6 +56,10 @@ function classificationV(p, user) {
 
   function isInternalReclassification(c) {
     return classificationUtils.isReclassification(p, c) && isKavi()
+  }
+
+  function isAuthoredByEloKuvalautakuntaKuvaohjelmalautakuntaOrKHO(c) {
+    return enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c)
   }
 }
 
@@ -131,6 +136,12 @@ function when(f, v) {
   return function(p) {
     if (f(p)) return v(p)
     else return Ok()
+  }
+}
+
+function and(v1, v2) {
+  return function(p) {
+    return v1(p) && v2(p)
   }
 }
 

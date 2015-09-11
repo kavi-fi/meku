@@ -317,6 +317,7 @@ function classificationFormUtils() {
     $('#classification-page').html($('#templates .program-details').clone())
     var $form = $('#classification-page .program-details-form')
     renderClassificationCriteria($form)
+    replaceWithStoredClassificationCriteria($form)
     renderExtraNameFields($form, program)
     filterFields($form, program, classification, editMode)
     if (editMode) configureRootEditMode($form, program, classification)
@@ -339,23 +340,30 @@ function classificationFormUtils() {
 
   function renderClassificationCriteria($form) {
     var lang = langCookie()
-    $.get('/classification/criteria').done(function (criteria) {
-      enums.criteriaCategories.map(function(category) {
-        var classificationCriteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
-        var $criteria = classificationCriteria.map(function(enumCriteria) {
-          var storedCriteria = _.find(criteria, function (c) { return c.id == enumCriteria.id})
-          var c = storedCriteria ? storedCriteria : enumCriteria
-          var isVet = enumCriteria.category === 'vet'
-          return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + enumCriteria.age, 'data-id': c.id})
-            .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + c.id + ')')))
-            .append($('<p>').html(isVet ? '' : c[lang].description))
-            .append(isVet ? '' : $('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:i18nText('Kommentit...'), class:'throttledInput' }))
-        })
-        $form.find('.category-container .' + category).append($criteria)
+    enums.criteriaCategories.map(function(category) {
+      var classificationCriteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
+      var $criteria = classificationCriteria.map(function (c) {
+        var isVet = c.category === 'vet'
+        return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
+          .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + c.id + ')')))
+          .append($('<p>').html(isVet ? '' : c[lang].description))
+          .append(isVet ? '' : $('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:i18nText('Kommentit...'), class:'throttledInput' }))
       })
+      $form.find('.category-container .' + category).append($criteria)
     })
   }
 
+  function replaceWithStoredClassificationCriteria($form) {
+    var lang = langCookie()
+    $.get('/classification/criteria').done(function (storedCriteria) {
+      storedCriteria.forEach(function (criteria) {
+        var isVet = enums.classificationCriteria.find(function (c) { return c.id == criteria.id}).category === 'vet'
+        var $div = $form.find('div[data-id=' + criteria.id + ']')
+        $div.find('h5').empty().append($('<h5>').text(criteria[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + criteria.id + ')')))
+        $div.find('p').html(isVet ? '' : criteria[lang].description)
+      })
+    })
+  }
   function filterFields($form, program, classification, editMode) {
     var isReclassification = classificationUtils.isReclassification(program, classification)
     var isInternalReclassification = isReclassification && hasRole('kavi')

@@ -1,4 +1,4 @@
-var fs = require('fs'),
+  var fs = require('fs'),
     xml = require('xml-object-stream'),
     enums = require('../shared/enums'),
     _ = require('lodash'),

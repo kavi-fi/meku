@@ -8,7 +8,7 @@ var envs = {
   },
   training: {
     port: 3000,
-    hostname: 'https://meku-training.herokuapp.com',
+    hostname: 'https://luokittelu-koulutus.kavi.fi',
     sendEmail: true,
     forceSSL: true
   },

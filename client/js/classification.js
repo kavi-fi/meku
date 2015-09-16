@@ -24,7 +24,9 @@ function classificationPage() {
     }
   }
   function draftClassificationFinder(program) {
-    return program.draftClassifications[user._id]
+    var draftClassification = program.draftClassifications[user._id]
+    if (draftClassification) draftClassification.registrationDate = new Date()
+    return draftClassification
   }
 }
 
@@ -96,6 +98,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       onSelect: function() { $registrationDate.trigger('input') }
     }
     $registrationDate.pikaday(_.defaults(pikadayOpts, pikadayDefaults))
+    if (c.status === 'in_process') saveRegistrationDate($registrationDate)
 
     c.criteria.forEach(function(id) { $form.find('.criteria[data-id=' + id + ']').addClass('selected') })
     Object.keys(c.criteriaComments || {}).forEach(function(id) {
@@ -205,11 +208,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       var val = $(this).val()
       $form.find('input[name="series"]').select2('data', { id: val, text: val, isNew: true })
     })
-    $form.find('input[name="classification.registrationDate"]').on('input', function() {
-      if ($(this).hasClass('invalid')) return false
-      var val = $.trim($(this).val())
-      var date = val != '' ? moment(val, utils.dateFormat).toJSON() : ''
-      save($(this).attr('name'), date)
+    $form.find('input[name="classification.registrationDate"]').on('input', function () {
+      saveRegistrationDate($(this))
     })
     $form.find('input[name="classification.buyer"]').on('change', function() {
       var $billing = $form.find('input[name="classification.billing"]')
@@ -248,6 +248,13 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         $container[isInitial ? 'hide' : 'slideUp']()
       }
     }
+  }
+
+  function saveRegistrationDate($registrationDate) {
+    if ($registrationDate.hasClass('invalid')) return false
+    var val = $.trim($registrationDate.val())
+    var date = val != '' ? moment(val, utils.dateFormat).toJSON() : ''
+    save($registrationDate.attr('name'), date)
   }
 
   function save(field, value) {

@@ -211,8 +211,6 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       var date = val != '' ? moment(val, utils.dateFormat).toJSON() : ''
       save($(this).attr('name'), date)
     })
-    updateAuthorOrganizationDependantValidation()
-
     $form.find('input[name="classification.buyer"]').on('change', function() {
       var $billing = $form.find('input[name="classification.billing"]')
       if (!$billing.select2('data')) $billing.select2('data', $(this).select2('data')).trigger('validate').trigger('change')

@@ -241,9 +241,33 @@ var i18n = {
     'Kuvaohjelma sisältää myös alempiin ikärajoihin liittyvät kriteerit': 'Bildprogrammet innehåller även kriterier som hör till lägre åldersgränser',
 
     // Manual addition:
-    'Kuvaohjelmien luokittelu- ja valvontajärjestelmä ei toimi selainversiollasi. Tuettuja selaimia ovat: ': 'Systemet för klassificering och övervakning av bildprogram fungerar inte med din webbläsare. Webbläsare som vi stödjer är bl.a.'
+    'Kuvaohjelmien luokittelu- ja valvontajärjestelmä ei toimi selainversiollasi. Tuettuja selaimia ovat: ': 'Systemet för klassificering och övervakning av bildprogram fungerar inte med din webbläsare. Webbläsare som vi stödjer är bl.a.',
+
+    // Kieku
+    'Valvontamaksu, vuosi': 'Tillsynsavgift, år',
+    'Lasku yhteensä': 'Totalt',
+    'KOONTILASKUTUS': 'Månadsfakturering',
+    'luokiteltu': 'klassificerat',
+    'uudelleenluokiteltu': 'omklassificerat',
+    'rekisteröity': 'anmält',
+    'kuvaohjelma' : 'bildprogram',
+    'kuvaohjelmaa': 'bildprogram',
+    'yhteensä': 'totalt'
+  },
+  en: {
+    // Kieku
+    'Valvontamaksu, vuosi': 'Supervision fee, year',
+    'Lasku yhteensä': 'Total',
+    'KOONTILASKUTUS': 'Monthly invoice',
+    'luokiteltu': 'classified',
+    'uudelleenluokiteltu': 'reclassified',
+    'rekisteröity': 'registered',
+    'kuvaohjelma' : 'audiovisual program',
+    'kuvaohjelmaa': 'audiovisual programs',
+    'yhteensä': 'total'
   }
 }
+i18n.se = i18n.sv // fix language = "SE" problem
 
 var i18nDateRangePicker = {
   fi: {

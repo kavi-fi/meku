@@ -3,6 +3,7 @@ var moment = require('moment')
 var excelWriter = require('./excel-writer')
 var fs = require('fs')
 var enums = require('../shared/enums')
+var i18n = require('../shared/i18n')
 
 var dateFormat = 'DD.MM.YYYY'
 
@@ -14,8 +15,11 @@ exports.createYearlyProviderRegistration = function createYearlyProviderRegistra
   return createBilling(accountRows, _.curry(providerBillingHeader)(moment().year()), providerRowDescription, _.curry(providerBillingFooter)(accountRows))
 }
 
+function t(txt, lang) { return i18n[lang] ? i18n[lang][txt] || txt : txt }
+function lang(invoice) { return (invoice.billingLanguage || 'fi').toLowerCase() }
+
 function providerBillingHeader(year, invoice) {
-  return 'Valvontamaksu, vuosi ' + (year ? year : invoice.registrationDate.getFullYear())
+  return t('Valvontamaksu, vuosi', lang(invoice)) + ' ' + (year ? year : invoice.registrationDate.getFullYear())
 }
 
 function providerRowDescription(invoice) {
@@ -24,13 +28,13 @@ function providerRowDescription(invoice) {
 
 function providerBillingFooter(accountRows, invoice) {
   var account = findAccountHavingInvoice(accountRows, invoice)
-  return 'Lasku yhteensä ' + price(account.rows) + ' EUR'
+  return t('Lasku yhteensä', lang(invoice)) + ' ' + price(account.rows) + ' EUR'
 }
 
 exports.createClassificationRegistration = function createClassificationRegistration(dateRange, accountRows) {
   function billingHeader(invoice) {
     var period = dateRange.begin + ' - ' + dateRange.end
-    return 'KOONTILASKUTUS ' + period
+    return t('KOONTILASKUTUS', lang(invoice)) + ' ' + period
   }
   function rowDescription(invoice) {
     return [
@@ -42,8 +46,8 @@ exports.createClassificationRegistration = function createClassificationRegistra
   function billingFooter(invoice) {
     function summaryText(type, rows) {
       var typeString = { classification: 'luokiteltu', reclassification: 'uudelleenluokiteltu', registration: 'rekisteröity' }
-      var plural = rows.length > 1 ? ' kuvaohjelmaa ' : ' kuvaohjelma '
-      return rows.length + plural + typeString[type] + ', yhteensä ' + price(rows) + ' EUR.'
+      var plural = rows.length > 1 ? 'kuvaohjelmaa' : 'kuvaohjelma'
+      return rows.length + ' ' + t(plural, lang(invoice)) + ' ' + t(typeString[type], lang(invoice)) + ', ' + t('yhteensä', lang(invoice)) + ' ' + price(rows) + ' EUR.'
     }
     var account = findAccountHavingInvoice(accountRows, invoice)
     var rowsPerType = _.groupBy(account.rows, 'type')
@@ -72,7 +76,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var accountInvoiceOperator = account.billingPreference == 'eInvoice' ? account.eInvoice.operator : ''
     var accountInvoiceAddress = account.billingPreference == 'eInvoice' ? account.eInvoice.address : ''
     var customerNumber = account.billingPreference == 'address' ? account.billing.customerNumber : account.customerNumber
-    var billingLanguage = account.language ? account.language : account.billing.language
+    var billingLanguage = account.language ? account.language : account.billing ? account.billing.language : ''
     var invoiceText = account.billing ? (account.billing.invoiceText || '').replace(/\n/g, ' ') : ''
     var accountAddress = customerNumber && customerNumber.trim().length > 0 ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
 

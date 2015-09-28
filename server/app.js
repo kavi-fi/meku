@@ -440,7 +440,6 @@ function getQueryUserRoleDependencies(userid, role){
   return roleQuery
 }
 
-
 app.get('/episodes/:seriesId', function(req, res, next) {
   var fields = !req.user ? {'classifications.author': 0, 'classifications.authorOrganization': 0, 'classifications.buyer': 0, 'classifications.billing': 0, 'classifications.comments': 0, 'classifications.userComments': 0, draftClassifications: 0 }
     : utils.hasRole(req.user, 'kavi') ? {} : {'classifications.comments': 0}
@@ -1472,6 +1471,54 @@ app.post('/classification/criteria/:id', requireRole('root'), function (req, res
   }, {upsert: true}, respond(res, next))
 })
 
+app.get('/agelimit/:q?', function (req, res, next) {
+  var types = _.map(enums.programType, function (t) { return t.type } )
+  var filtersByType = _.map(req.query.type ? _.isArray(req.query.type) ? req.query.type : [req.query.type] : [], function (t) { return types.indexOf(t) })
+  var queryParams = {
+    "q": req.params.q,
+    "filters": filtersByType
+  }
+  var q = constructQuery(queryParams)
+  var count = req.query.count ? parseInt(req.query.count) : undefined
+
+  function asCriteria(program) {
+    function firstTrimmedFrom(origList) {
+      return origList && origList.length > 0 ? origList[0].trim() : undefined
+    }
+    function trimmedList(origList) {
+      return origList && origList.length > 0 ? _.remove(origList.map(function (p) { return p && p.trim().length > 0 ? p.trim() : undefined }), undefined) : undefined
+    }
+    var classsification = enums.util.isTvSeriesName(program) ? program.episodes : program.classifications[0] || {}
+    var agelimit = classsification.agelimit || classsification.legacyAgeLimit || 0
+    var countryCode = trimmedList(program.country)
+    var durationInSeconds = classificationUtils.durationToSeconds(classsification.duration)
+    return {
+      id: program.sequenceId,
+      type: enums.programType[program.programType].type,
+      name: firstTrimmedFrom(program.name),
+      nameFi: firstTrimmedFrom(program.nameFi),
+      nameSv: firstTrimmedFrom(program.nameSv),
+      nameOthers: trimmedList(program.nameOthers),
+      series: enums.util.isTvEpisode(program) && program.series && program.series.name ? program.series.name.trim() : undefined,
+      season: enums.util.isTvEpisode(program) ? program.season : undefined,
+      episode: enums.util.isTvEpisode(program) ? program.episode : undefined,
+      country: countryCode ? countryCode.map(function (c) { return { code: c, name: enums.countries[c] } }) : undefined,
+      year: isNaN(program.year) ? undefined : parseInt(program.year),
+      directors: trimmedList(program.directors),
+      productionCompanies: trimmedList(program.productionCompanies),
+      duration: classsification.duration,
+      durationInSeconds: durationInSeconds > 0 ? durationInSeconds : undefined,
+      agelimit: agelimit > 0 ? agelimit : undefined,
+      warnings: trimmedList(classsification.warnings)
+    }
+  }
+
+  Program.find(q, Program.publicFields).limit(100).sort('name').lean().exec(function (err, docs) {
+    if (err) return next(err)
+    res.send(_.take(docs, count || docs.length).map(asCriteria))
+  })
+})
+
 if (env.isTest) {
   app.get('/emails/latest', function(req, res) { res.send(_.last(testEnvEmailQueue)) })
 }
@@ -1560,7 +1607,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var optionalList = ['GET:/programs/search/', 'GET:/episodes/', 'GET:/directors/search']
+  var optionalList = ['GET:/programs/search/', 'GET:/episodes/', 'GET:/directors/search', 'GET:/agelimit/']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   if (isWhitelisted(req)) return next()

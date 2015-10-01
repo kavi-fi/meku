@@ -11,8 +11,14 @@ function publicSearchPage() {
   setAgelimit0IconByLanguage($page)
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    $(this).find('.request-reclassification').attr('href', 'https://fi.surveymonkey.com/r/ikarajapalaute').attr('target', '_blank').show()
+    $(this).find('.request-reclassification').on('click', function () { openSurvey(program) })
+    $(this).find('.request-reclassification').show()
   })
+
+  function openSurvey(program) {
+    sendPageview('/#surveymonkey/' + program._id)
+    window.open('https://fi.surveymonkey.com/r/ikarajapalaute')
+  }
 }
 
 function setAgelimit0IconByLanguage($page) {

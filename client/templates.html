@@ -812,3 +812,19 @@
   <label><span data-i18n>Kuvaus ruotsiksi</span> <textarea name="sv.description"></textarea></label>
   <label><span></span><button class="button" data-i18n>Tallenna</button> <i class="stored"></i></label>
 </div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  var trackingCode = {
+    training: 'UA-68316537-1',
+    production: 'UA-68316537-2'
+  };
+  ga('create', trackingCode[APP_ENVIRONMENT], 'auto');
+
+  function sendPageview(path) {
+    if (trackingCode[APP_ENVIRONMENT]) ga('send', 'pageview', path);
+  }
+</script>

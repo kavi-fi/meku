@@ -93,6 +93,8 @@ function loadTemplates(callback) {
 }
 
 function setLocation(path) {
+  if (path === window.location.hash) return
+  sendPageview(window.location.pathname + path)
   history.replaceState(null, null, path)
 }
 

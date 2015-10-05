@@ -156,7 +156,7 @@ function programBox() {
   function renderClassification($e, p, c) {
     $.get('/classification/criteria').done(function (criteria) {
       renderClassificationWithStoredCriteria($e, p, c, criteria)
-    })
+    }).fail(function (err) { console.error(err.statusText) })
   }
 
   function renderClassificationWithStoredCriteria($e, p, c, criteria) {

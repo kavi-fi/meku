@@ -97,6 +97,7 @@ function subscriberManagementPage() {
         name: findInput('name').val(),
         emailAddresses: _.pluck(findInput('emailAddresses').select2('data'), 'text'),
         yTunnus: findInput('yTunnus').val(),
+        ssn: findInput('ssn').val(),
         address: {
           street: findInput('address.street').val(),
           city: findInput('address.city').val(),

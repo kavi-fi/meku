@@ -205,6 +205,7 @@ var AccountSchema = new Schema({
   name: {type: String, index: true},
   roles: [String],
   yTunnus: String,
+  ssn: String,
   address: address,
   billing: { address: address, language: String, invoiceText: String, customerNumber: String }, // lang in [FI,SV,EN]
   eInvoice: { address:String, operator:String },
@@ -248,6 +249,7 @@ var ProviderSchema = new Schema({
   sequenceId: Number,
   registrationDate: Date,
   yTunnus: String,
+  ssn: String,
   customerNumber: String,
   name: String,
   address: { street: String, city: String, zip: String, country: String },

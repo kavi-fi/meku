@@ -67,11 +67,9 @@ exports.canReclassify = function(program, user) {
   var head = program.classifications[0]
   if (!head) return false
   if (enums.util.isTvSeriesName(program)) return false
-  if (head.registrationDate && new Date(head.registrationDate).getFullYear() >= 2012) {
-    if (!utils.hasRole(user, 'kavi')) return false
-    if (enums.util.isUnknown(program)) return false
-  }
   if (program.draftClassifications && program.draftClassifications[user._id]) return false
+  if (utils.hasRole(user, 'kavi')) return true
+  if (head.registrationDate && new Date(head.registrationDate).getFullYear() >= 2012 && enums.util.isUnknown(program)) return false
   return !enums.authorOrganizationIsKHO(head) && !enums.authorOrganizationIsKuvaohjelmalautakunta(head) && !enums.authorOrganizationIsElokuvalautakunta(head)
 }
 

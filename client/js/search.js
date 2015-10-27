@@ -379,6 +379,10 @@ function searchPage() {
   var dateFormat = 'DD.MM.YYYY'
 
   setupKaviFilters()
+  $page.find('.filterbutton').click(function() {
+    $(this).toggleClass('active')
+    $input.trigger('fire')
+  })
 
   $page.on('show', function(e, q, filters, programId) {
     if (q) $input.val(q).trigger('reset')
@@ -486,11 +490,6 @@ function searchPage() {
     $reclassifiedToggle.change(function() {
       $input.trigger('fire')
     })
-
-    $page.find('.kavi-query-filters .filterbutton').click(function() {
-      $(this).toggleClass('active')
-      $input.trigger('fire')
-    })
   }
 
   function loadUntil(selectedProgramId, callback) {
@@ -555,10 +554,10 @@ function searchPage() {
     return $registrationDatePicker.data('selection')
   }
   function currentAgelimits() {
-    return $page.find('.kavi-query-filters .agelimit-filter.active').map(function() { return $(this).data('id') }).toArray()
+    return $page.find('.agelimit-filter.active').map(function() { return $(this).data('id') }).toArray()
   }
   function currentWarnings() {
-    return $page.find('.kavi-query-filters .warning-filter.active').map(function() { return $(this).data('id') }).toArray()
+    return $page.find('.warning-filter.active').map(function() { return $(this).data('id') }).toArray()
   }
 
   function updateProgramIfVisible(programId) {

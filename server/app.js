@@ -163,20 +163,28 @@ app.post('/reset-password', function(req, res, next) {
 app.get('/programs/search/:q?', function(req, res, next) {
   if (req.user) {
     var isKavi = utils.hasRole(req.user, 'kavi')
-    var query = isKavi ? constructKaviQuery() : {}
+    var query = isKavi ? constructKaviQuery() : constructPublicQuery()
     if (req.query.ownClassificationsOnly === 'true') _.merge(query, { classifications: { $elemMatch: { 'author._id': req.user._id }}})
     var fields = isKavi ? null : { 'classifications.comments': 0 }
     var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
     search(query, fields, sortBy, req, res, next)
   } else {
-    var query = { $or: [{ 'classifications.0': { $exists: true } }, { programType:2 }] }
+    var query = constructPublicQuery()
     search(query, Program.publicFields, 'name', req, res, next)
+  }
+
+  function constructPublicQuery() {
+    var query = {}
+    var classificationMatch = {}
+    var ors = agelimitAndWarningOrs(classificationMatch)
+    if (!_.isEmpty(ors)) query['$or'] = ors
+    if (!_.isEmpty(classificationMatch)) query['classifications'] = { $elemMatch: classificationMatch }
+    return query
   }
 
   function constructKaviQuery() {
     var rootQuery = {}
     var classificationMatch = {}
-    var rootOrs = []
     if (req.query.registrationDateRange) {
       var range = utils.parseDateRange(req.query.registrationDateRange)
       classificationMatch.registrationDate = { $gte: range.begin, $lt: range.end }
@@ -187,11 +195,19 @@ app.get('/programs/search/:q?', function(req, res, next) {
         rootQuery['classifications.0.author._id'] = { $ne: req.query.classifier }
       }
     }
+    var rootOrs = agelimitAndWarningOrs(classificationMatch)
+    if (!_.isEmpty(rootOrs)) rootQuery['$or'] = rootOrs
+    if (!_.isEmpty(classificationMatch)) rootQuery['classifications'] = { $elemMatch: classificationMatch }
+    return rootQuery
+  }
+
+  function agelimitAndWarningOrs(classificationMatch) {
+    var ors = []
     if (req.query.agelimits && req.query.warnings) {
       var agelimitsIn = { $in: req.query.agelimits.map(function(s) { return parseInt(s) }) }
       var warnings = { $all: req.query.warnings }
       if (_.isEmpty(classificationMatch)) {
-        rootOrs.push({
+        ors.push({
           $or: [
             { 'classifications.0.agelimit': agelimitsIn, 'classifications.0.warnings': warnings },
             { 'episodes.agelimit': agelimitsIn, 'episodes.warnings': warnings }
@@ -203,21 +219,19 @@ app.get('/programs/search/:q?', function(req, res, next) {
     } else if (req.query.agelimits) {
       var agelimitsIn = { $in: req.query.agelimits.map(function(s) { return parseInt(s) }) }
       if (_.isEmpty(classificationMatch)) {
-        rootOrs.push({ $or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn } ] })
+        ors.push({ $or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn } ] })
       } else {
         classificationMatch.agelimit = agelimitsIn
       }
     } else if (req.query.warnings) {
       var warnings = { $all: req.query.warnings }
       if (_.isEmpty(classificationMatch)) {
-        rootOrs.push({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
+        ors.push({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
       } else {
         classificationMatch.warnings = warnings
       }
     }
-    if (!_.isEmpty(rootOrs)) rootQuery['$or'] = rootOrs
-    if (!_.isEmpty(classificationMatch)) rootQuery['classifications'] = { $elemMatch: classificationMatch }
-    return rootQuery
+    return ors
   }
 
   function search(extraQueryTerms, responseFields, sortBy, req, res, next) {

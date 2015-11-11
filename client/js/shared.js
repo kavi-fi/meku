@@ -154,3 +154,28 @@ function yearShortcuts() {
     {name: '+10v', dates: year(10) }
   ]
 }
+
+function setupDatePicker($datePicker, opts, onChange, forceUpdate) {
+  $.dateRangePickerLanguages.fi = i18nDateRangePicker.fi
+  $.dateRangePickerLanguages.sv = i18nDateRangePicker.sv
+  var defaults = {
+    language: langCookie(),
+    format: 'DD.MM.YYYY',
+    separator: ' - ',
+    startOfWeek: 'monday',
+    getValue: function() { return $datePicker.find('span').text() },
+    setValue: function(s) { $datePicker.find('span').text(s) }
+  }
+  $datePicker.dateRangePicker(_.merge({}, defaults, opts)).bind('datepicker-change', function(event, obj) {
+    var selection = stringDateRange({ begin: moment(obj.date1), end: moment(obj.date2) })
+    if (!_.isEqual(selection, $datePicker.data('selection')) || forceUpdate) {
+      $datePicker.data('selection', selection)
+      onChange(selection)
+    }
+  })
+}
+
+function stringDateRange(range) {
+  var format = 'DD.MM.YYYY'
+  return { begin: range.begin.format(format), end: range.end.format(format) }
+}

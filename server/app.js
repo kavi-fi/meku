@@ -175,7 +175,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
   function constructPublicQuery() {
     var query = {}
-    var classificationMatch = {}
+    var classificationMatch = constructDateRangeQuery()
     var ors = agelimitAndWarningOrs(classificationMatch)
     if (!_.isEmpty(ors)) query['$or'] = ors
     if (!_.isEmpty(classificationMatch)) query['classifications'] = { $elemMatch: classificationMatch }
@@ -184,7 +184,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
   function constructKaviQuery() {
     var rootQuery = {}
-    var classificationMatch = {}
+    var classificationMatch = constructDateRangeQuery()
     if (req.query.registrationDateRange) {
       var range = utils.parseDateRange(req.query.registrationDateRange)
       classificationMatch.registrationDate = { $gte: range.begin, $lt: range.end }
@@ -199,6 +199,15 @@ app.get('/programs/search/:q?', function(req, res, next) {
     if (!_.isEmpty(rootOrs)) rootQuery['$or'] = rootOrs
     if (!_.isEmpty(classificationMatch)) rootQuery['classifications'] = { $elemMatch: classificationMatch }
     return rootQuery
+  }
+
+  function constructDateRangeQuery() {
+    var classificationMatch = {}
+    if (req.query.registrationDateRange) {
+      var range = utils.parseDateRange(req.query.registrationDateRange)
+      classificationMatch.registrationDate = { $gte: range.begin, $lt: range.end }
+    }
+    return classificationMatch
   }
 
   function agelimitAndWarningOrs(classificationMatch) {

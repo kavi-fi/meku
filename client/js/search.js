@@ -364,8 +364,8 @@ function searchPage() {
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
   var $filters = $page.find('.filters input[type=checkbox]')
-  var $registrationDatePicker = $page.find('.kavi-query-filters .datepicker')
-  var $clearRegistrationDatePicker = $page.find('.kavi-query-filters .clear-date-picker')
+  var $registrationDatePicker = $page.find('.public-query-filters .datepicker')
+  var $clearRegistrationDatePicker = $page.find('.public-query-filters .clear-date-picker')
   var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
   var $reclassifiedToggle = $page.find('.kavi-query-filters input[name=reclassified]')
   var $ownClassificationsOnly = $page.find('.user-query-filters input[name=own-classifications-only]')
@@ -373,16 +373,11 @@ function searchPage() {
   var $noResults = $page.find('.no-results')
   var $noMoreResults = $page.find('.no-more-results')
   var $loading = $page.find('.loading')
-
   var detailRenderer = programBox()
   var state = { q:'', page: 0 }
-  var dateFormat = 'DD.MM.YYYY'
 
+  setupPublicFilters()
   setupKaviFilters()
-  $page.find('.filterbutton').click(function() {
-    $(this).toggleClass('active')
-    $input.trigger('fire')
-  })
 
   $page.on('show', function(e, q, filters, programId) {
     if (q) $input.val(q).trigger('reset')
@@ -443,6 +438,32 @@ function searchPage() {
     $noResults.add($noMoreResults).hide()
   }
 
+  function setupPublicFilters() {
+    var datePickerOpts = {
+      shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['week', 'month']},
+      customShortcuts: yearShortcuts(),
+      getValue: function() { return $registrationDatePicker.find('span').text() },
+      setValue: function(s) {
+        $clearRegistrationDatePicker.toggle(!!s)
+        $registrationDatePicker.find('span').text(s)
+      }
+    }
+
+    $page.find('.filterbutton').click(function() {
+      $(this).toggleClass('active')
+      $input.trigger('fire')
+    })
+    setupDatePicker($registrationDatePicker, datePickerOpts, function() {
+      $input.trigger('fire')
+    })
+    $clearRegistrationDatePicker.click(function(e) {
+      e.stopPropagation()
+      $registrationDatePicker.removeData('selection')
+      $registrationDatePicker.data('dateRangePicker').clear()
+      $input.trigger('fire')
+    })
+  }
+
   function setupKaviFilters() {
     if (!hasRole('kavi')) {
       $page.find('.kavi-query-filters').remove()
@@ -464,26 +485,6 @@ function searchPage() {
       var isEmpty = !currentClassifier()
       $reclassifiedToggle.prop('disabled', isEmpty).parent().toggleClass('grey', isEmpty)
       if (isEmpty) $reclassifiedToggle.prop('checked', false)
-      $input.trigger('fire')
-    })
-
-    var datePickerOpts = {
-      shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['week', 'month']},
-      customShortcuts: yearShortcuts(),
-      getValue: function() { return $registrationDatePicker.find('span').text() },
-      setValue: function(s) {
-        $clearRegistrationDatePicker.toggle(!!s)
-        $registrationDatePicker.find('span').text(s)
-      }
-    }
-    setupDatePicker($registrationDatePicker, datePickerOpts, function() {
-      $input.trigger('fire')
-    })
-
-    $clearRegistrationDatePicker.click(function(e) {
-      e.stopPropagation()
-      $registrationDatePicker.removeData('selection')
-      $registrationDatePicker.data('dateRangePicker').clear()
       $input.trigger('fire')
     })
 

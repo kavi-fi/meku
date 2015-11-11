@@ -216,7 +216,10 @@
         <label><input type="checkbox" data-id="c" data-type="3"/><span data-i18n>TV-sarjan jakso</span></label>
         <label><input type="checkbox" data-id="h" data-type="0"/><span data-i18n>Kategorisoimattomat</span></label>
       </div>
-      <div class="agelimit-query-filters">
+      <div class="public-query-filters">
+        <div>
+          <label data-i18n>Rekisteröintipäivä</label><span class="datepicker"><span></span><i class="icon fa fa-calendar"></i><i class="icon clear-date-picker"></i></span>
+        </div>
         <div>
           <label data-i18n>Ikäraja</label>
           <button data-id="0"  class="filterbutton agelimit-filter"><img src="images/agelimit-0.png"/></button>
@@ -237,9 +240,6 @@
         <div>
           <label data-i18n>Luokittelija</label><input type="hidden" name="classifier" />
           <label class="reclassified grey"><input type="checkbox" disabled name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label>
-        </div>
-        <div>
-          <label data-i18n>Rekisteröintipäivä</label><span class="datepicker"><span></span><i class="icon fa fa-calendar"></i><i class="icon clear-date-picker"></i></span>
         </div>
         <div>
           <div class="program-count"><label data-i18n>Hakutuloksia</label><span class="num"></span></div>

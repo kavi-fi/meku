@@ -64,24 +64,6 @@ function setup() {
   navigation.start()
 }
 
-function setupDatePicker($datePicker, opts, onChange, forceUpdate) {
-  var defaults = {
-    language: langCookie(),
-    format: 'DD.MM.YYYY',
-    separator: ' - ',
-    startOfWeek: 'monday',
-    getValue: function() { return $datePicker.find('span').text() },
-    setValue: function(s) { $datePicker.find('span').text(s) }
-  }
-  $datePicker.dateRangePicker(_.merge({}, defaults, opts)).bind('datepicker-change', function(event, obj) {
-    var selection = stringDateRange({ begin: moment(obj.date1), end: moment(obj.date2) })
-    if (!_.isEqual(selection, $datePicker.data('selection')) || forceUpdate) {
-      $datePicker.data('selection', selection)
-      onChange(selection)
-    }
-  })
-}
-
 function setDatePickerSelection($datePicker, range, callbackWhenManualFire) {
   var rangeAsString = stringDateRange(range)
   $datePicker.data('dateRangePicker').setDateRange(rangeAsString.begin, rangeAsString.end)
@@ -89,11 +71,6 @@ function setDatePickerSelection($datePicker, range, callbackWhenManualFire) {
     $datePicker.data('selection', rangeAsString)
     callbackWhenManualFire(rangeAsString)
   }
-}
-
-function stringDateRange(range) {
-  var format = 'DD.MM.YYYY'
-  return { begin: range.begin.format(format), end: range.end.format(format) }
 }
 
 function errorDialog() {

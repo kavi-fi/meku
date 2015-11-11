@@ -209,11 +209,11 @@ label.top { vertical-align: top; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }
 #search-page input.query { width: 373px; }
 #search-page .datepicker { min-width: 253px; }
-#search-page .agelimit-query-filters > div { margin-top: 10px; min-height: 50px; }
-#search-page .agelimit-query-filters label, #search-page .kavi-query-filters label { display: inline-block; vertical-align: top; margin-top: 10px; margin-right: 20px; }
+#search-page .public-query-filters > div { margin-top: 10px; min-height: 50px; }
+#search-page .public-query-filters label, #search-page .kavi-query-filters label { display: inline-block; vertical-align: top; margin-top: 10px; margin-right: 20px; }
 #search-page .kavi-query-filters label.grey { color: #d3d3d3; }
 #search-page .kavi-query-filters .reclassified input { margin: 0 5px 0 20px; }
-#search-page .kavi-query-filters .clear-date-picker {
+#search-page .public-query-filters .clear-date-picker {
   display: none; cursor: pointer;
   width: 12px; height: 12px; font-size: 1px; text-decoration: none; border: 0;
   background: url('vendor/select2-3.4.6/select2.png') right top no-repeat;

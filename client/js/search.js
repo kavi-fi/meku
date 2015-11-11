@@ -10,8 +10,7 @@ function publicSearchPage() {
   $page.find('.controls h2.main').remove()
 
   $page.on('showDetails', '.program-box', function(e, program) {
-    var body = encodeURIComponent(program.sequenceId + ' ' + program.name[0])
-    $(this).find('.request-reclassification').attr('href', 'https://fi.surveymonkey.com/s/ikarajat2015?c=' + body).attr('target', '_blank').show()
+    $(this).find('.request-reclassification').attr('href', 'https://fi.surveymonkey.com/r/ikarajapalaute').attr('target', '_blank').show()
   })
 }
 

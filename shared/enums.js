@@ -246,8 +246,8 @@ enums.classificationStatus = [
 
 enums.reclassificationReason = {
   0: { emailText: 'KAVI:n oma aloite', uiText: 'KAVI:n oma aloite' },
-  1: { emailText: 'Yleisön pyyntö', uiText: 'Palaute' },
-  2: { emailText: 'Valitusosoitus', uiText: 'Valitus' },
+  1: { emailText: 'Palaute', uiText: 'Palaute' },
+  2: { emailText: 'Valitus', uiText: 'Valitus' },
   3: { emailText: 'Oikaisupyyntö', uiText: 'Oikaisuvaatimus' },
   4: { emailText: 'Ikärajakriteereiden muutos 2012', uiText: 'Ikärajakriteereiden muutos 2012' }
 }

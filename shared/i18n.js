@@ -1,4 +1,3 @@
-
 var i18n = {
   sv: {
 
@@ -226,11 +225,13 @@ var i18n = {
     'kausi': 'säsong',
     'jakso': 'avsnitt',
     'aiemmin': 'tidigare',
-    'Yleisön pyyntö': 'Begäran från publiken',
+    'Palaute': 'Respons',
     'KAVI:n oma aloite': 'KAVI:s eget initiativ',
     'Valitusosoitus': 'Besvärsanvisning',
+    'Valitus': 'Besvär',
     'Oikaisupyyntö': 'Rättelseyrkande',
     'Oikaisuvaatimusohje': 'Anvisning om rättelseyrkande',
+    'Ikärajakriteereiden muutos 2012': 'Ändring av åldersgränskriterierna 2012',
     'ei määritelty': 'inte fastslagna',
     'Kuvaohjelma sisältää myös alempiin ikärajoihin liittyvät kriteerit': 'Bildprogrammet innehåller även kriterier som hör till lägre åldersgränser',
 

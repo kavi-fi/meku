@@ -4,7 +4,7 @@ var db = require('./mongo-ext')
 var app = require('../server/app')
 
 describe('create-classification-test', function() {
-  this.timeout(30000)
+  this.timeout(40000)
 
   var date = moment().format('D.M.YYYY')
 
@@ -82,7 +82,7 @@ describe('create-classification-test', function() {
         .assertSelect2Value('#classification-page .select2-container.x-actors', ['Bill Murray', 'Harold Ramis', 'Dan Aykroyd', 'Sigourney Weaver'])
         .assertValue('#classification-page textarea[name=synopsis]', 'The plot is unknown at this time.')
 
-        .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org'])
+        .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'tuula.roos@kavi.fi'])
 
         .select2one('#classification-page .select2-container.x-classificationReason', 'pal', 'Palaute')
         .select2one('#classification-page .select2-container.x-classificationAuthorOrganization', 'kuva', 'Kuvaohjelmalautakunta')
@@ -154,7 +154,7 @@ describe('create-classification-test', function() {
       criteria: ['Väkivalta (12)','Komediaväkivaltaa...','Seksi (19)']
     }
     var expectedClassificationEmail = {
-      to: ['kavi@fake-meku.fi', 'demo.1@email.org'],
+      to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'tuula.roos@kavi.fi'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta (12), seksi (19)',
       body: [
         date,
@@ -181,7 +181,7 @@ describe('create-classification-test', function() {
     }
 
     var expectedReclassificationEmail = {
-      to: ['kavi@fake-meku.fi', 'demo.1@email.org'],
+      to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'tuula.roos@kavi.fi'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, S ',
       body: [
         date,

@@ -191,7 +191,7 @@ function internalSearchPage() {
     })
 
     function renderRecentRow(p, c) {
-      var registrationDate = utils.asDateTime(c.registrationDate) || i18nText('Tuntematon rekisteröintiaika')
+      var registrationDate = utils.asDate(c.registrationDate) || i18nText('Tuntematon rekisteröintiaika')
       return $('<div>', { 'data-id': p._id }).addClass('result').data('program', p)
         .append($('<span>', { class: 'registrationDate' }).text(registrationDate))
         .append($('<span>', { class: 'name' }).text(p.name[0]))

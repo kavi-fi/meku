@@ -25,7 +25,7 @@ var significantCriteria = exports.significantCriteria = function(classification)
   var maxAgeLimit = ageLimit(classification)
   return _(classification.criteria)
     .map(function(id) { return enums.classificationCriteria[id - 1] })
-    .filter(function(c) { return c.age > 0 && c.age == maxAgeLimit })
+    .filter(function(c) { return c.category !== 'vet' && c.age > 0 && c.age == maxAgeLimit })
     .map(function(c) { return { id: c.id, category: c.category } }).value()
 }
 

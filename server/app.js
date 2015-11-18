@@ -395,6 +395,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.draftClassifications = {}
     program.draftsBy = []
     program.classifications.unshift(newClassification)
+    program.classifications.sort(function (c1, c2) { return c2.registrationDate - c1.registrationDate })
     program.markModified('draftClassifications')
     program.preventSendingEmail = req.body.preventSendingEmail
 

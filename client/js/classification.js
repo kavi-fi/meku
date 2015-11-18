@@ -25,7 +25,7 @@ function classificationPage() {
   }
   function draftClassificationFinder(program) {
     var draftClassification = program.draftClassifications[user._id]
-    if (draftClassification) draftClassification.registrationDate = new Date()
+    if (draftClassification && !hasRole('root')) draftClassification.registrationDate = new Date()
     return draftClassification
   }
 }
@@ -133,6 +133,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function configureEventBinding() {
     $form.find('textarea').autosize()
     $form.on('submit', function(e) {
+      var registrationDate = $form.find('input[name="classification.registrationDate"]').val()
       $form.find('button[name=register]').prop('disabled', true)
       e.preventDefault()
       $.post('/programs/' + program._id + '/register', JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})).done(function(savedProgram) {
@@ -141,7 +142,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         showDialog($('<div>', {class: 'registration-confirmation dialog'})
           .append($('<span>', {class: 'name'}).text(savedProgram.name))
           .append(renderWarningSummary(classificationUtils.fullSummary(savedProgram)))
-          .append($('<p>', {class: 'registration-date'}).text(i18nText('Rekisteröity') + ' ' + utils.asDateTime(savedProgram.classifications[0].registrationDate)))
+          .append($('<p>', {class: 'registration-date'}).text(i18nText('Rekisteröity') + ' ' + registrationDate))
           .append($('<p>', {class: 'buttons'}).html($('<button>', { click: closeDialog, class: 'button' }).i18nText('Sulje'))))
         $(window).scrollTop(0)
       })

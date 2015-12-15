@@ -174,7 +174,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
   }
 
   function constructPublicQuery() {
-    var query = {}
+    var query = {$or: [{programType: 2}, {classifications:{$exists: true, $nin: [[]]}}]}
     var classificationMatch = constructDateRangeQuery()
     var ors = agelimitAndWarningOrs(classificationMatch)
     if (!_.isEmpty(ors)) query['$or'] = ors

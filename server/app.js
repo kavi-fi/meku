@@ -847,10 +847,10 @@ app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res,
     var locations = _.groupBy(data.locations, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
 
     res.json({
-      providerCount: providers.withMail.length,
-      locationCount: locations.withMail.length,
-      providersWithoutMail: providers.noMail,
-      locationsWithoutMail: locations.noMail
+      providerCount: providers.withMail ? providers.withMail.length : 0,
+      locationCount: locations.withMail ? locations.withMail.length : 0,
+      providersWithoutMail: providers.noMail ? providers.noMail : [],
+      locationsWithoutMail: locations.noMail ? locations.noMail : []
     })
   })
 })

@@ -311,12 +311,12 @@ exports.price = function(program, duration) {
 }
 
 exports.gameClassificationPrice = function(duration) {
-  return Math.min(80 + (~~(duration / (30 * 60))) * 36, 370) * 100
+  return Math.min(90 + (~~(duration / (30 * 60))) * 40, 410) * 100
 }
 
 exports.classificationPrice = function(duration) {
   if (duration == 0) return enums.durationsWithCodeAndPrice[0].price
-  if (duration > (240 * 60)) return Math.round(1.82 * (duration / 60))
+  if (duration > (240 * 60)) return Math.round(200.0 * (duration / 60))
 
   var dur = _.find(enums.durationsWithCodeAndPrice, function (d) {
     var min = (d.min * 60), max = (d.max * 60)

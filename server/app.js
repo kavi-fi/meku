@@ -434,14 +434,14 @@ app.post('/programs/:id/register', function(req, res, next) {
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
-          InvoiceRow.fromProgram(program, 'reclassification', seconds, 74 * 100).save(callback)
+          InvoiceRow.fromProgram(program, 'reclassification', seconds, 90 * 100).save(callback)
         } else if (!utils.hasRole(req.user, 'kavi')) {
-          InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(callback)
+          InvoiceRow.fromProgram(program, 'registration', seconds, 900).save(callback)
         } else {
           callback()
         }
       } else {
-        InvoiceRow.fromProgram(program, 'registration', seconds, 725).save(function(err, saved) {
+        InvoiceRow.fromProgram(program, 'registration', seconds, 900).save(function(err, saved) {
           if (err) return next(err)
           if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
@@ -1221,7 +1221,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
               updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
                 var seconds = classificationUtils.durationToSeconds(_.first(p.classifications).duration)
-                InvoiceRow.fromProgram(p, 'registration', seconds, 725).save(function (err, saved) {
+                InvoiceRow.fromProgram(p, 'registration', seconds, 900).save(function (err, saved) {
                   if (err) return callback(err)
                   updateActorAndDirectorIndexes(p, callback)
                 })

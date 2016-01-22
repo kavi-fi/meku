@@ -124,7 +124,7 @@ ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback
 }
 
 ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback) {
-  var query = { 'series._id': seriesId, deleted: { $ne: true } }
+  var query = { 'series._id': seriesId, deleted: { $ne: true }, classifications: { $exists: true, $nin: [[]] } }
   var fields = { classifications: { $slice: 1 } }
   Program.find(query, fields).lean().exec(function(err, programs) {
     if (err) return callback(err)

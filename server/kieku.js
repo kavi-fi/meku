@@ -74,7 +74,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var customerNumber = account.billingPreference == 'address' ? account.billing.customerNumber : account.customerNumber
     var billingLanguage = account.billingPreference == 'address' ? account.billing.language : account.language
     var invoiceText = account.billing ? (account.billing.invoiceText || '').replace(/\n/g, ' ') : ''
-    var accountAddress = customerNumber.trim().length > 0 ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
+    var accountAddress = customerNumber && customerNumber.trim().length > 0 ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
 
     return _.map(rows, function (row) {
       return _.extend(row, {

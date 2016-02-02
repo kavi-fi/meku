@@ -195,7 +195,7 @@ h3.main { margin: 0 0 20px 0; padding: 0 0 15px 0; border-bottom: 5px solid #DDD
 
 .page { display: none; width: 940px; margin: 70px auto; }
 
-.controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 20px; }
+.controls { border-bottom: 1px solid #d3d3d3; margin-bottom: 70px; padding-bottom: 30px; }
 
 .result, .location-row { border-bottom: 2px solid #e8e8e8; font-size: 14px; color: #444444; cursor: pointer; padding: 10px 0; }
 .result.inactive, .location-row.inactive { color: #afafaf; }

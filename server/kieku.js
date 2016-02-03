@@ -72,7 +72,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var accountInvoiceOperator = account.billingPreference == 'eInvoice' ? account.eInvoice.operator : ''
     var accountInvoiceAddress = account.billingPreference == 'eInvoice' ? account.eInvoice.address : ''
     var customerNumber = account.billingPreference == 'address' ? account.billing.customerNumber : account.customerNumber
-    var billingLanguage = account.billingPreference == 'address' ? account.billing.language : account.language
+    var billingLanguage = account.language ? account.language : account.billing.language
     var invoiceText = account.billing ? (account.billing.invoiceText || '').replace(/\n/g, ' ') : ''
     var accountAddress = customerNumber && customerNumber.trim().length > 0 ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
 

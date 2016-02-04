@@ -83,26 +83,24 @@ enums.invoiceItemCodes = {
   'Subscription_of_program': '1876'
 }
 
-enums.durationsWithCodeAndPrice = [
-  { min:0, max: 30, itemCode: '1855', price: 6200 },
-  { min: 30, max: 60, itemCode: '1856', price: 12400 },
-  { min: 60, max: 90, itemCode: '1857', price: 18600 },
-  { min: 90, max: 120, itemCode: '1857', price: 24000 },
-  { min: 120, max: 150, itemCode: '1859', price: 30000 },
-  { min: 150, max: 180, itemCode: '1860', price: 36000 },
-  { min: 180, max: 210, itemCode: '1861', price: 42000 },
-  { min: 210, max: 240, itemCode: '1862', price: 48000 }
-]
+enums.defaultPrices = { // Up-to-date prices should be set in PRICES_<year> config variable (i.e. PRICES_2016)
+  registrationFee: 900,
+  classificationFees: [6200, 12400, 18600, 24000, 30000, 36000, 42000, 48000],
+  classificationFeePerMinutesForLongPrograms: 200,
+  reclassificationFee: 9000,
+  gameFeePerHalfHour: 4000,
+  gameMinimumFee: 9000,
+  gameMaximumFee: 41000
+}
 
 enums.invoiceItemCode = function (type, duration) {
+  var itemCodes = ['1855', '1856', '1857', '1858', '1859', '1860', '1861', '1862']
+
   function classificationItemCode() {
-    if (duration <= 0) return enums.durationsWithCodeAndPrice[0].itemCode
-    if (duration > 240 * 60) return _.last(enums.durationsWithCodeAndPrice).itemCode
-    var dur = _.find(enums.durationsWithCodeAndPrice, function (d) {
-      var min = (d.min * 60), max = (d.max * 60)
-      return duration > min && duration <= max
-    })
-    return dur.itemCode
+    if (duration <= 0) return itemCodes[0]
+    if (duration > 240 * 60) return _.last(itemCodes)
+    var idx = Math.floor((duration - 1) / (30 * 60))
+    return itemCodes[idx]
   }
 
   if (type === 'classification' || type === 'reclassification') return classificationItemCode()

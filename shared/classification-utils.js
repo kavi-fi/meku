@@ -306,24 +306,24 @@ exports.secondsToDuration = function(seconds) {
   function pad(s) { return s < 10 ? '0'+s : ''+s }
 }
 
-exports.price = function(program, duration) {
+exports.price = function(program, duration, currentPrices) {
   // https://kavi.fi/fi/meku/kuvaohjelmat/maksut
-  return enums.util.isGameType(program) ? exports.gameClassificationPrice(duration) : exports.classificationPrice(duration)
+  return enums.util.isGameType(program) ? exports.gameClassificationPrice(duration, currentPrices) : exports.classificationPrice(duration, currentPrices)
 }
 
-exports.gameClassificationPrice = function(duration) {
-  return Math.min(90 + (~~(duration / (30 * 60))) * 40, 410) * 100
+exports.gameClassificationPrice = function(duration, currentPrices) {
+  var minFee = currentPrices.gameMinimumFee
+  var maxFee = currentPrices.gameMaximumFee
+  var perHalfHourFee = currentPrices.gameFeePerHalfHour
+  return Math.min(minFee + (~~(duration / (30 * 60))) * perHalfHourFee, maxFee)
 }
 
-exports.classificationPrice = function(duration) {
-  if (duration == 0) return enums.durationsWithCodeAndPrice[0].price
-  if (duration > (240 * 60)) return Math.round(200.0 * (duration / 60))
-
-  var dur = _.find(enums.durationsWithCodeAndPrice, function (d) {
-    var min = (d.min * 60), max = (d.max * 60)
-    return duration > min && duration <= max
-  })
-  return dur.price
+exports.classificationPrice = function(duration, currentPrices) {
+  var perMinuteFee = currentPrices.classificationFeePerMinutesForLongPrograms
+  if (duration == 0) return currentPrices.classificationFees[0]
+  if (duration > (240 * 60)) return Math.round(perMinuteFee * (duration / 60.0))
+  var idx = Math.floor((duration - 1) / (30 * 60))
+  return currentPrices.classificationFees[idx]
 }
 
 })(typeof exports === 'undefined'? this['classificationUtils']={}: exports)

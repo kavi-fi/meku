@@ -269,7 +269,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
       var and = []
       if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
       if (utils.getProperty(req, 'user.role') === 'user') and.push({ 'createdBy.role': { $ne: 'trainee' }})
-      var nameQueries = toSearchTermQuery(terms)
+      var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true)
       if (nameQueries) {
         if (parseInt(terms) == terms) {
           and.push({$or: [nameQueries, { sequenceId: terms }]})
@@ -278,25 +278,27 @@ app.get('/programs/search/:q?', function(req, res, next) {
         }
       }
       if (filters.length > 0) q.programType = { $in: filters }
-      if (and.length > 0) q.$and = and
+      var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis')
+      if (synopsisQueries) q.$or = [synopsisQueries, {$and: and}]
+      else if (and.length > 0) q.$and = and
       return q
     }
   }
 
-  function toSearchTermQuery(string) {
-    var lowerString = (string || '').trim().toLowerCase()
-    var parts = lowerString.match(/"[^"]*"|[^ ]+/g)
+  function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning) {
+    var searchString = (string || '').trim()
+    var parts = searchString.match(/"[^"]*"|[^ ]+/g)
     if (!parts) return undefined
     return parts.reduce(function(result, s) {
       if (/^".+"$/.test(s)) {
         var withoutQuotes = s.substring(1, s.length - 1)
         if (s.indexOf(' ') == -1) {
-          return addToAll(result, 'fullNames', withoutQuotes)
+          return addToAll(result, primaryField, withoutQuotes)
         } else {
-          return addToAll(result, 'fullNames', new RegExp(utils.escapeRegExp(withoutQuotes)))
+          return addToAll(result, primaryField, new RegExp(utils.escapeRegExp(withoutQuotes), "i"))
         }
       } else {
-        return addToAll(result, 'allNames', new RegExp('^' + utils.escapeRegExp(s)))
+        return addToAll(result, secondaryField, new RegExp((fromBeginning ? '^' : '') + utils.escapeRegExp(s), "i"))
       }
     }, {})
 

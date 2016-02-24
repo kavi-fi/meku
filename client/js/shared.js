@@ -72,7 +72,8 @@ function renderWarningSummary(summary) {
 }
 
 function ageLimitIcon(summary) {
-  return 'images/agelimit-'+summary.age+'.png'
+  var age = langCookie() === 'sv' && summary.age === 0 ? 't' : summary.age
+  return 'images/agelimit-'+ age +'.png'
 }
 
 function warningIcons(summary) {

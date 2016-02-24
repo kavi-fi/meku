@@ -649,6 +649,7 @@ textarea.invalid:disabled,
 .classification-criteria .category .criteria.agelimit-12 { background-image: url('images/agelimit-12.png'); }
 .classification-criteria .category .criteria.agelimit-7 { background-image: url('images/agelimit-7.png'); }
 .classification-criteria .category .criteria.agelimit-0 { background-image: url('images/agelimit-0.png'); }
+.classification-criteria .category .criteria.agelimit-t { background-image: url('images/agelimit-t.png'); }
 
 .classification-criteria .category-container .category.sex, .classification-criteria .category-container .category.drugs, .classification-criteria .category-container .category.vet {
   margin-right: 0;

@@ -127,7 +127,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
       extraInfoLink: extraInfoLink(),
       appendixLink: appendixLink(),
       previous: previous(),
-      icons: iconHtml(classificationSummary, hostName),
+      icons: function (lang) { return iconHtml(classificationSummary, lang) },
       reclassification: isReclassification(program, classification)
     }
 
@@ -254,7 +254,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     if (lang === 'fi') {
       return '<p>'+(reclassification ? 'Ilmoitus kuvaohjelman uudelleenluokittelusta' : 'Ilmoitus kuvaohjelman luokittelusta') + '</p>' +
         '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%= nameLink %>. <%- classification %></p>' +
-        '<%= icons %>' +
+        '<%= icons("fi") %>' +
         '<p>'+(reclassification ? ' <%- previous.author %> oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
         ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Syy uudelleenluokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
         '<%= extraInfoLink %>' +
@@ -262,7 +262,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
     } else if (lang === 'sv') {
       return '<p>Meddelande om ' + (reclassification ? 'om' : '') + 'klassificering av bildprogram</p>' +
         '<p><%- classifier %> har <%- date %> ' + (reclassification ? 'om' : '') + 'klassificerat bildprogrammet <%= nameLink %>. <%- classification %></p>' +
-        '<%= icons %>' +
+        '<%= icons("sv") %>' +
         '<p>' + (reclassification ? ' <%- previous.author %> hade <%- previous.date %> <%- previous.criteriaText %>' : '') + '</p>' +
         ((utils.hasRole(user, 'kavi') && reclassification) ? '<p>Orsak till omklassificering: <%- reason %>.<br/>Grunder: <%- publicComments %></p>' : '') +
         '<%= extraInfoLink %>' +
@@ -277,9 +277,10 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
   function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }
 
-  function iconHtml(summary) {
+  function iconHtml(summary, lang) {
     var warningHtml = summary.warnings.map(function(w) { return img(w.category) }).join('')
-    return '<div style="margin: 10px 0;">'+img('agelimit-'+summary.age) + warningHtml+'</div>'
+    var age = lang === 'sv' && summary.age === 0 ? 't' : summary.age
+    return '<div style="margin: 10px 0;">'+img('agelimit-'+age) + warningHtml+'</div>'
     function img(fileName) { return '<img src="'+hostName+'/images/'+fileName+'.png" style="width: 40px; height: 40px; padding-right: 8px;"/>' }
   }
 }

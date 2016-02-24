@@ -8,10 +8,16 @@ function publicSearchPage() {
   $page.find('.kavi-query-filters').remove()
   $page.find('.user-query-filters').remove()
   $page.find('.controls h2.main').remove()
+  setAgelimit0IconByLanguage($page)
 
   $page.on('showDetails', '.program-box', function(e, program) {
     $(this).find('.request-reclassification').attr('href', 'https://fi.surveymonkey.com/r/ikarajapalaute').attr('target', '_blank').show()
   })
+}
+
+function setAgelimit0IconByLanguage($page) {
+  var zeroAge = langCookie() === 'sv' ? 't' : '0'
+  $page.find('.agelimit-0').attr('src', 'images/agelimit-'+ zeroAge +'.png')
 }
 
 function internalSearchPage() {
@@ -23,6 +29,7 @@ function internalSearchPage() {
   var $newClassificationButton = $page.find('.new-classification button')
   var $drafts = $page.find('.drafts')
   var $recent = $page.find('.recent')
+  setAgelimit0IconByLanguage($page)
 
   var programTypesSelect2 = {
     data: [

@@ -350,7 +350,8 @@ function classificationFormUtils() {
       var classificationCriteria = enums.classificationCriteria.filter(function(c) { return c.category == category })
       var $criteria = classificationCriteria.map(function (c) {
         var isVet = c.category === 'vet'
-        return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + c.age, 'data-id': c.id})
+        var age = langCookie() === 'sv' && c.age === 0 ? 't' : c.age
+        return $('<div>', {class: 'criteria agelimit ' + 'agelimit-' + age, 'data-id': c.id})
           .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + c.id + ')')))
           .append($('<p>').html(isVet ? '' : c[lang].description))
           .append(isVet ? '' : $('<textarea>', { name:'classification.criteriaComments.' + c.id, placeholder:i18nText('Kommentit...'), class:'throttledInput' }))

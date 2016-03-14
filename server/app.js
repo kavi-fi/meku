@@ -669,16 +669,7 @@ app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
   if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
   Account.findById(req.params.id, function(err, account) {
     if (err) return next(err)
-    InvoiceRow.find({'account._id': req.params.id}, function (err, invoiceRows) {
-      if (err) return next(err)
-      async.forEach(invoiceRows, function(invoiceRow, callback) {
-        invoiceRow.account.name = req.body.name
-        invoiceRow.save(callback)
-      },function (err) {
-        if (err) return next(err)
-        updateAndLogChanges(account, req.body, req.user, respond(res, next))
-      })
-    })
+    updateAndLogChanges(account, req.body, req.user, respond(res, next))
   })
 })
 

@@ -367,8 +367,8 @@ app.post('/programs/new', function(req, res, next) {
     var fieldsToCopy = ['series', 'country', 'year', 'productionCompanies', 'genre', 'directors', 'actors']
     _.forEach(fieldsToCopy, function (field) { p[field] = origProgram[field] })
     if (origProgram.classifications.length > 0) {
-      draftClassification.buyer = origProgram.classifications[0].buyer
-      draftClassification.billing = origProgram.classifications[0].billing
+      draftClassification.buyer = undefined
+      draftClassification.billing = undefined
       draftClassification.format = origProgram.classifications[0].format
     }
     if (enums.util.isTrailer(origProgram)) {

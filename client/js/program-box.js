@@ -173,8 +173,9 @@ function programBox() {
       .find('.duration').labeledText(txtIfNotCurrent(c.duration)).end()
       .find('.criteria').html(renderClassificationCriteria(c, criteria)).end()
       .find('.comments').labeledText(c.comments).end()
+      .find('.userComments').labeledText(c.userComments).end()
       .find('.publicComments').labeledText(c.publicComments).end()
-      .find('.commentHeader').toggle(!!(c.comments || c.publicComments)).end()
+      .find('.commentHeader').toggle(!!(c.comments || c.userComments || c.publicComments)).end()
     if (!window.user) {
       $e.find('.program-classification-details').addClass('hide')
     }

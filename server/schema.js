@@ -25,6 +25,7 @@ var classification = {
   registrationDate: { type: Date, index: true },
   registrationEmailAddresses: [String],
   comments: String,
+  userComments: String,
   publicComments: String,
   reason: Number,
   status: String,
@@ -194,7 +195,7 @@ Program.publicFields = {
   'classifications.emekuId':0, 'classifications.author':0,
   'classifications.billing': 0, 'classifications.buyer': 0,
   'classifications.registrationEmailAddresses':0,
-  'classifications.comments':0, 'classifications.criteriaComments':0
+  'classifications.comments':0, 'classifications.userComments':0, 'classifications.criteriaComments':0
 }
 var address = { street: String, city: String, zip: String, country: String }
 

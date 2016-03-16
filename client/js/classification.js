@@ -79,6 +79,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('span.author').text(utils.getProperty(c, 'author.name') || '-').end()
       .find('input[name="classification.duration"]').val(c.duration).end()
       .find('textarea[name="classification.comments"]').val(c.comments).end()
+      .find('textarea[name="classification.userComments"]').val(c.userComments).end()
       .find('textarea[name="classification.publicComments"]').val(c.publicComments).end()
       .find('input[name="classification.safe"]').prop('checked', !!c.safe).end()
       .find('input[name="classification.vet"]').prop('checked', isVetClassification).end()
@@ -410,7 +411,8 @@ function classificationFormUtils() {
       $form.find('.author-and-reason-fields').remove()
       $form.find('.public-comments').remove()
     }
-    if (!hasRole('kavi')) $form.find('.private-comments').remove()
+    if (hasRole('kavi')) $form.find('.user-comments').remove()
+    else $form.find('.private-comments').remove()
 
     if (isReclassification && !editMode) {
       $form.find('.program-info input, .program-info textarea').prop('disabled', true)

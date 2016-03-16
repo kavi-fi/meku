@@ -257,6 +257,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
           res.send({ count: count, programs: docs })
         })
       } else {
+        docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, req.user) })
         res.send({ programs: docs })
       }
     })
@@ -335,10 +336,24 @@ app.get('/programs/recent', function(req, res, next) {
     .exec(function(err, recents) {
       if (err) return next(err)
       async.map(recents, function(p, callback) {
-        return Program.findById(p._id, callback)
+        return Program.findById(p._id, function (err, program) {
+          if (!err) removeOtherUsersComments(program.classifications, req.user)
+          callback(err, program)
+        })
       }, respond(res, next))
     })
 })
+
+function removeOtherUsersComments(classifications, user) {
+  if (classifications) return classifications.forEach(function (c) {
+    if (!utils.hasRole(user, 'kavi')) {
+      c.comments = ''
+      if (!user || !c.author || user.username !== c.author.username) {
+        c.userComments = ''
+      }
+    }
+  })
+}
 
 app.delete('/programs/drafts/:id', function(req, res, next) {
   var pull = { draftsBy: req.user._id }
@@ -597,7 +612,7 @@ app.post('/programs/autosave/:id', function(req, res, next) {
 
   function allowedAutosaveFields(p, user) {
     var programFields = ['name', 'nameFi', 'nameSv', 'nameOther', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
-    var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationDate', 'registrationEmailAddresses', 'comments', 'criteriaComments*']
+    var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationDate', 'registrationEmailAddresses', 'comments', 'userComments', 'criteriaComments*']
     var kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
     if (p.classifications.length == 0) {
       return programFields.concat(classificationFields.map(asDraftField))

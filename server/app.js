@@ -310,11 +310,17 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
 
 app.get('/episodes/:seriesId', function(req, res, next) {
-  var fields = !req.user ? {'classifications.author': 0, 'classifications.authorOrganisation': 0, 'classifications.buyer': 0, 'classifications.billing': 0, 'classifications.comments': 0, draftClassifications: 0 }
+  var fields = !req.user ? {'classifications.author': 0, 'classifications.authorOrganization': 0, 'classifications.buyer': 0, 'classifications.billing': 0, 'classifications.comments': 0, 'classifications.userComments': 0, draftClassifications: 0 }
     : utils.hasRole(req.user, 'kavi') ? {} : {'classifications.comments': 0}
   var query = { deleted: { $ne:true }, 'series._id': req.params.seriesId }
   if (!req.user) query.classifications = { $exists: true, $nin: [[]] }
-  Program.find(query, fields).sort({ season:1, episode:1 }).lean().exec(respond(res, next))
+  Program.find(query, fields).sort({ season:1, episode:1 }).lean().exec(function (err, docs) {
+    if (err) return next(err)
+    else {
+      docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, req.user)  })
+      res.send(docs)
+    }
+  })
 })
 
 app.get('/programs/drafts', function(req, res, next) {

@@ -47,7 +47,7 @@ function author(dateRange, callback) {
   var q = query(dateRange)
   schema.Program.aggregate()
     .match(q)
-    .project({ _id: 0, 'classifications.author.username': 1, 'classifications.registrationDate': 1 })
+    .project({ _id: 0, 'classifications.authorOrganization': 1, 'classifications.author.username': 1, 'classifications.registrationDate': 1 })
     .unwind('classifications')
     .match(q)
     .group({ _id: '$classifications.author.username', value: { $sum: 1 } })
@@ -136,6 +136,7 @@ function kaviAuthor(dateRange, callback) {
       .unwind('classifications')
       .match(q)
       .match({ 'classifications.author._id': { $in: _.pluck(users, '_id')} })
+      .group({ _id: '$classifications.authorOrganization', value: { $sum: 1 } })
       .group({ _id: '$classifications.author', value: { $sum: 1 } })
       .sort('_id.username')
       .project({ _id: { $concat : [ '$_id.name' , ' ', '$_id.username' ] }, value: 1 })
@@ -246,7 +247,7 @@ function kaviClassificationList(dateRange, callback) {
       .project({
         name:1, sequenceId:1, programType:1,
         duration: '$classifications.duration', date: '$classifications.registrationDate', author: '$classifications.author.username',
-        isReclassification: '$classifications.isReclassification', comments: '$classifications.comments' })
+        authorOrganization: '$classifications.authorOrganization', isReclassification: '$classifications.isReclassification', comments: '$classifications.comments' })
       .sort('date')
       .exec(callback)
   })

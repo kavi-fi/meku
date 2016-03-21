@@ -109,11 +109,15 @@ function reportsPage() {
         .find('.sequenceId').text(row.sequenceId).end()
         .find('.programType').text(enums.programType[row.programType].fi).end()
         .find('.date').text(moment(row.date).format(format)).end()
-        .find('.author').text(row.author).end()
+        .find('.author').text(authorColumn(row)).end()
         .find('.duration').text(row.duration).end()
         .find('.type').text(row.isReclassification ? 'Uudelleenluokittelu' : 'Luokittelu').end()
         .find('.comments').text(row.comments).end()
     }
+  }
+
+  function authorColumn(c) {
+    return (enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c)) ? enums.authorOrganization[c.authorOrganization] : c.author
   }
 
   function renderDefaultReport(reportName, report) {

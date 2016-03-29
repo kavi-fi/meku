@@ -4,6 +4,7 @@ var classificationUtils = require('../shared/classification-utils')
 var bcrypt = require('bcrypt')
 var mongoose = require('mongoose')
 var enums = require('../shared/enums')
+var latinize = require('latinize')
 var ObjectId = mongoose.Schema.Types.ObjectId
 var Schema = mongoose.Schema
 var bcryptSaltFactor = 12
@@ -177,8 +178,10 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
     var initialNames = _.reject(concatNames(p), _.isEmpty)
     var words = _.reject(initialNames.concat([utils.seasonEpisodeCode(p)]).concat(extraNames), _.isEmpty)
     words = words.map(function(s) { return (s + ' ' + s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1')).split(/\s+/) })
-    p.allNames = _(words).flatten().invoke('toLowerCase').uniq().sort().value()
-    p.fullNames = _(initialNames).invoke('toLowerCase').uniq().sort().value()
+    var latinizedWords = _.map(_.flatten(words), function (word) { return latinize(word) })
+    var latinizedInitialNames = _.map(initialNames, function (word) { return latinize(word) })
+    p.allNames = _(words.concat(latinizedWords)).flatten().invoke('toLowerCase').uniq().sort().value()
+    p.fullNames = _(initialNames.concat(latinizedInitialNames)).invoke('toLowerCase').uniq().sort().value()
   }
   function concatNames(p) {
     return p.name.concat(p.nameFi || []).concat(p.nameSv || []).concat(p.nameOther || [])

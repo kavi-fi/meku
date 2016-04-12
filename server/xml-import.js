@@ -204,7 +204,7 @@ function optional(field, toField) {
     if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) {
       return {program: {}, errors: []}
     } else {
-      return {program: utils.keyValue(toField, xml[field].$text), errors: []}
+      return {program: utils.keyValue(toField, xml[field].$text.trim()), errors: []}
     }
   }
 }

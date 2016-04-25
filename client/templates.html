@@ -234,6 +234,10 @@
           <button data-id="fear" class="filterbutton warning-filter"><img src="images/fear.png"/></button>
           <button data-id="drugs" class="filterbutton warning-filter"><img src="images/drugs.png"/></button>
         </div>
+        <div class="filters">
+          <label><input class="searchFromSynopsis" type="checkbox"/><span data-i18n>Hae myös synopsis-kentästä</span></label>
+          <label class="reclassified"><input type="checkbox" name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label>
+        </div>
       </div>
       <div class="user-query-filters">
         <label><input type="checkbox" name="own-classifications-only"><span data-i18n>Näytä vain omat luokittelut</span></label>
@@ -241,7 +245,6 @@
       <div class="kavi-query-filters">
         <div>
           <label data-i18n>Luokittelija</label><input type="hidden" name="classifier" />
-          <label class="reclassified grey"><input type="checkbox" disabled name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label>
         </div>
         <div>
           <div class="program-count"><label data-i18n>Hakutuloksia</label><span class="num"></span></div>

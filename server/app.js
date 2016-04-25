@@ -164,126 +164,66 @@ app.post('/reset-password', function(req, res, next) {
 })
 
 app.get('/programs/search/:q?', function(req, res, next) {
-  if (req.user) {
-    var isKavi = utils.hasRole(req.user, 'kavi')
-    var query = isKavi ? constructKaviQuery() : constructUserQuery(req.user)
-    if (req.query.ownClassificationsOnly === 'true') _.merge(query, { classifications: { $elemMatch: { 'author._id': req.user._id }}})
-    if (req.query.showDeleted == 'true') _.merge(query, { deleted: true })
-    else _.merge(query, { deleted: { $ne: true }})
-    var fields = isKavi ? null : { 'classifications.comments': 0 }
-    var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-    search(query, fields, sortBy, req, res, next)
-  } else {
-    var query = constructUserQuery(req.user)
-    search(query, Program.publicFields, 'name', req, res, next)
+
+  var page = req.query.page || 0
+  var isUser = req.user ? true : false
+  var isKavi = isUser ? utils.hasRole(req.user, 'kavi') : false
+  var fields = isKavi ? null : { 'classifications.comments': 0 }
+  fields = isUser ? fields : Program.publicFields
+
+  var query = constructQuery(isUser, isKavi)
+  var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
+
+  searchAndSend(query, fields, page, isKavi, sortBy, req, res, next)
+
+  function constructQuery(isUser, isKavi) {
+    var mainQuery = {$and: []}
+
+    mainQuery.$and.push(constructTypeClassificationQuery(req.user))
+    mainQuery.$and.push(constructNameQueries(req.params.q, req.query.searchFromSynopsis))
+    mainQuery.$and.push(agelimitQuery(req.query.agelimits))
+    mainQuery.$and.push(warningsQuery(req.query.warnings))
+    mainQuery.$and.push(constructProgramTypeFilter(req.query.filters))
+    mainQuery.$and.push(constructDateRangeQuery(req.query.registrationDateRange))
+    mainQuery.$and.push(getQueryUserRoleDependencies(req.user ? req.user._id : undefined, utils.getProperty(req, 'user.role')))
+    mainQuery.$and.push(constructClassifierQuery(req.query.classifier, req.query.reclassified))
+
+    if(isUser) mainQuery.$and.push(constructOwnClassifications(req.query.ownClassificationsOnly, req.user._id))
+    mainQuery.$and.push(constructDeletedQuery(req.query.showDeleted))
+
+    mainQuery.$and = _.filter(mainQuery.$and, function (andItem) { return !_.isEmpty(andItem)})
+
+    //console.log('Final query:  ', JSON.stringify(mainQuery))
+    return mainQuery
   }
 
-  function constructUserQuery(user) {
-    var query = user ? {} : {$or: [{programType: 2}, {classifications:{$exists: true, $nin: [[]]}}]}
-    var classificationMatch = constructDateRangeQuery()
-    var ors = agelimitAndWarningOrs(classificationMatch)
-    if (!_.isEmpty(ors)) query['$or'] = ors
-    if (!_.isEmpty(classificationMatch)) query['classifications'] = { $elemMatch: classificationMatch }
-    return query
+  function constructDeletedQuery(showDeleted){
+    var deleted = {deleted: { $ne: true }}
+    if (showDeleted == 'true') deleted = { deleted: true }
+
+    return deleted
   }
 
-  function constructKaviQuery() {
-    var rootQuery = {}
-    var classificationMatch = constructDateRangeQuery()
-    if (req.query.registrationDateRange) {
-      var range = utils.parseDateRange(req.query.registrationDateRange)
-      classificationMatch.registrationDate = { $gte: range.begin, $lt: range.end }
+  function constructOwnClassifications(ownClassifications, userid){
+    var owns = {}
+    if (ownClassifications === 'true'){
+      owns = { classifications: { $elemMatch: { 'author._id': req.user._id }}}
     }
-    if (req.query.classifier) {
-      classificationMatch['author._id'] = req.query.classifier
-      if (req.query.reclassified == 'true') {
-        rootQuery['classifications.0.author._id'] = { $ne: req.query.classifier }
-      }
-    }
-    var rootOrs = agelimitAndWarningOrs(classificationMatch)
-    if (!_.isEmpty(rootOrs)) rootQuery['$or'] = rootOrs
-    if (!_.isEmpty(classificationMatch)) rootQuery['classifications'] = { $elemMatch: classificationMatch }
-    return rootQuery
+
+    return owns
   }
 
-  function constructDateRangeQuery() {
-    var classificationMatch = {}
-    if (req.query.registrationDateRange) {
-      var range = utils.parseDateRange(req.query.registrationDateRange)
-      classificationMatch.registrationDate = { $gte: range.begin, $lt: range.end }
-    }
-    return classificationMatch
+  function constructProgramTypeFilter(filters){
+    var filt = {}
+
+    var filters = filters || []
+    if (filters.length > 0) filt = ({"programType": { $in: filters }})
+
+    return filt
   }
 
-  function agelimitAndWarningOrs(classificationMatch) {
-    var ors = []
-    if (req.query.agelimits && req.query.warnings) {
-      var agelimitsIn = { $in: req.query.agelimits.map(function(s) { return parseInt(s) }) }
-      var warnings = { $all: req.query.warnings }
-      if (_.isEmpty(classificationMatch)) {
-        ors.push({
-          $or: [
-            { 'classifications.0.agelimit': agelimitsIn, 'classifications.0.warnings': warnings },
-            { 'episodes.agelimit': agelimitsIn, 'episodes.warnings': warnings }
-          ] })
-      } else {
-        classificationMatch.agelimit = agelimitsIn
-        classificationMatch.warnings = warnings
-      }
-    } else if (req.query.agelimits) {
-      var agelimitsIn = { $in: req.query.agelimits.map(function(s) { return parseInt(s) }) }
-      if (_.isEmpty(classificationMatch)) {
-        ors.push({ $or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn } ] })
-      } else {
-        classificationMatch.agelimit = agelimitsIn
-      }
-    } else if (req.query.warnings) {
-      var warnings = { $all: req.query.warnings }
-      if (_.isEmpty(classificationMatch)) {
-        ors.push({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
-      } else {
-        classificationMatch.warnings = warnings
-      }
-    }
-    return ors
-  }
-
-  function search(extraQueryTerms, responseFields, sortBy, req, res, next) {
-    var page = req.query.page || 0
-    var filters = req.query.filters || []
-    var q = query(extraQueryTerms)
-    Program.find(q, responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
-      if (err) return next(err)
-      if (page == 0 && utils.hasRole(req.user, 'kavi')) {
-        Program.count(q, function(err, count) {
-          res.send({ count: count, programs: docs })
-        })
-      } else {
-        docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, req.user) })
-        res.send({ programs: docs })
-      }
-    })
-
-    function query(q) {
-      var ObjectId = mongoose.Types.ObjectId
-      var terms = req.params.q
-      var and = []
-      if (utils.getProperty(req, 'user.role') === 'trainee') and.push({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(req.user._id)}]})
-      if (utils.getProperty(req, 'user.role') === 'user') and.push({ 'createdBy.role': { $ne: 'trainee' }})
-      var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true)
-      if (nameQueries) {
-        if (parseInt(terms) == terms) {
-          and.push({$or: [nameQueries, { sequenceId: terms }]})
-        } else {
-          and.push(nameQueries)
-        }
-      }
-      if (filters.length > 0) q.programType = { $in: filters }
-      var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis')
-      if (synopsisQueries) q.$or = [synopsisQueries, {$and: and}]
-      else if (and.length > 0) q.$and = and
-      return q
-    }
+  function constructTypeClassificationQuery(user){
+    return user ? {} : {$or: [{programType: 2}, {classifications:{$exists: true, $nin: [[]]}}]}
   }
 
   function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning) {
@@ -309,6 +249,103 @@ app.get('/programs/search/:q?', function(req, res, next) {
       return obj
     }
   }
+
+  function agelimitQuery(agelimits) {
+    var limits = {}
+    if (agelimits) {
+      var agelimitsIn = { $in: agelimits.map(function(s) { return parseInt(s) }) }
+      limits = ({$or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn }]})
+    }
+
+    return limits
+  }
+
+  function warningsQuery(w) {
+    var warnings = {}
+
+    if (w) {
+      var warnings = { $all: w }
+      warnings = ({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
+    }
+
+    return warnings
+  }
+
+
+  function searchAndSend(query, responseFields, page, showUserComments, sortBy, req, res, next) {
+    Program.find(query, responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
+      if (err) return next(err)
+
+      if(!showUserComments) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, req.user) })
+
+      if (page == 0 && utils.hasRole(req.user, 'kavi')) {
+        Program.count(query, function(err, count) {
+          res.send({ count: count, programs: docs })
+        })
+      } else {
+        res.send({ programs: docs })
+      }
+    })
+  }
+
+
+  function constructClassifierQuery(classifier, reclassified){
+
+    var classifierQuery = {}
+    if (classifier) {
+      classifierQuery = {$and: []}
+      classifierQuery.$and.push({"classifications.author._id": classifier})
+      if (reclassified) {
+        classifierQuery.$and.push({"classifications.0.author._id": { $ne: classifier }})
+      }
+    } else if (reclassified) {
+        classifierQuery = {$and: []}
+        classifierQuery.$and.push({"classifications.1._id" : {$exists : true}})    // At least one reclassification
+    }
+
+    return classifierQuery
+  }
+
+  function constructDateRangeQuery(registrationDateRange) {
+    var dtQuery = {}
+    if (registrationDateRange) {
+      var range = utils.parseDateRange(registrationDateRange)
+      dtQuery = {"classifications.registrationDate": {$gte: range.begin, $lt: range.end}}
+    }
+    return dtQuery
+  }
+
+
+  function constructNameQueries(terms, useSynopsis){
+    var nameQuery = {}
+
+    var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true)
+    if (nameQueries) {
+      if (parseInt(terms) == terms) {
+        nameQuery = ({$or: [nameQueries, { sequenceId: terms }]})
+      } else {
+        nameQuery = ({$or: [nameQueries]})
+      }
+    }
+
+    if(useSynopsis == 'true') {
+      var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis')
+      if(synopsisQueries) nameQuery.$or.push(synopsisQueries)
+    }
+
+    return nameQuery
+  }
+
+  function getQueryUserRoleDependencies(userid, role){
+    var roleQuery = {}
+    var ObjectId = mongoose.Types.ObjectId
+
+    if (role === 'trainee') roleQuery = ({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(userid)}]})
+    if (role === 'user') roleQuery = ({ 'createdBy.role': { $ne: 'trainee' }})
+
+    return roleQuery
+  }
+
 })
 
 

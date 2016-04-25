@@ -84,6 +84,7 @@ var i18n = {
     'Rekisteröintipäivä': 'Registreringsdatum',
     'Hakutuloksia': 'Sökresultat',
     'Ikäraja': 'Åldersgräns',
+    'Hae myös synopsis-kentästä': 'käännös [Hae myös synopsis-kentästä]',
     'Ladataan...': 'Laddar...',
     'Ei hakutuloksia.': 'Söket gav inga resultat.',
     'FIN': 'FIN',

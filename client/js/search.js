@@ -377,11 +377,12 @@ function searchPage() {
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
   var $showDeleted = $page.find('input[type=checkbox].showDeleted')
+  var $searchFromSynopsis = $page.find('input[type=checkbox].searchFromSynopsis')
   var $filters = $page.find('.filters input[type=checkbox]')
   var $registrationDatePicker = $page.find('.public-query-filters .datepicker')
   var $clearRegistrationDatePicker = $page.find('.public-query-filters .clear-date-picker')
   var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
-  var $reclassifiedToggle = $page.find('.kavi-query-filters input[name=reclassified]')
+  var $reclassifiedToggle = $page.find('.filters input[name=reclassified]')
   var $ownClassificationsOnly = $page.find('.user-query-filters input[name=own-classifications-only]')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
@@ -498,8 +499,6 @@ function searchPage() {
       formatResultCssClass: function(user) { return user.active ? '' : 'grey' }
     }, function() {
       var isEmpty = !currentClassifier()
-      $reclassifiedToggle.prop('disabled', isEmpty).parent().toggleClass('grey', isEmpty)
-      if (isEmpty) $reclassifiedToggle.prop('checked', false)
       $input.trigger('fire')
     })
 
@@ -539,7 +538,8 @@ function searchPage() {
       agelimits: currentAgelimits(),
       warnings: currentWarnings(),
       ownClassificationsOnly: $ownClassificationsOnly.is(':checked'),
-      showDeleted: $showDeleted.is(':checked')
+      showDeleted: $showDeleted.is(':checked'),
+      searchFromSynopsis: $searchFromSynopsis.is(':checked')
     })
     state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
       if (state.jqXHR != jqXHR) return

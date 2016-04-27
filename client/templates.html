@@ -208,6 +208,10 @@
       <label class="search-label" data-i18n>Nimi</label>
       <input class="query" type="text" /><button class="button search" data-i18n>Hae</button>
       <div class="filters">
+        <label><input class="searchFromSynopsis" type="checkbox"/><span data-i18n>Hae myös synopsis-kentästä</span></label>
+      </div>
+      <br />
+      <div class="filters">
         <label class="first"><input type="checkbox" data-id="a" data-type="1"/><span data-i18n>Elokuvat</span></label>
         <label class="second"><input type="checkbox" data-id="f" data-type="6"/><span data-i18n>Trailerit</span></label>
         <label><input type="checkbox" data-id="b" data-type="2"/><span data-i18n>TV-sarjan nimi</span></label>
@@ -235,9 +239,13 @@
           <button data-id="drugs" class="filterbutton warning-filter"><img src="images/drugs.png"/></button>
         </div>
         <div class="filters">
-          <label><input class="searchFromSynopsis" type="checkbox"/><span data-i18n>Hae myös synopsis-kentästä</span></label>
-          <label class="reclassified"><input type="checkbox" name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label>
+          <label class="reclassified"><input type="checkbox" name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label> <br />
+          <div class="kavi-query-filters">
+            <input class="hide" type="hidden" name="reclassified-by" />
+          </div>
         </div>
+
+
       </div>
       <div class="user-query-filters">
         <label><input type="checkbox" name="own-classifications-only"><span data-i18n>Näytä vain omat luokittelut</span></label>

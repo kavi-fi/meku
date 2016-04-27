@@ -179,6 +179,8 @@ app.get('/programs/search/:q?', function(req, res, next) {
   function constructQuery(isUser, isKavi) {
     var mainQuery = {$and: []}
 
+    //console.log(constructReclassifiedByQuery(req.query.reclassified, req.query.reclassifiedBy))
+
     mainQuery.$and.push(constructTypeClassificationQuery(req.user))
     mainQuery.$and.push(constructNameQueries(req.params.q, req.query.searchFromSynopsis))
     mainQuery.$and.push(agelimitQuery(req.query.agelimits))
@@ -187,6 +189,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
     mainQuery.$and.push(constructDateRangeQuery(req.query.registrationDateRange))
     mainQuery.$and.push(getQueryUserRoleDependencies(req.user ? req.user._id : undefined, utils.getProperty(req, 'user.role')))
     mainQuery.$and.push(constructClassifierQuery(req.query.classifier, req.query.reclassified))
+    mainQuery.$and.push(constructReclassifiedByQuery(req.query.reclassified, req.query.reclassifiedBy))
 
     if(isUser) mainQuery.$and.push(constructOwnClassifications(req.query.ownClassificationsOnly, req.user._id))
     mainQuery.$and.push(constructDeletedQuery(req.query.showDeleted))
@@ -195,6 +198,16 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
     //console.log('Final query:  ', JSON.stringify(mainQuery))
     return mainQuery
+  }
+
+  function constructReclassifiedByQuery(reclassified, reclassifiedBy){
+    var reclassifiedByQuery = {}
+    if (reclassified == 'true') {
+      if (reclassifiedBy == 2) reclassifiedByQuery = {"classifications.authorOrganization" : {$exists : true}}
+      if (reclassifiedBy == 3) reclassifiedByQuery = {"classifications.authorOrganization" : {$exists : false}}
+    }
+
+    return reclassifiedByQuery
   }
 
   function constructDeletedQuery(showDeleted){
@@ -295,12 +308,12 @@ app.get('/programs/search/:q?', function(req, res, next) {
     if (classifier) {
       classifierQuery = {$and: []}
       classifierQuery.$and.push({"classifications.author._id": classifier})
-      if (reclassified) {
+      if (reclassified == 'true') {
         classifierQuery.$and.push({"classifications.0.author._id": { $ne: classifier }})
       }
-    } else if (reclassified) {
+    } else if (reclassified == 'true') {
         classifierQuery = {$and: []}
-        classifierQuery.$and.push({"classifications.1._id" : {$exists : true}})    // At least one reclassification
+        classifierQuery.$and.push({"classifications.isReclassification" : {$eq : true}})    // At least one reclassification
     }
 
     return classifierQuery

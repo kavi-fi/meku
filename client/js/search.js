@@ -35,6 +35,7 @@ function internalSearchPage() {
   var $newClassificationButton = $page.find('.new-classification button')
   var $drafts = $page.find('.drafts')
   var $recent = $page.find('.recent')
+  var $reclassifiedBy = $page.find('.public-query-filters input[name=reclassified-by]')
   setAgelimit0IconByLanguage($page)
 
   var programTypesSelect2 = {
@@ -48,7 +49,16 @@ function internalSearchPage() {
     ]
   }
 
+  var reclassifierBySelect = {
+    data: [
+      {id: 1, text: i18nText('Kaikki') },
+      {id: 2, text: i18nText('Organisaatio') },
+      {id: 3, text: i18nText('Henkilö') }
+    ]
+  }
+
   $newClassificationType.select2(programTypesSelect2).select2('val', 1)
+  $reclassifiedBy.select2(reclassifierBySelect).select2('val', 1)
 
   $page.on('show', function(e, q, filters, programId) {
     loadDrafts()
@@ -383,6 +393,7 @@ function searchPage() {
   var $clearRegistrationDatePicker = $page.find('.public-query-filters .clear-date-picker')
   var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
   var $reclassifiedToggle = $page.find('.filters input[name=reclassified]')
+  var $reclassifiedBy = $page.find('.public-query-filters input[name=reclassified-by]')
   var $ownClassificationsOnly = $page.find('.user-query-filters input[name=own-classifications-only]')
   var $results = $page.find('.results')
   var $noResults = $page.find('.no-results')
@@ -498,11 +509,15 @@ function searchPage() {
       formatSelection: function(user, $container) { $container.toggleClass('grey', !user.active).text(user.text) },
       formatResultCssClass: function(user) { return user.active ? '' : 'grey' }
     }, function() {
-      var isEmpty = !currentClassifier()
+      $input.trigger('fire')
+    })
+
+    $reclassifiedBy.change(function() {
       $input.trigger('fire')
     })
 
     $reclassifiedToggle.change(function() {
+      $reclassifiedBy.toggleClass('hide', !$reclassifiedToggle.prop('checked'))
       $input.trigger('fire')
     })
   }
@@ -539,6 +554,7 @@ function searchPage() {
       warnings: currentWarnings(),
       ownClassificationsOnly: $ownClassificationsOnly.is(':checked'),
       showDeleted: $showDeleted.is(':checked'),
+      reclassifiedBy: currentReClassifier(),
       searchFromSynopsis: $searchFromSynopsis.is(':checked')
     })
     state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
@@ -561,6 +577,11 @@ function searchPage() {
     $filters.each(function() {
       $(this).prop('checked', !!(filterString && filterString.indexOf($(this).data('id')) >= 0))
     })
+  }
+
+  function currentReClassifier() {
+    var data = $reclassifiedBy.select2 && $reclassifiedBy.select2('data') || undefined
+    return data && data.id || undefined
   }
 
   function currentClassifier() {

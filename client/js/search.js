@@ -386,6 +386,7 @@ function searchPage() {
   var $page = $('#search-page').html($('#templates .search-page').clone())
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
+  var $exportbutton = $page.find('button.export')
   var $showDeleted = $page.find('input[type=checkbox].showDeleted')
   var $searchFromSynopsis = $page.find('input[type=checkbox].searchFromSynopsis')
   var $filters = $page.find('.filters input[type=checkbox]')
@@ -416,9 +417,25 @@ function searchPage() {
       }
       if ($('#login').is(':hidden')) $input.focus()
     })
+
+    $("#search-excel-export-form").find('input[name=_csrf]').val($.cookie('_csrf_token'))
+
   })
 
   $button.click(function() { $input.trigger('fire') })
+  $exportbutton.on('click', function(){
+    if (state.page == 0) $results.empty()
+
+    var $form = $("#search-excel-export-form")
+
+    var postParams = constructPostDataParams()
+    postParams.q = state.q ? state.q : ""
+
+    $form.find('input[name=post_data]').val(JSON.stringify(postParams))
+    $form.submit()
+
+  })
+  
   $filters.on('change', function() { $input.trigger('fire') })
   $ownClassificationsOnly.on('change', function() { $input.trigger('fire') })
 
@@ -544,7 +561,26 @@ function searchPage() {
     $loading.show()
     if (state.page == 0) $results.empty()
     var url = '/programs/search/'+encodeURIComponent(state.q)
-    var data = $.param({
+    var data = $.param(constructPostDataParams())
+    state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
+      if (state.jqXHR != jqXHR) return
+      var results = data.programs
+
+      $page.find('.button.export').prop('disabled', !(data.count != undefined && data.count < 5001))
+      $page.find('.search-export').toggle(data.count === undefined || data.count > 5000)
+
+
+      if (data.count != undefined) $page.find('.program-count .num').text(data.count)
+      $noResults.toggle(state.page == 0 && results.length == 0)
+      $noMoreResults.toggle((state.page > 0 || results.length > 0) && results.length < 100)
+      $results.append(results.map(function(p) { return render(p, state.q) }))
+      $loading.hide()
+      if (callback) callback()
+    })
+  }
+
+  function constructPostDataParams(){
+    return {
       page: state.page,
       filters: currentFilters(),
       classifier: currentClassifier(),
@@ -556,17 +592,7 @@ function searchPage() {
       showDeleted: $showDeleted.is(':checked'),
       reclassifiedBy: currentReClassifier(),
       searchFromSynopsis: $searchFromSynopsis.is(':checked')
-    })
-    state.jqXHR = $.get(url, data).done(function(data, status, jqXHR) {
-      if (state.jqXHR != jqXHR) return
-      var results = data.programs
-      if (data.count != undefined) $page.find('.program-count .num').text(data.count)
-      $noResults.toggle(state.page == 0 && results.length == 0)
-      $noMoreResults.toggle((state.page > 0 || results.length > 0) && results.length < 100)
-      $results.append(results.map(function(p) { return render(p, state.q) }))
-      $loading.hide()
-      if (callback) callback()
-    })
+    }
   }
 
   function currentFilters() {

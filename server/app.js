@@ -17,6 +17,7 @@ var ClassificationCriteria = schema.ClassificationCriteria
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var kieku = require('./kieku')
+var programExport = require('./program-export')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD)
@@ -163,6 +164,46 @@ app.post('/reset-password', function(req, res, next) {
   }
 })
 
+
+app.post('/program/excel/export', function(req, res, next) {
+
+  var isUser = req.user ? true : false
+  var isKavi = isUser ? utils.hasRole(req.user, 'kavi') : false
+  var fields = isKavi ? null : { 'classifications.comments': 0 }
+  fields = isUser ? fields : Program.publicFields
+
+  var data = JSON.parse(req.body.post_data)
+
+  var queryParams = {
+    "page": data.page,
+    "isUser": isUser,
+    "isKavi": isKavi,
+    "fields": fields,
+    "user": req.user,
+    "q": data.q,
+    "searchFromSynopsis": data.searchFromSynopsis,
+    "agelimits": data.agelimits,
+    "warnings": data.warnings,
+    "filters": data.filters,
+    "registrationDateRange": data.registrationDateRange,
+    "userRole": utils.getProperty(req, 'user.role'),
+    "classifier": data.classifier,
+    "reclassified": data.reclassified,
+    "reclassifiedBy": data.reclassifiedBy,
+    "ownClassificationsOnly": data.ownClassificationsOnly,
+    "showDeleted": data.showDeleted
+  }
+
+  var query = constructQuery(queryParams)
+  var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
+
+  //console.log(JSON.stringify(queryParams))
+  //console.log('Final query:  ', JSON.stringify(query))
+  sendOrExport(query, queryParams, sortBy, false, res, next)
+ 
+})
+
+
 app.get('/programs/search/:q?', function(req, res, next) {
 
   var page = req.query.page || 0
@@ -171,128 +212,47 @@ app.get('/programs/search/:q?', function(req, res, next) {
   var fields = isKavi ? null : { 'classifications.comments': 0 }
   fields = isUser ? fields : Program.publicFields
 
-  var query = constructQuery(isUser, isKavi)
+  var queryParams = {
+    "page": page,
+    "isUser": isUser,
+    "isKavi": isKavi,
+    "fields": fields,
+    "user": req.user,
+    "q": req.params.q,
+    "searchFromSynopsis": req.query.searchFromSynopsis == 'true',
+    "agelimits": req.query.agelimits,
+    "warnings": req.query.warnings,
+    "filters": req.query.filters,
+    "registrationDateRange": req.query.registrationDateRange,
+    "userRole": utils.getProperty(req, 'user.role'),
+    "classifier": req.query.classifier,
+    "reclassified": req.query.reclassified == 'true',
+    "reclassifiedBy": req.query.reclassifiedBy,
+    "ownClassificationsOnly": req.query.ownClassificationsOnly == 'true',
+    "showDeleted": req.query.showDeleted == 'true'
+  }
+
+  var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
 
-  searchAndSend(query, fields, page, isKavi, sortBy, req, res, next)
+  //console.log(JSON.stringify(queryParams))
+  //console.log('Final query:  ', JSON.stringify(query))
+  sendOrExport(query, queryParams, sortBy, true, res, next)
 
-  function constructQuery(isUser, isKavi) {
-    var mainQuery = {$and: []}
+})
 
-    //console.log(constructReclassifiedByQuery(req.query.reclassified, req.query.reclassifiedBy))
+function sendOrExport(query, queryData, sortBy, sendJSONResponse, res, next){
 
-    mainQuery.$and.push(constructTypeClassificationQuery(req.user))
-    mainQuery.$and.push(constructNameQueries(req.params.q, req.query.searchFromSynopsis))
-    mainQuery.$and.push(agelimitQuery(req.query.agelimits))
-    mainQuery.$and.push(warningsQuery(req.query.warnings))
-    mainQuery.$and.push(constructProgramTypeFilter(req.query.filters))
-    mainQuery.$and.push(constructDateRangeQuery(req.query.registrationDateRange))
-    mainQuery.$and.push(getQueryUserRoleDependencies(req.user ? req.user._id : undefined, utils.getProperty(req, 'user.role')))
-    mainQuery.$and.push(constructClassifierQuery(req.query.classifier))
-    mainQuery.$and.push(constructReclassifiedByQuery(req.query.reclassified, req.query.reclassifiedBy))
+  var isAdminUser = utils.hasRole(queryData.user, 'root')
+  var showClassificationAuthor = isAdminUser
 
-    if(isUser) mainQuery.$and.push(constructOwnClassifications(req.query.ownClassificationsOnly, req.user._id))
-    mainQuery.$and.push(constructDeletedQuery(req.query.showDeleted))
-
-    mainQuery.$and = _.filter(mainQuery.$and, function (andItem) { return !_.isEmpty(andItem)})
-
-    //console.log('Final query:  ', JSON.stringify(mainQuery))
-    return mainQuery
-  }
-
-  function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
-    var reclassifiedByQuery = {}
-    if (reclassified == 'true') {
-      reclassifiedByQuery = {$and: []}
-      reclassifiedByQuery.$and.push({"classifications.isReclassification": {$eq: true}})    // At least one reclassification in the classifications list 
-      if (reclassifiedBy == 2) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: true}})
-      if (reclassifiedBy == 3) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: false}})
-    }
-    return reclassifiedByQuery
-  }
-
-  function constructDeletedQuery(showDeleted){
-    var deleted = {deleted: { $ne: true }}
-    if (showDeleted == 'true') deleted = { deleted: true }
-
-    return deleted
-  }
-
-  function constructOwnClassifications(ownClassifications, userid){
-    var owns = {}
-    if (ownClassifications === 'true'){
-      owns = { classifications: { $elemMatch: { 'author._id': req.user._id }}}
-    }
-
-    return owns
-  }
-
-  function constructProgramTypeFilter(filters){
-    var filt = {}
-
-    var filters = filters || []
-    if (filters.length > 0) filt = ({"programType": { $in: filters }})
-
-    return filt
-  }
-  
-  function constructTypeClassificationQuery(user){
-    return user ? {} : {$or: [{programType: 2}, {classifications:{$exists: true, $nin: [[]]}}]}
-  }
-
-  function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning) {
-    var searchString = (string || '').trim()
-    var parts = searchString.match(/"[^"]*"|[^ ]+/g)
-    if (!parts) return undefined
-    return parts.reduce(function(result, s) {
-      if (/^".+"$/.test(s)) {
-        var withoutQuotes = s.substring(1, s.length - 1)
-        if (s.indexOf(' ') == -1) {
-          return addToAll(result, primaryField, withoutQuotes)
-        } else {
-          return addToAll(result, primaryField, new RegExp(utils.escapeRegExp(withoutQuotes), "i"))
-        }
-      } else {
-        return addToAll(result, secondaryField, new RegExp((fromBeginning ? '^' : '') + utils.escapeRegExp(s), "i"))
-      }
-    }, {})
-
-    function addToAll(obj, key, value) {
-      if (!obj[key]) obj[key] = { $all: [] }
-      obj[key].$all.push(value)
-      return obj
-    }
-  }
-
-  function agelimitQuery(agelimits) {
-    var limits = {}
-    if (agelimits) {
-      var agelimitsIn = { $in: agelimits.map(function(s) { return parseInt(s) }) }
-      limits = ({$or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn }]})
-    }
-
-    return limits
-  }
-
-  function warningsQuery(w) {
-    var warnings = {}
-
-    if (w) {
-      var warnings = { $all: w }
-      warnings = ({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
-    }
-
-    return warnings
-  }
-
-
-  function searchAndSend(query, responseFields, page, showUserComments, sortBy, req, res, next) {
-    Program.find(query, responseFields).skip(page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
+  if (sendJSONResponse) {
+    Program.find(query, queryData.fields).skip(queryData.page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
       if (err) return next(err)
 
-      if(!showUserComments) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, req.user) })
+      if(!queryData.isKavi) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, queryData.user) })
 
-      if (page == 0 && utils.hasRole(req.user, 'kavi')) {
+      if (queryData.page == 0) {
         Program.count(query, function(err, count) {
           res.send({ count: count, programs: docs })
         })
@@ -300,17 +260,127 @@ app.get('/programs/search/:q?', function(req, res, next) {
         res.send({ programs: docs })
       }
     })
+  } else {
+    Program.find(query, queryData.fields).limit(5000).exec().then(function(docs){
+
+      var result = programExport.constructProgramExportData(docs, showClassificationAuthor)
+      var filename = 'kavi_luokittelut.xlsx'
+      res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+      res.send(result)
+    })
   }
+}
+
+function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
+  var reclassifiedByQuery = {}
+  if (reclassified == 'true') {
+    reclassifiedByQuery = {$and: []}
+    reclassifiedByQuery.$and.push({"classifications.isReclassification": {$eq: true}})    // At least one reclassification in the classifications list 
+    if (reclassifiedBy == 2) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: true}})
+    if (reclassifiedBy == 3) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: false}})
+  }
+  return reclassifiedByQuery
+}
+
+function constructQuery(queryData) {
+  var mainQuery = {$and: []}
+
+  //isUser, isKavi, user, qstring, fromSynopsis, agelimits, warnings, filters, registrationDateRange, userRole, classifier, reclassified, reclassifiedBy, ownClassificationsOnly, showDeleted
+  mainQuery.$and.push(constructTypeClassificationQuery(queryData.user))
+  mainQuery.$and.push(constructNameQueries(queryData.q, queryData.searchFromSynopsis))
+  mainQuery.$and.push(agelimitQuery(queryData.agelimits))
+  mainQuery.$and.push(warningsQuery(queryData.warnings))
+  mainQuery.$and.push(constructProgramTypeFilter(queryData.filters))
+  mainQuery.$and.push(constructDateRangeQuery(queryData.registrationDateRange))
+  mainQuery.$and.push(getQueryUserRoleDependencies(queryData.user ? queryData.user._id : undefined, queryData.userRole))
+  mainQuery.$and.push(constructClassifierQuery(queryData.classifier, queryData.reclassified))
+  mainQuery.$and.push(constructReclassifiedByQuery(queryData.reclassified, queryData.reclassifiedBy))
+
+  if(queryData.isUser) mainQuery.$and.push(constructOwnClassifications(queryData.ownClassificationsOnly, queryData.user._id))
+  mainQuery.$and.push(constructDeletedQuery(queryData.showDeleted))
+
+  mainQuery.$and = _.filter(mainQuery.$and, function (andItem) { return !_.isEmpty(andItem)})
+
+  return mainQuery
+}
   
-  function constructDateRangeQuery(registrationDateRange) {
-    var dtQuery = {}
-    if (registrationDateRange) {
-      var range = utils.parseDateRange(registrationDateRange)
-      dtQuery = {classifications: {$elemMatch: {registrationDate: {$gte: range.begin.toDate(), $lt: range.end.toDate()}} }}
-    }
-    return dtQuery
+  function constructTypeClassificationQuery(user){
+    return user ? {} : {$or: [{programType: 2}, {classifications:{$exists: true, $nin: [[]]}}]}
   }
 
+function constructDeletedQuery(showDeleted){
+  var deleted = {deleted: { $ne: true }}
+  if (showDeleted) {
+    deleted = { deleted: true }
+  }
+
+  return deleted
+}
+
+function constructOwnClassifications(ownClassifications, userid){
+  var owns = {}
+  if (ownClassifications){
+    owns = { classifications: { $elemMatch: { 'author._id': userid }}}
+  }
+
+  return owns
+}
+
+function constructProgramTypeFilter(filters){
+  var filt = {}
+
+  var filters = filters || []
+  if (filters.length > 0) filt = ({"programType": { $in: filters }})
+
+  return filt
+}
+
+function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning) {
+  var searchString = (string || '').trim()
+  var parts = searchString.match(/"[^"]*"|[^ ]+/g)
+  if (!parts) return undefined
+  return parts.reduce(function(result, s) {
+    if (/^".+"$/.test(s)) {
+      var withoutQuotes = s.substring(1, s.length - 1)
+      if (s.indexOf(' ') == -1) {
+        return addToAll(result, primaryField, withoutQuotes)
+      } else {
+        return addToAll(result, primaryField, new RegExp(utils.escapeRegExp(withoutQuotes), "i"))
+      }
+    } else {
+      return addToAll(result, secondaryField, new RegExp((fromBeginning ? '^' : '') + utils.escapeRegExp(s), "i"))
+    }
+  }, {})
+
+  function addToAll(obj, key, value) {
+    if (!obj[key]) obj[key] = { $all: [] }
+    obj[key].$all.push(value)
+    return obj
+  }
+}
+
+function agelimitQuery(agelimits) {
+  var limits = {}
+  if (agelimits && !_.isEmpty(agelimits)) {
+    var agelimitsIn = { $in: agelimits.map(function(s) { return parseInt(s) }) }
+    limits = ({$or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn }]})
+  }
+
+  return limits
+}
+
+function warningsQuery(w) {
+  var warnings = {}
+
+  if (w && !_.isEmpty(w)) {
+    var warnings = { $all: w }
+    warnings = ({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
+  }
+
+  return warnings
+}
 
   function constructClassifierQuery(classifier) {
     var classifierQuery = {}
@@ -320,37 +390,45 @@ app.get('/programs/search/:q?', function(req, res, next) {
     return classifierQuery
   }
 
-  function constructNameQueries(terms, useSynopsis){
-    var nameQuery = {}
 
-    var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true)
-    if (nameQueries) {
-      if (parseInt(terms) == terms) {
-        nameQuery = ({$or: [nameQueries, { sequenceId: terms }]})
-      } else {
-        nameQuery = ({$or: [nameQueries]})
-      }
+function constructDateRangeQuery(registrationDateRange) {
+  var dtQuery = {}
+  if (registrationDateRange) {
+    var range = utils.parseDateRange(registrationDateRange)
+    dtQuery = {classifications: {$elemMatch: {registrationDate: {$gte: range.begin.toDate(), $lt: range.end.toDate()}} }}
+  }
+  return dtQuery
+}
+
+function constructNameQueries(terms, useSynopsis){
+  var nameQuery = {}
+
+  var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true)
+  if (nameQueries) {
+    if (parseInt(terms) == terms) {
+      nameQuery = ({$or: [nameQueries, { sequenceId: terms }]})
+    } else {
+      nameQuery = ({$or: [nameQueries]})
     }
-
-    if(useSynopsis == 'true') {
-      var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis')
-      if(synopsisQueries) nameQuery.$or.push(synopsisQueries)
-    }
-
-    return nameQuery
   }
 
-  function getQueryUserRoleDependencies(userid, role){
-    var roleQuery = {}
-    var ObjectId = mongoose.Types.ObjectId
-
-    if (role === 'trainee') roleQuery = ({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(userid)}]})
-    if (role === 'user') roleQuery = ({ 'createdBy.role': { $ne: 'trainee' }})
-
-    return roleQuery
+  if(useSynopsis) {
+    var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis')
+    if(synopsisQueries) nameQuery.$or.push(synopsisQueries)
   }
 
-})
+  return nameQuery
+}
+
+function getQueryUserRoleDependencies(userid, role){
+  var roleQuery = {}
+  var ObjectId = mongoose.Types.ObjectId
+
+  if (role === 'trainee') roleQuery = ({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(userid)}]})
+  if (role === 'user') roleQuery = ({ 'createdBy.role': { $ne: 'trainee' }})
+
+  return roleQuery
+}
 
 
 app.get('/episodes/:seriesId', function(req, res, next) {
@@ -1796,7 +1874,7 @@ function getIpAddress(req) {
 }
 
 function isUrlEncodedBody(req) {
-  var paths = ['POST:/kieku', 'POST:/providers/billing/kieku', 'POST:/providers/yearlyBilling/kieku']
+  var paths = ['POST:/program/excel/export', 'POST:/kieku', 'POST:/providers/billing/kieku', 'POST:/providers/yearlyBilling/kieku']
   return _.contains(paths, req.method + ':' + req.path)
 }
 
@@ -1807,7 +1885,7 @@ function isWhitelisted(req) {
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
     'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls',
-    'GET:/upgrade-browser.html', 'GET:/emails/latest', 'GET:/classification/criteria'
+    'GET:/upgrade-browser.html', 'GET:/emails/latest', 'GET:/classification/criteria', 'POST:/program/excel/export'
   ]
   var url = req.method + ':' + req.path
   return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

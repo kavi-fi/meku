@@ -199,6 +199,12 @@
     </div>
   </div>
 
+
+  <form method="POST" action="/program/excel/export" id="search-excel-export-form">
+    <input type="hidden" name="_csrf">
+    <input type="hidden" name="post_data">
+  </form>
+
   <div class="controls">
     <h2 class="main" data-i18n>Kuvaohjelmahaku</h2>
     <div class="new-classification">
@@ -254,22 +260,27 @@
         <div>
           <label data-i18n>Luokittelija</label><input type="hidden" name="classifier" />
         </div>
-        <div>
-          <div class="program-count"><label data-i18n>Hakutuloksia</label><span class="num"></span></div>
-        </div>
       </div>
       <div class="root-query-filters">
         <div class="filters">
           <label><input class="showDeleted" type="checkbox"/><span data-i18n>Hae vain poistettuja ohjelmia</span></label>
         </div>
       </div>
+
+      <br /><br />
+      <div>
+        <div class="program-count"><label data-i18n>Hakutuloksia</label><span class="num"></span></div>
+      </div>
     </div>
+
+    <button class="button export" data-i18n>Lataa Excel-tiedosto</button> <span class="search-export" data-i18n>Tarkenna hakua</span>
   </div>
   <div class="results"></div>
   <div class="loading" data-i18n>Ladataan...</div>
   <div class="no-results" data-i18n>Ei hakutuloksia.</div>
   <div class="no-more-results"><i data-i18n>FIN</i></div>
 </div>
+
 
 <div class="user-details detail-box clearfix">
   <div class="activity modify-only">

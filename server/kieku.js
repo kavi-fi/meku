@@ -175,6 +175,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
   })
   var tmpXlsxFile = 'kieku_' + Math.random() + '.xlsx'
   var columnWidths = _.map(columns, function (column) { return { wch: (column.width || 10) }})
+
   excelWriter.write(tmpXlsxFile, xlsData, columnWidths)
   var fileData = fs.readFileSync(tmpXlsxFile)
   fs.unlinkSync(tmpXlsxFile)

@@ -188,7 +188,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
     mainQuery.$and.push(constructProgramTypeFilter(req.query.filters))
     mainQuery.$and.push(constructDateRangeQuery(req.query.registrationDateRange))
     mainQuery.$and.push(getQueryUserRoleDependencies(req.user ? req.user._id : undefined, utils.getProperty(req, 'user.role')))
-    mainQuery.$and.push(constructClassifierQuery(req.query.classifier, req.query.reclassified))
+    mainQuery.$and.push(constructClassifierQuery(req.query.classifier))
     mainQuery.$and.push(constructReclassifiedByQuery(req.query.reclassified, req.query.reclassifiedBy))
 
     if(isUser) mainQuery.$and.push(constructOwnClassifications(req.query.ownClassificationsOnly, req.user._id))
@@ -200,13 +200,14 @@ app.get('/programs/search/:q?', function(req, res, next) {
     return mainQuery
   }
 
-  function constructReclassifiedByQuery(reclassified, reclassifiedBy){
+  function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
     var reclassifiedByQuery = {}
-    if (reclassified == 'true') {
-      if (reclassifiedBy == 2) reclassifiedByQuery = {"classifications.authorOrganization" : {$exists : true}}
-      if (reclassifiedBy == 3) reclassifiedByQuery = {"classifications.authorOrganization" : {$exists : false}}
+    if (reclassified) {
+      reclassifiedByQuery = {$and: []}
+      reclassifiedByQuery.$and.push({"classifications.isReclassification": {$eq: true}})    // At least one reclassification in the classifications list 
+      if (reclassifiedBy == 2) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: true}})
+      if (reclassifiedBy == 3) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: false}})
     }
-
     return reclassifiedByQuery
   }
 
@@ -234,7 +235,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
     return filt
   }
-
+  
   function constructTypeClassificationQuery(user){
     return user ? {} : {$or: [{programType: 2}, {classifications:{$exists: true, $nin: [[]]}}]}
   }
@@ -300,25 +301,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
       }
     })
   }
-
-
-  function constructClassifierQuery(classifier, reclassified){
-
-    var classifierQuery = {}
-    if (classifier) {
-      classifierQuery = {$and: []}
-      classifierQuery.$and.push({"classifications.author._id": classifier})
-      if (reclassified == 'true') {
-        classifierQuery.$and.push({"classifications.0.author._id": { $ne: classifier }})
-      }
-    } else if (reclassified == 'true') {
-        classifierQuery = {$and: []}
-        classifierQuery.$and.push({"classifications.isReclassification" : {$eq : true}})    // At least one reclassification
-    }
-
-    return classifierQuery
-  }
-
+  
   function constructDateRangeQuery(registrationDateRange) {
     var dtQuery = {}
     if (registrationDateRange) {
@@ -328,6 +311,14 @@ app.get('/programs/search/:q?', function(req, res, next) {
     return dtQuery
   }
 
+
+  function constructClassifierQuery(classifier) {
+    var classifierQuery = {}
+    if (classifier) {
+      classifierQuery = {"classifications.author._id": classifier}
+    }
+    return classifierQuery
+  }
 
   function constructNameQueries(terms, useSynopsis){
     var nameQuery = {}

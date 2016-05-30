@@ -24,7 +24,7 @@ var envs = {
     hostname: 'http://localhost:3000',
     sendEmail: false,
     forceSSL: false,
-    mongoUrl: 'mongodb://localhost/meku-production'
+    mongoUrl: 'mongodb://localhost/meku'
   },
   test: {
     isTest: true,

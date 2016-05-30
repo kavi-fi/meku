@@ -323,7 +323,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
     var dtQuery = {}
     if (registrationDateRange) {
       var range = utils.parseDateRange(registrationDateRange)
-      dtQuery = {"classifications.registrationDate": {$gte: range.begin, $lt: range.end}}
+      dtQuery = {classifications: {$elemMatch: {registrationDate: {$gte: range.begin.toDate(), $lt: range.end.toDate()}} }}
     }
     return dtQuery
   }

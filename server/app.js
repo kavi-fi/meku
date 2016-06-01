@@ -202,7 +202,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
   function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
     var reclassifiedByQuery = {}
-    if (reclassified) {
+    if (reclassified == 'true') {
       reclassifiedByQuery = {$and: []}
       reclassifiedByQuery.$and.push({"classifications.isReclassification": {$eq: true}})    // At least one reclassification in the classifications list 
       if (reclassifiedBy == 2) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: true}})

@@ -224,8 +224,7 @@ label.top { vertical-align: top; }
 #search-page .pad { margin-left: 12px; }
 #search-page .program-count { float: right; }
 #search-page .program-count span { display: inline-block; font-size: 14px; min-width: 50px; margin-top: 10px; text-align: right; }
-#search-page .csv-export button { float: right; }
-#search-page .csv-export span { display: inline-block; font-size: 14px; min-width: 50px; margin-top: 10px; text-align: right; }
+#search-page .search-export { font-size: 12px; color: #444444; font-weight: normal; }
 
 #search-page .user-query-filters input[type=checkbox] { margin-right: 7px; margin-bottom: 10px; }
 #search-page .user-query-filters label { font-size: 14px; color: #444444; font-weight: normal; }

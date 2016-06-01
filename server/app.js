@@ -275,7 +275,7 @@ function sendOrExport(query, queryData, sortBy, sendJSONResponse, res, next){
 
 function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
   var reclassifiedByQuery = {}
-  if (reclassified == 'true') {
+  if (reclassified) {
     reclassifiedByQuery = {$and: []}
     reclassifiedByQuery.$and.push({"classifications.isReclassification": {$eq: true}})    // At least one reclassification in the classifications list 
     if (reclassifiedBy == 2) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: true}})

@@ -112,6 +112,7 @@ function reportsPage() {
         .find('.author').text(authorColumn(row)).end()
         .find('.duration').text(row.duration).end()
         .find('.type').text(row.isReclassification ? 'Uudelleenluokittelu' : 'Luokittelu').end()
+        .find('.buyer').text(row.buyer ? row.buyer.name : '').end()
         .find('.comments').text(row.comments).end()
     }
   }

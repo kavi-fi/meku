@@ -677,6 +677,16 @@ textarea.invalid:disabled,
 .classification-email dl .select2-container { width: 760px; }
 .classification-email .email-preview .body a { pointer-events: none; opacity: 0.7; cursor: default; }
 
+.report-classification-list-table .id {font-size: small}
+.report-classification-list-table .sequenceId {font-size: small}
+.report-classification-list-table .programType {font-size: small}
+.report-classification-list-table .date {font-size: smaller}
+.report-classification-list-table .author {font-size: small}
+.report-classification-list-table .duration {font-size: small}
+.report-classification-list-table .type {font-size: small}
+.report-classification-list-table .buyer {font-size: small}
+.report-classification-list-table .comments {font-size: small}
+
 .select2-dropdown-result-icon { text-align: center; width: 20px; margin-right: 10px; }
 
 #classification-page .register { padding: 25px 0; }

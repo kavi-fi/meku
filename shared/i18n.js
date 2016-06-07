@@ -59,6 +59,7 @@ var i18n = {
     'Tuotantoyhtiö': 'Produktionsbolag',
     'Ohjaaja': 'Regissör',
     'Kommentit': 'Kommentarer',
+    'Tilaaja': 'Beställare',
     'Sarjan jaksot': 'Seriens avsnitt',
     'Luokittelu rekisteröity': 'Klassificering registrerad',
     'Muuta tietoja': 'Ändra uppgifter',

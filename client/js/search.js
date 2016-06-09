@@ -566,8 +566,8 @@ function searchPage() {
       if (state.jqXHR != jqXHR) return
       var results = data.programs
 
-      $page.find('.button.export').prop('disabled', !(data.count != undefined && data.count < 5001))
-      $page.find('.search-export').toggle(data.count === undefined || data.count > 5000)
+      //$page.find('.button.export').prop('disabled', !(data.count != undefined && data.count < 5001))
+      //$page.find('.search-export').toggle(data.count === undefined || data.count > 5000)
 
 
       if (data.count != undefined) $page.find('.program-count .num').text(data.count)

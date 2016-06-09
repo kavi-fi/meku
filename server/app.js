@@ -196,11 +196,8 @@ app.post('/program/excel/export', function(req, res, next) {
 
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-
-  //console.log(JSON.stringify(queryParams))
-  //console.log('Final query:  ', JSON.stringify(query))
+  
   sendOrExport(query, queryParams, sortBy, false, res, next)
- 
 })
 
 
@@ -234,11 +231,8 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-
-  //console.log(JSON.stringify(queryParams))
-  //console.log('Final query:  ', JSON.stringify(query))
+  
   sendOrExport(query, queryParams, sortBy, true, res, next)
-
 })
 
 function sendOrExport(query, queryData, sortBy, sendJSONResponse, res, next){

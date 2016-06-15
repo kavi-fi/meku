@@ -167,19 +167,19 @@ app.post('/reset-password', function(req, res, next) {
 
 app.post('/program/excel/export', function(req, res, next) {
 
-  var isUser = req.user ? true : false
-  var isKavi = isUser ? utils.hasRole(req.user, 'kavi') : false
+  var data = JSON.parse(req.body.post_data)
+
+  var isUser = data.user ? true : false
+  var isKavi = isUser ? utils.hasRole(data.user, 'kavi') : false
   var fields = isKavi ? null : { 'classifications.comments': 0 }
   fields = isUser ? fields : Program.publicFields
-
-  var data = JSON.parse(req.body.post_data)
 
   var queryParams = {
     "page": data.page,
     "isUser": isUser,
     "isKavi": isKavi,
     "fields": fields,
-    "user": req.user,
+    "user": data.user,
     "q": data.q,
     "searchFromSynopsis": data.searchFromSynopsis,
     "agelimits": data.agelimits,

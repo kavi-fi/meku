@@ -11,6 +11,8 @@ var stream = Program.find({programType: 2, deleted: {$ne: true}}).stream()
 stream.on('data', function (program) {
     stream.pause()
     Program.updateTvSeriesClassification(program._id, function () {
+        count++
+        if (count % 100 === 0) console.info('Saved: ' + count)
         stream.resume()
     })
 })

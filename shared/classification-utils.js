@@ -51,9 +51,10 @@ var aggregateClassification = exports.aggregateClassification = function(program
 
 function aggregateWarningOrder(classifications) {
   var criteria = _(classifications).pluck('criteria').flatten().value()
+  var maxAge = _.max(_.map(criteria, function(c){return enums.classificationCriteria[c - 1].age}))
   var counts = _.reduce(criteria, function(order, id) {
     var category = enums.classificationCriteria[id - 1].category
-    return utils.merge(order, utils.keyValue(category, order[category] + 1))
+    return utils.merge(order, utils.keyValue(category, order[category] + (enums.classificationCriteria[id - 1].age == maxAge ? 1 : 0)))
   }, {violence: 0, fear: 0, sex: 0, drugs: 0})
   return _(counts).omit(function(c) { return c === 0}).pairs().sortBy(utils.snd).reverse().map(utils.fst).value()
 }

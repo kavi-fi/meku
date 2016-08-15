@@ -136,7 +136,6 @@ function kaviAuthor(dateRange, callback) {
       .unwind('classifications')
       .match(q)
       .match({ 'classifications.author._id': { $in: _.pluck(users, '_id')} })
-      .group({ _id: '$classifications.authorOrganization', value: { $sum: 1 } })
       .group({ _id: '$classifications.author', value: { $sum: 1 } })
       .sort('_id.username')
       .project({ _id: { $concat : [ '$_id.name' , ' ', '$_id.username' ] }, value: 1 })

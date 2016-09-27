@@ -229,22 +229,25 @@
         <label><input type="checkbox" data-id="h" data-type="0"/><span data-i18n>Kategorisoimattomat</span></label>
       </div>
       <div class="public-query-filters">
-        <div>
-          <label data-i18n>Rekisteröintipäivä</label><span class="datepicker"><span></span><i class="icon fa fa-calendar"></i><i class="icon clear-date-picker"></i></span>
-        </div>
-        <div>
-          <label data-i18n>Ikäraja</label>
-          <button data-id="0"  class="filterbutton agelimit-filter"><img class="agelimit-0" src="images/agelimit-0.png"/></button>
-          <button data-id="7"  class="filterbutton agelimit-filter"><img src="images/agelimit-7.png"/></button>
-          <button data-id="12" class="filterbutton agelimit-filter"><img src="images/agelimit-12.png"/></button>
-          <button data-id="16" class="filterbutton agelimit-filter"><img src="images/agelimit-16.png"/></button>
-          <button data-id="18" class="filterbutton agelimit-filter"><img src="images/agelimit-18.png"/></button>
-          <button data-id="violence" class="filterbutton warning-filter pad"><img src="images/violence.png"/></button>
-          <button data-id="sex" class="filterbutton warning-filter"><img src="images/sex.png"/></button>
-          <button data-id="fear" class="filterbutton warning-filter"><img src="images/fear.png"/></button>
-          <button data-id="drugs" class="filterbutton warning-filter"><img src="images/drugs.png"/></button>
+        <div class="filters">
+          <div>
+            <label data-i18n>Rekisteröintipäivä</label><span class="datepicker"><span></span><i class="icon fa fa-calendar"></i><i class="icon clear-date-picker"></i></span>
+          </div>
         </div>
         <div class="filters">
+          <div>
+            <label data-i18n>Ikäraja</label>
+            <button data-id="0"  class="filterbutton agelimit-filter"><img class="agelimit-0" src="images/agelimit-0.png"/></button>
+            <button data-id="7"  class="filterbutton agelimit-filter"><img src="images/agelimit-7.png"/></button>
+            <button data-id="12" class="filterbutton agelimit-filter"><img src="images/agelimit-12.png"/></button>
+            <button data-id="16" class="filterbutton agelimit-filter"><img src="images/agelimit-16.png"/></button>
+            <button data-id="18" class="filterbutton agelimit-filter"><img src="images/agelimit-18.png"/></button>
+            <button data-id="violence" class="filterbutton warning-filter pad"><img src="images/violence.png"/></button>
+            <button data-id="sex" class="filterbutton warning-filter"><img src="images/sex.png"/></button>
+            <button data-id="fear" class="filterbutton warning-filter"><img src="images/fear.png"/></button>
+            <button data-id="drugs" class="filterbutton warning-filter"><img src="images/drugs.png"/></button>
+          </div>
+
           <label class="reclassified"><input type="checkbox" name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label> <br />
           <div class="kavi-query-filters">
             <input class="hide" type="hidden" name="reclassified-by" />
@@ -256,11 +259,16 @@
       <div class="user-query-filters">
         <label><input type="checkbox" name="own-classifications-only"><span data-i18n>Näytä vain omat luokittelut</span></label>
       </div>
-      <div class="kavi-query-filters">
-        <div>
-          <label data-i18n>Luokittelija</label><input type="hidden" name="classifier" />
+      <div class="filters">
+        <div class="kavi-query-filters">
+          <div>
+            <label data-i18n>Luokittelija</label><input type="hidden" name="classifier" />
+          </div>
+          <div>
+            <label data-i18n>Tilaaja</label><input type="hidden" name="buyer" />
+          </div>
         </div>
-      </div>
+        </div>
       <div class="root-query-filters">
         <div class="filters">
           <label><input class="showDeleted" type="checkbox"/><span data-i18n>Hae vain poistettuja ohjelmia</span></label>

@@ -3,3 +3,4 @@ node_modules/
 *.iml
 /tables/
 scripts/data.staging.js
+*.DS_Store

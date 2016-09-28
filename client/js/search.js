@@ -535,7 +535,8 @@ function searchPage() {
       path: function (term) { return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Subscriber' },
       toOption: idNamePairToSelect2Option,
       fromOption: select2OptionToIdNamePair,
-      termMinLength: 0
+      termMinLength: 0,
+      allowClear: true
     }, function() {
       $input.trigger('fire')
     })

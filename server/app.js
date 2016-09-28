@@ -191,7 +191,8 @@ app.post('/program/excel/export', function(req, res, next) {
     "reclassified": data.reclassified,
     "reclassifiedBy": data.reclassifiedBy,
     "ownClassificationsOnly": data.ownClassificationsOnly,
-    "showDeleted": data.showDeleted
+    "showDeleted": data.showDeleted,
+    "buyer": data.buyer
   }
 
   var query = constructQuery(queryParams)
@@ -226,7 +227,8 @@ app.get('/programs/search/:q?', function(req, res, next) {
     "reclassified": req.query.reclassified == 'true',
     "reclassifiedBy": req.query.reclassifiedBy,
     "ownClassificationsOnly": req.query.ownClassificationsOnly == 'true',
-    "showDeleted": req.query.showDeleted == 'true'
+    "showDeleted": req.query.showDeleted == 'true',
+    "buyer": req.query.buyer
   }
 
   var query = constructQuery(queryParams)
@@ -291,6 +293,7 @@ function constructQuery(queryData) {
   mainQuery.$and.push(getQueryUserRoleDependencies(queryData.user ? queryData.user._id : undefined, queryData.userRole))
   mainQuery.$and.push(constructClassifierQuery(queryData.classifier, queryData.reclassified))
   mainQuery.$and.push(constructReclassifiedByQuery(queryData.reclassified, queryData.reclassifiedBy))
+  mainQuery.$and.push(constructBuyerQuery(queryData.buyer))
 
   if(queryData.isUser) mainQuery.$and.push(constructOwnClassifications(queryData.ownClassificationsOnly, queryData.user._id))
   mainQuery.$and.push(constructDeletedQuery(queryData.showDeleted))
@@ -311,6 +314,14 @@ function constructDeletedQuery(showDeleted){
   }
 
   return deleted
+}
+
+function constructBuyerQuery(buyer){
+  var buyers = {}
+  if (buyer){
+    buyers = { 'classifications': { $elemMatch: { 'buyer._id': buyer }}}
+  }
+  return buyers
 }
 
 function constructOwnClassifications(ownClassifications, userid){

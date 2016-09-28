@@ -393,6 +393,7 @@ function searchPage() {
   var $registrationDatePicker = $page.find('.public-query-filters .datepicker')
   var $clearRegistrationDatePicker = $page.find('.public-query-filters .clear-date-picker')
   var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
+  var $buyer = $page.find('.kavi-query-filters input[name="buyer"]')
   var $reclassifiedToggle = $page.find('.filters input[name=reclassified]')
   var $reclassifiedBy = $page.find('.public-query-filters input[name=reclassified-by]')
   var $ownClassificationsOnly = $page.find('.user-query-filters input[name=own-classifications-only]')
@@ -530,6 +531,17 @@ function searchPage() {
       $input.trigger('fire')
     })
 
+    select2Autocomplete({
+      $el: $buyer,
+      path: function (term) { return '/accounts/search?q=' + encodeURIComponent(term) + '&roles=Subscriber' },
+      toOption: idNamePairToSelect2Option,
+      fromOption: select2OptionToIdNamePair,
+      termMinLength: 0,
+      allowClear: true
+    }, function() {
+      $input.trigger('fire')
+    })
+
     $reclassifiedBy.change(function() {
       $input.trigger('fire')
     })
@@ -592,6 +604,7 @@ function searchPage() {
       ownClassificationsOnly: $ownClassificationsOnly.is(':checked'),
       showDeleted: $showDeleted.is(':checked'),
       reclassifiedBy: currentReClassifier(),
+      buyer: currentBuyer(),
       searchFromSynopsis: $searchFromSynopsis.is(':checked')
     }
   }
@@ -615,6 +628,12 @@ function searchPage() {
     var data = $classifier.select2 && $classifier.select2('data') || undefined
     return data && data.id || undefined
   }
+
+  function currentBuyer() {
+    var data = $buyer.select2 && $buyer.select2('data') || undefined
+    return data && data.id || undefined
+  }
+
   function currentRegistrationDateRange() {
     return $registrationDatePicker.data('selection')
   }

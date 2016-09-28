@@ -134,6 +134,8 @@ var i18n = {
     'Aihe': 'Ämne',
     'Rekisteröi': 'Registrera',
     'Kirjaudu ulos': 'Logga ut',
+    'Lataa Excel-tiedosto' : 'Ladda ner en Excel fil',
+    '': 'Specificera sökning',
 
   // public.html:
 

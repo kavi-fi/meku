@@ -135,7 +135,7 @@ var i18n = {
     'Rekisteröi': 'Registrera',
     'Kirjaudu ulos': 'Logga ut',
     'Lataa Excel-tiedosto' : 'Ladda ner en Excel fil',
-    '': 'Specificera sökning',
+    'Tarkenna hakua luodaksesi Excel-tiedoston': 'Specificera sökning',
 
   // public.html:
 

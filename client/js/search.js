@@ -425,13 +425,12 @@ function searchPage() {
 
   $button.click(function() { $input.trigger('fire') })
   $exportbutton.on('click', function(){
-    if (state.page == 0) $results.empty()
 
     var $form = $("#search-excel-export-form")
 
     var postParams = constructPostDataParams()
     postParams.q = state.q ? state.q : ""
-    postParams.user = user
+    postParams.user = window.user
 
     $form.find('input[name=post_data]').val(JSON.stringify(postParams))
     $form.submit()

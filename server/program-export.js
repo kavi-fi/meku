@@ -36,7 +36,7 @@ function createData(docs, showClassificationAuthor) {
     doc.reclassifier = doc.classifications[0] === undefined ? "" : doc.classifications[0].isReclassification ? doc.classifications[0].authorOrganization === undefined ? "" : enums.authorOrganization[doc.classifications[0].authorOrganization] : ""
 
 
-    xlsData.push([doc.originalName, doc.nameFi.join(', '), doc.episodeCode, doc.episodeName, moment(doc.registrationDate).format(dateFormat), doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteriaComments, doc.warnings, enums.programType[doc.programType].fi, doc.country.join(', '), doc.year, doc.directors.join(', '), doc.productionCompanies.join(', '), doc.synopsis])
+    xlsData.push([doc.originalName, doc.nameFi.join(', '), doc.episodeCode, doc.episodeName, moment(doc.classifications[0].registrationDate).format(dateFormat), doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteriaComments, doc.warnings, enums.programType[doc.programType].fi, doc.country.join(', '), doc.year, doc.directors.join(', '), doc.productionCompanies.join(', '), doc.synopsis])
   })
   
   excelWriter.write(tmpXlsxFile, xlsData, columnWidths)

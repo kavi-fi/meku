@@ -1510,7 +1510,7 @@ var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
 
 var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
   User.find({ $and: [
-    { certificateEndDate: { $lt: moment().add(3, 'months').toDate(), $gt: new Date() }},
+    { certificateEndDate: { $lt: moment().add(6, 'months').toDate(), $gt: new Date() }},
     { active: true},
     {'emails.0': { $exists: true }},
     { $or: [
@@ -1522,10 +1522,17 @@ var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
       sendEmail({
         recipients: [ user.emails[0] ],
         subject: 'Luokittelusertifikaattisi on vanhentumassa',
-        body: '<p>Luokittelusertifikaattisi on vanhentumassa ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
-          '. Uusithan sertifikaattisi, jotta tunnustasi ei suljeta.</p>' +
-          '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
-          '<p>Terveisin,<br/>KAVI</p>'
+        body: '<p>Oikeutesi luokitella kuvaohjelmia päättyy ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
+              '. Jos haluat jatkaa kuvaohjelmien luokittelua tämän jälkeen, ilmoittaudu kuvaohjelmaluokittelijoiden kertauskoulutukseen.<br />' +
+              'Lisätietoja: <a href="https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/kertauskoulutus">https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/kertauskoulutus</a> tai <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+
+              '<p>Din rätt att klassificera bildprogram upphör att gälla den ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
+              '. Om du vill fortsätta att klassificera bildprogram därefter, ska du anmäla dig till en repetitionsutbildning för klassificerare av bildprogram.<br />' +
+              'Mer information: <a href="https://kavi.fi/sv/enheten-mediefostran-och-bildprogram/repetitionsutbildning">https://kavi.fi/sv/enheten-mediefostran-och-bildprogram/repetitionsutbildning</a> eller <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>'+
+
+              '<p>Terveisin,<br />' +
+              'Kansallinen audiovisuaalinen instituutti /<br />' +
+              'National Audiovisual Institute, Finland</p>'
       }, user, function(err) {
         if (err) console.error(err)
         else user.update({ certExpiryReminderSent: new Date() }, logError)

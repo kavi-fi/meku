@@ -85,7 +85,7 @@ function userManagementPage() {
     if (user.certificateEndDate) {
       var certEnd = moment(user.certificateEndDate)
       return $('<span>').text(certEnd.format(utils.dateFormat))
-        .toggleClass('expires-soon', certEnd.isBefore(moment().add(3, 'months')))
+        .toggleClass('expires-soon', certEnd.isBefore(moment().add(6, 'months')))
     } else {
       return '<i class="fa fa-warning"></i>'
     }

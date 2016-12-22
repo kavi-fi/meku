@@ -79,6 +79,7 @@
     <span class="userComments"></span>
     <label data-i18n>KAVI:n sisäiset kommentit</label>
     <span class="comments"></span>
+    <span class="kaviType"></span>
   </div>
   <div class="episode-container">
     <h3><i class="fa fa-play"></i><span data-i18n>Sarjan jaksot</span></h3>
@@ -681,6 +682,10 @@
           <label class="text-area-label" data-i18n>Luokittelijan sisäiset kommentit</label><textarea placeholder="Luokittelijan kommentit" data-i18n-placeholder name="classification.userComments" class="throttledInput"></textarea>
           <span class="field-hint" data-i18n>Luokittelijan kommentit näkyvät vain tekijälle itselleen ja KAVI:n työntekijöille.</span>
         </div>
+        <br>
+        <div class="kavi-type">
+          <label class="select2-label" data-i18n>KAVI:n peruste</label><input name="classification.kaviType" class="required kaviType" type="hidden"/>
+        </div>
       </div>
     </div>
     <div class="classification-criteria row">
@@ -789,6 +794,7 @@
       <th class="author">Luokittelija</th>
       <th class="duration">Kesto</th>
       <th class="type">Tyyppi</th>
+      <th class="kaviType">KAVI Tyyppi</th>
       <th class="buyer">Tilaaja</th>
       <th class="comments">Kommentit</th>
     </tr>
@@ -802,6 +808,7 @@
       <td class="author"></td>
       <td class="duration"></td>
       <td class="type"></td>
+      <td class="kaviType"></td>
       <td class="buyer"></td>
       <td class="comments"></td>
     </tr>

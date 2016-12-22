@@ -250,6 +250,12 @@ enums.reclassificationReason = {
   4: { emailText: 'Ikärajakriteereiden muutos 2012', uiText: 'Ikärajakriteereiden muutos 2012' }
 }
 
+enums.kaviType = {
+  0: { emailText: 'KKAVI:n esitystoiminta', uiText: 'KAVI:n esitystoiminta' },
+  1: { emailText: 'Maksullinen luokittelu', uiText: 'Maksullinen luokittelu' },
+  2: { emailText: 'Muu', uiText: 'Muu' }
+}
+
 enums.isOikaisupyynto = function(val) { return val == 3 }
 
 enums.authorOrganization = {

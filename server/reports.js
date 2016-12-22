@@ -254,7 +254,8 @@ function kaviClassificationList(dateRange, callback) {
       .project({
         name:1, sequenceId:1, programType:1,
         duration: '$classifications.duration', date: '$classifications.registrationDate', author: '$classifications.author.username',
-        authorOrganization: '$classifications.authorOrganization', isReclassification: '$classifications.isReclassification', comments: '$classifications.comments', buyer: '$classifications.buyer' })
+        authorOrganization: '$classifications.authorOrganization', isReclassification: '$classifications.isReclassification',
+        comments: '$classifications.comments', buyer: '$classifications.buyer', kaviType: '$classifications.kaviType' })
       .sort('date')
       .exec(callback)
   })

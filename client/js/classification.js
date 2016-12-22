@@ -73,6 +73,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function setClassificationFields(c) {
     var authorOrgVal = typeof c.authorOrganization == 'number' ? c.authorOrganization.toString() : ''
     var reasonVal = typeof c.reason == 'number' ? c.reason.toString() : ''
+    var kaviTypeVal = typeof c.kaviType == 'number' ? c.kaviType.toString() : ''
     var isVetClassification =_.find(c.criteria.map(function(id) { return enums.classificationCriteria[id - 1].category === 'vet' })) != undefined
 
     $form
@@ -92,6 +93,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     select2EnumAutocomplete(select2Opts.format, save).trigger('setVal', c.format)
     select2EnumAutocomplete(select2Opts.authorOrg, save).trigger('setVal', authorOrgVal)
     select2EnumAutocomplete(select2Opts.reason, save).trigger('setVal', reasonVal)
+    select2EnumAutocomplete(select2Opts.kaviType, save).trigger('setVal', kaviTypeVal)
 
     var $registrationDate = $form.find('input[name="classification.registrationDate"]')
     var pikadayOpts = {
@@ -412,7 +414,10 @@ function classificationFormUtils() {
       $form.find('.public-comments').remove()
     }
     if (hasRole('kavi')) $form.find('.user-comments').remove()
-    else $form.find('.private-comments').remove()
+    else {
+      $form.find('.private-comments').remove()
+      $form.find('.kavi-type').remove()
+    }
 
     if (isReclassification && !editMode) {
       $form.find('.program-info input, .program-info textarea').prop('disabled', true)
@@ -566,7 +571,7 @@ function classificationFormUtils() {
     var programClone = _.cloneDeep(p)
     var classificationClone = classificationFinder(programClone)
     delete programClone.draftClassifications
-    var sensitiveClassificationFields = ['author', 'billing', 'buyer', 'authorOrganization', 'reason', 'comments', 'criteriaComments']
+    var sensitiveClassificationFields = ['author', 'billing', 'buyer', 'authorOrganization', 'reason', 'kaviType', 'comments', 'criteriaComments']
     programClone.classifications.forEach(function(c) {
       sensitiveClassificationFields.forEach(function(f) { delete c[f] })
     })
@@ -666,6 +671,11 @@ function classificationFormUtils() {
       reason: {
         $el: $form.find('input[name="classification.reason"]'),
         data: _.map(enums.reclassificationReason, function(reason, id) { return { id: id, text: reason.uiText } }),
+        fromOption: select2OptionToInt
+      },
+      kaviType: {
+        $el: $form.find('input[name="classification.kaviType"]'),
+        data: _.map(enums.kaviType, function(reason, id) { return { id: id, text: reason.uiText } }),
         fromOption: select2OptionToInt
       }
     }

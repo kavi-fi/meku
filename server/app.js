@@ -33,9 +33,6 @@ var validation = require('./validation')
 var srvUtils = require('./server-utils')
 var env = require('./env').get()
 var testEnvEmailQueue = []
-var pricesExistingYear = _.find(_.range(moment().year(), 2015, -1), function (y) { return process.env['PRICES_' + y] != undefined })
-var currentPrices = pricesExistingYear ? JSON.parse(process.env['PRICES_' + pricesExistingYear]) : enums.defaultPrices
-  if (!pricesExistingYear) console.warn('Cannot find prices from config variable, using (possibly outdated) defaults')
 
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
@@ -580,6 +577,12 @@ app.post('/programs/:id/register', function(req, res, next) {
       updateMetadataIndexes(program, callback)
     }
 
+    function currentPrices() {
+      var pricesExistingYear = _.find(_.range(moment().year(), 2015, -1), function (y) { return process.env['PRICES_' + y] != undefined })
+      if (!pricesExistingYear) console.warn('Cannot find prices from config variable, using (possibly outdated) defaults')
+      return pricesExistingYear ? JSON.parse(process.env['PRICES_' + pricesExistingYear]) : enums.defaultPrices
+    }
+
     function addInvoicerows(currentClassification, callback) {
       if (utils.hasRole(req.user, 'root')) return process.nextTick(callback)
 
@@ -587,18 +590,18 @@ app.post('/programs/:id/register', function(req, res, next) {
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
-          InvoiceRow.fromProgram(program, 'reclassification', seconds, currentPrices.reclassificationFee).save(callback)
+          InvoiceRow.fromProgram(program, 'reclassification', seconds, currentPrices().reclassificationFee).save(callback)
         } else if (!utils.hasRole(req.user, 'kavi')) {
-          InvoiceRow.fromProgram(program, 'registration', seconds, currentPrices.registrationFee).save(callback)
+          InvoiceRow.fromProgram(program, 'registration', seconds, currentPrices().registrationFee).save(callback)
         } else {
           callback()
         }
       } else {
-        InvoiceRow.fromProgram(program, 'registration', seconds, currentPrices.registrationFee).save(function(err, saved) {
+        InvoiceRow.fromProgram(program, 'registration', seconds, currentPrices().registrationFee).save(function(err, saved) {
           if (err) return next(err)
           if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
-            var classificationPrice = classificationUtils.price(program, seconds, currentPrices)
+            var classificationPrice = classificationUtils.price(program, seconds, currentPrices())
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
             callback()

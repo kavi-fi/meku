@@ -113,6 +113,7 @@ function reportsPage() {
         .find('.duration').text(row.duration).end()
         .find('.type').text(row.isReclassification ? 'Uudelleenluokittelu' : 'Luokittelu').end()
         .find('.kaviType').text(utils.getProperty(enums.kaviType[row.kaviType], 'uiText')).end()
+        .find('.reason').text(row.isReclassification ? utils.getProperty(enums.reclassificationReason[row.reason], 'uiText') || 'Ei tiedossa' : '').end()
         .find('.buyer').text(row.buyer ? row.buyer.name : '').end()
         .find('.comments').text(row.comments).end()
     }

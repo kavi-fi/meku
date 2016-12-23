@@ -244,10 +244,12 @@ enums.classificationStatus = [
 
 enums.reclassificationReason = {
   0: { emailText: 'KAVI:n oma aloite', uiText: 'KAVI:n oma aloite' },
-  1: { emailText: 'Palaute', uiText: 'Palaute' },
+  1: { emailText: 'Yleisöpalaute', uiText: 'Yleisöpalaute' },
   2: { emailText: 'Valitus', uiText: 'Valitus' },
   3: { emailText: 'Oikaisupyyntö', uiText: 'Oikaisuvaatimus' },
-  4: { emailText: 'Ikärajakriteereiden muutos 2012', uiText: 'Ikärajakriteereiden muutos 2012' }
+  4: { emailText: 'Ikärajakriteereiden muutos 2012', uiText: 'Ikärajakriteereiden muutos 2012' },
+  5: { emailText: ' Tuplat', uiText: ' Tuplat' },
+  6: { emailText: '  KHO/LTK', uiText: '  KHO/LTK' }
 }
 
 enums.kaviType = {

@@ -1,15 +1,24 @@
 var fs = require('fs'),
-    xml = require('xml-object-stream'),
+    xml = require('xml-stream'),
     enums = require('../shared/enums'),
     _ = require('lodash'),
     moment = require('moment'),
     utils = require('../shared/utils')
 
 exports.readPrograms = function (body, callback) {
-  var stream = xml.parse(body)
+  var stream = new xml(body)
   var programs = []
 
-  stream.each('KUVAOHJELMA', function(xml) {
+  stream.collect('TUOTANTOYHTIO')
+  stream.collect('OHJAAJA')
+  stream.collect('NAYTTELIJA')
+  stream.collect('VALITTUTERMI')
+
+  stream.on('error', function (err) {
+    callback(err, [])
+  })
+
+  stream.on('endElement: KUVAOHJELMA', function(xml) {
     programs.push(validateProgram(xml))
   })
 
@@ -53,7 +62,7 @@ var validateProgram = map(compose([
       else return error('Virheellinen MAAT kenttä: ' + countries)
     }
   }),
-  map(childrenByNameTo('TUOTANTOYHTIO', 'productionCompanies'), function(p) { return { productionCompanies: p.productionCompanies.map(text) } }),
+  map(childrenByNameTo('TUOTANTOYHTIO', 'productionCompanies'), function(p) { return { productionCompanies: p.productionCompanies } }),
   required('SYNOPSIS', 'synopsis'),
   flatMap(requiredAttr('TYPE', 'type'), function(p) {
     return p.type == '03' ? and(optional('TUOTANTOKAUSI', 'season'), testOptional('TUOTANTOKAUSI', isInt, "Virheellinen TUOTANTOKAUSI", 'season')) : ret({})
@@ -178,7 +187,7 @@ function required(name, toField) {
   return function(xml) {
     toField = toField || name
     var val = xml[name]
-    if (val && val.$text !== '' && val.$text !== undefined) return ok(utils.keyValue(toField, xml[name].$text))
+    if (val && val !== '') return ok(utils.keyValue(toField, val))
     else return error(["Pakollinen kenttä puuttuu: " + name])
   }
 }
@@ -186,7 +195,7 @@ function required(name, toField) {
 function requiredNode(name, toField) {
   return function(xml) {
     toField = toField || name
-    if (xml[name]) return ok(utils.keyValue(toField, xml[name].$text))
+    if (xml[name]) return ok(utils.keyValue(toField, xml[name]))
     else return error(["Pakollinen elementti puuttuu: " + name])
   }
 }
@@ -201,10 +210,10 @@ function requiredAttr(name, toField) {
 function optional(field, toField) {
   return function(xml) {
     toField = toField || field
-    if (!xml[field] || !xml[field].$text || xml[field].$text.length == 0) {
+    if (!xml[field] || xml[field].length == 0) {
       return {program: {}, errors: []}
     } else {
-      return {program: utils.keyValue(toField, xml[field].$text.trim()), errors: []}
+      return {program: utils.keyValue(toField, xml[field].trim()), errors: []}
     }
   }
 }
@@ -238,7 +247,7 @@ function valuesInList(field, list) {
 function valueInList(field, list, toField) {
   return function(xml) {
     toField = toField || field
-    var value = xml[field].$text
+    var value = xml[field]
     if (_.contains(list, value)) return ok(utils.keyValue(toField, value))
     else return error("Virheellinen kenttä " + field)
   }
@@ -264,7 +273,7 @@ function node(name, toField, validators) {
 
 function test(field, f, msg, toField) {
   return function(xml) {
-    var text = xml[field].$text
+    var text = xml[field]
     if (f(text)) return ok(utils.keyValue(toField || field, text))
     else return error(msg + " " + text)
   }
@@ -273,28 +282,25 @@ function test(field, f, msg, toField) {
 function testOptional(field, f, msg, toField) {
   return function(xml) {
     if (!xml[field]) return ok({})
-    var text = xml[field].$text
+    var text = xml[field]
     if (f(text)) return ok(utils.keyValue(toField || field, text))
     else return error(msg + " " + text)
   }
 }
 
-function text(node) {
-  return node.$text
-}
 function fullname(node) {
-  return node.ETUNIMI.$text + ' ' + node.SUKUNIMI.$text
+  return node.ETUNIMI + ' ' + node.SUKUNIMI
 }
 function childrenByName(root, name) {
-  return root.$children.filter(function(e) { return e.$name == name })
+  return root[name] ? _.isArray(root[name]) ? root[name] : [root[name]] : []
 }
 
 function isInt(val) { return val == parseInt(val) }
 
 function optionListToArray(field, sep) {
   sep = sep || ' '
-  if (!field || field.$text.length == 0) return []
-  var arr = field.$text.split(sep).map(function(s) { return s.replace(/[\^\s]/g, '')} )
+  if (!field || field.length == 0) return []
+  var arr = field.split(sep).map(function(s) { return s.replace(/[\^\s]/g, '')} )
   return _(arr).compact().uniq().value()
 }
 

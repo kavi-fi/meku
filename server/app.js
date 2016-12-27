@@ -1287,7 +1287,6 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
   var now = new Date()
   var account = { _id: req.account._id, name: req.account.name }
   var root = builder.create("ASIAKAS")
-  req.resume()
   var xmlDoc = ""
   req.on('data', function(chunk) { xmlDoc += chunk })
   req.on('end', function() {
@@ -1298,6 +1297,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
   })
 
   xml.readPrograms(req, function(err, programs) {
+    if (err) return console.error(err)
     if (programs.length == 0) {
       writeError('Yhtään kuvaohjelmaa ei voitu lukea', root)
       return res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
@@ -1312,6 +1312,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       res.send(err ? 500 : 200, root.end({ pretty: true, indent: '  ', newline: '\n' }))
     })
   })
+  req.resume()
 
   function writeError(err, parent) {
     parent.ele('VIRHE', err)

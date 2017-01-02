@@ -528,6 +528,12 @@ app.post('/programs/new', function(req, res, next) {
   })
 })
 
+function currentPrices() {
+  var pricesExistingYear = _.find(_.range(moment().year(), 2015, -1), function (y) { return process.env['PRICES_' + y] != undefined })
+  if (!pricesExistingYear) console.warn('Cannot find prices from config variable, using (possibly outdated) defaults')
+  return pricesExistingYear ? JSON.parse(process.env['PRICES_' + pricesExistingYear]) : enums.defaultPrices
+}
+
 app.post('/programs/:id/register', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
@@ -575,12 +581,6 @@ app.post('/programs/:id/register', function(req, res, next) {
     function updateMetadataIndexesForNewProgram(program, callback) {
       if (program.classifications.length > 1) return callback()
       updateMetadataIndexes(program, callback)
-    }
-
-    function currentPrices() {
-      var pricesExistingYear = _.find(_.range(moment().year(), 2015, -1), function (y) { return process.env['PRICES_' + y] != undefined })
-      if (!pricesExistingYear) console.warn('Cannot find prices from config variable, using (possibly outdated) defaults')
-      return pricesExistingYear ? JSON.parse(process.env['PRICES_' + pricesExistingYear]) : enums.defaultPrices
     }
 
     function addInvoicerows(currentClassification, callback) {
@@ -1370,7 +1370,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
               updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
                 var seconds = classificationUtils.durationToSeconds(_.first(p.classifications).duration)
-                InvoiceRow.fromProgram(p, 'registration', seconds, 900).save(function (err, saved) {
+                InvoiceRow.fromProgram(p, 'registration', seconds, currentPrices().registrationFee).save(function (err, saved) {
                   if (err) return callback(err)
                   updateActorAndDirectorIndexes(p, callback)
                 })

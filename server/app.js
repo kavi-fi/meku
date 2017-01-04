@@ -225,7 +225,8 @@ app.get('/programs/search/:q?', function(req, res, next) {
     "reclassifiedBy": req.query.reclassifiedBy,
     "ownClassificationsOnly": req.query.ownClassificationsOnly == 'true',
     "showDeleted": req.query.showDeleted == 'true',
-    "buyer": req.query.buyer
+    "buyer": req.query.buyer,
+    "directors": req.query.directors
   }
 
   var query = constructQuery(queryParams)
@@ -286,6 +287,7 @@ function constructQuery(queryData) {
   mainQuery.$and.push(agelimitQuery(queryData.agelimits))
   mainQuery.$and.push(warningsQuery(queryData.warnings))
   mainQuery.$and.push(constructProgramTypeFilter(queryData.filters))
+  mainQuery.$and.push(constructDirectorFilter(queryData.directors))
   mainQuery.$and.push(constructDateRangeQuery(queryData.registrationDateRange))
   mainQuery.$and.push(getQueryUserRoleDependencies(queryData.user ? queryData.user._id : undefined, queryData.userRole))
   mainQuery.$and.push(constructClassifierQuery(queryData.classifier, queryData.reclassified))
@@ -392,6 +394,12 @@ function warningsQuery(w) {
     return classifierQuery
   }
 
+function constructDirectorFilter(directors) {
+  if (directors && directors.length > 0) {
+    return {directors: {$in: directors.split(',')}}
+  }
+  return {}
+}
 
 function constructDateRangeQuery(registrationDateRange) {
   var dtQuery = {}
@@ -1552,7 +1560,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var optionalList = ['GET:/programs/search/', 'GET:/episodes/']
+  var optionalList = ['GET:/programs/search/', 'GET:/episodes/', 'GET:/directors/search']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   if (isWhitelisted(req)) return next()

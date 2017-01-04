@@ -393,6 +393,7 @@ function searchPage() {
   var $registrationDatePicker = $page.find('.public-query-filters .datepicker')
   var $clearRegistrationDatePicker = $page.find('.public-query-filters .clear-date-picker')
   var $classifier = $page.find('.kavi-query-filters input[name=classifier]')
+  var $director = $page.find('.public-query-filters input[name=director]')
   var $buyer = $page.find('.kavi-query-filters input[name="buyer"]')
   var $reclassifiedToggle = $page.find('.filters input[name=reclassified]')
   var $reclassifiedBy = $page.find('.public-query-filters input[name=reclassified-by]')
@@ -496,6 +497,15 @@ function searchPage() {
 
     $page.find('.filterbutton').click(function() {
       $(this).toggleClass('active')
+      $input.trigger('fire')
+    })
+    select2Autocomplete({
+      $el: $director,
+      path: function(term) { return '/directors/search?q=' + encodeURIComponent(term) },
+      termMinLength: 0,
+      multiple: true,
+      allowClear: true
+    }, function() {
       $input.trigger('fire')
     })
     setupDatePicker($registrationDatePicker, datePickerOpts, function() {
@@ -604,7 +614,8 @@ function searchPage() {
       showDeleted: $showDeleted.is(':checked'),
       reclassifiedBy: currentReClassifier(),
       buyer: currentBuyer(),
-      searchFromSynopsis: $searchFromSynopsis.is(':checked')
+      searchFromSynopsis: $searchFromSynopsis.is(':checked'),
+      directors: currentDirectors()
     }
   }
 
@@ -626,6 +637,11 @@ function searchPage() {
   function currentClassifier() {
     var data = $classifier.select2 && $classifier.select2('data') || undefined
     return data && data.id || undefined
+  }
+
+  function currentDirectors() {
+    var data = $director.select2 && $director.select2('data') || []
+    return _.map(data, function (d) { return d.id }).join(',')
   }
 
   function currentBuyer() {
@@ -754,3 +770,57 @@ function searchPage() {
 
   }
 }
+
+function select2Autocomplete(opts, onChangeFn) {
+  var defaults = {
+    toOption: function(x) { return {id: x.replace(/,/g, '&#44;'), text: x} },
+    fromOption: function(x) { return x.id.replace(/&#44;/g, ',') },
+    multiple: false,
+    allowAdding: false,
+    termMinLength: 1
+  }
+  opts = _.merge(defaults, opts)
+
+  var $select = opts.$el
+
+  function createSearchChoice(term, data) {
+    var found = _.find(data, function(d) { return d.text === term })
+    if (!found) {
+      return {id: term, text: term, isNew: true }
+    }
+  }
+
+  $select.select2({
+    query: function(query) {
+      var len = $.trim(query.term).length
+      if (len < opts.termMinLength) {
+        return query.callback({results: []})
+      }
+      var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + encodeURIComponent(query.term)
+      return $.get(path).done(function(data) {
+        return query.callback({results: data.map(opts.toOption)})
+      })
+    },
+    initSelection: function(element, callback) {
+      var val = opts.multiple ? (opts.val || []).map(opts.toOption) : opts.toOption(opts.val)
+      return callback(val)
+    },
+    multiple: opts.multiple,
+    placeholder: i18nText('Valitse...'),
+    allowClear: opts.allowClear,
+    formatSelection: opts.formatSelection,
+    formatResultCssClass: opts.formatResultCssClass,
+    createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
+  })
+
+  return $select.on('change', function() {
+    var data = $(this).select2('data')
+    var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
+    onChangeFn && onChangeFn($(this).attr('name'), val)
+  }).on('setVal', function() {
+    var arr = Array.prototype.slice.call(arguments, 1).map(opts.toOption)
+    var data = opts.multiple ? arr : (arr[0] && arr[0] || '')
+    $(this).select2('data', data).trigger('validate')
+  })
+}
+

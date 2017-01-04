@@ -221,59 +221,6 @@ function parseUserCookie() {
   return JSON.parse(cookie.substring(4, cookie.lastIndexOf('.')))
 }
 
-function select2Autocomplete(opts, onChangeFn) {
-  var defaults = {
-    toOption: function(x) { return {id: x.replace(/,/g, '&#44;'), text: x} },
-    fromOption: function(x) { return x.id.replace(/&#44;/g, ',') },
-    multiple: false,
-    allowAdding: false,
-    termMinLength: 1
-  }
-  opts = _.merge(defaults, opts)
-
-  var $select = opts.$el
-
-  function createSearchChoice(term, data) {
-    var found = _.find(data, function(d) { return d.text === term })
-    if (!found) {
-      return {id: term, text: term, isNew: true }
-    }
-  }
-
-  $select.select2({
-    query: function(query) {
-      var len = $.trim(query.term).length
-      if (len < opts.termMinLength) {
-        return query.callback({results: []})
-      }
-      var path = (typeof opts.path === 'function') ? opts.path(query.term) : opts.path + encodeURIComponent(query.term)
-      return $.get(path).done(function(data) {
-        return query.callback({results: data.map(opts.toOption)})
-      })
-    },
-    initSelection: function(element, callback) {
-      var val = opts.multiple ? (opts.val || []).map(opts.toOption) : opts.toOption(opts.val)
-      return callback(val)
-    },
-    multiple: opts.multiple,
-    placeholder: i18nText('Valitse...'),
-    allowClear: opts.allowClear,
-    formatSelection: opts.formatSelection,
-    formatResultCssClass: opts.formatResultCssClass,
-    createSearchChoice: opts.allowAdding ? createSearchChoice : undefined
-  })
-
-  return $select.on('change', function() {
-    var data = $(this).select2('data')
-    var val = opts.multiple ? data.map(opts.fromOption) : opts.fromOption(data)
-    onChangeFn && onChangeFn($(this).attr('name'), val)
-  }).on('setVal', function() {
-    var arr = Array.prototype.slice.call(arguments, 1).map(opts.toOption)
-    var data = opts.multiple ? arr : (arr[0] && arr[0] || '')
-    $(this).select2('data', data).trigger('validate')
-  })
-}
-
 function select2EnumAutocomplete(opts, onChangeFn) {
   opts = _.merge({
     data: opts.data,

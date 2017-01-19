@@ -85,8 +85,7 @@ enums.invoiceItemCodes = {
 
 enums.defaultPrices = { // Up-to-date prices should be set in PRICES_<year> config variable (i.e. PRICES_2016)
   registrationFee: 1300,
-  classificationFees: [6200, 12400, 18600, 24000, 30000, 36000, 42000, 48000],
-  classificationFeePerMinutesForLongPrograms: 200,
+  classificationFeePerMinute: 200,
   reclassificationFee: 9000,
   gameFeePerHalfHour: 4000,
   gameMinimumFee: 9000,

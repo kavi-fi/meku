@@ -320,11 +320,9 @@ exports.gameClassificationPrice = function(duration, currentPrices) {
 }
 
 exports.classificationPrice = function(duration, currentPrices) {
-  var perMinuteFee = currentPrices.classificationFeePerMinutesForLongPrograms
-  if (duration == 0) return currentPrices.classificationFees[0]
-  if (duration > (240 * 60)) return Math.round(perMinuteFee * (duration / 60.0))
-  var idx = Math.floor((duration - 1) / (30 * 60))
-  return currentPrices.classificationFees[idx]
+  var perMinuteFee = currentPrices.classificationFeePerMinute
+  if (duration < (30 * 60)) return Math.round(perMinuteFee * (1800 / 60.0))
+  return Math.round(perMinuteFee * (duration / 60.0))
 }
 
 })(typeof exports === 'undefined'? this['classificationUtils']={}: exports)

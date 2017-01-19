@@ -409,7 +409,9 @@ function classificationFormUtils() {
     if (!hasRole('root') && isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     }
-    if (!isInternalReclassification) {
+    if (isInternalReclassification) {
+      $form.find('.kavi-type').remove()
+    } else {
       $form.find('.author-and-reason-fields').remove()
       $form.find('.public-comments').remove()
     }

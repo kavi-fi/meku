@@ -21,7 +21,7 @@ function createData(docs, showClassificationAuthor) {
   _.forEach(docs, function(doc){
     doc.originalName = doc.programType === 3 ? doc.series.name : doc.name.join(', ')
     doc.format = doc.classifications[0] === undefined ? "" : doc.classifications[0].format
-    doc.duration = doc.classifications[0] === undefined ? "" : doc.classifications[0].duration
+    doc.duration = doc.classifications[0] === undefined || enums.util.isGameType(doc) ? "" : doc.classifications[0].duration
     doc.classificationBuyer = doc.classifications[0] === undefined ? "" : doc.classifications[0].buyer === undefined ? "" : doc.classifications[0].buyer.name
     doc.classificationAuthor = doc.classifications[0] === undefined ? "" : doc.classifications[0].author === undefined ? "" :  showClassificationAuthor ? doc.classifications[0].author.name : ""
     doc.agelimit = doc.classifications[0] === undefined ? "" : doc.classifications[0].agelimit === undefined ? "" : doc.classifications[0].agelimit

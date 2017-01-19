@@ -123,6 +123,10 @@ function programBox() {
         .find('.current-format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
         .find('.current-duration').labeledText(c.duration).end()
         .find('.classifications').html(classificationLinks()).end()
+      if (!window.user && enums.util.isGameType(p)) {
+        $e.find('.current-duration').prev('label').remove();
+        $e.find('.current-duration').remove();
+      }
       renderClassification($e, p, c)
     } else {
       $e.find('.classification-container').html($classificationTemplates.empty.clone()).end()

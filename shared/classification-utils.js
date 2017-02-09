@@ -309,17 +309,6 @@ exports.secondsToDuration = function(seconds) {
 
 exports.price = function(program, duration, currentPrices) {
   // https://kavi.fi/fi/meku/kuvaohjelmat/maksut
-  return enums.util.isGameType(program) ? exports.gameClassificationPrice(duration, currentPrices) : exports.classificationPrice(duration, currentPrices)
-}
-
-exports.gameClassificationPrice = function(duration, currentPrices) {
-  var minFee = currentPrices.gameMinimumFee
-  var maxFee = currentPrices.gameMaximumFee
-  var perHalfHourFee = currentPrices.gameFeePerHalfHour
-  return Math.min(minFee + (~~(duration / (30 * 60))) * perHalfHourFee, maxFee)
-}
-
-exports.classificationPrice = function(duration, currentPrices) {
   var perMinuteFee = currentPrices.classificationFeePerMinute
   if (duration < (30 * 60)) return Math.round(perMinuteFee * (1800 / 60.0))
   return Math.round(perMinuteFee * (duration / 60.0))

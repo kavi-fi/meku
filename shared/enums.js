@@ -92,17 +92,12 @@ enums.defaultPrices = { // Up-to-date prices should be set in PRICES_<year> conf
   gameMaximumFee: 41000
 }
 
-enums.invoiceItemCode = function (type, duration) {
-  var itemCodes = ['1855', '1856', '1857', '1858', '1859', '1860', '1861', '1862']
-
-  function classificationItemCode() {
-    if (duration <= 0) return itemCodes[0]
-    if (duration > 240 * 60) return _.last(itemCodes)
-    var idx = Math.floor((duration - 1) / (30 * 60))
-    return itemCodes[idx]
+enums.invoiceItemCode = function (item) {
+  var type = item.providingType ? item.providingType : item.type
+  if (type === 'classification' || type === 'reclassification') {
+    if (enums.util.isGameType(item)) return item.duration <= 30 * 60 ? '4692' : '4693'
+    return item.duration <= 30 * 60 ? '4690' : '4691'
   }
-
-  if (type === 'classification' || type === 'reclassification') return classificationItemCode()
   return enums.invoiceItemCodes[type]
 }
 

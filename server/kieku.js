@@ -94,7 +94,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
         accountBusinessId: account.yTunnus,
         accountInvoiceAddress: accountInvoiceAddress,
         accountInvoiceOperator: accountInvoiceOperator,
-        invoiceItemCode: enums.invoiceItemCode(row.providingType ? row.providingType : row.type, row.duration),
+        invoiceItemCode: enums.invoiceItemCode(row),
         invoiceText: invoiceText,
         euroPrice: row.price / 100,
         billingLanguage: billingLanguage

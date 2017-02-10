@@ -387,6 +387,7 @@ var InvoiceSchema = new Schema({
   account: {_id: ObjectId, name: String},
   type: String, // registration, classification, reclassification or distributor fee
   program: ObjectId,
+  programType: String,
   programSequenceId: Number,
   name: String,
   duration: Number,
@@ -397,7 +398,7 @@ var InvoiceSchema = new Schema({
 InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, price) {
   var row = new this({
     type: rowType, program: program._id, programSequenceId: program.sequenceId,
-    name: program.name, duration: durationSeconds, price: price,
+    name: program.name, programType: program.programType, duration: durationSeconds, price: price,
     registrationDate: program.classifications[0].registrationDate
   })
   row.account = program.classifications[0].billing

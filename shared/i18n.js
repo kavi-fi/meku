@@ -252,6 +252,8 @@ var i18n = {
     'rekisteröity': 'anmält',
     'kuvaohjelma' : 'bildprogram',
     'kuvaohjelmaa': 'bildprogram',
+    'peli':'spel',
+    'peliä':'spel',
     'yhteensä': 'totalt'
   },
   en: {
@@ -264,6 +266,8 @@ var i18n = {
     'rekisteröity': 'registered',
     'kuvaohjelma' : 'audiovisual program',
     'kuvaohjelmaa': 'audiovisual programs',
+    'peli':'game',
+    'peliä':'games',
     'yhteensä': 'total'
   }
 }

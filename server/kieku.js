@@ -46,8 +46,14 @@ exports.createClassificationRegistration = function createClassificationRegistra
   function billingFooter(invoice) {
     function summaryText(type, rows) {
       var typeString = { classification: 'luokiteltu', reclassification: 'uudelleenluokiteltu', registration: 'rekisteröity' }
-      var plural = rows.length > 1 ? 'kuvaohjelmaa' : 'kuvaohjelma'
-      return rows.length + ' ' + t(plural, lang(invoice)) + ' ' + t(typeString[type], lang(invoice)) + ', ' + t('yhteensä', lang(invoice)) + ' ' + price(rows) + ' EUR.'
+      var programs = _.filter(rows, function (r) { return !enums.util.isGameType(r) })
+      var games = _.filter(rows, function (r) { return enums.util.isGameType(r) })
+      var programsPlural = programs.length > 1 ? 'kuvaohjelmaa' : 'kuvaohjelma'
+      var gamesPlural = games.length > 1 ? 'peliä' : 'peli'
+      var invoiceRows = []
+      if (programs.length > 0) invoiceRows.push(programs.length + ' ' + t(programsPlural, lang(invoice)))
+      if (games.length > 0) invoiceRows.push(games.length + ' ' + t(gamesPlural, lang(invoice)))
+      return invoiceRows.join(' & ') + ' ' + t(typeString[type], lang(invoice)) + ', ' + t('yhteensä', lang(invoice)) + ' ' + price(rows) + ' EUR.'
     }
     var account = findAccountHavingInvoice(accountRows, invoice)
     var rowsPerType = _.groupBy(account.rows, 'type')

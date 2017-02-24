@@ -387,6 +387,7 @@ function searchPage() {
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
   var $exportbutton = $page.find('button.export')
+  var $asCsv = $page.find('.ascsv')
   var $showDeleted = $page.find('input[type=checkbox].showDeleted')
   var $searchFromSynopsis = $page.find('input[type=checkbox].searchFromSynopsis')
   var $filters = $page.find('.filters input[type=checkbox]')
@@ -436,6 +437,9 @@ function searchPage() {
     $form.find('input[name=post_data]').val(JSON.stringify(postParams))
     $form.submit()
 
+  })
+  $asCsv.on('click', function () {
+    $('#search-excel-export-form:visible input[name=csv]').val('' + $('.ascsv:checked').length)
   })
   
   $filters.on('change', function() { $input.trigger('fire') })

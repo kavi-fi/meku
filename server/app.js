@@ -163,9 +163,7 @@ app.post('/reset-password', function(req, res, next) {
 
 
 app.post('/program/excel/export', function(req, res, next) {
-
   var data = JSON.parse(req.body.post_data)
-
   var isUser = data.user ? true : false
   var isKavi = isUser ? utils.hasRole(data.user, 'kavi') : false
   var fields = isKavi ? null : { 'classifications.comments': 0 }
@@ -194,8 +192,7 @@ app.post('/program/excel/export', function(req, res, next) {
 
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-  
-  sendOrExport(query, queryParams, sortBy, false, res, next)
+  sendOrExport(query, queryParams, sortBy, 'kavi_luokittelut.' + (req.body.csv == "1" ? 'csv' : '.xlsx'), res, next)
 })
 
 
@@ -232,15 +229,24 @@ app.get('/programs/search/:q?', function(req, res, next) {
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
   
-  sendOrExport(query, queryParams, sortBy, true, res, next)
+  sendOrExport(query, queryParams, sortBy, undefined, res, next)
 })
 
-function sendOrExport(query, queryData, sortBy, sendJSONResponse, res, next){
+function sendOrExport(query, queryData, sortBy, filename, res, next){
 
   var isAdminUser = utils.hasRole(queryData.user, 'root')
   var showClassificationAuthor = isAdminUser
 
-  if (sendJSONResponse) {
+  if (filename) {
+    Program.find(query, queryData.fields).limit(5000).exec().then(function(docs){
+      var ext = filename.substring(filename.lastIndexOf(('.')))
+      var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      var result = programExport.constructProgramExportData(docs, showClassificationAuthor, filename)
+      res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+      res.setHeader('Content-Type', contentType)
+      res.send(result)
+    })
+  } else {
     Program.find(query, queryData.fields).skip(queryData.page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
       if (err) return next(err)
 
@@ -253,16 +259,6 @@ function sendOrExport(query, queryData, sortBy, sendJSONResponse, res, next){
       } else {
         res.send({ programs: docs })
       }
-    })
-  } else {
-    Program.find(query, queryData.fields).limit(5000).exec().then(function(docs){
-
-      var result = programExport.constructProgramExportData(docs, showClassificationAuthor)
-      var filename = 'kavi_luokittelut.xlsx'
-      res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-      res.send(result)
     })
   }
 }

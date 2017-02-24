@@ -7,12 +7,7 @@ const utils = require('../shared/utils')
 
 var dateFormat = 'DD.MM.YYYY'
 
-exports.constructProgramExportData = function constructProgramExportData(docs, showClassificationAuthor) {
-  return createData(docs, showClassificationAuthor)
-}
-
-function createData(docs, showClassificationAuthor) {
-  var tmpXlsxFile = "kavi_luokittelut.xlsx"
+exports.constructProgramExportData = function constructProgramExportData(docs, showClassificationAuthor, tmpFile) {
   var columns = ["Alkuperäinen nimi", "Suomenkielinen nimi", "Jakso", "Jakson nimi", "Rekisteröintipäivä", "Kesto", "Luokittelun tilaaja", "Luokittelija", "Uudelleenluokittelija", "Ikäraja", "Kriteerit", "Perustelu", "Varoitukset", "Ohjelman tyyppi", "Maa", "Valmistumisvuosi", "Ohjaaja", "Tuotantoyhtiö", "Synopsis"]
   columnWidths = [{"wch":40},{"wch":40},{"wch":10},{"wch":40},{"wch":15},{"wch":10},{"wch":40},{"wch":25},{"wch":25},{"wch":10},{"wch":40},{"wch":20},{"wch":20},{"wch":20},{"wch":10},{"wch":15},{"wch":20},{"wch":20},{"wch":40}]
 
@@ -43,8 +38,8 @@ function createData(docs, showClassificationAuthor) {
     }
   })
 
-  excelWriter.write(tmpXlsxFile, xlsData, columnWidths)
-  var fileData = fs.readFileSync(tmpXlsxFile)
-  fs.unlinkSync(tmpXlsxFile)
+  excelWriter.write(tmpFile, xlsData, columnWidths)
+  var fileData = fs.readFileSync(tmpFile)
+  fs.unlinkSync(tmpFile)
   return fileData
 }

@@ -204,6 +204,7 @@
   <form method="POST" action="/program/excel/export" id="search-excel-export-form">
     <input type="hidden" name="_csrf">
     <input type="hidden" name="post_data">
+    <input type="hidden" name="csv">
   </form>
 
   <div class="controls">
@@ -283,7 +284,7 @@
       </div>
     </div>
 
-    <button class="button export" data-i18n>Lataa Excel-tiedosto</button><br /><span class="search-export" data-i18n>Tarkenna hakua luodaksesi Excel-tiedoston</span>
+    <button class="button export" data-i18n>Lataa Excel-tiedosto</button> <label><input type="checkbox" class="ascsv"> CSV</label><br /><span class="search-export" data-i18n>Tarkenna hakua luodaksesi Excel-tiedoston</span>
   </div>
   <div class="results"></div>
   <div class="loading" data-i18n>Ladataan...</div>

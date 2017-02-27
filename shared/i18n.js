@@ -1,4 +1,12 @@
 var i18n = {
+  fi: {
+    // Excel export
+    'violence': 'väkivalta',
+    'sex': 'seksi',
+    'fear': 'ahdistus',
+    'anxiety': 'ahdistus',
+    'drugs': 'päihteet'
+  },
   sv: {
 
   // Custom HTML-content texts:
@@ -240,6 +248,15 @@ var i18n = {
     'ei määritelty': 'inte fastslagna',
     'Kuvaohjelma sisältää myös alempiin ikärajoihin liittyvät kriteerit': 'Bildprogrammet innehåller även kriterier som hör till lägre åldersgränser',
 
+    // Excel export
+    'Uudelleenluokittelija': 'Omklassificerare',
+    'Perustelu': 'Motivering',
+    'violence': 'våld',
+    'sex': 'sex',
+    'fear': 'ångest',
+    'anxiety': 'ångest',
+    'drugs': 'rusmedel',
+
     // Manual addition:
     'Kuvaohjelmien luokittelu- ja valvontajärjestelmä ei toimi selainversiollasi. Tuettuja selaimia ovat: ': 'Systemet för klassificering och övervakning av bildprogram fungerar inte med din webbläsare. Webbläsare som vi stödjer är bl.a.',
 
@@ -259,6 +276,9 @@ var i18n = {
     'yhteensä': 'totalt'
   },
   en: {
+    // Excel export
+    'fear': 'anxiety', // 'fear' should not be used anywhere
+
     // Kieku
     'Valvontamaksu, vuosi': 'Supervision fee, year',
     'Lasku yhteensä': 'Total',

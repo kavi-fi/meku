@@ -192,7 +192,7 @@ app.post('/program/excel/export', function(req, res, next) {
 
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-  sendOrExport(query, queryParams, sortBy, 'kavi_luokittelut.' + (req.body.csv == "1" ? 'csv' : '.xlsx'), res, next)
+  sendOrExport(query, queryParams, sortBy, 'kavi_luokittelut.' + (req.body.csv == "1" ? 'csv' : '.xlsx'), req.cookies.lang || 'fi', res, next)
 })
 
 
@@ -229,10 +229,10 @@ app.get('/programs/search/:q?', function(req, res, next) {
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
   
-  sendOrExport(query, queryParams, sortBy, undefined, res, next)
+  sendOrExport(query, queryParams, sortBy, undefined, req.cookies.lang || 'fi', res, next)
 })
 
-function sendOrExport(query, queryData, sortBy, filename, res, next){
+function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
 
   var isAdminUser = utils.hasRole(queryData.user, 'root')
   var showClassificationAuthor = isAdminUser
@@ -241,7 +241,7 @@ function sendOrExport(query, queryData, sortBy, filename, res, next){
     Program.find(query, queryData.fields).limit(5000).exec().then(function(docs){
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      var result = programExport.constructProgramExportData(docs, showClassificationAuthor, filename)
+      var result = programExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
       res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
       res.setHeader('Content-Type', contentType)
       res.send(result)

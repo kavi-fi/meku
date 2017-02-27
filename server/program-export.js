@@ -8,8 +8,8 @@ const utils = require('../shared/utils')
 var dateFormat = 'DD.MM.YYYY'
 
 exports.constructProgramExportData = function constructProgramExportData(docs, showClassificationAuthor, tmpFile) {
-  var columns = ["Alkuperäinen nimi", "Suomenkielinen nimi", "Jakso", "Jakson nimi", "Rekisteröintipäivä", "Kesto", "Luokittelun tilaaja", "Luokittelija", "Uudelleenluokittelija", "Ikäraja", "Kriteerit", "Perustelu", "Varoitukset", "Ohjelman tyyppi", "Maa", "Valmistumisvuosi", "Ohjaaja", "Tuotantoyhtiö", "Synopsis"]
-  columnWidths = [{"wch":40},{"wch":40},{"wch":10},{"wch":40},{"wch":15},{"wch":10},{"wch":40},{"wch":25},{"wch":25},{"wch":10},{"wch":40},{"wch":20},{"wch":20},{"wch":20},{"wch":10},{"wch":15},{"wch":20},{"wch":20},{"wch":40}]
+  var columns = ["Alkuperäinen nimi", "Suomenkielinen nimi", "Jakso", "Jakson nimi", "Rekisteröintipäivä", "Kesto", "Luokittelun tilaaja", "Luokittelija", "Uudelleenluokittelija", "Ikäraja", "Kriteerit", "Perustelu", "Varoitukset", "Ohjelman tyyppi", "Maa", "Valmistumisvuosi", "Ohjaaja", "Tuotantoyhtiö", "Synopsis", "Id"]
+  columnWidths = [{"wch":40},{"wch":40},{"wch":10},{"wch":40},{"wch":15},{"wch":10},{"wch":40},{"wch":25},{"wch":25},{"wch":10},{"wch":40},{"wch":20},{"wch":20},{"wch":20},{"wch":10},{"wch":15},{"wch":20},{"wch":20},{"wch":40},{"wch":10}]
 
   var xlsData = []
   xlsData.push(columns)
@@ -31,7 +31,7 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
     doc.registrationDate = classification.registrationDate ? moment(classification.registrationDate).format(dateFormat) : ""
     doc.programTypeName = (enums.programType[doc.programType] || {}).fi
 
-    xlsData.push([doc.originalName, listToString(doc.nameFi), doc.episodeCode, doc.episodeName, doc.registrationDate, doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteria, doc.criteriaComments, doc.warnings, doc.programTypeName, listToString(doc.country), doc.year, listToString(doc.directors), listToString(doc.productionCompanies), doc.synopsis])
+    xlsData.push([doc.originalName, listToString(doc.nameFi), doc.episodeCode, doc.episodeName, doc.registrationDate, doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteria, doc.criteriaComments, doc.warnings, doc.programTypeName, listToString(doc.country), doc.year, listToString(doc.directors), listToString(doc.productionCompanies), doc.synopsis, doc.sequenceId])
 
     function listToString(list) {
       return (list || []).join(', ')

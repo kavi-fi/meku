@@ -1461,7 +1461,8 @@ app.get('/report/:name', requireRole('root'), function(req, res, next) {
 })
 
 app.get('/classification/criteria', function (req, res, next) {
-  ClassificationCriteria.find({}, respond(res, next))
+  if (!req.user) res.send([])
+  else ClassificationCriteria.find({}, respond(res, next))
 })
 
 app.post('/classification/criteria/:id', requireRole('root'), function (req, res, next) {
@@ -1607,7 +1608,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var optionalList = ['GET:/programs/search/', 'GET:/episodes/', 'GET:/directors/search', 'GET:/agelimit/']
+  var optionalList = ['GET:/programs/search/', 'GET:/episodes/', 'GET:/directors/search', 'GET:/agelimit/', 'GET:/classification/criteria']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   if (isWhitelisted(req)) return next()
@@ -1955,7 +1956,7 @@ function isWhitelisted(req) {
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
     'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls',
-    'GET:/upgrade-browser.html', 'GET:/emails/latest', 'GET:/classification/criteria', 'POST:/program/excel/export'
+    'GET:/upgrade-browser.html', 'GET:/emails/latest', 'POST:/program/excel/export'
   ]
   var url = req.method + ':' + req.path
   return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

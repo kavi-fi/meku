@@ -127,14 +127,14 @@ enums.util.programTypeName = function(programType) {
   return p ? p.fi : undefined
 }
 
-enums.util.isTvEpisode = function(p) { return p.programType == 3 }
-enums.util.isOtherTv = function(p) { return p.programType == 4 }
-enums.util.isTrailer = function(p) { return p.programType == 6 }
-enums.util.isMovieType = function(p) { return p.programType == 1 || p.programType == 5 || p.programType == 6 }
-enums.util.isGameType = function(p) { return p.programType == 7 }
+enums.util.isTvEpisode = function(p) { return p && p.programType == 3 }
+enums.util.isOtherTv = function(p) { return p && p.programType == 4 }
+enums.util.isTrailer = function(p) { return p && p.programType == 6 }
+enums.util.isMovieType = function(p) { return p && (p.programType == 1 || p.programType == 5 || p.programType == 6) }
+enums.util.isGameType = function(p) { return p && p.programType == 7 }
 enums.util.isDefinedProgramType = function(i) { return i >= 1 && i <= 7 }
-enums.util.isTvSeriesName = function(p) { return p.programType == 2 }
-enums.util.isUnknown = function(p) { return p.programType === 0 }
+enums.util.isTvSeriesName = function(p) { return p && p.programType == 2 }
+enums.util.isUnknown = function(p) { return p && p.programType === 0 }
 
 enums.movieGenre = [
   'Fiktio',

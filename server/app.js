@@ -1608,7 +1608,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var optionalList = ['GET:/programs/search/', 'GET:/episodes/', 'GET:/directors/search', 'GET:/agelimit/', 'GET:/classification/criteria']
+  var optionalList = ['GET:/programs/search/', 'POST:/program/excel/export', 'GET:/episodes/', 'GET:/directors/search', 'GET:/agelimit/', 'GET:/classification/criteria']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   if (isWhitelisted(req)) return next()
@@ -1956,7 +1956,7 @@ function isWhitelisted(req) {
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
     'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls',
-    'GET:/upgrade-browser.html', 'GET:/emails/latest', 'POST:/program/excel/export'
+    'GET:/upgrade-browser.html', 'GET:/emails/latest'
   ]
   var url = req.method + ':' + req.path
   return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })

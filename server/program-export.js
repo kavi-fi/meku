@@ -20,22 +20,23 @@ function createData(docs, showClassificationAuthor) {
   xlsData.push(columns)
   _.forEach(docs, function (doc) {
     var name = listToString(doc.name)
-    var classification = doc.classification && doc.classification[0] ? doc.classification[0] : {}
+    var classification = doc.classifications && doc.classifications[0] ? doc.classifications[0] : {}
     doc.originalName = enums.util.isTvEpisode(doc) ? (doc.series || {}).name : name
     doc.format = classification.format
     doc.duration = enums.util.isGameType(doc) ? "" :classification.duration
-    doc.classificationBuyer = classification.buyer ? doc.classifications[0].buyer.name : ""
-    doc.classificationAuthor = classification.author && showClassificationAuthor ? doc.classifications[0].author.name : ""
+    doc.classificationBuyer = classification.buyer ? classification.buyer.name : ""
+    doc.classificationAuthor = classification.author && showClassificationAuthor ? classification.author.name : ""
     doc.agelimit = classification.agelimit
-    doc.warnings = classification.warnings ? doc.classifications[0].warnings.join(', ') : ""
+    doc.warnings = classification.warnings ? classification.warnings.join(', ') : ""
     doc.criteriaComments = classification.isReclassification ? _.values(classification.criteriaComments).listToString(', ') : ""
     doc.criteria = classification.criteria
     doc.episodeCode = enums.util.isTvEpisode(doc) ? utils.seasonEpisodeCode(doc) : ""
     doc.episodeName = enums.util.isTvEpisode(doc) ? name : ""
     doc.reclassifier = classification.isReclassification && classification.authorOrganization ? enums.authorOrganization[classification.authorOrganization] : ""
     doc.registrationDate = classification.registrationDate ? moment(classification.registrationDate).format(dateFormat) : ""
+    doc.programTypeName = (enums.programType[doc.programType] || {}).fi
 
-    xlsData.push([doc.originalName, listToString(doc.nameFi), doc.episodeCode, doc.episodeName, doc.registrationDate, doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteria, doc.criteriaComments, doc.warnings, enums.programType[doc.programType].fi, listToString(doc.country), doc.year, listToString(doc.directors), listToString(doc.productionCompanies), doc.synopsis])
+    xlsData.push([doc.originalName, listToString(doc.nameFi), doc.episodeCode, doc.episodeName, doc.registrationDate, doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteria, doc.criteriaComments, doc.warnings, doc.programTypeName, listToString(doc.country), doc.year, listToString(doc.directors), listToString(doc.productionCompanies), doc.synopsis])
 
     function listToString(list) {
       return (list || []).join(', ')

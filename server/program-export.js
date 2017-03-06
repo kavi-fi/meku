@@ -28,7 +28,7 @@ function createData(docs, showClassificationAuthor) {
     doc.classificationAuthor = classification.author && showClassificationAuthor ? classification.author.name : ""
     doc.agelimit = classification.agelimit
     doc.warnings = classification.warnings ? classification.warnings.join(', ') : ""
-    doc.criteriaComments = classification.isReclassification ? _.values(classification.criteriaComments).listToString(', ') : ""
+    doc.criteriaComments = classification.isReclassification ? listToString(_.values(classification.criteriaComments)) : ""
     doc.criteria = classification.criteria
     doc.episodeCode = enums.util.isTvEpisode(doc) ? utils.seasonEpisodeCode(doc) : ""
     doc.episodeName = enums.util.isTvEpisode(doc) ? name : ""

@@ -441,7 +441,7 @@ function getQueryUserRoleDependencies(userid, role){
 }
 
 app.get('/episodes/:seriesId', function(req, res, next) {
-  var fields = !req.user ? {'classifications.author': 0, 'classifications.authorOrganization': 0, 'classifications.buyer': 0, 'classifications.billing': 0, 'classifications.comments': 0, 'classifications.userComments': 0, draftClassifications: 0 }
+  var fields = !req.user ? Program.publicFields
     : utils.hasRole(req.user, 'kavi') ? {} : {'classifications.comments': 0}
   var query = { deleted: { $ne:true }, 'series._id': req.params.seriesId }
   if (!req.user) query.classifications = { $exists: true, $nin: [[]] }

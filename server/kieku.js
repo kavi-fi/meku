@@ -4,6 +4,7 @@ var excelWriter = require('./excel-writer')
 var fs = require('fs')
 var enums = require('../shared/enums')
 var i18n = require('../shared/i18n')
+var srvUtils = require('./server-utils')
 
 var dateFormat = 'DD.MM.YYYY'
 
@@ -87,6 +88,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     var accountAddress = customerNumber && customerNumber.trim().length > 0 ? {} : account.billingPreference == 'address' ? account.billing.address : account.address
 
     return _.map(rows, function (row) {
+      var invoiceItem = enums.invoiceItem(row)
       return _.extend(row, {
         first: row === first ? 1 : 0,
         customerNumber: customerNumber,
@@ -100,9 +102,11 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
         accountBusinessId: account.yTunnus,
         accountInvoiceAddress: accountInvoiceAddress,
         accountInvoiceOperator: accountInvoiceOperator,
-        invoiceItemCode: enums.invoiceItemCode(row),
+        invoiceItemCode: invoiceItem.itemCode,
+        invoiceIemCount: invoiceItem.itemCount,
+        invoiceItemUnit: t(invoiceItem.itemUnit, billingLanguage),
         invoiceText: invoiceText,
-        euroPrice: row.price / 100,
+        euroPrice: invoiceItem.pricePerMinute ? srvUtils.currentPrices().classificationFeePerMinute / 100 : row.price / 100,
         billingLanguage: billingLanguage
       })
     })
@@ -145,8 +149,8 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     { name: 'Otsikkoteksti: Otsikkomuistio 1 (tekstilaji 0002) tulostuu ennen rivejä. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingDescription, width: 20 },
     { name: 'Otsikkoteksti: Maksuperusteteksti (tekstilaji Z000) tulostuu laskun loppuun. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingFooter, width: 20 },
     { name: 'Nimike', value: invoiceValue('invoiceItemCode'), repeatable: true },
-    { name: 'Määrä', value: constantValue(1), repeatable: true },
-    { name: 'Määräyksikkö', value: constantValue('kpl'), repeatable: true },
+    { name: 'Määrä', value: invoiceValue('invoiceIemCount'), repeatable: true },
+    { name: 'Määräyksikkö', value: invoiceValue('invoiceItemUnit'), repeatable: true },
     { name: 'Yksikköhinta', value: invoiceValue('euroPrice'), repeatable: true },
     { name: 'Brutto/Netto', value: constantValue('N'), repeatable: true },
     { name: 'Rivityyppi', value: constantValue('') },

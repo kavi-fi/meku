@@ -92,15 +92,15 @@ enums.defaultPrices = { // Up-to-date prices should be set in PRICES_<year> conf
   gameMaximumFee: 41000
 }
 
-enums.invoiceItemCode = function (item) {
+enums.invoiceItem = function (item) {
   var type = item.providingType ? item.providingType : item.type
   if (type === 'classification' || type === 'reclassification') {
-    if (enums.util.isGameType(item)) return item.duration <= 30 * 60 ? '4692' : '4693'
-    return item.duration <= 30 * 60 ? '4690' : '4691'
+    var short = item.duration <= 30 * 60
+    var code = enums.util.isGameType(item) ? (short ? '4692' : '4693') : (short ? '4690' : '4691')
+    return { itemCode: code, itemUnit: 'min', itemCount: Math.round(item.duration / 60), pricePerMinute: true }
   }
-  return enums.invoiceItemCodes[type]
+  return {itemCode: enums.invoiceItemCodes[type], itemUnit: 'kpl', itemCount: 1, pricePerMinute: false }
 }
-
 
 enums.providingTypePrices = {
   'Recordings_provide': 100,

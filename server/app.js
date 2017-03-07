@@ -535,12 +535,6 @@ app.post('/programs/new', function(req, res, next) {
   })
 })
 
-function currentPrices() {
-  var pricesExistingYear = _.find(_.range(moment().year(), 2015, -1), function (y) { return process.env['PRICES_' + y] != undefined })
-  if (!pricesExistingYear) console.warn('Cannot find prices from config variable, using (possibly outdated) defaults')
-  return pricesExistingYear ? JSON.parse(process.env['PRICES_' + pricesExistingYear]) : enums.defaultPrices
-}
-
 app.post('/programs/:id/register', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) return next(err)
@@ -597,18 +591,18 @@ app.post('/programs/:id/register', function(req, res, next) {
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
-          InvoiceRow.fromProgram(program, 'reclassification', seconds, currentPrices().reclassificationFee).save(callback)
+          InvoiceRow.fromProgram(program, 'reclassification', seconds, srvUtils.currentPrices().reclassificationFee).save(callback)
         } else if (!utils.hasRole(req.user, 'kavi')) {
-          InvoiceRow.fromProgram(program, 'registration', seconds, currentPrices().registrationFee).save(callback)
+          InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(callback)
         } else {
           callback()
         }
       } else {
-        InvoiceRow.fromProgram(program, 'registration', seconds, currentPrices().registrationFee).save(function(err, saved) {
+        InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(function(err, saved) {
           if (err) return next(err)
           if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
-            var classificationPrice = classificationUtils.price(program, seconds, currentPrices())
+            var classificationPrice = classificationUtils.price(program, seconds, srvUtils.currentPrices())
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
             callback()
@@ -1377,7 +1371,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
               updateTvSeriesClassification(p, function(err) {
                 if (err) return callback(err)
                 var seconds = classificationUtils.durationToSeconds(_.first(p.classifications).duration)
-                InvoiceRow.fromProgram(p, 'registration', seconds, currentPrices().registrationFee).save(function (err, saved) {
+                InvoiceRow.fromProgram(p, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(function (err, saved) {
                   if (err) return callback(err)
                   updateActorAndDirectorIndexes(p, callback)
                 })

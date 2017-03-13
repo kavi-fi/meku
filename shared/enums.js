@@ -97,7 +97,10 @@ enums.invoiceItem = function (item) {
   if (type === 'classification' || type === 'reclassification') {
     var short = item.duration <= 30 * 60
     var code = enums.util.isGameType(item) ? (short ? '4692' : '4693') : (short ? '4690' : '4691')
-    return { itemCode: code, itemUnit: 'min', itemCount: Math.round(item.duration / 60), pricePerMinute: true }
+    var pricePerMinute = !short
+    var itemUnit = pricePerMinute ? 'min' : 'kpl'
+    var itemCount = pricePerMinute ? Math.round(item.duration / 60) : 1
+    return { itemCode: code, itemUnit: itemUnit, itemCount: itemCount, pricePerMinute: pricePerMinute }
   }
   return {itemCode: enums.invoiceItemCodes[type], itemUnit: 'kpl', itemCount: 1, pricePerMinute: false }
 }

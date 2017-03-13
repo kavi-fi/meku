@@ -310,8 +310,8 @@ exports.secondsToDuration = function(seconds) {
 exports.price = function(program, duration, currentPrices) {
   // https://kavi.fi/fi/meku/kuvaohjelmat/maksut
   var perMinuteFee = currentPrices.classificationFeePerMinute
-  if (duration < (30 * 60)) return Math.round(perMinuteFee * (1800 / 60.0))
-  return Math.round(perMinuteFee * (duration / 60.0))
+  if (duration < (30 * 60)) return perMinuteFee * 30
+  return perMinuteFee * Math.ceil(duration / 60.0)
 }
 
 })(typeof exports === 'undefined'? this['classificationUtils']={}: exports)

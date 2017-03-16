@@ -253,6 +253,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
     Program.find(query, queryData.fields).skip(queryData.page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
       if (err) return next(err)
 
+      replaceFearToAnxiety(docs)
       if(!queryData.isKavi) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, queryData.user) })
 
       if (queryData.page == 0 && queryData.showCount) {
@@ -264,6 +265,20 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
       }
     })
   }
+}
+
+function fearToAnxiety(w) {
+  return w.replace(/^fear$/, 'anxiety')
+}
+
+function replaceFearToAnxiety(docs) {
+  docs.forEach(function (doc) {
+    var classifications = enums.util.isTvSeriesName(doc) ? [doc.episodes] : doc.classifications
+    classifications.forEach(function (classification) {
+      classification.warnings = classification.warnings ? classification.warnings.map(fearToAnxiety) : undefined
+      classification.warningOrder = classification.warningOrder ? classification.warningOrder.map(fearToAnxiety) : undefined
+    })
+  })
 }
 
 function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
@@ -1487,6 +1502,7 @@ app.get('/agelimit/:q?', function (req, res, next) {
     var agelimit = classsification.agelimit || classsification.legacyAgeLimit || 0
     var countryCode = trimmedList(program.country)
     var durationInSeconds = classificationUtils.durationToSeconds(classsification.duration)
+    var warnings = trimmedList(classsification.warningOrder)
     return {
       id: program.sequenceId,
       type: enums.programType[program.programType].type,
@@ -1504,7 +1520,7 @@ app.get('/agelimit/:q?', function (req, res, next) {
       duration: classsification.duration,
       durationInSeconds: durationInSeconds > 0 ? durationInSeconds : undefined,
       agelimit: agelimit > 0 ? agelimit : undefined,
-      warnings: trimmedList(classsification.warnings)
+      warnings: warnings ? warnings.map(fearToAnxiety) : undefined
     }
   }
 

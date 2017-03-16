@@ -18,7 +18,7 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
   xlsData.push(columns)
   _.forEach(docs, function (doc) {
     var name = listToString(doc.name)
-    var classification = doc.classifications && doc.classifications[0] ? doc.classifications[0] : {}
+    var classification = enums.util.isTvSeriesName(doc) && doc.episodes ? doc.episodes : doc.classifications && doc.classifications[0] ? doc.classifications[0] : {}
     doc.originalName = enums.util.isTvEpisode(doc) ? (doc.series || {}).name : name
     doc.format = classification.format
     doc.duration = enums.util.isGameType(doc) ? "" :classification.duration

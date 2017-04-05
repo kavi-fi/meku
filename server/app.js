@@ -31,6 +31,7 @@ var csrf = require('csurf')
 var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 var validation = require('./validation')
 var srvUtils = require('./server-utils')
+var RateLimit = require('express-rate-limit')
 var env = require('./env').get()
 var testEnvEmailQueue = []
 
@@ -52,6 +53,15 @@ app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
 app.use(multer({ dest: '/tmp/', limits: { fileSize:5000000, files:1 } }))
+app.enable('trust proxy')
+
+var requestLimiter = new RateLimit({
+  windowMs: process.env.RATE_LIMIT_WINDOW || 60000,
+  max: process.env.RATE_LIMIT_MAX_REQUESTS_PER_IP || 30,
+  delayAfter: process.env.RATE_LIMIT_DELAY_AFTER || 10,
+  delayMs: process.env.RATE_LIMIT_DELAY || 5000
+})
+app.use('/programs/search/', requestLimiter)
 
 app.post('/login', function(req, res, next) {
   var username = req.body.username

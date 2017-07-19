@@ -222,6 +222,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
     "reclassifiedBy": req.query.reclassifiedBy,
     "ownClassificationsOnly": req.query.ownClassificationsOnly == 'true',
     "showDeleted": req.query.showDeleted == 'true',
+    "showCount": req.query.showCount == 'true',
     "buyer": req.query.buyer,
     "directors": req.query.directors
   }
@@ -252,7 +253,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
 
       if(!queryData.isKavi) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, queryData.user) })
 
-      if (queryData.page == 0) {
+      if (queryData.page == 0 && queryData.showCount) {
         Program.count(query, function(err, count) {
           res.send({ count: count, programs: docs })
         })

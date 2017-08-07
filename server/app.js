@@ -28,6 +28,9 @@ var providerUtils = require('./provider-utils')
 var multer  = require('multer')
 var providerImport = require('./provider-import')
 var csrf = require('csurf')
+var bodyParser = require('body-parser')
+var cookieParser = require('cookie-parser')
+var compression = require('compression')
 var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 var validation = require('./validation')
 var srvUtils = require('./server-utils')
@@ -41,10 +44,10 @@ var app = express()
 app.use(rejectNonHttpMethods)
 app.use(nocache)
 app.use(forceSSL)
-app.use(express.compress())
-app.use(express.json())
+app.use(compression())
+app.use(bodyParser.json({limit: '10mb'}))
 app.use(setupUrlEncodedBodyParser())
-app.use(express.cookieParser(process.env.COOKIE_SALT || 'secret'))
+app.use(cookieParser(process.env.COOKIE_SALT || 'secret'))
 app.use(buildRevisionCheck)
 app.use(setupCsrfMiddleware())
 app.use(setCsrfTokenCookie)
@@ -56,16 +59,16 @@ app.use(multer({ dest: '/tmp/', limits: { fileSize:5000000, files:1 } }))
 app.post('/login', function(req, res, next) {
   var username = req.body.username
   var password = req.body.password
-  if (!username || !password) return res.send(403)
+  if (!username || !password) return res.sendStatus(403)
   User.findOne({ username: username.toUpperCase(), password: {$exists: true}, active: true }, function(err, user) {
     if (err) return next(err)
-    if (!user) return res.send(403)
+    if (!user) return res.sendStatus(403)
     if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
       user.update({ active: false }, respond(res, next, 403))
     } else {
       user.checkPassword(password, function(err, ok) {
         if (err) return next(err)
-        if (!ok) return res.send(403)
+        if (!ok) return res.sendStatus(403)
         logUserIn(req, res, user)
         res.send({})
       })
@@ -93,13 +96,13 @@ app.post('/logout', function(req, res, next) {
 
 app.post('/forgot-password', function(req, res, next) {
   var username = req.body.username
-  if (!username) return res.send(403)
+  if (!username) return res.sendStatus(403)
   User.findOne({ username: username.toUpperCase(), active: true }, function(err, user) {
     if (err) return next(err)
-    if (!user) return res.send(403)
+    if (!user) return res.sendStatus(403)
     if (_.isEmpty(user.emails)) {
       console.log(user.username + ' has no email address')
-      return res.send(500)
+      return res.sendStatus(500)
     }
     var subject = 'Salasanan uusiminen / Förnya lösenordet'
     srvUtils.getTemplate('reset-password-email.tpl.html', function(err, tpl) {
@@ -136,7 +139,7 @@ function createAndSaveHash(user, callback) {
 app.get('/check-reset-hash/:hash', function(req, res, next) {
   User.findOne({ resetHash: req.params.hash, active: true }).lean().exec(function(err, user) {
     if (err) return next(err)
-    if (!user) return res.send(403)
+    if (!user) return res.sendStatus(403)
     if (user.password) return res.send({ name: user.name })
     res.send({ newUser: true, name: user.name })
   })
@@ -147,7 +150,7 @@ app.post('/reset-password', function(req, res, next) {
   if (resetHash) {
     User.findOne({ resetHash: resetHash, active: true }, function (err, user) {
       if (err) return next(err)
-      if (!user) return res.send(403)
+      if (!user) return res.sendStatus(403)
       user.password = req.body.password
       user.resetHash = null
       user.save(function (err, user) {
@@ -157,7 +160,7 @@ app.post('/reset-password', function(req, res, next) {
       })
     })
   } else {
-    return res.send(403)
+    return res.sendStatus(403)
   }
 })
 
@@ -508,7 +511,7 @@ app.get('/programs/:id', function(req, res, next) {
 
 app.post('/programs/new', function(req, res, next) {
   var programType = parseInt(req.body.programType)
-  if (!enums.util.isDefinedProgramType(programType)) return res.send(400)
+  if (!enums.util.isDefinedProgramType(programType)) return res.sendStatus(400)
   var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.name, role: req.user.role}})
   var draftClassification = p.newDraftClassification(req.user)
   var origProgram = req.body.origProgram
@@ -537,7 +540,7 @@ app.post('/programs/:id/register', function(req, res, next) {
     if (err) return next(err)
 
     var newClassification = program.draftClassifications[req.user._id]
-    if (!newClassification) return res.send(409)
+    if (!newClassification) return res.sendStatus(409)
 
     newClassification.status = 'registered'
     newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
@@ -614,7 +617,7 @@ app.post('/programs/:id/register', function(req, res, next) {
         if (err) return callback(err)
         var valid = validation.registration(program.toObject(), newClassification, req.user)
         if (!valid.valid) {
-          return res.send(400, "Invalid program. Field: " + valid.field)
+          return res.status(400).send("Invalid program. Field: " + valid.field)
         }
         callback(null, program)
       })
@@ -630,7 +633,7 @@ app.post('/programs/:id/register', function(req, res, next) {
 app.post('/programs/:id/classification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
-    if (program.classifications.length > 0) return res.send(400)
+    if (program.classifications.length > 0) return res.sendStatus(400)
     program.deleted = false
     program.newDraftClassification(req.user)
     program.save(respond(res, next))
@@ -640,7 +643,7 @@ app.post('/programs/:id/classification', function(req, res, next) {
 app.post('/programs/:id/reclassification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
     if (err) next(err)
-    if (!classificationUtils.canReclassify(program, req.user)) return res.send(400)
+    if (!classificationUtils.canReclassify(program, req.user)) return res.sendStatus(400)
     program.deleted = false
     program.newDraftClassification(req.user)
     program.populateSentRegistrationEmailAddresses(function(err) {
@@ -726,8 +729,8 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
 app.post('/programs/autosave/:id', function(req, res, next) {
   Program.findOne({ _id: req.params.id, draftsBy: req.user._id }, function(err, program) {
     if (err) return next(err)
-    if (!program) return res.send(409)
-    if (!isValidUpdate(req.body, program, req.user)) return res.send(400)
+    if (!program) return res.sendStatus(409)
+    if (!isValidUpdate(req.body, program, req.user)) return res.sendStatus(400)
     watchChanges(program, req.user).applyUpdates(req.body)
     program.verifyAllNamesUpToDate(function(err) {
       if (err) return next(err)
@@ -1149,8 +1152,8 @@ app.get('/accounts/search', function(req, res, next) {
 app.get('/accounts/:id/emailAddresses', function(req, res, next) {
   Account.findById(req.params.id, { emailAddresses: 1, users: 1 }).exec(function(err, account) {
     if (err) return next(err)
-    if (!account) return res.send(404)
-    if (!utils.hasRole(req.user, 'kavi') && !account.users.id(req.user._id)) return res.send(400)
+    if (!account) return res.sendStatus(404)
+    if (!utils.hasRole(req.user, 'kavi') && !account.users.id(req.user._id)) return res.sendStatus(400)
     res.send({ _id: account._id, emailAddresses: account.emailAddresses })
   })
 })
@@ -1178,7 +1181,7 @@ app.get('/users/exists/:username', requireRole('root'), function(req, res, next)
 
 app.post('/users/new', requireRole('root'), function(req, res, next) {
   var hasRequiredFields = (req.body.username != '' && req.body.emails[0].length > 0 && req.body.name != '')
-  if (!hasRequiredFields || !utils.isValidUsername(req.body.username)) return res.send(400)
+  if (!hasRequiredFields || !utils.isValidUsername(req.body.username)) return res.sendStatus(400)
   req.body.username = req.body.username.toUpperCase()
   new User(req.body).save(function(err, user) {
     if (err) return next(err)
@@ -1310,7 +1313,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
         console.error(err)
       }
       res.set('Content-Type', 'application/xml');
-      res.send(err ? 500 : 200, root.end({ pretty: true, indent: '  ', newline: '\n' }))
+      res.status(err ? 500 : 200).send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
     })
   })
   req.resume()
@@ -1433,8 +1436,8 @@ app.get('/environment', function(req, res) {
 })
 
 app.post('/files/provider-import', function(req, res, next) {
-  if (_.isEmpty(req.files) || !req.files.providerFile) return res.send(400)
-  if (req.files.providerFile.truncated) return res.send(400)
+  if (_.isEmpty(req.files) || !req.files.providerFile) return res.sendStatus(400)
+  if (req.files.providerFile.truncated) return res.sendStatus(400)
   providerImport.import(req.files.providerFile.path, function(err, provider) {
     if (err) return res.send({ error: err })
     var providerData = utils.merge(provider, {message: req.body.message ? req.body.message : undefined})
@@ -1519,8 +1522,7 @@ if (env.isTest) {
 // Error handler
 app.use(function(err, req, res, next) {
   console.error(err.stack || err)
-  res.status(err.status || 500)
-  res.send({ message: err.message || err })
+  res.status(err.status || 500).send({ message: err.message || err })
 })
 
 function createParentProgram(program, data, user, callback) {
@@ -1613,7 +1615,7 @@ function authenticate(req, res, next) {
   } else if (isOptional) {
     return next()
   } else {
-    return res.send(403)
+    return res.sendStatus(403)
   }
 }
 
@@ -1625,13 +1627,13 @@ function authenticateXmlApi(req, res, next) {
       req.user = {username: 'xml-api', ip: getIpAddress(req)}
       return next()
     } else {
-      res.send(403)
+      res.sendStatus(403)
     }
   })
 }
 
 function rejectNonHttpMethods(req, res, next) {
-  if (['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'].indexOf(req.method) === -1) res.send(405)
+  if (['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'].indexOf(req.method) === -1) res.sendStatus(405)
   else next()
 }
 
@@ -1641,7 +1643,7 @@ function forceSSL(req, res, next) {
     if (req.method === 'GET') {
       return res.redirect(301, 'https://' + req.get('host') + req.originalUrl)
     } else {
-      return res.send(403, "Please use HTTPS")
+      return res.status(403).send("Please use HTTPS")
     }
   } else {
     return next()
@@ -1655,14 +1657,14 @@ function buildRevisionCheck(req, res, next) {
   } else if (req.xhr && req.path != '/templates.html') {
     var clientRevision = req.cookies['build.revision']
     if (!clientRevision || clientRevision != buildRevision) {
-      return res.send(418)
+      return res.sendStatus(418)
     }
   }
   next()
 }
 
 function setupUrlEncodedBodyParser() {
-  var parser = express.urlencoded({ parameterLimit: Infinity, arrayLimit: Infinity })
+  var parser = bodyParser.urlencoded({ parameterLimit: Infinity, arrayLimit: Infinity, limit: '10mb', extended: false })
   return function(req, res, next) {
     return isUrlEncodedBody(req) ? parser(req, res, next) : next()
   }
@@ -1689,7 +1691,7 @@ function setCsrfTokenCookie(req, res, next) {
 
 function requireRole(role) {
   return function(req, res, next) {
-    if (!utils.hasRole(req.user, role)) return res.send(403)
+    if (!utils.hasRole(req.user, role)) return res.sendStatus(403)
     else return next()
   }
 }

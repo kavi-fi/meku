@@ -84,11 +84,11 @@ function sv(txt) {
 exports.import = function(file, callback) {
   var parser = false
 
-  if (file.search(/.xls$/) > 1) parser = xls
-  else if (file.search(/.xlsx$/) > 1) parser = xlsx
+  if (file.originalname.search(/.xls$/) > 1) parser = xls
+  else if (file.originalname.search(/.xlsx$/) > 1) parser = xlsx
   else return callback({ message: '.xlsx or .xls required' })
 
-  var allSheets = parser.readFile(file)
+  var allSheets = parser.readFile(file.path)
   var sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
   var sheetSv = allSheets.Sheets['Leverant&#xF6;rsanm&#xE4;lan'] || allSheets.Sheets['Leverantörsanmälan']
   var useFi = isEmptySheet(sheetSv, i18n.sv['Tarjoaja'])

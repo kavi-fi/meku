@@ -25,7 +25,7 @@ var builder = require('xmlbuilder')
 var bcrypt = require('bcrypt')
 var CronJob = require('cron').CronJob
 var providerUtils = require('./provider-utils')
-var multer  = require('multer')
+var upload = require('multer')({ dest: '/tmp/', limits: { fileSize: 5000000, files: 1 } })
 var providerImport = require('./provider-import')
 var csrf = require('csurf')
 var bodyParser = require('body-parser')
@@ -54,7 +54,6 @@ app.use(setCsrfTokenCookie)
 app.use(authenticate)
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
-app.use(multer({ dest: '/tmp/', limits: { fileSize:5000000, files:1 } }))
 
 app.post('/login', function(req, res, next) {
   var username = req.body.username
@@ -1435,10 +1434,10 @@ app.get('/environment', function(req, res) {
   res.send('var APP_ENVIRONMENT = "' + app.get('env') + '";')
 })
 
-app.post('/files/provider-import', function(req, res, next) {
-  if (_.isEmpty(req.files) || !req.files.providerFile) return res.sendStatus(400)
-  if (req.files.providerFile.truncated) return res.sendStatus(400)
-  providerImport.import(req.files.providerFile.path, function(err, provider) {
+app.post('/files/provider-import', upload.single('providerFile'), function(req, res, next) {
+  if (_.isEmpty(req.file) || !req.file.path) return res.sendStatus(400)
+  if (req.file.truncated) return res.sendStatus(400)
+  providerImport.import(req.file, function(err, provider) {
     if (err) return res.send({ error: err })
     var providerData = utils.merge(provider, {message: req.body.message ? req.body.message : undefined})
     new schema.Provider(providerData).save(function(err, saved) {

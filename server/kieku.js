@@ -58,7 +58,7 @@ exports.createClassificationRegistration = function createClassificationRegistra
     }
     var account = findAccountHavingInvoice(accountRows, invoice)
     var rowsPerType = _.groupBy(account.rows, 'type')
-    return _.pairs(rowsPerType).map(function (item) {
+    return _.toPairs(rowsPerType).map(function (item) {
       return summaryText(item[0], item[1])
     }).join(' ')
   }
@@ -70,7 +70,7 @@ function findAccountHavingInvoice(accountRows, invoice) {
 }
 
 function price(arr) {
-  return _(arr).pluck('price').reduce(function (a, b) {
+  return _(arr).map('price').reduce(function (a, b) {
     return a + b
   }, 0) / 100
 }

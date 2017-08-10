@@ -42,7 +42,7 @@ exports.registrationEmail = function (provider, hostName, callback) {
 
     readTemplate('registration-email.tpl.html', function(err, tpl) {
       if (err) return callback(err)
-      var html =  _.template(tpl, vars, {imports: {sv: sv}})
+      var html =  _.template(tpl, {imports: {sv: sv}})(vars)
       //fs.writeFileSync('./tmp/registration-email.html', html)
       callback(null, html)
     })
@@ -88,7 +88,7 @@ exports.yearlyBillingProviderEmail = function(provider, hostName, callback) {
     }
     readTemplate('registration-email.tpl.html', function(err, tpl) {
       if (err) return callback(err)
-      var html =  _.template(tpl, vars, {imports: {sv: sv}})
+      var html =  _.template(tpl, {imports: {sv: sv}})(vars)
       //fs.writeFileSync('./tmp/registration-email.html', html)
       callback(null, html)
     })
@@ -119,7 +119,7 @@ exports.registrationEmailProviderLocation = function (location, hostName, callba
 
     readTemplate('provider-location-registration-email.tpl.html', function(err, tpl) {
       if (err) return callback(err)
-      var html =  _.template(tpl, vars, {imports: {utils: utils, sv: sv}})
+      var html =  _.template(tpl, {imports: {utils: utils, sv: sv}})(vars)
       //fs.writeFileSync('./tmp/registration-email-location.html', html)
       callback(null, html)
     })
@@ -150,7 +150,7 @@ exports.yearlyBillingProviderLocationEmail = function(location, hostName, callba
 
     var tpl = readTemplate('provider-location-registration-email.tpl.html', function(err, tpl) {
       if (err) return callback(err)
-      var html = _.template(tpl, vars, {imports: {utils: utils, sv: sv}})
+      var html = _.template(tpl, {imports: {utils: utils, sv: sv}})(vars)
       //fs.writeFileSync('./tmp/registration-email-location.html', html)
       callback(null, html)
     })

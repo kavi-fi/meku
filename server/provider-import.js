@@ -203,7 +203,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, text, callback) {
 
     function values(xs, row) {
       var currentValues = toObject(providerSheet, row, fieldMap)
-      if (_.all(currentValues, function(x) { return x === null})) {
+      if (_.every(currentValues, function(x) { return x === null})) {
         return xs
       } else {
         return values(xs.concat([currentValues]), row + 1)
@@ -241,7 +241,7 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, text, callback) {
 
     return _.map(missing, function (field) {
       var errorString = 'Rivillä <%- row %>. <%- name %> pakollinen kenttä "<%- field %>" puuttuu'
-      return _.template(errorString, {
+      return _.template(errorString)({
         name: requiredFields.name,
         field: fieldNames[field],
         row: index
@@ -277,9 +277,9 @@ function toObject(from, row, fields) {
     else return result
   }, emptyRow(fields.length))
 
-  var values = _(ob).pairs().sortBy(fst).map(snd).value()
+  var values = _(ob).toPairs().sortBy(fst).map(snd).value()
 
-  return _(_.pairs(_.zipObject(fields, values))).filter(function(x) {
+  return _(_.toPairs(_.zipObject(fields, values))).filter(function(x) {
     return x[1] !== null
   }).object().value()
 
@@ -301,7 +301,7 @@ function isEmptySheet(s, heading) {
 function identity(x) { return x }
 
 function createObjectAndSetValuesWithMap(object, map, enumProperties) {
-  var enumProps = _.reduce(_.pairs(enumProperties), function(ob, x) {
+  var enumProps = _.reduce(_.toPairs(enumProperties), function(ob, x) {
     var propName = x[0], fields = x[1]
     return utils.merge(ob, utils.keyValue(propName, toArray(fields)))
 
@@ -313,7 +313,7 @@ function createObjectAndSetValuesWithMap(object, map, enumProperties) {
     }
   }, {})
 
-  var props = _.reduce(_.pairs(utils.flattenObject(object)), function(ob, pair) {
+  var props = _.reduce(_.toPairs(utils.flattenObject(object)), function(ob, pair) {
     var key = pair[0], val = pair[1], prop = {}
     utils.setValueForPath(key.split('.'), prop, val)
     return utils.merge(ob, prop)
@@ -322,7 +322,7 @@ function createObjectAndSetValuesWithMap(object, map, enumProperties) {
   return utils.merge(enumProps, omitEnumProps(props))
 
   function omitEnumProps(props) {
-    var enumPropNames = _(enumProperties).pairs().map(function (x) { return x[1] }).flatten().value()
+    var enumPropNames = _(enumProperties).toPairs().map(function (x) { return x[1] }).flatten().value()
     return _.omit(props, enumPropNames)
   }
 }

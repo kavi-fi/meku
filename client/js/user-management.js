@@ -53,7 +53,7 @@ function userManagementPage() {
     $userList.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
       var username = $(this).children('.username').text().toLowerCase()
-      var match = _.contains(name, searchString) || _.contains(username, searchString)
+      var match = _.includes(name, searchString) || _.includes(username, searchString)
       $(this).toggle(match)
     })
     closeDetails()
@@ -66,7 +66,7 @@ function userManagementPage() {
   }
 
   function renderUsers(users) {
-    _(users).sortBy('name').map(renderUser).forEach(function(u) { $userList.append(u) })
+    _(users).sortBy('name').map(renderUser).value().forEach(function(u) { $userList.append(u) })
   }
 
   function renderUser(user) {

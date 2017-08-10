@@ -35,7 +35,7 @@ programStream.on('close', function () {
   var directorStream = Director.find({}, {_id:1,name:1}).stream()
 
   directorStream.on('data', function (director) {
-    if (!_.contains(directors, director.name)) {
+    if (!_.includes(directors, director.name)) {
       directorStream.pause()
       Director.remove({name: director.name}, function (err) {
         if (err) console.error(err)

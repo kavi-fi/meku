@@ -335,7 +335,7 @@ function classificationFormUtils() {
 
   function renderExtraNameFields($form, p) {
     nameFields.forEach(function(field) {
-      _.range(1, p[field].length).forEach(function() {
+      _.range(0, p[field].length).forEach(function() {
         $form.find('.' + field + 'Container').append(nameFieldHtml(field))
       })
     })
@@ -474,7 +474,7 @@ function classificationFormUtils() {
         }
       }
       $input.select2(opts).on('change', function() {
-        var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).pluck('id').value()
+        var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).map('id').value()
         saveFn($(this).attr('name'), manual)
       })
       if (rootEditMode) {
@@ -667,7 +667,7 @@ function classificationFormUtils() {
       },
       authorOrg: {
         $el: $form.find('input[name="classification.authorOrganization"]'),
-          data: _.map(_.chain(enums.authorOrganization).pairs().rest().value(), function(pair) { return { id: pair[0], text: pair[1] } }),
+          data: _.map(_.chain(enums.authorOrganization).toPairs().tail().value(), function(pair) { return { id: pair[0], text: pair[1] } }),
         fromOption: select2OptionToInt
       },
       reason: {

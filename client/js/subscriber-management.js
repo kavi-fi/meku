@@ -24,7 +24,7 @@ function subscriberManagementPage() {
     var searchString = $(this).val().toLowerCase()
     $subscribers.find('.result').each(function() {
       var name = $(this).children('.name').text().toLowerCase()
-      $(this).toggle(_.contains(name, searchString))
+      $(this).toggle(_.includes(name, searchString))
     })
     closeDetails()
   })
@@ -95,7 +95,7 @@ function subscriberManagementPage() {
         }).toArray(),
         customerNumber: findInput('customerNumber').val(),
         name: findInput('name').val(),
-        emailAddresses: _.pluck(findInput('emailAddresses').select2('data'), 'text'),
+        emailAddresses: _.map(findInput('emailAddresses').select2('data'), 'text'),
         yTunnus: findInput('yTunnus').val(),
         ssn: findInput('ssn').val(),
         address: {
@@ -153,7 +153,7 @@ function subscriberManagementPage() {
 
     $form.find('input[name=emailAddresses]').on('change', function(event) {
       var emails = event.val
-      if (!_.isEmpty(emails) && _.all(emails, validateEmail)) {
+      if (!_.isEmpty(emails) && _.every(emails, validateEmail)) {
         this.setCustomValidity('')
       } else {
         this.setCustomValidity('Invalid email')
@@ -211,7 +211,7 @@ function subscriberManagementPage() {
 
   function renderSubscribers(subscribers) {
     $subscribers.empty()
-    _(subscribers).sortBy('name').map(renderSubscriber).forEach(function(acc) { $subscribers.append(acc) })
+    _(subscribers).sortBy('name').map(renderSubscriber).value().forEach(function(acc) { $subscribers.append(acc) })
   }
 
   function renderSubscriber(subscriber) {
@@ -267,7 +267,7 @@ function subscriberManagementPage() {
     }
 
     function populateClassifiers(users) {
-      var names = _.pluck(users, 'username').join(',')
+      var names = _.map(users, 'username').join(',')
       if (names.length === 0) return
       $.get('/users/names/' + names, function(data) {
         var usersWithNames = _.map(users, function(user) {

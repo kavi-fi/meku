@@ -123,7 +123,7 @@ function sendHashLinkViaEmail(user, subject, template, callback) {
   var emailData = {
     recipients: user.emails,
     subject: subject,
-    body: _.template(template, { link: url, username: user.username })
+    body: _.template(template)({ link: url, username: user.username })
   }
   sendEmail(emailData, user, callback)
 }
@@ -740,7 +740,7 @@ app.post('/programs/autosave/:id', function(req, res, next) {
   function isValidUpdate(update, p, user) {
     var allowedFields = allowedAutosaveFields(p, user)
     return _.every(Object.keys(update), function(updateField) {
-      return _.any(allowedFields, function(allowedField) {
+      return _.some(allowedFields, function(allowedField) {
         return allowedField[allowedField.length-1] == '*'
           ? updateField.indexOf(allowedField.substring(0, allowedField.length-1)) == 0
           : updateField == allowedField
@@ -1008,10 +1008,10 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
   Provider.getForBilling(function(err, data) {
     if (err) return next(err)
 
-    _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).forEach(function(p) {
+    _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).value().forEach(function(p) {
       providerUtils.yearlyBillingProviderEmail(p, env.hostname, logErrorOrSendEmail(req.user))
     })
-    _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).forEach(function(l) {
+    _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).value().forEach(function(l) {
       providerUtils.yearlyBillingProviderLocationEmail(l, env.hostname, logErrorOrSendEmail(req.user))
     })
 
@@ -1271,13 +1271,13 @@ app.post('/kieku', requireRole('kavi'), function(req, res, next) {
   InvoiceRow.find({ _id: { $in: invoiceIds }}).sort('registrationDate').lean().exec(function(err, rows) {
     var accountIds = _(rows).map(function(i) { return i.account._id.toString() }).uniq().value()
     Account.find({ _id: { $in: accountIds } }).lean().exec(function(err, accounts) {
-      var accountMap = _.indexBy(accounts, '_id')
+      var accountMap = _.keyBy(accounts, '_id')
 
       function accountId(row) { return row.account._id }
       function toNamedTuple(pair) { return { account: accountMap[pair[0]], rows: pair[1] } }
       function accountName(tuple) { return tuple.account.name }
 
-      var data = _(rows).groupBy(accountId).pairs().map(toNamedTuple).sortBy(accountName).value()
+      var data = _(rows).groupBy(accountId).toPairs().map(toNamedTuple).sortBy(accountName).value()
       var result = kieku.createClassificationRegistration(dates, data)
       res.setHeader('Content-Disposition', 'attachment; filename=kieku-'+dates.begin+'-'+dates.end+'.xlsx')
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -1605,7 +1605,7 @@ function authenticate(req, res, next) {
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   if (isWhitelisted(req)) return next()
-  var isOptional =  _.any(optionalList, function(p) { return url.indexOf(p) == 0 })
+  var isOptional =  _.some(optionalList, function(p) { return url.indexOf(p) == 0 })
   var cookie = req.signedCookies.user
   if (cookie) {
     req.user = cookie
@@ -1651,7 +1651,7 @@ function forceSSL(req, res, next) {
 
 function buildRevisionCheck(req, res, next) {
   var entryPoints = ['/', '/public.html', '/index.html', '/register-provider.html', '/reset-password.html', 'classification-criteria/.html']
-  if (_.contains(entryPoints, req.path)) {
+  if (_.includes(entryPoints, req.path)) {
     res.cookie('build.revision', buildRevision)
   } else if (req.xhr && req.path != '/templates.html') {
     var clientRevision = req.cookies['build.revision']
@@ -1741,7 +1741,7 @@ function queryNameIndex(schemaName) {
     if (parts) q.parts = parts
     schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').lean().exec(function(err, docs) {
       if (err) return next(err)
-      res.send(_.pluck(docs || [], 'name'))
+      res.send(_.map(docs || [], 'name'))
     })
   }
 }
@@ -1867,7 +1867,7 @@ function watchChanges(document, user, excludedLogPaths) {
   }
 
   function isIncludedLogPath(p) {
-    return document.isDirectModified(p) && document.schema.pathType(p) != 'nested' && !_.contains(excludedLogPaths, p)
+    return document.isDirectModified(p) && document.schema.pathType(p) != 'nested' && !_.includes(excludedLogPaths, p)
   }
 
   function log(changedPaths, oldObject, updatedDocument, callback) {
@@ -1939,7 +1939,7 @@ function getIpAddress(req) {
 
 function isUrlEncodedBody(req) {
   var paths = ['POST:/program/excel/export', 'POST:/kieku', 'POST:/providers/billing/kieku', 'POST:/providers/yearlyBilling/kieku']
-  return _.contains(paths, req.method + ':' + req.path)
+  return _.includes(paths, req.method + ':' + req.path)
 }
 
 function isWhitelisted(req) {
@@ -1952,7 +1952,7 @@ function isWhitelisted(req) {
     'GET:/upgrade-browser.html', 'GET:/emails/latest', 'GET:/directors/search', 'GET:/agelimit/'
   ]
   var url = req.method + ':' + req.path
-  return _.any(whitelist, function(p) { return url.indexOf(p) == 0 })
+  return _.some(whitelist, function(p) { return url.indexOf(p) == 0 })
 }
 
 if (env.isDev) {

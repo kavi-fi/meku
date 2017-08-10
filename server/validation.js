@@ -113,7 +113,7 @@ function requiredArray(name) {
 
 function arrayEach(name, f) {
   return function(p) {
-    if (_.all(p[name], f)) return Ok()
+    if (_.every(p[name], f)) return Ok()
     else return Fail(name)
   }
 }

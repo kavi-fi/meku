@@ -49,7 +49,7 @@ function billingPage() {
       $page.find('input[name=end]').val(range.end)
       var $accounts = $page.find('.accounts').empty()
       $noResults.toggle(rows.length == 0)
-      _(rows).groupBy(function(x) { return x.account.name }).pairs().sortBy(function(t) { return t[0] }).forEach(function(account) {
+      _(rows).groupBy(function(x) { return x.account.name }).toPairs().sortBy(function(t) { return t[0] }).value().forEach(function(account) {
         var name = account[0]
         var rows = account[1]
         var $account = $("#templates").find('.invoice-account').clone()

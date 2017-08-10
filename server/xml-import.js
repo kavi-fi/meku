@@ -48,7 +48,7 @@ var validateProgram = map(compose([
   required('ALKUPERAINENNIMI', 'name'),
   flatMap(requiredAttr('TYPE', 'type'), function(p) {
     var allButTvOrOther = ['01','02','03','04','06','07','08','10','11']
-    if (_.contains(allButTvOrOther, p.type)) return required('SUOMALAINENNIMI', 'nameFi')
+    if (_.includes(allButTvOrOther, p.type)) return required('SUOMALAINENNIMI', 'nameFi')
     else return optional('SUOMALAINENNIMI', 'nameFi')
   }),
   optional('RUOTSALAINENNIMI', 'nameSv'),
@@ -58,7 +58,7 @@ var validateProgram = map(compose([
   flatMap(optional('MAAT'), function(p) {
     var countries = p.MAAT ? p.MAAT.split(' ') : []
     return function(xml) {
-      if (_.all(countries, _.curry(_.has)(enums.countries))) return ok({country: countries})
+      if (_.every(countries, _.curry(_.has)(enums.countries))) return ok({country: countries})
       else return error('Virheellinen MAAT kenttä: ' + countries)
     }
   }),
@@ -91,14 +91,12 @@ var validateProgram = map(compose([
       var errors = _.flatten(p.criteria.map(function(c) {
         return and(requiredAttr('KRITEERI'), function(xml) {
           var criteria = parseInt(xml.$.KRITEERI)
-          if (_.contains(validCriteria, criteria)) return ok({})
+          if (_.includes(validCriteria, criteria)) return ok({})
           else return error('Virheellinen attribuutti KRITEERI ' + criteria)
         })(c).errors
       }))
       if (errors.length > 0) return function() { return {program: {}, errors: errors } }
-      var criteriaComments = _.object(p.criteria.map(function (c) {
-        return [parseInt(c.$.KRITEERI), c.$.KOMMENTTI]
-      }))
+      var criteriaComments = _.zipObject(p.criteria.map(function (c) { return c.$.KRITEERI }), p.criteria.map(function (c) { return c.$.KOMMENTTI }))
       return function () { return ok({safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), criteriaComments: criteriaComments}) }
     })
   ])
@@ -230,7 +228,7 @@ function childrenByNameTo(field, toField) {
 function valuesInEnum(field, _enum) {
   return function(xml) {
     var values = optionListToArray(xml[field]).map(function(g) { return _enum[g] })
-    if (_.all(values, function(v) { return v !== undefined })) return ok(utils.keyValue(field, values))
+    if (_.every(values, function(v) { return v !== undefined })) return ok(utils.keyValue(field, values))
     else return error("Virheellinen kenttä " + field)
   }
 }
@@ -238,8 +236,8 @@ function valuesInEnum(field, _enum) {
 function valuesInList(field, list) {
   return function(xml) {
     var values = optionListToArray(xml[field])
-    var exists = values.map(_.curry(_.contains)(list))
-    if (_.all(exists)) return ok(utils.keyValue(field, values))
+    var exists = values.map(_.curry(_.includes)(list))
+    if (_.every(exists)) return ok(utils.keyValue(field, values))
     else return error("Virheellinen kenttä " + field)
   }
 }
@@ -248,7 +246,7 @@ function valueInList(field, list, toField) {
   return function(xml) {
     toField = toField || field
     var value = xml[field]
-    if (_.contains(list, value)) return ok(utils.keyValue(toField, value))
+    if (_.includes(list, value)) return ok(utils.keyValue(toField, value))
     else return error("Virheellinen kenttä " + field)
   }
 }
@@ -256,7 +254,7 @@ function valueInList(field, list, toField) {
 function attrInList(attr, list) {
   return function(xml) {
     var value = xml.$[attr]
-    if (_.contains(list.map(function(x) { return x.toString() }), value)) return ok(utils.keyValue(attr, value))
+    if (_.includes(list.map(function(x) { return x.toString() }), value)) return ok(utils.keyValue(attr, value))
     else return error("Virheellinen arvo atribuutille " + attr + ": " + value)
   }
 }

@@ -103,7 +103,7 @@ function kaviAgelimit(dateRange, callback) {
       .match(q)
       .unwind('classifications')
       .match(q)
-      .match({ 'classifications.author._id': { $in: _.pluck(users, '_id')} })
+      .match({ 'classifications.author._id': { $in: _.map(users, '_id')} })
       .group({ _id: '$classifications.agelimit', value: { $sum: 1 } })
       .sort('_id')
       .exec(callback)
@@ -118,7 +118,7 @@ function kaviAgelimitChanges(dateRange, callback) {
       'classifications.1': { $exists: true },
       'classifications': { $elemMatch: {
         registrationDate: { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate() },
-        'author._id': { $in: _.pluck(users, '_id') }
+        'author._id': { $in: _.map(users, '_id') }
       }},
       'deleted': { $ne: true }
     }
@@ -137,7 +137,7 @@ function kaviAuthor(dateRange, callback) {
       .match(q)
       .unwind('classifications')
       .match(q)
-      .match({ 'classifications.author._id': { $in: _.pluck(users, '_id')} })
+      .match({ 'classifications.author._id': { $in: _.map(users, '_id')} })
       .group({ _id: '$classifications.author', value: { $sum: 1 } })
       .sort('_id.username')
       .project({ _id: { $concat : [ '$_id.name' , ' ', '$_id.username' ] }, value: 1 })
@@ -150,7 +150,7 @@ function kaviReclassificationReason(dateRange, callback) {
     if (err) return callback(err)
     var q = {
       'classifications.registrationDate': { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate() },
-      'classifications.author._id': { $in: _.pluck(users, '_id') },
+      'classifications.author._id': { $in: _.map(users, '_id') },
       'classifications.isReclassification': true,
       'deleted': { $ne: true }
     }
@@ -184,12 +184,12 @@ function durations(dateRange, callback) {
 function kaviDurations(dateRange, callback) {
   schema.Account.find({ isKavi: true}, '_id', function(err, accounts) {
     if (err) return callback(err)
-    var kaviAccounts = _.pluck(accounts, '_id').map(function(objectId) { return String(objectId) })
+    var kaviAccounts = _.map(accounts, '_id').map(function(objectId) { return String(objectId) })
 
     loadKaviUsers('_id', function(err, users) {
       if (err) return callback(err)
 
-      var kaviAuthorIds = _.pluck(users, '_id').map(function(objectId) { return String(objectId) })
+      var kaviAuthorIds = _.map(users, '_id').map(function(objectId) { return String(objectId) })
       var q = { classifications: { $elemMatch: {
         'author._id' : { $in: kaviAuthorIds },
         registrationDate: { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate() },
@@ -221,7 +221,7 @@ function searchDurations(q, dateRange, isValidAuthor, durationKey, buyerKey, cal
 }
 
 function sumClassifications(result, p, dateRange, isValidAuthor, durationKey, buyerKey) {
-  _(p.classifications).forEach(function(c, classificationIndex) {
+  p.classifications.forEach(function(c, classificationIndex) {
     if (!isValidAuthor(c.author)) return
     if (!utils.withinDateRange(c.registrationDate, dateRange.begin, dateRange.end)) return
 
@@ -243,7 +243,7 @@ function kaviClassificationList(dateRange, callback) {
   loadKaviUsers('username', function(err, users) {
     if (err) return callback(err)
     var q = {
-      'classifications.author._id' : { $in: _.pluck(users, '_id') },
+      'classifications.author._id' : { $in: _.map(users, '_id') },
       'classifications.registrationDate': { $gte: dateRange.begin.toDate(), $lt: dateRange.end.toDate()},
       'deleted': { $ne: true }
     }
@@ -273,7 +273,7 @@ function query(range) {
 function mapProgramsToAgeLimitChanges(dateRange, programs) {
   return _(programs)
     .map(classificationsToAgelimitChange(dateRange)).flatten().compact().countBy()
-    .pairs().map(function(arr) { return { _id:arr[0], value:arr[1] }}).value()
+    .toPairs().map(function(arr) { return { _id:arr[0], value:arr[1] }}).value()
 }
 
 function classificationsToAgelimitChange(dateRange) {

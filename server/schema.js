@@ -96,7 +96,7 @@ ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback
   var program = this
   async.parallel([loadAuthorEmails, loadBuyerEmails, loadFixedKaviUsers], function(err, emails) {
     if (err) return callback(err)
-    var manual = _.pluck(program.classifications, 'registrationEmailAddresses')
+    var manual = _.map(program.classifications, 'registrationEmailAddresses')
     program.sentRegistrationEmailAddresses = _(emails.concat(manual)).flatten().compact().uniq().value()
     callback(null, program)
   })
@@ -135,7 +135,7 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
     var summary = classificationUtils.summary(data)
     var episodeSummary = {
       count: programs.length, criteria: data.criteria, legacyAgeLimit: data.legacyAgeLimit,
-      agelimit: summary.age, warnings: _.pluck(summary.warnings, 'category'), warningOrder: data.warningOrder
+      agelimit: summary.age, warnings: _.map(summary.warnings, 'category'), warningOrder: data.warningOrder
     }
     Program.update({ _id: seriesId }, { episodes: episodeSummary }, callback)
   })
@@ -143,11 +143,11 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
 ProgramSchema.statics.updateClassificationSummary = function(classification) {
   var summary = classificationUtils.summary(classification)
   classification.agelimit = summary.age
-  classification.warnings = _.pluck(summary.warnings, 'category')
+  classification.warnings = _.map(summary.warnings, 'category')
 }
 ProgramSchema.methods.hasNameChanges = function() {
   var namePaths = ['name', 'nameFi', 'nameSv', 'nameOther']
-  return _.any(this.modifiedPaths(), function(path) { return _.contains(namePaths, path) })
+  return _.some(this.modifiedPaths(), function(path) { return _.includes(namePaths, path) })
 }
 
 ProgramSchema.methods.verifyAllNamesUpToDate = function(callback) {
@@ -181,8 +181,8 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
     words = words.map(function(s) { return (s + ' ' + s.replace(/[\\.,]/g, ' ').replace(/(^|\W)["\\'\\\[\\(]/, '$1').replace(/["\\'\\\]\\)](\W|$)/, '$1')).split(/\s+/) })
     var latinizedWords = _.map(_.flatten(words), function (word) { return latinize(word) })
     var latinizedInitialNames = _.map(initialNames, function (word) { return latinize(word) })
-    p.allNames = _(words.concat(latinizedWords)).flatten().invoke('toLowerCase').uniq().sort().value()
-    p.fullNames = _(initialNames.concat(latinizedInitialNames)).invoke('toLowerCase').uniq().sort().value()
+    p.allNames = _(words.concat(latinizedWords)).flatten().invokeMap('toLowerCase').uniq().sort().value()
+    p.fullNames = _(initialNames.concat(latinizedInitialNames)).invokeMap('toLowerCase').uniq().sort().value()
   }
   function concatNames(p) {
     return p.name.concat(p.nameFi || []).concat(p.nameSv || []).concat(p.nameOther || [])
@@ -288,12 +288,12 @@ ProviderSchema.statics.getForBilling = function(extraFilters, callback) {
     providers.forEach(function(p) {
       var providerClone = _.cloneDeep(p)
       delete providerClone.locations
-      _(p.locations).filter({ isPayer: true }).forEach(function(l) {
+      _(p.locations).filter({ isPayer: true }).value().forEach(function(l) {
         l.provider = providerClone
         locationsForBilling.push(l)
       })
 
-      if (_.any(p.locations, { isPayer: false })) {
+      if (_.some(p.locations, { isPayer: false })) {
         providersForBilling.push(p)
       }
     })

@@ -152,7 +152,7 @@ utils.setValueForPath = function(path, property, value) {
       if (_.isNumber(path[0])) property[path[0]] = []
       else property[path[0]] = {}
     }
-    utils.setValueForPath(_.rest(path), property[path[0]], value)
+    utils.setValueForPath(_.tail(path), property[path[0]], value)
   }
 }
 

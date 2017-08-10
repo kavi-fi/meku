@@ -189,7 +189,7 @@ function isNotEmpty(val) {
 }
 
 function isMultiEmail(xs) {
-  return _.all(xs.split(','), utils.isEmail)
+  return _.every(xs.split(','), utils.isEmail)
 }
 
 function validate(f) {

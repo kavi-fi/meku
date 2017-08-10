@@ -42,21 +42,21 @@ var tvSeriesClassification = exports.tvSeriesClassification = function(episodes)
 
 var aggregateClassification = exports.aggregateClassification = function(programs) {
   var classifications = _.compact(programs.map(function(p) { return p.classifications[0] }))
-  var criteria = _(classifications).pluck('criteria').flatten().uniq().compact().value()
-  var legacyAgeLimit = _(classifications).pluck('legacyAgeLimit').compact().max().value()
+  var criteria = _(classifications).map('criteria').flatten().uniq().compact().value()
+  var legacyAgeLimit = _(classifications).map('legacyAgeLimit').compact().max()
   if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
   var warningOrder = aggregateWarningOrder(classifications)
   return { criteria: criteria, legacyAgeLimit: legacyAgeLimit, warningOrder: warningOrder }
 }
 
 function aggregateWarningOrder(classifications) {
-  var criteria = _(classifications).pluck('criteria').flatten().value()
+  var criteria = _(classifications).map('criteria').flatten().value()
   var maxAge = _.max(_.map(criteria, function(c){return enums.classificationCriteria[c - 1].age}))
   var counts = _.reduce(criteria, function(order, id) {
     var category = enums.classificationCriteria[id - 1].category
     return utils.merge(order, utils.keyValue(category, order[category] + (enums.classificationCriteria[id - 1].age == maxAge ? 1 : 0)))
   }, {violence: 0, fear: 0, sex: 0, drugs: 0})
-  return _(counts).omit(function(c) { return c === 0}).pairs().sortBy(utils.snd).reverse().map(utils.fst).value()
+  return _(counts).omit(function(c) { return c === 0}).toPairs().sortBy(utils.snd).reverse().map(utils.fst).value()
 }
 
 exports.aggregateSummary = function(programs) {
@@ -76,7 +76,7 @@ exports.canReclassify = function(program, user) {
 
 var isReclassification = exports.isReclassification = function(program, classification) {
   if (program.classifications.length == 0) return false
-  var index = _.findIndex(program.classifications, { _id: classification._id })
+  var index = _.findIndex(program.classifications, {'_id': classification._id})
   if (index == -1) {
     // classification is a draft, and other classifications already exist
     return true
@@ -99,10 +99,10 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   return {
     recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(user.email)),
     from: 'kirjaamo@kavi.fi',
-    subject: _.template('Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>', fiData),
+    subject: _.template('Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>')(fiData),
     body: '<div style="text-align: right; margin-top: 8px;"><img src="' + hostName + '/images/logo.png" /></div>' +
-      _.template('<p><%- date %><br/><%- buyer %></p>', fiData) +
-      _.template(generateText('fi'), fiData) + '<br>' +  _.template(generateText('sv'), svData) +
+      _.template('<p><%- date %><br/><%- buyer %></p>')(fiData) +
+      _.template(generateText('fi'))(fiData) + '<br>' +  _.template(generateText('sv'))(svData) +
       '<br><p>Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)<br>' +
       'Mediakasvatus- ja kuvaohjelmayksikkö / Enheten för mediefostran och bildprogram</p>'
   }
@@ -218,7 +218,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
     function previousClassification() {
       if (program.classifications.length == 0) return
-      var index = _.findIndex(program.classifications, { _id: classification._id })
+      var index = _.findIndex(program.classifications, {'_id': classification._id})
       if (index == -1) {
         return program.classifications[0]
       } else {

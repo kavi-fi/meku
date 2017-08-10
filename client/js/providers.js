@@ -41,6 +41,7 @@ function providerPage() {
       $unapproved.empty()
       _(providers).sortBy('name')
         .map(renderProvider)
+        .value()
         .forEach(function(p) {
           $unapproved.append(p)
         })
@@ -79,10 +80,10 @@ function providerPage() {
     var onlyK18 = $onlyK18.is(':checked')
     $providers.find('.result').each(function (i, result) {
       var name = $(this).children('.name').text().toLowerCase()
-      var matchesProviderName = searchString.length > 0 && _.contains(name, searchString)
+      var matchesProviderName = searchString.length > 0 && _.includes(name, searchString)
       var providerLocations = $(this).data('provider').locations
       var isLocationRowVisible = _.map(providerLocations, function (providerLocation) {
-        var matchesName = matchesProviderName || _.contains(providerLocation.name.toLowerCase(), searchString.toLowerCase())
+        var matchesName = matchesProviderName || _.includes(providerLocation.name.toLowerCase(), searchString.toLowerCase())
         var matchesK18 = onlyK18 ? providerLocation.adultContent : true
         var matchesProvidingType = providingTypes.length === 0 || _.intersection(providingTypes, providerLocation.providingType).length > 0
         return matchesName && matchesK18 && matchesProvidingType
@@ -245,7 +246,7 @@ function providerPage() {
       event.preventDefault()
 
       var specialFields = {
-        emailAddresses: _.pluck($form.find('input[name=emailAddresses]').select2('data'), 'text'),
+        emailAddresses: _.map($form.find('input[name=emailAddresses]').select2('data'), 'text'),
         billingPreference: $form.find('input[name=billing-extra]').prop('checked')
           ? $form.find('input[name=billing-extra-type]:checked').val() : ''
       }
@@ -339,11 +340,11 @@ function providerPage() {
 
     Object.keys(enums.providingType).forEach(function(type) {
       var matchingLocationCounts = _(registeredProviders).map(countLocationsWithProvidingType(type)).compact().value()
-      $rows.push($row(enums.providingType[type], matchingLocationCounts.length, matchingLocationCounts.reduce(sum)))
+      $rows.push($row(enums.providingType[type], matchingLocationCounts.length, matchingLocationCounts.reduce(sum, 0)))
     })
 
     var k18Counts = _(registeredProviders).map(countAdultContentLocations).compact().value()
-    $rows.push($row('Tarjolla luokittelemattomia K-18 ohjelmia', k18Counts.length, k18Counts.reduce(sum)).addClass('last'))
+    $rows.push($row('Tarjolla luokittelemattomia K-18 ohjelmia', k18Counts.length, k18Counts.reduce(sum, 0)).addClass('last'))
 
     $page.find('.statistics-rows').html($rows)
 
@@ -352,7 +353,7 @@ function providerPage() {
     }
     function countLocationsWithProvidingType(type) {
       return function(provider) {
-        return _.filter(provider.locations, function(l) { return !!l.active && _.contains(l.providingType, type) }).length
+        return _.filter(provider.locations, function(l) { return !!l.active && _.includes(l.providingType, type) }).length
       }
     }
     function $row(a,b,c) {
@@ -379,7 +380,7 @@ function providerPage() {
 
   function renderProviders(providers) {
     $providers.empty()
-    _(providers).sortBy('name').map(renderProvider).forEach(function(acc) { $providers.append(acc) })
+    _(providers).sortBy('name').map(renderProvider).value().forEach(function(acc) { $providers.append(acc) })
   }
 
   function renderProvider(provider) {
@@ -477,7 +478,7 @@ function providerPage() {
 
     $form.find('input[name=emailAddresses]').on('change', function (event) {
       var emails = event.val
-      if (_.all(emails, validateEmail)) {
+      if (_.every(emails, validateEmail)) {
         this.setCustomValidity('')
       } else {
         this.setCustomValidity('Invalid email')
@@ -652,8 +653,8 @@ function providerPage() {
         event.preventDefault()
 
         var specialFields = {
-          emailAddresses: _.pluck($form.find('input[name=emailAddresses]').select2('data'), 'text'),
-          providingType: _.pluck($form.find('input[name=providingType]').select2('data'), 'id')
+          emailAddresses: _.map($form.find('input[name=emailAddresses]').select2('data'), 'text'),
+          providingType: _.map($form.find('input[name=providingType]').select2('data'), 'id')
         }
 
         submitCallback(_.merge(createDataObjectFromForm($form), specialFields))

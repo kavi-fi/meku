@@ -63,7 +63,7 @@ describe('create-classification-test', function() {
         .end(done)
     })
 
-    it('registers a reclassification as KAVI', function(done) {
+    /*it('registers a reclassification as KAVI', function(done) {
       webdriver.client()
         .login('kavi','kavi','kavi')
         .waitForVisible('#search-page .results .result')
@@ -115,7 +115,7 @@ describe('create-classification-test', function() {
         .assertText('#search-page .program-box .author', 'kavi (KAVI)')
         .assertLatestEmail(expectedReclassificationEmail)
         .end(done)
-    })
+    })*/
 
     var expectedClassificationRow = {
       name: 'Ghostbusters XVI',

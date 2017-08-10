@@ -484,7 +484,7 @@ function accounts(callback) {
     }, function(parentId, emailsByLoc, callback) {
       schema.Provider.findOne({ emekuId: parentId }, function(err, provider) {
         if (err) return callback(err)
-        var locsById = _.indexBy(provider.locations, 'emekuId')
+        var locsById = _.keyBy(provider.locations, 'emekuId')
         _.forEach(emailsByLoc, function(emails, locId) {
           var location = locsById[locId]
           location.emailAddresses = emails
@@ -521,7 +521,7 @@ function accounts(callback) {
     var kaviUsers = "select distinct u.id from securitygroups_users sgu join users u on (u.id = sgu.user_id) where sgu.securitygroup_id in ('6f6ec169-9572-c2d2-0363-4e3663b9e3ed', '8d4ad931-1055-a4f5-96da-4e3664911855', 'b02cf3e0-cf10-f827-766c-4e36641b1d78') and u.user_name not like 'Y%' and u.user_name not like '2%' and sgu.deleted != '1' and u.deleted != '1'"
     conn.query(kaviUsers, function(err, rows) {
       if (err) return callback(err)
-      schema.User.update({ emekuId: { $in: _.pluck(rows, 'id') } }, { role:'kavi' }, { multi: true }, function(err) {
+      schema.User.update({ emekuId: { $in: _.map(rows, 'id') } }, { role:'kavi' }, { multi: true }, function(err) {
         if (err) return callback(err)
         schema.User.update({ emekuId: { $in: ['bb0d1a8e-3862-58eb-5f3b-4e4cc62b34fb', 'd095df75-d622-e91a-6476-50693f4d5852'] } }, { role:'root' }, { multi: true }, callback)
       })
@@ -661,7 +661,7 @@ function linkTvSeries(callback) {
   function linkEpisodesToSeries(callback) {
     var tick = progressMonitor()
     schema.Program.find({ programType: 2 }, { emekuId:1, name:1 }).lean().exec(function(err, parents) {
-      var parentMap = _.indexBy(parents, 'emekuId')
+      var parentMap = _.keyBy(parents, 'emekuId')
       conn.query('select program.id as programId, program.season, program.episode, parent.id as parentId from meku_audiovisualprograms program join meku_audiovisualprograms parent on (program.parent_id = parent.id) where program.deleted != "1" and parent.deleted != "1" and program.program_type = "03" and parent.program_type = "05"')
         .stream()
         .pipe(consumer(onRow, callback))
@@ -684,7 +684,7 @@ function linkTvSeries(callback) {
   function calculateParentClassifications(callback) {
     var tick = progressMonitor(10)
     schema.Program.find({ programType: 2 }, { _id:1 }).lean().exec(function(err, series) {
-      async.eachLimit(_.pluck(series, '_id'), 10, function(id, callback) {
+      async.eachLimit(_.map(series, '_id'), 10, function(id, callback) {
         tick('*')
         schema.Program.updateTvSeriesClassification(id, callback)
       }, callback)
@@ -700,7 +700,7 @@ function linkTvSeries(callback) {
 function linkCustomersIds(callback) {
   schema.Account.find({}, { emekuId:1 }, function(err, accounts) {
     if (err) return callback(err)
-    var accountMap = _.indexBy(accounts, 'emekuId')
+    var accountMap = _.keyBy(accounts, 'emekuId')
 
     var tick = progressMonitor()
     conn.query('select id, ref_id, provider_id from meku_audiovisualprograms where ref_id is not null')
@@ -808,7 +808,7 @@ function singleFieldUpdater(schemaName, fieldName) {
 function documentMap(schemaName, indexField, callback) {
   schema[schemaName].find({}).lean().exec(function(err, docs) {
     if (err) return callback(err)
-    callback(null, _.indexBy(docs, indexField))
+    callback(null, _.keyBy(docs, indexField))
   })
 }
 

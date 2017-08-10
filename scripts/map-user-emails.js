@@ -47,15 +47,15 @@ function combine(file, callback) {
 function logTotals(file) {
   combine(file, function(err, result, mongoUsers, excelUsers) {
     if (err) throw err
-    var foundRows = _.pluck(result, 'row')
+    var foundRows = _.map(result, 'row')
     var notFound = excelUsers.filter(function(eu) {
-      return !_.contains(foundRows, eu.row)
+      return !_.includes(foundRows, eu.row)
     })
     console.log('Totals:' +
         '\n#excel '+excelUsers.length + '  #mongo '+mongoUsers.length +
         '\nfound  '+foundRows.length  + '  unmapped '+notFound.length
     )
-    console.log('\nUnmapped: \n', _.pluck(notFound, 'username'))
+    console.log('\nUnmapped: \n', _.map(notFound, 'username'))
   })
 }
 

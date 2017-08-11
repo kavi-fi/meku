@@ -91,7 +91,7 @@ function providerPage() {
       $(result).next('.locations').find('.location-row').each(function (i, locationRow) {
         $(locationRow).toggle(isLocationRowVisible[i])
       })
-      $(this).parent('.provider-row').toggle(_.include(isLocationRowVisible, true))
+      $(this).parent('.provider-row').toggle(_.includes(isLocationRowVisible, true))
     })
     $search.find('.result-count .num').text($providers.find('.result:visible').length)
     closeDetails()

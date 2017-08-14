@@ -43,8 +43,7 @@ var tvSeriesClassification = exports.tvSeriesClassification = function(episodes)
 var aggregateClassification = exports.aggregateClassification = function(programs) {
   var classifications = _.compact(programs.map(function(p) { return p.classifications[0] }))
   var criteria = _(classifications).map('criteria').flatten().uniq().compact().value()
-  var legacyAgeLimit = _(classifications).map('legacyAgeLimit').compact().max()
-  if (legacyAgeLimit == Number.NEGATIVE_INFINITY) legacyAgeLimit = null
+  var legacyAgeLimit = _(classifications).map('legacyAgeLimit').compact().max() || 0
   var warningOrder = aggregateWarningOrder(classifications)
   return { criteria: criteria, legacyAgeLimit: legacyAgeLimit, warningOrder: warningOrder }
 }

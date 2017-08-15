@@ -96,7 +96,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
   var fiData = generateData('fi')
   var svData = generateData('sv')
   return {
-    recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(user.email)),
+    recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(utils.hasRole(user, 'root') ? [] : user.email)),
     from: 'kirjaamo@kavi.fi',
     subject: _.template('Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>')(fiData),
     body: '<div style="text-align: right; margin-top: 8px;"><img src="' + hostName + '/images/logo.png" /></div>' +
@@ -189,7 +189,7 @@ exports.registrationEmail = function(program, classification, user, hostName) {
 
     function extraInfoLink() {
       if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification) || enums.authorOrganizationIsKHO(classification)) return ''
-      if (utils.hasRole(user, 'kavi')) return '<p>' + t('Lisätietoja') + ': <a href="mailto:' + user.email + '">' + user.email + '</a></p>'
+      if (utils.hasRole(user, 'kavi') && !utils.hasRole(user, 'root')) return '<p>' + t('Lisätietoja') + ': <a href="mailto:' + user.email + '">' + user.email + '</a></p>'
       return ''
     }
 

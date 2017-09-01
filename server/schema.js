@@ -205,7 +205,7 @@ var address = { street: String, city: String, zip: String, country: String }
 
 var AccountSchema = new Schema({
   emekuId: String,
-  sequenceId: { type: Number, index: { unique: true } },
+  sequenceId: { type: Number },
   customerNumber: String,
   name: {type: String, index: true},
   roles: [String],

@@ -9,7 +9,7 @@ function sv(txt) { return i18n.sv[txt] || txt  }
 
 exports.registrationEmail = function (provider, hostName, callback) {
   function emailHtml(provider, callback) {
-    var active =_.select(provider.locations, function(l) { return !l.deleted && l.active })
+    var active =_.filter(provider.locations, function(l) { return !l.deleted && l.active })
     var allLocations = active.map(function(l) {
       return {
         name: l.name,
@@ -19,8 +19,8 @@ exports.registrationEmail = function (provider, hostName, callback) {
         providingTypesSv: l.providingType.map(enums.providingTypeName).map(sv).join(', ')
       }
     })
-    var locations = _.select(allLocations, function(l) { return !l.isPayer })
-    var payerLocations = _.select(allLocations, function(l) { return l.isPayer })
+    var locations = _.filter(allLocations, function(l) { return !l.isPayer })
+    var payerLocations = _.filter(allLocations, function(l) { return l.isPayer })
     var vars = {
       hostName: hostName,
       header: 'Ilmoittautuminen tarjoajaksi',
@@ -167,11 +167,11 @@ exports.yearlyBillingProviderLocationEmail = function(location, hostName, callba
 }
 
 exports.payingLocationsWithEmail = function(locations) {
-  return _.select(locations, function(l) { return !l.deleted && l.isPayer && l.active && !_.isEmpty(l.emailAddresses) })
+  return _.filter(locations, function(l) { return !l.deleted && l.isPayer && l.active && !_.isEmpty(l.emailAddresses) })
 }
 
 exports.payingLocationsWithoutEmail = function(locations) {
-  return _.select(locations, function(l) { return !l.deleted && l.isPayer && l.active && _.isEmpty(l.emailAddresses) })
+  return _.filter(locations, function(l) { return !l.deleted && l.isPayer && l.active && _.isEmpty(l.emailAddresses) })
 }
 
 function providerEmail(fields) {

@@ -888,7 +888,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
       var now = new Date()
       provider.registrationDate = now
       updates.registrationDate = {old: undefined, new: now}
-      _.select(provider.locations, function(l) {
+      _.filter(provider.locations, function(l) {
         return !l.deleted && l.active
       }).forEach(function(l) {
         l.registrationDate = now
@@ -920,7 +920,7 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
   })
 
   function sendProviderLocationEmails(provider) {
-    _.select(provider.locations, function(l) {
+    _.filter(provider.locations, function(l) {
       return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
     }).forEach(function(l) {
       providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), env.hostname, logErrorOrSendEmail(req.user))

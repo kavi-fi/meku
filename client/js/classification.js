@@ -477,9 +477,6 @@ function classificationFormUtils() {
         var manual = _($(this).select2('data')).filter(function(e) { return !e.locked }).map('id').value()
         saveFn($(this).attr('name'), manual)
       })
-      if (rootEditMode) {
-        $input.select2('enable', false)
-      }
       update(program, classification, rootEditMode)
       return this
     }

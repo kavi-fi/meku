@@ -155,7 +155,7 @@ function or(v1, v2) {
 
 function newSeries(p) {
   var series = p.series
-  if (series.draft && series.draft.name && series.draft.name.length > 0
+  if (series && series.draft && series.draft.name && series.draft.name.length > 0
       && series.draft.nameFi && series.draft.nameFi.length > 0) {
     return Ok()
   } else {

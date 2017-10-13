@@ -1820,7 +1820,8 @@ function updateTvSeriesClassification(program, callback) {
 
 function verifyTvSeriesExistsOrCreate(program, user, callback) {
   if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
-    var draft = program.series.draft || {}
+    var series = program.series || {}
+    var draft = series.draft || {}
     var data = {
       name: [draft.name || program.series.name],
       nameFi: draft.nameFi ? [draft.nameFi] : [],

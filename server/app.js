@@ -531,7 +531,7 @@ app.post('/programs/new', function(req, res, next) {
   var origProgram = req.body.origProgram
   if (origProgram) {
     var fieldsToCopy = ['series', 'country', 'year', 'productionCompanies', 'genre', 'directors', 'actors']
-    _.forEach(fieldsToCopy, function (field) { p[field] = origProgram[field] })
+    _.forEach(fieldsToCopy, function (field) { if (origProgram[field]) p[field] = origProgram[field] })
     if (origProgram.classifications.length > 0) {
       draftClassification.buyer = undefined
       draftClassification.billing = undefined

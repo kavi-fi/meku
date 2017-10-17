@@ -99,7 +99,7 @@ enums.invoiceItem = function (item) {
     var code = enums.util.isGameType(item) ? (short ? '4692' : '4693') : (short ? '4690' : '4691')
     var pricePerMinute = !short
     var itemUnit = pricePerMinute ? 'min' : 'kpl'
-    var itemCount = pricePerMinute ? Math.round(item.duration / 60) : 1
+    var itemCount = pricePerMinute ? Math.ceil(item.duration / 60) : 1
     return { itemCode: code, itemUnit: itemUnit, itemCount: itemCount, pricePerMinute: pricePerMinute }
   }
   return {itemCode: enums.invoiceItemCodes[type], itemUnit: 'kpl', itemCount: 1, pricePerMinute: false }

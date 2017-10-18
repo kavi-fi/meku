@@ -1963,7 +1963,7 @@ function isUrlEncodedBody(req) {
 
 function isWhitelisted(req) {
   var whitelist = [
-    'GET:/index.html', 'GET:/public.html', 'GET:/templates.html', 'GET:/environment',
+    'GET:/index.html', 'GET:/favicon.ico', 'GET:/public.html', 'GET:/templates.html', 'GET:/environment',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',

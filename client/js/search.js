@@ -188,6 +188,7 @@ function internalSearchPage() {
   })
 
   function loadDrafts() {
+    if (!hasRole('kavi')) return loginPage().show()
     $.get('/programs/drafts', function(drafts) {
       $drafts.find('.draft').remove()
       drafts.forEach(function(draft) {
@@ -203,6 +204,7 @@ function internalSearchPage() {
 
   function loadRecent() {
     $recent.find('.program-box').remove()
+    if (!hasRole('kavi')) return
     $.get('/programs/recent', function(recents) {
       $recent.hide()
       $recent.find('.result').remove()

@@ -1964,7 +1964,7 @@ function isUrlEncodedBody(req) {
 function isWhitelisted(req) {
   var whitelist = [
     'GET:/index.html', 'GET:/favicon.ico', 'GET:/robots.txt', 'GET:/public.html', 'GET:/templates.html', 'GET:/environment',
-    'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema',
+    'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema', 'GET:/apple-touch-icon',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
     'POST:/reset-password', 'GET:/check-reset-hash', 'POST:/files/provider-import',
     'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls',

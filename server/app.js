@@ -469,6 +469,7 @@ app.get('/episodes/:seriesId', function(req, res, next) {
 })
 
 app.get('/programs/drafts', function(req, res, next) {
+  if (!req.user) return res.send([])
   Program.find({ draftsBy: req.user._id, deleted: { $ne:true } }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {
@@ -478,6 +479,7 @@ app.get('/programs/drafts', function(req, res, next) {
 })
 
 app.get('/programs/recent', function(req, res, next) {
+  if (!req.user) return res.send([])
   var ObjectId = mongoose.Types.ObjectId
   Program.aggregate({$match: { "classifications.author._id": ObjectId(req.user._id), deleted: { $ne: true } }})
     .unwind("classifications")
@@ -1619,7 +1621,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var optionalList = ['GET:/programs/search/', 'POST:/program/excel/export', 'GET:/episodes/', 'GET:/classification/criteria']
+  var optionalList = ['GET:/programs/search/', 'POST:/program/excel/export', 'GET:/episodes/', 'GET:/classification/criteria', 'GET:/programs/recent', 'GET:/programs/drafts']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   if (isWhitelisted(req)) return next()

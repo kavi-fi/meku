@@ -317,7 +317,7 @@ function constructQuery(queryData) {
 }
   
   function constructTypeClassificationQuery(user){
-    return user ? {} : {$or: [{programType: 2}, {classifications:{$exists: true, $nin: [[]]}}]}
+    return user ? {} : {$or: [{programType: 2}, {$and: [{classifications:{$exists: true}}, {'classifications.0': {$exists: true}}]}]}
   }
 
 function constructDeletedQuery(showDeleted){

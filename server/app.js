@@ -231,7 +231,7 @@ app.get('/programs/search/:q?', function(req, res, next) {
 
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-  
+
   sendOrExport(query, queryParams, sortBy, undefined, req.cookies.lang || 'fi', res, next)
 })
 
@@ -1621,7 +1621,7 @@ function nocache(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-  var optionalList = ['GET:/programs/search/', 'POST:/program/excel/export', 'GET:/episodes/', 'GET:/classification/criteria', 'GET:/programs/recent', 'GET:/programs/drafts']
+  var optionalList = ['GET:/programs/', 'POST:/program/excel/export', 'GET:/episodes/', 'GET:/classification/criteria']
   var url = req.method + ':' + req.path
   if (url == 'GET:/') return next()
   if (isWhitelisted(req)) return next()

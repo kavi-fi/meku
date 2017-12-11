@@ -3,7 +3,6 @@ var schema = require('../server/schema')
 var utils = require('../shared/utils')
 var _ = require('lodash')
 var xlsx = require('xlsx')
-var xls = require('xlsjs')
 var async = require('async')
 var enums = require('../shared/enums')
 
@@ -84,8 +83,7 @@ function sv(txt) {
 exports.import = function(file, callback) {
   var parser = false
 
-  if (file.originalname.search(/.xls$/) > 1) parser = xls
-  else if (file.originalname.search(/.xlsx$/) > 1) parser = xlsx
+  if (file.originalname.search(/.xlsx{0,1}$/) > 1) parser = xlsx
   else return callback({ message: '.xlsx or .xls required' })
 
   var allSheets = parser.readFile(file.path)

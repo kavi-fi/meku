@@ -1899,13 +1899,17 @@ function watchChanges(document, user, excludedLogPaths) {
 
   function asChanges(changedPaths, oldObject, updatedDocument) {
     var newObject = updatedDocument.toObject()
-    return _(changedPaths).map(asChange).zipObject().valueOf()
+    return _.zipObject(_(changedPaths).map(asPath).value(), _(changedPaths).map(asChange).value())
+
+    function asPath(path) {
+      return path.replace(/\./g, ',')
+    }
 
     function asChange(path) {
       var newValue = utils.getProperty(newObject, path)
       var oldValue = utils.getProperty(oldObject, path)
       if (_.isEqual(newValue, oldValue) || (oldValue == null && newValue === "")) return []
-      return [ path.replace(/\./g, ','), { new: newValue, old: oldValue } ]
+      return { new: newValue, old: oldValue }
     }
   }
 }

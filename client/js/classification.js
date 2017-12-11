@@ -335,7 +335,8 @@ function classificationFormUtils() {
 
   function renderExtraNameFields($form, p) {
     nameFields.forEach(function(field) {
-      _.range(0, p[field].length).forEach(function() {
+      var range = p[field].length > 0 ? _.range(1, p[field].length) : _.range(0, 0)
+      range.forEach(function() {
         $form.find('.' + field + 'Container').append(nameFieldHtml(field))
       })
     })

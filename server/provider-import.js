@@ -279,11 +279,7 @@ function toObject(from, row, fields) {
 
   var values = _(ob).toPairs().sortBy(fst).map(snd).value()
 
-  return _(_.toPairs(_.zipObject(fields, values))).filter(function(x) {
-    return x[1] !== null
-  }).object().value()
-
-  function parseColumnKey(key) { return key.substring(0, key.search(/\d/)) }
+  return _.pickBy(_.zipObject(fields, values), _.identity)
 }
 
 function emptyRow(count) {

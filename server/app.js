@@ -1594,17 +1594,19 @@ var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
       sendEmail({
         recipients: [ user.emails[0] ],
         subject: 'Luokittelusertifikaattisi on vanhentumassa',
-        body: '<p>Oikeutesi luokitella kuvaohjelmia päättyy ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
-              '. Jos haluat jatkaa kuvaohjelmien luokittelua tämän jälkeen, ilmoittaudu kuvaohjelmaluokittelijoiden kertauskoulutukseen.<br />' +
-              'Lisätietoja: <a href="https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/kertauskoulutus">https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/kertauskoulutus</a> tai <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
+        body: '<p>Tämä on KAVIn kuvaohjelmaluokittelujärjestelmästä (IKLU) lähetetty automaattinen muistutusviesti luokitteluoikeutesi päättymisestä. Luokitteluoikeutesi päättyy ' + moment(user.certificateEndDate).format('DD.MM.YYYY') + '.</p>' +
+          '<p>Jos haluat jatkaa kuvaohjelmien luokittelua, on sinun osallistuttava KAVin järjestämään kertauskoulutukseen ennen luokitteluoikeutesi viimeistä voimassaolopäivää. Tietoja kertauskoulutuksesta: https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/kertauskoulutus tai meku@kavi.fi</p>' +
+          '<p>Kun kertauskoulutus on suoritettu hyväksytysti, jatketaan luokittelijatunnuksen (käyttäjätunnuksen) voimassaoloaikaa viidellä vuodella.</p>' +
+          '<p>Jos kertauskoulutusta ei suoriteta luokittelijaoikeuden voimassaoloaikana, tunnus lakkaa toimimasta voimassaoloajan päätyttyä. Voit uusia luokittelulupasi käymällä kertauskoulutuksen myös sen jälkeen, kun luokittelijaoikeutesi on ehtinyt päättyä.</p>' +
+          '<p>Tähän viestiin ei tarvitse reagoida, jos olet jo ilmoittautunut kertauskoulutukseen, olet äskettäin osallistunut kertauskoulutukseen tai et halua uusia luokittelulupaasi.</p>' +
+          '<p>Älä vastaa tähän viestiin, vaan lähetä mahdolliset kysymykset osoitteeseen meku@kavi.fi</p>' +
 
-              '<p>Din rätt att klassificera bildprogram upphör att gälla den ' + moment(user.certificateEndDate).format('DD.MM.YYYY') +
-              '. Om du vill fortsätta att klassificera bildprogram därefter, ska du anmäla dig till en repetitionsutbildning för klassificerare av bildprogram.<br />' +
-              'Mer information: <a href="https://kavi.fi/sv/enheten-mediefostran-och-bildprogram/repetitionsutbildning">https://kavi.fi/sv/enheten-mediefostran-och-bildprogram/repetitionsutbildning</a> eller <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>'+
-
-              '<p>Terveisin,<br />' +
-              'Kansallinen audiovisuaalinen instituutti /<br />' +
-              'National Audiovisual Institute, Finland</p>'
+          '<p>Detta är en automatisk påminnelse om att dina klassificeringsrättigheter upphör från KAVIs system för klassificering av bilder (IKLU). Dina klassificeringsrättigheter upphör ' + moment(user.certificateEndDate).format('DD.MM.YYYY') + '.</p>' +
+          '<p>Om du vill fortsätta att klassificera bildprogram ska du delta i KAVIs fortbildning innan dina klassificeringsrättigheter går ut. Information om fortbildningen: https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/kertauskoulutus tai meku@kavi.fi.</p>' +
+          '<p>Efter fortbildningen förlängs klassificeringsrättigheterna (användarnamnet) med fem år.</p>' +
+          '<p>Om du inte slutför fortbildningen under klassificeringsrättigheternas giltighetstid slutar användarnamnet att fungera när giltighetstiden går ut.  Du kan fönya din behörighet genom att delta i fortbildningen även efter att din klassificeringsbehörighet upphört.</p>' +
+          '<p>Du behöver inte reagera på detta meddelande om du redan anmält dig till fortbildning, nyligen har deltagit i fortbildning eller inte vill förnya din klassificeringsbehörighet.</p>' +
+          '<p>Svara inte på detta meddelande, utan skicka eventuella frågor till meku@kavi.fi.</p>'
       }, user, function(err) {
         if (err) console.error(err)
         else user.update({ certExpiryReminderSent: new Date() }, logError)

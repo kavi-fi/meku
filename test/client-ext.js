@@ -27,7 +27,6 @@ var client = null
 exports.client = function(url) {
   var options = process.env.BROWSER ? browsers[process.env.BROWSER] : browsers['chrome']
   client = extend(webdriverio.remote(options).init().url(url || 'http://localhost:4000/'))
-  client.windowHandleMaximize()
   return client
 }
 
@@ -96,7 +95,7 @@ function extend(client) {
   client.addCommand('assertAgelimitAndWarnings', function(selector, string, callback) {
     client.execute(function(selector) {
       return [$(selector).find('.agelimit').attr('src').match(/agelimit-\d+/)[0].substring(9)]
-        .concat($(selector).find('.warning').map(function() { return $(this).attr('class').replace('warning ','') }))
+        .concat($(selector).find('.warning').toArray().map(function (s) { return $(s).attr('class').replace('warning ','') }))
         .join(' ')
     }, selector, function(err, result) {
       if (err) return callback(err)

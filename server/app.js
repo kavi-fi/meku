@@ -194,7 +194,7 @@ app.post('/program/excel/export', function(req, res, next) {
 
   var query = constructQuery(queryParams)
   var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-  sendOrExport(query, queryParams, sortBy, 'kavi_luokittelut.' + (req.body.csv == "1" ? 'csv' : '.xlsx'), req.cookies.lang || 'fi', res, next)
+  sendOrExport(query, queryParams, sortBy, 'kavi_luokittelut' + (req.body.csv == "1" ? '.csv' : '.xlsx'), req.cookies.lang || 'fi', res, next)
 })
 
 

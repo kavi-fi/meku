@@ -46,6 +46,7 @@ function setup() {
     } else if (req.status == 418) {
       showRevisionMismatchDialog()
     } else if (req.statusText != 'abort') {
+      console.error(req, e)
       error.show()
     }
   })

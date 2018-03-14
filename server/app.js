@@ -635,7 +635,9 @@ app.post('/programs/:id/register', function(req, res, next) {
         if (err) return callback(err)
         var valid = validation.registration(program.toObject(), newClassification, req.user)
         if (!valid.valid) {
-          return res.status(400).send("Invalid program. Field: " + valid.field)
+          var msg = "Invalid program. Field: " + valid.field
+          console.error(msg)
+          return res.status(400).send(msg)
         }
         callback(null, program)
       })
@@ -660,11 +662,12 @@ app.post('/programs/:id/classification', function(req, res, next) {
 
 app.post('/programs/:id/reclassification', function(req, res, next) {
   Program.findById(req.params.id, function(err, program) {
-    if (err) next(err)
+    if (err) return next(err)
     if (!classificationUtils.canReclassify(program, req.user)) return res.sendStatus(400)
     program.deleted = false
     program.newDraftClassification(req.user)
     program.populateSentRegistrationEmailAddresses(function(err) {
+      if (err) return next(err)
       program.save(respond(res, next))
     })
   })

@@ -110,6 +110,7 @@ ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback
   function loadFixedKaviUsers(callback) {
     if (!program.classifications || program.classifications.length === 0 || !program.classifications[0].author) return callback(null, [])
     load(User, [program.classifications[0].author._id], 'role', function(u) { return u.role }, function (err, roles) {
+      if (err) return callback(err)
       var emails = roles && roles.length > 0 && roles[0] === 'kavi' ? enums.fixedKaviRecipients : []
       callback(null, emails)
     })

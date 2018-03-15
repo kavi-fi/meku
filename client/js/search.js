@@ -618,6 +618,7 @@ function searchPage() {
       ownClassificationsOnly: $ownClassificationsOnly.is(':checked'),
       showDeleted: $showDeleted.is(':checked'),
       showCount: true,
+      sorted: true,
       reclassifiedBy: currentReClassifier(),
       buyer: currentBuyer(),
       searchFromSynopsis: $searchFromSynopsis.is(':checked'),

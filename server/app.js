@@ -225,12 +225,13 @@ app.get('/programs/search/:q?', function(req, res, next) {
     "ownClassificationsOnly": req.query.ownClassificationsOnly == 'true',
     "showDeleted": req.query.showDeleted == 'true',
     "showCount": req.query.showCount == 'true',
+    "sorted": req.query.sorted == 'true',
     "buyer": req.query.buyer,
     "directors": req.query.directors
   }
 
   var query = constructQuery(queryParams)
-  var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
+  var sortBy = queryParams.sorted ? query.classifications ? '-classifications.0.registrationDate' : 'name' : ''
 
   sendOrExport(query, queryParams, sortBy, undefined, req.cookies.lang || 'fi', res, next)
 })

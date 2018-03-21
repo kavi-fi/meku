@@ -356,8 +356,8 @@ function constructProgramTypeFilter(filters){
   return filt
 }
 
-function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning) {
-  var searchString = (string || '').trim()
+function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning, ignoreCase) {
+  var searchString = (string || '').trim().toLowerCase()
   var parts = searchString.match(/"[^"]*"|[^ ]+/g)
   if (!parts) return undefined
   return parts.reduce(function(result, s) {
@@ -366,10 +366,10 @@ function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning) 
       if (s.indexOf(' ') == -1) {
         return addToAll(result, primaryField, withoutQuotes)
       } else {
-        return addToAll(result, primaryField, new RegExp(utils.escapeRegExp(withoutQuotes), "i"))
+        return addToAll(result, primaryField, new RegExp(utils.escapeRegExp(withoutQuotes), ignoreCase ? 'i' : ''))
       }
     } else {
-      return addToAll(result, secondaryField, new RegExp((fromBeginning ? '^' : '') + utils.escapeRegExp(s), "i"))
+      return addToAll(result, secondaryField, new RegExp((fromBeginning ? '^' : '') + utils.escapeRegExp(s), ignoreCase ? 'i' : ''))
     }
   }, {})
 
@@ -427,9 +427,9 @@ function constructDateRangeQuery(registrationDateRange) {
 
 function constructNameQueries(terms, useSynopsis){
   if (parseInt(terms) == terms) return { sequenceId: parseInt(terms) }
-  var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true)
+  var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true, false)
   if (useSynopsis) {
-    var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis')
+    var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis', false, true)
     if(synopsisQueries) return {$or: [nameQueries, synopsisQueries]}
   }
   return nameQueries

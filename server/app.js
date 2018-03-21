@@ -242,7 +242,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
   var showClassificationAuthor = isAdminUser
 
   if (filename) {
-    Program.find(query, queryData.fields).limit(5000).exec().then(function(docs){
+    Program.find(query, queryData.fields).limit(5000).lean().exec().then(function(docs){
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       var result = programExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
@@ -426,23 +426,13 @@ function constructDateRangeQuery(registrationDateRange) {
 }
 
 function constructNameQueries(terms, useSynopsis){
-  var nameQuery = {}
-
+  if (parseInt(terms) == terms) return { sequenceId: parseInt(terms) }
   var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true)
-  if (nameQueries) {
-    if (parseInt(terms) == terms) {
-      nameQuery = ({$or: [nameQueries, { sequenceId: terms }]})
-    } else {
-      nameQuery = ({$or: [nameQueries]})
-    }
-  }
-
-  if(useSynopsis) {
+  if (useSynopsis) {
     var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis')
-    if(synopsisQueries) nameQuery.$or.push(synopsisQueries)
+    if(synopsisQueries) return {$or: [nameQueries, synopsisQueries]}
   }
-
-  return nameQuery
+  return nameQueries
 }
 
 function getQueryUserRoleDependencies(userid, role){

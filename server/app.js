@@ -1987,8 +1987,9 @@ function isWhitelisted(req) {
 }
 
 if (env.isDev) {
-  var liveReload = require('express-livereload')
-  liveReload(app, { watchDir: path.join(__dirname, '../client') })
+  var livereload = require('livereload')
+  var server = livereload.createServer()
+  server.watch(path.join(__dirname, '../client'))
 }
 
 var server

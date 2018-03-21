@@ -472,20 +472,13 @@ app.get('/programs/drafts', function(req, res, next) {
 app.get('/programs/recent', function(req, res, next) {
   if (!req.user) return res.send([])
   var ObjectId = mongoose.Types.ObjectId
-  Program.aggregate({$match: { "classifications.author._id": ObjectId(req.user._id), deleted: { $ne: true } }})
-    .unwind("classifications")
-    .project({"registrationDate": "$classifications.registrationDate"})
-    .sort('-registrationDate')
-    .limit(1)
-    .exec(function(err, recents) {
-      if (err) return next(err)
-      async.map(recents, function(p, callback) {
-        return Program.findById(p._id, function (err, program) {
-          if (!err) removeOtherUsersComments(program.classifications, req.user)
-          callback(err, program)
-        })
-      }, respond(res, next))
-    })
+  Program.find({ "classifications.author._id": ObjectId(req.user._id), deleted: { $ne: true } }).sort('-classifications.registrationDate').limit(1).lean().exec(function (err, program) {
+    if (err) next(err)
+    else {
+      removeOtherUsersComments(program.classifications, req.user)
+      res.send(program)
+    }
+  })
 })
 
 function removeOtherUsersComments(classifications, user) {

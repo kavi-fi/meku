@@ -215,11 +215,11 @@ function internalSearchPage() {
     })
 
     function renderRecentRow(p, c) {
-      var registrationDate = utils.asDate(c.registrationDate) || i18nText('Tuntematon rekisteröintiaika')
+      var registrationDate = utils.asDate((c || {}).registrationDate) || i18nText('Tuntematon rekisteröintiaika')
       return $('<div>', { 'data-id': p._id }).addClass('result').data('program', p)
         .append($('<span>', { class: 'registrationDate' }).text(registrationDate))
         .append($('<span>', { class: 'name' }).text(p.name[0]))
-        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.durationAsText(c.duration)))
+        .append($('<span>', { class: 'duration-or-game' }).text(enums.util.isGameType(p) ? p.gameFormat || '': utils.durationAsText((c || {}).duration)))
         .append($('<span>', { class: 'program-type' }).i18nText(enums.util.programTypeName(p.programType)))
         .append($('<span>', { class: 'classification'}).append(renderWarningSummary(classificationUtils.summary(c)) || ' - '))
         .data('renderer', rerenderRecentRow)

@@ -230,8 +230,8 @@ var AccountSchema = new Schema({
   deleted: Boolean,
   message: String
 })
-var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 AccountSchema.pre('save', ensureSequenceId('Account'))
+var Account = exports.Account = mongoose.model('accounts', AccountSchema)
 
 var ProviderLocationSchema = new Schema({
   emekuId: String,

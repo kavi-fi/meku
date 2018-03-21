@@ -169,7 +169,7 @@ function extend(client) {
   client.addCommand('select2one', function(selector, query, expectedValue, callback) {
     if (expectedValue === true) expectedValue = query
     this.click(selector + ' a')
-      .waitForVisible('#select2-drop', 5000)
+      .waitForVisible('#select2-drop', 15000)
       .setValue('#select2-drop input[type=text]', query)
       .waitForText('#select2-drop .select2-highlighted', expectedValue)
       .addValue('#select2-drop input[type=text]', keys.enter)

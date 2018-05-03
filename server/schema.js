@@ -92,6 +92,11 @@ ProgramSchema.methods.newDraftClassification = function(user) {
   return draft
 }
 
+exports.fixedKaviRecipients = function () {
+  var recipients = process.env.FIXED_KAVI_RECIPIENTS_ON_REGISTER ? process.env.FIXED_KAVI_RECIPIENTS_ON_REGISTER.split(',') : enums.fixedKaviRecipients
+  return recipients.map(function (email) { return email.trim() })
+}
+
 ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback) {
   var program = this
   async.parallel([loadAuthorEmails, loadBuyerEmails, loadFixedKaviUsers], function(err, emails) {
@@ -111,7 +116,7 @@ ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback
     if (!program.classifications || program.classifications.length === 0 || !program.classifications[0].author) return callback(null, [])
     load(User, [program.classifications[0].author._id], 'role', function(u) { return u.role }, function (err, roles) {
       if (err) return callback(err)
-      var emails = roles && roles.length > 0 && roles[0] === 'kavi' ? enums.fixedKaviRecipients : []
+      var emails = roles && roles.length > 0 && roles[0] === 'kavi' ? exports.fixedKaviRecipients() : []
       callback(null, emails)
     })
   }
@@ -395,7 +400,6 @@ var InvoiceSchema = new Schema({
   registrationDate: {type: Date, index: true},
   price: Number // eurocents
 })
-
 InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, price) {
   var row = new this({
     type: rowType, program: program._id, programSequenceId: program.sequenceId,

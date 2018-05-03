@@ -163,6 +163,9 @@ app.post('/reset-password', function(req, res, next) {
   }
 })
 
+app.get('/fixedKaviRecipients', function (req, res) {
+  res.send(schema.fixedKaviRecipients())
+})
 
 app.post('/program/excel/export', function(req, res, next) {
   var data = JSON.parse(req.body.post_data)

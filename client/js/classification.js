@@ -498,9 +498,14 @@ function classificationFormUtils() {
 
       var email = classificationUtils.registrationEmail(program, classification, user, location.protocol + '//' + location.host)
 
-      updateEmails('kavi', user.role === 'kavi' ? enums.fixedKaviRecipients : [])
-      updateEmails('sent', email.recipients)
-      updateEmails('manual', classification.registrationEmailAddresses)
+      if (user.role === 'kavi') $.get('/fixedKaviRecipients').done(updateAllEmails)
+      else updateAllEmails([])
+
+      function updateAllEmails(fixedKaviRecipients) {
+        updateEmails('kavi', fixedKaviRecipients)
+        updateEmails('sent', email.recipients)
+        updateEmails('manual', classification.registrationEmailAddresses)
+      }
 
       function updateEmails(source, emails) {
         var current = getCurrentEmailSelection()

@@ -26,9 +26,11 @@ function dropCollection(coll, callback) {
 
 function wipe(done) {
   connectMongoose(function() {
-    async.each(schema.models, function(m, callback) {
-      m.collection.dropAllIndexes(function() {
-        dropCollection(m.collection.name, function() { callback() })
+    async.forEachSeries(schema.models, function(m, callback) {
+      mongoose.connection.db.listCollections({name: m.collection.name}).next(function (err, coll) {
+        if (err) callback(err)
+        else if (coll) dropCollection(coll.name, callback)
+        else callback()
       })
     }, done)
   })
@@ -36,7 +38,7 @@ function wipe(done) {
 
 exports.reset = function(done) {
   wipe(function(err) {
-    if (err) return callback(err)
+    if (err) return done(err)
     async.forEachSeries(baseData(), function(obj, callback) { obj.save(callback) }, done)
   })
 }

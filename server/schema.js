@@ -123,7 +123,7 @@ ProgramSchema.methods.populateSentRegistrationEmailAddresses = function(callback
   function load(schema, ids, field, plucker, callback) {
     schema.find({ _id: { $in: ids } }, field).lean().exec(function(err, docs) {
       if (err) return callback(err)
-      callback(null, _.map(docs, plucker))
+      callback(null, _.flatten(_.map(docs, plucker)))
     })
   }
   function uniqIds(param) {

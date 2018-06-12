@@ -1327,6 +1327,7 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
   req.resume()
 
   function writeError(err, parent) {
+    console.error(err)
     parent.ele('VIRHE', err)
   }
 

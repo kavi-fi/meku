@@ -1318,7 +1318,6 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
     async.eachSeries(programs, handleXmlProgram, function(err) {
       if (err) {
         writeError('Järjestelmävirhe: ' + err, root)
-        console.error(err)
       }
       res.set('Content-Type', 'application/xml');
       res.status(err ? 500 : 200).send(root.end({ pretty: true, indent: '  ', newline: '\n' }))

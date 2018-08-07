@@ -241,10 +241,10 @@ function extend(client) {
   client.addCommand('assertLatestEmail', function(expectedEmail, callback) {
     this.call(function() {
       request('http://localhost:4000/emails/latest', function(error, response, body) {
-        var email = JSON.parse(body)
-        assert.sameMembers(email.smtpapi.header.to, _.isArray(expectedEmail.to) ? expectedEmail.to : [expectedEmail.to])
-        assert.equal(email.subject, expectedEmail.subject)
-        assert.equal(stripTags(email.html), expectedEmail.body)
+        var msg = JSON.parse(body)
+        assert.sameMembers(msg.to, _.isArray(expectedEmail.to) ? expectedEmail.to : [expectedEmail.to])
+        assert.equal(msg.subject, expectedEmail.subject)
+        assert.equal(stripTags(msg.html), expectedEmail.body)
         callback()
       })
     })

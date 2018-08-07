@@ -20,7 +20,7 @@ var kieku = require('./kieku')
 var programExport = require('./program-export')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
-var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD)
+var sendgrid = require('@sendgrid/mail')
 var builder = require('xmlbuilder')
 var bcrypt = require('bcryptjs')
 var CronJob = require('cron').CronJob
@@ -37,6 +37,7 @@ var srvUtils = require('./server-utils')
 var env = require('./env').get()
 var testEnvEmailQueue = []
 
+sendgrid.setApiKey(process.env.SENDGRID_APIKEY)
 express.static.mime.define({ 'text/xml': ['xsd'] })
 
 var app = express()
@@ -1715,22 +1716,25 @@ function logErrorOrSendEmail(user) {
 }
 
 function sendEmail(opts, user, callback) {
-  var email = new sendgrid.Email({ from: opts.from || 'no-reply@kavi.fi', subject: opts.subject, html: opts.body })
+  var msg = {
+    from: opts.from || 'no-reply@kavi.fi',
+    to: opts.recipients,
+    subject: opts.subject,
+    html: opts.body
+  }
   if (process.env.EMAIL_TO != undefined) {
-    email.to = process.env.EMAIL_TO
+    msg.to = process.env.EMAIL_TO
   } else if (process.env.NODE_ENV === 'training') {
-    email.to = user.email || user.emails[0]
-  } else {
-    opts.recipients.forEach(function(to) { email.addTo(to) })
+    msg.to = user.email || user.emails[0]
   }
 
   if (env.sendEmail || process.env.EMAIL_TO != undefined) {
-    sendgrid.send(email, callback)
+    sendgrid.send(msg, callback)
   } else if (env.isTest) {
-    testEnvEmailQueue.push(email)
+    testEnvEmailQueue.push(msg)
     return callback()
   } else {
-    console.log('email (suppressed) to: ', opts.recipients, email)
+    console.log('email (suppressed) to: ', opts.recipients, msg)
     return callback()
   }
 }

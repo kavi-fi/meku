@@ -422,14 +422,14 @@ function searchPage() {
       if ($('#login').is(':hidden')) $input.focus()
     })
 
-    $("#search-excel-export-form").find('input[name=_csrf]').val($.cookie('_csrf_token'))
+    $(".search-excel-export-form:visible").find('input[name=_csrf]').val($.cookie('_csrf_token'))
 
   })
 
   $button.click(function() { $input.trigger('fire') })
   $exportbutton.on('click', function(){
 
-    var $form = $("#search-excel-export-form")
+    var $form = $(".search-excel-export-form:visible")
 
     var postParams = constructPostDataParams()
     postParams.q = state.q ? state.q : ""
@@ -440,7 +440,7 @@ function searchPage() {
 
   })
   $asCsv.on('click', function () {
-    $('#search-excel-export-form:visible input[name=csv]').val('' + $('.ascsv:checked').length)
+    $('.search-excel-export-form:visible input[name=csv]').val('' + $('.ascsv:checked').length)
   })
   
   $filters.on('change', function() { $input.trigger('fire') })

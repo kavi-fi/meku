@@ -63,7 +63,7 @@ describe('create-classification-test', function() {
         .end(done)
     })
 
-    /*it('registers a reclassification as KAVI', function(done) {
+    it('registers a reclassification as KAVI', function(done) {
       webdriver.client()
         .login('kavi','kavi','kavi')
         .waitForVisible('#search-page .results .result')
@@ -84,7 +84,7 @@ describe('create-classification-test', function() {
 
         .assertSelect2Value('#classification-page .select2-container.x-registrationEmails', ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'tuula.roos@kavi.fi'])
 
-        .select2one('#classification-page .select2-container.x-classificationReason', 'pal', 'Palaute')
+        .select2one('#classification-page .select2-container.x-classificationReason', 'pal', 'Yleisöpalaute')
         .select2one('#classification-page .select2-container.x-classificationAuthorOrganization', 'kuva', 'Kuvaohjelmalautakunta')
         .select2one('#classification-page .select2-container.format', 'DVD', true)
         .setValue('#classification-page input.duration', '02:22:22')
@@ -98,13 +98,13 @@ describe('create-classification-test', function() {
         .ajaxClick('#classification-page button[name=register]')
 
         .assertVisible('#dialog .registration-confirmation')
-        .assertAgelimitAndWarnings('#dialog .registration-confirmation .warning-summary', 'S')
+        .assertAgelimitAndWarnings('#dialog .registration-confirmation .warning-summary', '0')
         .click('#dialog button')
 
         .waitForVisible('#search-page .results .result')
         .assertSearchResultRow('#search-page .results .result', expectedReclassificationRow)
-        .assertAgelimitAndWarnings('#search-page .program-box .warning-summary', 'S')
-        .assertText('#search-page .program-box .reason', 'Palaute')
+        .assertAgelimitAndWarnings('#search-page .program-box .warning-summary', '0')
+        .assertText('#search-page .program-box .reason', 'Yleisöpalaute')
         .assertText('#search-page .program-box .current-duration', '02:22:22')
         .assertText('#search-page .program-box .publicComments', 'PUBLIC COMMENTS')
         .assertText('#search-page .program-box .comments', 'POW2! by Webdriverio+Selenium/WebDriver')
@@ -115,7 +115,7 @@ describe('create-classification-test', function() {
         .assertText('#search-page .program-box .author', 'kavi (KAVI)')
         .assertLatestEmail(expectedReclassificationEmail)
         .end(done)
-    })*/
+    })
 
     var expectedClassificationRow = {
       name: 'Ghostbusters XVI',
@@ -128,7 +128,7 @@ describe('create-classification-test', function() {
     var expectedReclassificationRow = {
       name: 'Ghostbusters XVI',
       duration: '2 t 22 min 22 s',
-      ageAndWarnings: 'S',
+      ageAndWarnings: '0',
       countryYearDate: '('+date+', Suomi, 2014)',
       type: 'Elokuva'
     }
@@ -160,7 +160,7 @@ describe('create-classification-test', function() {
         date,
         'DEMO tilaaja 1',
         'Ilmoitus kuvaohjelman luokittelusta',
-          'Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on '+date+'  luokitellut kuvaohjelman ',
+        'Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on '+date+'  luokitellut kuvaohjelman ',
         'Ghostbusters XVI',
         '. Kuvaohjelman ikäraja on 7 ja haitallisuuskriteerit väkivalta (12), seksi (19). ',
         'Lisätietoja: ',
@@ -186,19 +186,19 @@ describe('create-classification-test', function() {
       body: [
         date,
         'Ilmoitus kuvaohjelman uudelleenluokittelusta',
-          'Kuvaohjelmalautakunta on '+date+' uudelleenluokitellut kuvaohjelman ',
+        'Kuvaohjelmalautakunta on '+date+' uudelleenluokitellut kuvaohjelman ',
         'Ghostbusters XVI',
         '. Kuvaohjelma on sallittu.',
-          ' Kuvaohjelmaluokittelija oli '+date+' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta (12), seksi (19). ',
-        'Syy uudelleenluokittelulle: Palaute.',
+        ' Kuvaohjelmaluokittelija oli '+date+' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta (12), seksi (19). ',
+        'Syy uudelleenluokittelulle: Yleisöpalaute.',
         'Perustelut: PUBLIC COMMENTS',
         'Liitteet:',
         'Valitusosoitus',
         'Meddelande om omklassificering av bildprogram',
-          'Bildprogramsnämnden har '+date+' omklassificerat bildprogrammet ',
+        'Bildprogramsnämnden har '+date+' omklassificerat bildprogrammet ',
         'Ghostbusters XVI',
         '. Bildprogrammet är tillåtet.',
-          ' Bildprogramsklassificeraren hade '+date+' som åldergräns för bildprogrammet bedömt 7 och som skadligt innehåll våld (12), sexuellt innehåll (19). ',
+        ' Bildprogramsklassificeraren hade '+date+' som åldergräns för bildprogrammet bedömt 7 och som skadligt innehåll våld (12), sexuellt innehåll (19). ',
         'Orsak till omklassificering: Respons.',
         'Grunder: PUBLIC COMMENTS',
         'Bilaga:',

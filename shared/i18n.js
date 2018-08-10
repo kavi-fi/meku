@@ -238,7 +238,7 @@ var i18n = {
     'kausi': 'säsong',
     'jakso': 'avsnitt',
     'aiemmin': 'tidigare',
-    'Palaute': 'Respons',
+    'Yleisöpalaute': 'Respons',
     'KAVI:n oma aloite': 'KAVI:s eget initiativ',
     'Valitusosoitus': 'Besvärsanvisning',
     'Valitus': 'Besvär',

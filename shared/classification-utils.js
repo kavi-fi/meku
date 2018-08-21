@@ -17,7 +17,7 @@ var summary = exports.summary = function(classification) {
   if (classification.safe) return { age:0, warnings:[] }
   var maxAgeLimit = ageLimit(classification)
   var warnings = _.uniqBy(significantCriteria(classification), 'category')
-  sortWarnings(classification.warningOrder, warnings)
+  sortWarnings(classification.warningOrder.map(function (c) { return c.replace(/^anxiety$/, 'fear')}), warnings)
   return { age: maxAgeLimit, warnings: warnings }
 }
 

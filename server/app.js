@@ -429,13 +429,13 @@ function constructDateRangeQuery(registrationDateRange) {
 }
 
 function constructNameQueries(terms, useSynopsis){
-  if (parseInt(terms) == terms) return { sequenceId: parseInt(terms) }
   var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true, false)
+  var finalQuery = parseInt(terms) == terms ? {$or: [nameQueries, { sequenceId: parseInt(terms) }]} : nameQueries
   if (useSynopsis) {
     var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis', false, true)
-    if(synopsisQueries) return {$or: [nameQueries, synopsisQueries]}
+    if(synopsisQueries) return {$or: [finalQuery, synopsisQueries]}
   }
-  return nameQueries
+  return finalQuery
 }
 
 function getQueryUserRoleDependencies(userid, role){

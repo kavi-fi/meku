@@ -4,30 +4,10 @@ var webdriverio = require('webdriverio')
 var assert = require('chai').assert
 var keys = exports.keys = { enter: '\ue006' }
 
-/*
-
-First-time setup:
-
- npm install -g selenium-server
- start-selenium
-
-Run tests:
-
- npm test
-
-*/
-var browsers = {
-  'phantomjs': { desiredCapabilities: { browserName: 'phantomjs' } }, // doesn't work, no flex support!
-  'firefox': { desiredCapabilities: { browserName: 'firefox' } },
-  'chrome': { desiredCapabilities: { browserName: 'chrome' } }
-}
-
 var client = null
 
 exports.client = function(url) {
-  var options = process.env.BROWSER ? browsers[process.env.BROWSER] : browsers['chrome']
-  client = extend(webdriverio.remote(options).init().url(url || 'http://localhost:4000/'))
-  return client
+  return extend(webdriverio.remote({ desiredCapabilities: { browserName: 'chrome' } }).init().url(url || 'http://localhost:4000/'))
 }
 
 process.on('uncaughtException', function(err) {
@@ -169,7 +149,6 @@ function extend(client) {
   client.addCommand('select2one', function(selector, query, expectedValue, callback) {
     if (expectedValue === true) expectedValue = query
     this.click(selector + ' a')
-      .waitForVisible('#select2-drop', 15000)
       .setValue('#select2-drop input[type=text]', query)
       .waitForText('#select2-drop .select2-highlighted', expectedValue)
       .addValue('#select2-drop input[type=text]', keys.enter)

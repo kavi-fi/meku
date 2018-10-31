@@ -7,7 +7,7 @@ if [ ! -f ./node_modules/chromedriver/bin/chromedriver ]; then echo "Run 'npm in
 BASE_DIR=`dirname $0`
 cd $BASE_DIR/..
 
-java -Dwebdriver.chrome.driver=./node_modules/chromedriver/bin/chromedriver -jar ./node_modules/selenium-server-standalone-jar/jar/selenium-server-standalone-3.13.0.jar &
+java -Dwebdriver.chrome.driver=./node_modules/chromedriver/bin/chromedriver -jar ./node_modules/selenium-server-standalone-jar/jar/selenium-server-standalone-3.14.0.jar &
 SELENIUM_PID=$!
 
 if [ "$1" == "" ]; then

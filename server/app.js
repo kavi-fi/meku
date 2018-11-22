@@ -1155,7 +1155,7 @@ app.get('/accounts/search', function(req, res, next) {
     q['users._id'] = req.user._id
   }
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
-  Account.find(q, { _id:1, name:1 }).sort('name').limit(50).lean().exec(respond(res, next))
+  Account.find(q, { _id:1, name:1 }).sort('name').limit(process.env.SELECT_DROPDOWN_SIZE || 50).lean().exec(respond(res, next))
 })
 
 app.get('/accounts/:id/emailAddresses', function(req, res, next) {
@@ -1177,7 +1177,7 @@ app.get('/users', requireRole('root'), function(req, res, next) {
 app.get('/users/search', requireRole('kavi'), function(req, res, next) {
   var regexp = new RegExp(utils.escapeRegExp(req.query.q), 'i')
   var q = { $or:[{ name: regexp }, { username: regexp }] }
-  User.find(q, 'name username active').limit(50).sort('name').lean().exec(respond(res, next))
+  User.find(q, 'name username active').limit(process.env.SELECT_DROPDOWN_SIZE || 50).sort('name').lean().exec(respond(res, next))
 })
 
 app.get('/users/exists/:username', requireRole('root'), function(req, res, next) {

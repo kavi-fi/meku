@@ -1755,7 +1755,7 @@ function queryNameIndex(schemaName) {
     var q = {}
     var parts = toMongoArrayQuery(req.query.q)
     if (parts) q.parts = parts
-    schema[schemaName].find(q, { name: 1 }).limit(100).sort('name').lean().exec(function(err, docs) {
+    schema[schemaName].find(q, { name: 1 }).limit(process.env.SELECT_DROPDOWN_SIZE || 100).sort('name').lean().exec(function(err, docs) {
       if (err) return next(err)
       res.send(_.map(docs || [], 'name'))
     })

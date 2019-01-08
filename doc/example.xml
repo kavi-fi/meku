@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?> <!-- XML-importissa annetun xml-tiedoston rakenne ja selitykset -->
+<!-- XML ei validoida xsd-schemalla, mutta xml-datan validointi tapahtuu sisäänluvun yhteydessä -->
+
+<!-- root-tagi, attribuutteja ei käytetä mihinkään. Kaikki muut tagit ovat tämän tagin alaisuudessa. -->
+<ASIAKAS NIMI="Media Oy" ID="cd5ad00f-3632-3f57-cc9e-4e770b9eeef9" PVM="8.1.2019 15:30:34" LKM="1">
+
+    <!--
+    Kuvaohjelman tyyppinä pitää olla jokin seuraavista (arvo kaksoispisteen vasemmalla puolella). Käytännössä
+    tyyppi ei voi kuitenkaan olla "05" (sarjan nimi luodaan sarjan jaksosta tai liitetään olemassaolevaan nimen perusteella).
+    Tyyppiä "11" ei voi käyttäää, se on disabloitu (en tiedä syytä tähän).
+
+          '01': 1,       // 'Kotimainen elokuva' -> movie
+          '02': 1,       // 'Ulkomainen elokuva' -> movie
+          '02b': 0,      // 'TESTI' -> unknown
+          '03': 3,       //'TV-sarjan jakso' -> tv
+          '04': 4,       // 'Muu tv-ohjelma' -> tv
+          '05': 2,       // 'TV-sarjan nimi' -> series
+          '06': 6,       // 'Traileri' -> trailer
+          '07': 5,       // 'Extra' -> extra
+          '08': 7,       // 'Peli' -> game
+          '10': 0,       // 'Yhteistuotanto' -> unknown
+          '11': 0,       // 'PEGI hyväksytty peli' -> pegi-game (disabled)
+          '12': 0        // 'Muu kuvaohjelma' -> unknown
+    -->
+    <KUVAOHJELMA TYPE="03"> <!-- Näitä tageja voi olla 1 - n kpl peräkkäin -->
+
+        <ALKUPERAINENNIMI>Nimi</ALKUPERAINENNIMI> <!-- pakollinen kaikilla ohjelmilla -->
+
+        <SUOMALAINENNIMI>Nimi</SUOMALAINENNIMI> <!-- pakollinen kaikilla, paitsi jos TYPE="12" -->
+
+        <RUOTSALAINENNIMI>Namn</RUOTSALAINENNIMI> <!-- optional -->
+
+        <MUUNIMI>Muu nimi</MUUNIMI> <!-- optional -->
+
+        <TUOTANTOKAUSI>1</TUOTANTOKAUSI> <!-- optional, vain TYPE="03" -->
+
+        <OSA>1</OSA> <!-- pakollinen, jos TYPE="03" -->
+
+        <!-- Asiakkaan tunniste yksilöi ohjelman, jolloin samaa ohjelmaa ei voi (vahingossa) luokitella duplikaattina. -->
+        <ASIAKKAANTUNNISTE>tunniste</ASIAKKAANTUNNISTE> <!-- pakollinen kaikilla ohjelmilla -->
+
+        <!--
+          Maa on jokin alla olevista kaksimerkkisistä koodeista. Useampia maita luokittelulle saa erottamalla koodit välilöynnillä.
+
+          'AE': 'Arabiemiirikunnat',
+          'AF': 'Afganistan',
+          'AL': 'Albania',
+          'AM': 'Armenia',
+          'AR': 'Argentiina',
+          'AT': 'Itävalta',
+          'AU': 'Australia',
+          'BA': 'Bosnia-Hertsegovina',
+          'BD': 'Bangladesh',
+          'BE': 'Belgia',
+          'BG': 'Bulgaria',
+          'BH': 'Bhutan',
+          'BM': 'Bermuda',
+          'BO': 'Bolivia',
+          'BR': 'Brasilia',
+          'BT': 'Bhutan',
+          'BY': 'Valko-Venäjä',
+          'CA': 'Kanada',
+          'CH': 'Sveitsi',
+          'CL': 'Chile',
+          'CM': 'Kamerun',
+          'CN': 'Kiina',
+          'CO': 'Kolumbia',
+          'CR': 'Costa Rica',
+          'CS': 'Serbia ja Montenegro / Tsekkoslovakia',
+          'CU': 'Kuuba',
+          'CY': 'Kypros',
+          'CZ': 'Tsekinmaa',
+          'DD': 'Itä-Saksa',
+          'DE': 'Saksa',
+          'DK': 'Tanska',
+          'DZ': 'Algeria',
+          'EC': 'Ecuador',
+          'EE': 'Viro',
+          'EG': 'Egypti',
+          'ES': 'Espanja',
+          'ET': 'Etiopia',
+          'EU': 'Euroopan unioni',
+          'FI': 'Suomi',
+          'FO': 'Fär-saaret',
+          'FR': 'Ranska',
+          'GB': 'Iso-Britannia',
+          'GE': 'Georgia',
+          'GL': 'Grönlanti',
+          'GN': 'Guinea',
+          'GR': 'Kreikka',
+          'GT': 'Guatemala',
+          'HK': 'Hongkong',
+          'HR': 'Kroatia',
+          'HU': 'Unkari',
+          'ID': 'Indonesia',
+          'IE': 'Irlanti',
+          'IL': 'Israel',
+          'IN': 'Intia',
+          'IQ': 'Irak',
+          'IR': 'Iran',
+          'IS': 'Islanti',
+          'IT': 'Italia',
+          'JM': 'Jamaika',
+          'JO': 'Jordania',
+          'JP': 'Japani',
+          'KN': 'Kenia',
+          'KP': 'Pohjois-Korea',
+          'KR': 'Etelä-Korea',
+          'LA': 'Laos',
+          'LB': 'Libanon',
+          'LI': 'Lichtenstein',
+          'LK': 'Sri Lanka',
+          'LT': 'Liettua',
+          'LU': 'Luxemburg',
+          'LV': 'Latvia',
+          'MA': 'Marokko',
+          'MC': 'Monaco',
+          'ME': 'Montenegro',
+          'ML': 'Mali',
+          'MN': 'Mongolia',
+          'MR': 'Mauritania',
+          'MT': 'Malta',
+          'MU': 'Mauritius',
+          'MX': 'Meksiko',
+          'MY': 'Malesia',
+          'MZ': 'Mosambik',
+          'NA': 'Namibia',
+          'NE': 'Niger',
+          'NG': 'Nigeria',
+          'NI': 'Nicaragua',
+          'NL': 'Alankomaat',
+          'NO': 'Norja',
+          'NP': 'Nepal',
+          'NZ': 'Uusi-Seelanti',
+          'PE': 'Peru',
+          'PH': 'Filippiinit',
+          'PK': 'Pakistan',
+          'PL': 'Puola',
+          'PR': 'Puerto Rico',
+          'PT': 'Portugali',
+          'PY': 'Paraguay',
+          'RO': 'Romania',
+          'RS': 'Serbia',
+          'RU': 'Venäjä',
+          'SD': 'Sudan',
+          'SE': 'Ruotsi',
+          'SG': 'Singapore',
+          'SI': 'Slovenia',
+          'SK': 'Slovakia',
+          'SN': 'Senegal',
+          'SU': 'Neuvostoliitto',
+          'SV': 'El Salvador',
+          'SY': 'Syyria',
+          'TH': 'Thaimaa',
+          'TN': 'Tunisia',
+          'TR': 'Turkki',
+          'TW': 'Taiwan',
+          'TZ': 'Tansania',
+          'UA': 'Ukraina',
+          'US': 'Yhdysvallat',
+          'UY': 'Uruguay',
+          'VA': 'Vatikaanivaltio',
+          'VE': 'Venezuela',
+          'VN': 'Vietnam',
+          'YU': 'Jugoslavia',
+          'ZA': 'Etelä-Afrikka',
+          'ZM': 'Sambia',
+          'ZW': 'Zimbabwe',
+          '-': 'Muu maa'
+          -->
+        <MAAT>FI SV</MAAT> <!-- optional -->
+
+        <!--
+          LAJIT, TELEVISIO-OHJELMALAJIT ja PELINLAJIT yhdistetään listaksi (näkyy ohjelmatiedoissa genre-otsikon alla). Usempia arvoja saa erottamalla koodit välilyönnillä.
+
+          LAJIT:
+          '1': 'Fiktio',
+          '2': 'Animaatio',
+          '3': 'Viihde',
+          '4': 'Seksi / Erotiikka',
+          '5': 'Dokumentti',
+          '6': 'Lasten ohjelmat',
+          '9': 'Muut',
+          '1a': 'Romantiikka',
+          '1b': 'Draama',
+          '1c': 'Historiallinen näytelmä',
+          '1d': 'Trilleri',
+          '1e': 'Seikkailu',
+          '1f': 'Western',
+          '1g': 'Sota',
+          '1h': 'Kauhu',
+          '1j': 'Tieteisseikkailu',
+          '1k': 'Toimintaelokuva',
+          '1m': 'Fantasia',
+          '1n': 'Komedia ja farssi',
+          '3c': 'Musiikki',
+          '5a': 'Opetus',
+          '5b': 'Urheilu',
+          '5c': 'Matkailu',
+          '5d': 'Henkilödokumentti',
+          '5e': 'Luontodokumentti',
+          '6a': 'Lasten animaatio',
+          '6b': 'Lasten fiktio',
+          '6c': 'Muu lastenelokuva',
+          '9a': 'Mainonta',
+          '9c': 'Tietoisku',
+          '9d': 'Kokeiluelokuva',
+          '9e': 'Videotaide',
+          '7a': 'Trailer',
+          '7b': 'Extra'
+
+          TELEVISIO-OHJELMALAJIT:
+          '2': 'Ajankohtaisohjelmat',
+          '3': 'Asiaohjelmat/kulttuuri/lifestyle',
+          '4': 'Urheilu',
+          '5': 'Kotimainen fiktio',
+          '6': 'Ulkomainen fiktio',
+          '7': 'Elokuvat',
+          '8': 'Lasten ohjelmat',
+          '9': 'Opetus- ja tiedeohjelmat',
+          '10': 'Viihde/kevyt musiikki/reality',
+          '11': 'Muu musiikki',
+          '12': 'Muut ohjelmat',
+          '1.': 'Uutiset',
+          '1.1': 'Vakiouutiset',
+          '1.2': 'Muut uutislähetykset',
+          '3.1': 'Asiaohjelmat/lifestyle',
+          '3.2': 'Kulttuuriohjelmat',
+          '4.1': 'Urheilu-uutiset',
+          '4.2': 'Muu urheilu',
+          '7.1': 'Kotimaiset elokuvat',
+          '7.2': 'Ulkomaiset elokuvat',
+          '12.1': 'Ostos-TV',
+          '12.2': 'WWW (peliohjelmat, chatit)',
+          '10.1': 'Kotimainen viihde/kevyt musiikki/reality',
+          '10.2': 'Ulkomainen viihde/kevyt musiikki/reality',
+          '13': 'Populaarikulttuuri'
+
+          PELINLAJIT:
+          "opetus",
+          "seikkailu",
+          "strategia",
+          "toiminta",
+          "rooli",
+          "simulaatio",
+          "tasohyppely",
+          "urheilu",
+          "muu",
+          "räiskintä",
+          "autopeli (ajopeli)",
+          "puzzle",
+          "managerointi",
+          "first person shooter (FPS)",
+          "koulutus",
+          "lastenpeli",
+          "onlinepeli",
+          "karaoke",
+          "musiikki",
+          "party" -->
+        <LAJIT>1 2</LAJIT> <!-- optional -->
+
+        <TELEVISIO-OHJELMALAJIT>2 3</TELEVISIO-OHJELMALAJIT> <!-- optional -->
+
+        <PELINLAJIT>rooli seikkailu</PELINLAJIT> <!-- optional -->
+
+        <!-- Tageista vain JULKAISUVUOSI tai VALMISTUMISVUOSI. Jos on molemmat, VALMISTUMISVUOSI on vahvempi kuin JULKAISUVUOSI.
+        Julkaisuvuosi on oltava 4-numeroinen luku ja vähintään 1890 -->
+        <JULKAISUVUOSI>2019</JULKAISUVUOSI> <!-- optional -->
+        <VALMISTUMISVUOSI>2018</VALMISTUMISVUOSI> <!-- optional -->
+
+        <!-- Ohjelman kuvaus (synopsis) on pakollinen kaikilla ohjelmilla -->
+        <SYNOPSIS>
+            Ohjelman tekstimuotoinen kuvaus.
+        </SYNOPSIS>
+
+        <TUOTANTOYHTIO>Tutotantofirma 1</TUOTANTOYHTIO> <!-- tätä tagia voi olla 0 - n kpl -->
+        <TUOTANTOYHTIO>Tutotantofirma 2</TUOTANTOYHTIO>
+
+        <OHJAAJA> <!-- Näitä tageja voi olla 0 - n kpl peräkkäin -->
+            <SUKUNIMI>sukunimi</SUKUNIMI> <!-- optional, mutta puuttuva tagi aiheuttaa sukunimen "undefined" -->
+            <ETUNIMI>etunimi</ETUNIMI> <!-- optional, mutta puuttuva tagi aiheuttaa etunimen "undefined" -->
+        </OHJAAJA>
+
+        <NAYTTELIJA> <!-- Näitä tageja voi olla 0 - n kpl peräkkäin -->
+            <SUKUNIMI>sukunimi</SUKUNIMI> <!-- optional, mutta puuttuva tagi aiheuttaa sukunimen "undefined" -->
+            <ETUNIMI>etunimi</ETUNIMI> <!-- optional, mutta puuttuva tagi aiheuttaa etunimen "undefined" -->
+        </NAYTTELIJA>
+
+        <!-- Luokittelijan pitää olla aktiivinen luokittelija. Luokittelijan pitää myöskin olla sen organisaation (tilaajan)
+        luokittelija, jolla xml-import tehdään. Organisaatio yksilöidään api-kutsussa api-tokenilla, joka on tilaajakohtainen. -->
+        <LUOKITTELIJA>luokittelijan tunnus</LUOKITTELIJA> <!-- pakollinen -->
+
+        <!-- LUOKITTELU-tagin attribuutteja ei käytetä, anottu ikäraja tulee VALITTUTERMI-tagien kautta. Rekisteröintipäiväksi tulee kuluva hetki. -->
+        <LUOKITTELU ANOTTUIKARAJA="S" REKISTEROINTIPAIVA="8.1.2019 15:30:34">
+
+            <KESTO>00:05:00</KESTO> <!-- pakollinen, muodossa hh:mm:ss -->
+
+            <!-- FORMAATTI-tagi on aina pakollinen, paitsi jos TYPE="08", niin tagin nimi pitää olla "PELIFORMAATTI".
+              Validit formaatit:
+              'Blu-ray Disc',
+              'DCP',
+              'DVD',
+              'Verkkoaineisto',
+              '8 mm',
+              '16 mm',
+              '35 mm',
+              '70 mm',
+              'CDKuva',
+              'Televisio',
+              'VHS',
+              'video',
+              'VoD',
+              'Muu'
+
+               Validit peliformaatit:
+              '3DS',
+              'DVD TV-peli',
+              'Kolikkopeli',
+              'PC',
+              'PS3',
+              'PS4',
+              'PSV',
+              'WII',
+              'WIIU',
+              'X1',
+              'X360'
+            -->
+            <FORMAATTI>Televisio</FORMAATTI>
+            <PELIFORMAATTI>PC</PELIFORMAATTI>
+
+            <!--  Ohjelman luokittelu tehdään VALITTUTERMI-tageilla. Jos kyseistä tagia ei esiinny xml:ssä lainkaan,
+            anottu ikäraja on sallittu (S). Valittu termi voi sisältää myös kommentin (esim. perustelun kriteerin valintaan).
+
+            Validit KRITEERI-attribuutit (id), fear == anxiety
+            id:1,  category: 'violence', age: 18,
+            id:2,  category: 'violence', age: 18,
+            id:3,  category: 'violence', age: 18,
+            id:4,  category: 'violence', age: 16,
+            id:5,  category: 'violence', age: 16,
+            id:6,  category: 'violence', age: 16,
+            id:7,  category: 'violence', age: 16,
+            id:8,  category: 'violence', age: 16,
+            id:9,  category: 'violence', age: 12,
+            id:10, category: 'violence', age: 12,
+            id:11, category: 'violence', age: 12,
+            id:12, category: 'violence', age: 7,
+            id:13, category: 'violence', age: 7,
+            id:14, category: 'violence', age: 0,
+            id:15, category: 'sex',      age: 18,
+            id:16, category: 'sex',      age: 16,
+            id:17, category: 'sex',      age: 12,
+            id:18, category: 'sex',      age: 12,
+            id:19, category: 'sex',      age: 7,
+            id:20, category: 'sex',      age: 0,
+            id:21, category: 'fear',     age: 18,
+            id:22, category: 'fear',     age: 18,
+            id:23, category: 'fear',     age: 16,
+            id:24, category: 'fear',     age: 16,
+            id:25, category: 'fear',     age: 16,
+            id:26, category: 'fear',     age: 12,
+            id:27, category: 'fear',     age: 12,
+            id:28, category: 'fear',     age: 12,
+            id:29, category: 'fear',     age: 12,
+            id:30, category: 'fear',     age: 12,
+            id:31, category: 'fear',     age: 7,
+            id:32, category: 'fear',     age: 7,
+            id:33, category: 'fear',     age: 7,
+            id:34, category: 'fear',     age: 0,
+            id:35, category: 'drugs',    age: 18,
+            id:36, category: 'drugs',    age: 16,
+            id:37, category: 'drugs',    age: 12
+          -->
+            <VALITTUTERMI KRITEERI="6" KOMMENTTI="kommentti"/> <!-- Näitä tageja voi olla 0 - n kpl -->
+
+        </LUOKITTELU>
+
+        <ISANTAOHJELMA>Sarjan nimi</ISANTAOHJELMA> <!-- pakollinen, jos TYPE="03" -->
+
+        <!-- Kaikki muut kuin edellä mainitut tagit ignoroidaan.
+        Tagien keskinäisellä järjestyksellä ei ole merkitystä, mutta rakenne pitää pysyä samana. -->
+
+    </KUVAOHJELMA>
+
+</ASIAKAS>

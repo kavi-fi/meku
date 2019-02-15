@@ -416,14 +416,12 @@ function searchPage() {
     setFilters(filters)
     queryChanged($input.val().trim())
     loadUntil(programId, function() {
-      if ($results.find('.result').length == 1) {
+      $('.search-excel-export-form:visible').find('input[name="_csrf"]').val($.cookie('_csrf_token'))
+      if ($results.find('.result').length === 1) {
         openDetail($results.find('.result:first'), false)
       }
       if ($('#login').is(':hidden')) $input.focus()
     })
-
-    $(".search-excel-export-form:visible").find('input[name=_csrf]').val($.cookie('_csrf_token'))
-
   })
 
   $button.click(function() { $input.trigger('fire') })

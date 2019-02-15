@@ -144,6 +144,8 @@ var i18n = {
     'Kirjaudu ulos': 'Logga ut',
     'Lataa Excel-tiedosto' : 'Ladda ner en Excel fil',
     'Tarkenna hakua luodaksesi Excel-tiedoston': 'Specificera sökning',
+    'Vastuuvapauslauseke' : 'Ansvarsfriskrivning',
+    'Hakuohje' : 'Sökning Hjälp',
 
   // public.html:
 

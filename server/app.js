@@ -53,6 +53,15 @@ app.use(buildRevisionCheck)
 app.use(setupCsrfMiddleware())
 app.use(setCsrfTokenCookie)
 app.use(authenticate)
+app.set('view engine', 'ejs');
+
+app.get('/public.html', function(req, res) {
+  res.render('../client/public', {
+    searchHelpPageUrl: process.env.SEARCH_HELP_PAGE_URL || 'https://kavi.fi',
+    disclaimerPageUrl: process.env.DISCLAIMER_PAGE_URL || 'https://kavi.fi',
+    lang: req.cookies.lang
+  })
+});
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
 

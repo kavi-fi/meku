@@ -300,8 +300,7 @@ function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
 function constructQuery(queryData) {
   var mainQuery = {$and: []}
 
-  //isUser, isKavi, user, qstring, fromSynopsis, agelimits, warnings, filters, registrationDateRange, userRole, classifier, reclassified, reclassifiedBy, ownClassificationsOnly, showDeleted
-  mainQuery.$and.push(constructTypeClassificationQuery(queryData.user))
+  mainQuery.$and.push(constructClassificationsExistQuery(queryData.user))
   mainQuery.$and.push(constructNameQueries(queryData.q, queryData.searchFromSynopsis))
   mainQuery.$and.push(agelimitQuery(queryData.agelimits))
   mainQuery.$and.push(warningsQuery(queryData.warnings))
@@ -321,8 +320,8 @@ function constructQuery(queryData) {
   return mainQuery
 }
   
-  function constructTypeClassificationQuery(user){
-    return user ? {} : {$or: [{programType: 2}, {$and: [{classifications:{$exists: true}}, {'classifications.0': {$exists: true}}]}]}
+  function constructClassificationsExistQuery(user) {
+    return user ? {} : {$or: [{$and: [{episodes: {$exists: true}}, {'episodes.count': {$gt: 0}}]}, {$and: [{classifications:{$exists: true}}, {'classifications.0': {$exists: true}}]}]}
   }
 
 function constructDeletedQuery(showDeleted){

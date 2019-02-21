@@ -46,7 +46,7 @@ var ProgramSchema = new Schema({
   nameFi: [String],
   nameSv: [String],
   nameOther: [String],
-  deleted: Boolean,
+  deleted: {type: Boolean, index: true},
   country: [String],
   year: String,
   productionCompanies: [String],

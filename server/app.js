@@ -1292,7 +1292,7 @@ app.post('/kieku', requireRole('kavi'), function(req, res, next) {
       var accountMap = _.keyBy(accounts, '_id')
 
       function accountId(row) { return row.account._id }
-      function toNamedTuple(pair) { return { account: accountMap[pair[0]], rows: pair[1] } }
+      function toNamedTuple(pair) { return { account: accountMap[pair[0]], rows: _.sortBy(pair[1], ['type', 'name']) } }
       function accountName(tuple) { return tuple.account.name }
 
       var data = _(rows).groupBy(accountId).toPairs().map(toNamedTuple).sortBy(accountName).value()

@@ -57,7 +57,8 @@ exports.createClassificationRegistration = function createClassificationRegistra
       return invoiceRows.join(' & ') + ' ' + t(typeString[type], lang(invoice)) + ', ' + t('yhteensä', lang(invoice)) + ' ' + price(rows) + ' EUR.'
     }
     var account = findAccountHavingInvoice(accountRows, invoice)
-    var rowsPerType = _.groupBy(account.rows, 'type')
+    var filteredAccountRows = _.filter(account.rows, function (row) { return invoice.type === 'registration' ? isRegistration(row) : !isRegistration(row) })
+    var rowsPerType = _.groupBy(filteredAccountRows, 'type')
     return _.toPairs(rowsPerType).map(function (item) {
       return summaryText(item[0], item[1])
     }).join(' ')
@@ -75,11 +76,15 @@ function price(arr) {
   }, 0) / 100
 }
 
+function isRegistration(row) {
+  return row.type === 'registration'
+}
+
 function createBilling(accounts, billingDescription, rowDescription, billingFooter) {
   var billingData = _.flatten(_.map(accounts, function (ac) {
     var account = ac.account
     var rows = ac.rows
-    var first = _.first(rows)
+    var firstOfGroups = _(rows).groupBy(isRegistration).toPairs().map(function (pair) { return _.first(pair[1])}).value()
     var accountInvoiceOperator = account.billingPreference == 'eInvoice' ? account.eInvoice.operator : ''
     var accountInvoiceAddress = account.billingPreference == 'eInvoice' ? account.eInvoice.address : ''
     var customerNumber = account.billingPreference == 'address' ? account.billing.customerNumber : account.customerNumber
@@ -90,7 +95,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     return _.map(rows, function (row) {
       var invoiceItem = enums.invoiceItem(row)
       return _.extend(row, {
-        first: row === first ? 1 : 0,
+        first: _.includes(firstOfGroups, row) ? 1 : 0,
         customerNumber: customerNumber,
         accountName: account.name,
         accountContactName: account.contactName,

@@ -431,7 +431,6 @@ function searchPage() {
 
     var postParams = constructPostDataParams()
     postParams.q = state.q ? state.q : ""
-    postParams.user = window.user
 
     $form.find('input[name=post_data]').val(JSON.stringify(postParams))
     $form.submit()
@@ -613,10 +612,10 @@ function searchPage() {
       reclassified: $reclassifiedToggle.prop('checked'),
       agelimits: currentAgelimits(),
       warnings: currentWarnings(),
-      ownClassificationsOnly: $ownClassificationsOnly.is(':checked'),
-      showDeleted: $showDeleted.is(':checked'),
-      showCount: true,
-      sorted: true,
+      ownClassificationsOnly: $ownClassificationsOnly.is(':checked').toString(),
+      showDeleted: $showDeleted.is(':checked').toString(),
+      showCount: 'true',
+      sorted: 'true',
       reclassifiedBy: currentReClassifier(),
       buyer: currentBuyer(),
       searchFromSynopsis: $searchFromSynopsis.is(':checked'),
@@ -625,7 +624,8 @@ function searchPage() {
   }
 
   function currentFilters() {
-    return $filters.filter(':checked').map(function() { return $(this).data('type') }).toArray()
+    var filters = $filters.filter(':checked').map(function() { return $(this).data('type') }).toArray()
+    return filters.length > 0 ? filters : undefined
   }
 
   function setFilters(filterString) {
@@ -658,10 +658,12 @@ function searchPage() {
     return $registrationDatePicker.data('selection')
   }
   function currentAgelimits() {
-    return $page.find('.agelimit-filter.active').map(function() { return $(this).data('id') }).toArray()
+    var ageLimits = $page.find('.agelimit-filter.active').map(function() { return $(this).data('id') }).toArray()
+    return ageLimits.length > 0 ? ageLimits : ''
   }
   function currentWarnings() {
-    return $page.find('.warning-filter.active').map(function() { return $(this).data('id') }).toArray()
+    var warnings = $page.find('.warning-filter.active').map(function() { return $(this).data('id') }).toArray()
+    return warnings.length > 0 ? warnings : ''
   }
 
   function updateProgramIfVisible(programId) {

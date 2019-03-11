@@ -177,76 +177,55 @@ app.get('/fixedKaviRecipients', function (req, res) {
   res.send(schema.fixedKaviRecipients())
 })
 
-app.post('/program/excel/export', function(req, res, next) {
-  var data = JSON.parse(req.body.post_data)
-  var isUser = data.user ? true : false
-  var isKavi = isUser ? utils.hasRole(data.user, 'kavi') : false
+function programFields(req, isUser, isKavi) {
   var fields = isKavi ? null : { 'classifications.comments': 0 }
-  fields = isUser ? fields : Program.publicFields
+  return isUser ? fields : Program.publicFields
+}
 
-  var queryParams = {
-    "page": data.page,
-    "isUser": isUser,
-    "isKavi": isKavi,
-    "fields": fields,
-    "user": data.user,
-    "q": data.q,
-    "searchFromSynopsis": data.searchFromSynopsis,
-    "agelimits": data.agelimits,
-    "warnings": data.warnings,
-    "filters": data.filters,
-    "registrationDateRange": data.registrationDateRange,
-    "userRole": utils.getProperty(req, 'user.role'),
-    "classifier": data.classifier,
-    "reclassified": data.reclassified,
-    "reclassifiedBy": data.reclassifiedBy,
-    "ownClassificationsOnly": data.ownClassificationsOnly,
-    "showDeleted": data.showDeleted,
-    "buyer": data.buyer
+function searchQueryParams(req, data) {
+  var isUser = !!req.user
+  var isKavi = utils.hasRole(req.user, 'kavi')
+  return {
+    page: parseInt(data.page),
+    isUser: isUser,
+    isKavi: isKavi,
+    fields: programFields(req, isUser, isKavi),
+    user: req.user,
+    q: data.q,
+    searchFromSynopsis: data.searchFromSynopsis === 'true',
+    agelimits: data.agelimits,
+    warnings: data.warnings,
+    filters: data.filters,
+    registrationDateRange: data.registrationDateRange,
+    userRole: utils.getProperty(req, 'user.role'),
+    classifier: data.classifier,
+    reclassified: data.reclassified === 'true',
+    reclassifiedBy: data.reclassifiedBy,
+    ownClassificationsOnly: data.ownClassificationsOnly === 'true',
+    showDeleted: data.showDeleted === 'true',
+    showCount: data.showCount === 'true',
+    sorted: data.sorted === 'true',
+    buyer: data.buyer,
+    directors: data.directors
   }
+}
 
+function processQuery(req, res, next, data, filename) {
+  var queryParams = searchQueryParams(req, data)
   var query = constructQuery(queryParams)
-  var sortBy = query.classifications ? '-classifications.0.registrationDate' : 'name'
-  sendOrExport(query, queryParams, sortBy, 'kavi_luokittelut' + (req.body.csv == "1" ? '.csv' : '.xlsx'), req.cookies.lang || 'fi', res, next)
+  var sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
+  var sortBy = sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name'
+  sendOrExport(query, queryParams, sortBy, filename, req.cookies.lang || 'fi', res, next)
+
+}
+
+app.post('/program/excel/export', function(req, res, next) {
+  processQuery(req, res, next, JSON.parse(req.body.post_data), 'kavi_luokittelut' + (req.body.csv === "1" ? '.csv' : '.xlsx'))
 })
 
 
 app.get('/programs/search/:q?', function(req, res, next) {
-
-  var page = req.query.page || 0
-  var isUser = req.user ? true : false
-  var isKavi = isUser ? utils.hasRole(req.user, 'kavi') : false
-  var fields = isKavi ? null : { 'classifications.comments': 0 }
-  fields = isUser ? fields : Program.publicFields
-
-  var queryParams = {
-    "page": page,
-    "isUser": isUser,
-    "isKavi": isKavi,
-    "fields": fields,
-    "user": req.user,
-    "q": req.params.q,
-    "searchFromSynopsis": req.query.searchFromSynopsis == 'true',
-    "agelimits": req.query.agelimits,
-    "warnings": req.query.warnings,
-    "filters": req.query.filters,
-    "registrationDateRange": req.query.registrationDateRange,
-    "userRole": utils.getProperty(req, 'user.role'),
-    "classifier": req.query.classifier,
-    "reclassified": req.query.reclassified == 'true',
-    "reclassifiedBy": req.query.reclassifiedBy,
-    "ownClassificationsOnly": req.query.ownClassificationsOnly == 'true',
-    "showDeleted": req.query.showDeleted == 'true',
-    "showCount": req.query.showCount == 'true',
-    "sorted": req.query.sorted == 'true',
-    "buyer": req.query.buyer,
-    "directors": req.query.directors
-  }
-
-  var query = constructQuery(queryParams)
-  var sortBy = queryParams.sorted ? query.classifications ? '-classifications.0.registrationDate' : 'name' : ''
-
-  sendOrExport(query, queryParams, sortBy, undefined, req.cookies.lang || 'fi', res, next)
+  processQuery(req, res, next, _.extend(req.query, {q: req.params.q}))
 })
 
 function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
@@ -255,7 +234,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
   var showClassificationAuthor = isAdminUser
 
   if (filename) {
-    Program.find(query, queryData.fields).limit(5000).lean().exec().then(function(docs){
+    Program.find(query, queryData.fields).limit(5000).sort(sortBy).lean().exec().then(function(docs){
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       var result = programExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
@@ -518,7 +497,7 @@ app.delete('/programs/drafts/:id', function(req, res, next) {
 })
 
 app.get('/programs/:id', function(req, res, next) {
-  Program.findById(req.params.id).lean().exec(respond(res, next))
+  Program.findById(req.params.id, programFields(req, !!req.user, utils.hasRole(req.user, 'kavi'))).lean().exec(respond(res, next))
 })
 
 app.post('/programs/new', function(req, res, next) {

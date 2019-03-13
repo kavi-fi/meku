@@ -214,7 +214,7 @@ function processQuery(req, res, next, data, filename) {
   var queryParams = searchQueryParams(req, data)
   var query = constructQuery(queryParams)
   var sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
-  var sortBy = sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name'
+  var sortBy = queryParams.sorted ? sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name' : ''
   sendOrExport(query, queryParams, sortBy, filename, req.cookies.lang || 'fi', res, next)
 
 }

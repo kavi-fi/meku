@@ -202,7 +202,7 @@ function searchQueryParams(req, data) {
     reclassified: data.reclassified === 'true',
     reclassifiedBy: data.reclassifiedBy,
     ownClassificationsOnly: data.ownClassificationsOnly === 'true',
-    showDeleted: data.showDeleted === 'true',
+    showDeleted: isUser ? data.showDeleted === 'true' : false,
     showCount: data.showCount === 'true',
     sorted: data.sorted === 'true',
     buyer: data.buyer,

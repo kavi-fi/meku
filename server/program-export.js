@@ -14,6 +14,7 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
   var columns = _.map(columnsOrig, translate)
   columnWidths = [{"wch":40},{"wch":40},{"wch":40},{"wch":10},{"wch":40},{"wch":15},{"wch":10},{"wch":40},{"wch":25},{"wch":25},{"wch":10},{"wch":40},{"wch":20},{"wch":20},{"wch":20},{"wch":10},{"wch":15},{"wch":20},{"wch":20},{"wch":40},{"wch":10}]
 
+  var ext = tmpFile.substring(tmpFile.lastIndexOf('.'))
   var xlsData = []
   xlsData.push(columns)
   _.forEach(docs, function (doc) {
@@ -34,10 +35,15 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
     doc.registrationDate = classification.registrationDate ? moment(classification.registrationDate).format(dateFormat) : ""
     doc.programTypeName = translate((enums.programType[doc.programType] || {}).fi)
 
-    xlsData.push([doc.originalName, listToString(doc.nameFi), listToString(doc.nameSv), doc.episodeCode, doc.episodeName, doc.registrationDate, doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteria, doc.criteriaComments, doc.warnings, doc.programTypeName, listToString(doc.country), doc.year, listToString(doc.directors), listToString(doc.productionCompanies), doc.synopsis, doc.sequenceId])
+    xlsData.push([removeNewlinesIfCsv(doc.originalName), listToString(doc.nameFi), listToString(doc.nameSv), doc.episodeCode, removeNewlinesIfCsv(doc.episodeName), doc.registrationDate, doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteria, removeNewlinesIfCsv(doc.criteriaComments), doc.warnings, doc.programTypeName, listToString(doc.country), doc.year, listToString(doc.directors), listToString(doc.productionCompanies), removeNewlinesIfCsv(doc.synopsis), doc.sequenceId])
 
     function listToString(list) {
-      return (list || []).join(', ')
+      removeNewlinesIfCsv((list || []).join(', '))
+    }
+
+    function removeNewlinesIfCsv(orig) {
+      if (orig && ext === '.csv') return orig.replace(/\n/g, ' ')
+      return orig
     }
   })
 

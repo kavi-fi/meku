@@ -12,7 +12,7 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
   function translate(txt) { return i18n[lang] ? i18n[lang][txt] || txt : txt }
   var columnsOrig = ["Alkuperäinen nimi", "Suomenkielinen nimi", "Ruotsinkielinen nimi", "Jakso", "Jakson alkuperäinen nimi", "Rekisteröintipäivä", "Kesto", "Luokittelun tilaaja", "Luokittelija", "Uudelleenluokittelija", "Ikäraja", "Luokittelun kriteerit", "Perustelu", "Varoitukset", "Ohjelman tyyppi", "Maa", "Valmistumisvuosi", "Ohjaaja", "Tuotantoyhtiö", "Synopsis", "Id"]
   var columns = _.map(columnsOrig, translate)
-  columnWidths = [{"wch":40},{"wch":40},{"wch":40},{"wch":10},{"wch":40},{"wch":15},{"wch":10},{"wch":40},{"wch":25},{"wch":25},{"wch":10},{"wch":40},{"wch":20},{"wch":20},{"wch":20},{"wch":10},{"wch":15},{"wch":20},{"wch":20},{"wch":40},{"wch":10}]
+  var columnWidths = [40, 40, 40, 10, 40, 15, 10, 40, 25, 25, 10, 40, 20, 20, 20, 10, 15, 20, 20, 40, 10]
 
   var ext = tmpFile.substring(tmpFile.lastIndexOf('.'))
   var xlsData = []
@@ -47,7 +47,7 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
     }
   })
 
-  excelWriter.write(tmpFile, xlsData, columnWidths)
+  excelWriter.write(tmpFile, xlsData, columnWidths.map(function (c) { return {wch: c} }))
   var fileData = fs.readFileSync(tmpFile)
   fs.unlinkSync(tmpFile)
   return fileData

@@ -38,7 +38,7 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
     xlsData.push([removeNewlinesIfCsv(doc.originalName), listToString(doc.nameFi), listToString(doc.nameSv), doc.episodeCode, removeNewlinesIfCsv(doc.episodeName), doc.registrationDate, doc.duration, doc.classificationBuyer, doc.classificationAuthor, doc.reclassifier, doc.agelimit, doc.criteria, removeNewlinesIfCsv(doc.criteriaComments), doc.warnings, doc.programTypeName, listToString(doc.country), doc.year, listToString(doc.directors), listToString(doc.productionCompanies), removeNewlinesIfCsv(doc.synopsis), doc.sequenceId])
 
     function listToString(list) {
-      removeNewlinesIfCsv((list || []).join(', '))
+      return removeNewlinesIfCsv((list || []).map(function (f) { return f ? f.trim() : '' }).filter(function (f) { return f.length > 0 }).join(', '))
     }
 
     function removeNewlinesIfCsv(orig) {

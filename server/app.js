@@ -234,7 +234,8 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
   var showClassificationAuthor = isAdminUser
 
   if (filename) {
-    Program.find(query, queryData.fields).limit(5000).sort(sortBy).lean().exec().then(function(docs){
+    Program.find(query, queryData.fields).limit(5000).sort(sortBy).lean().exec(function (err, docs) {
+      if (err) return next(err)
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       var result = programExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)

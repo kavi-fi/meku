@@ -32,7 +32,7 @@
     </div>
   </div>
   <div>
-    <div style="display: inline-block; margin-right: 4px;">
+    <div class="basic-information">
       <h3 style="" data-i18n>Kuvaohjelman perustiedot</h3>
       <div class="column">
         <label data-i18n>Alkuperäinen nimi</label>
@@ -69,7 +69,7 @@
         <span class="current-duration"></span>
       </div>
     </div>
-    <div class="column classification-container" style="margin: 0 0 0 28px;">
+    <div class="column classification-container">
     </div>
   </div>
   <div class="comment-container">
@@ -219,14 +219,13 @@
         <label><input class="searchFromSynopsis" type="checkbox"/><span data-i18n>Hae myös synopsis-kentästä</span></label>
       </div>
       <br />
-      <div class="filters">
-        <label class="first"><input type="checkbox" data-id="a" data-type="1"/><span data-i18n>Elokuvat</span></label>
-        <label class="second"><input type="checkbox" data-id="f" data-type="6"/><span data-i18n>Trailerit</span></label>
+      <div class="filters" style="max-width: 650px;">
+        <label><input type="checkbox" data-id="a" data-type="1"/><span data-i18n>Elokuvat</span></label>
+        <label><input type="checkbox" data-id="f" data-type="6"/><span data-i18n>Trailerit</span></label>
         <label><input type="checkbox" data-id="b" data-type="2"/><span data-i18n>TV-sarjan nimi</span></label>
         <label><input type="checkbox" data-id="d" data-type="4"/><span data-i18n>Muu TV-ohjelma</span></label>
-        <br/>
-        <label class="first"><input type="checkbox" data-id="g" data-type="7"/><span data-i18n>Pelit</span></label>
-        <label class="second"><input type="checkbox" data-id="e" data-type="5"/><span data-i18n>Extrat</span></label>
+        <label><input type="checkbox" data-id="g" data-type="7"/><span data-i18n>Pelit</span></label>
+        <label><input type="checkbox" data-id="e" data-type="5"/><span data-i18n>Extrat</span></label>
         <label><input type="checkbox" data-id="c" data-type="3"/><span data-i18n>TV-sarjan jakso</span></label>
         <label><input type="checkbox" data-id="h" data-type="0"/><span data-i18n>Kategorisoimattomat</span></label>
       </div>
@@ -277,14 +276,12 @@
           <label><input class="showDeleted" type="checkbox"/><span data-i18n>Hae vain poistettuja ohjelmia</span></label>
         </div>
       </div>
-
-      <br /><br />
-      <div>
-        <div class="program-count"><label data-i18n>Hakutuloksia</label><span class="num"></span></div>
-      </div>
     </div>
 
-    <button class="button export" data-i18n>Lataa Excel-tiedosto</button> <label><input type="checkbox" class="ascsv"> CSV</label><br /><span class="search-export" data-i18n>Tarkenna hakua luodaksesi Excel-tiedoston</span>
+    <button class="button export" data-i18n>Lataa Excel-tiedosto</button> <label><input type="checkbox" class="ascsv"> CSV</label>
+    <br />
+    <span class="search-export" data-i18n>Tarkenna hakua luodaksesi Excel-tiedoston</span>
+    <div class="program-count"><label data-i18n>Hakutuloksia</label><span class="num"></span></div>
   </div>
   <div class="results"></div>
   <div class="loading" data-i18n>Ladataan...</div>

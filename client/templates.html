@@ -215,65 +215,66 @@
     <div>
       <label class="search-label" data-i18n>Nimi</label>
       <input class="query" type="text" /><button class="button search" data-i18n>Hae</button>
-      <div class="filters">
-        <label><input class="searchFromSynopsis" type="checkbox"/><span data-i18n>Hae myös synopsis-kentästä</span></label>
-      </div>
-      <br />
-      <div class="filters" style="max-width: 650px;">
-        <label><input type="checkbox" data-id="a" data-type="1"/><span data-i18n>Elokuvat</span></label>
-        <label><input type="checkbox" data-id="f" data-type="6"/><span data-i18n>Trailerit</span></label>
-        <label><input type="checkbox" data-id="b" data-type="2"/><span data-i18n>TV-sarjan nimi</span></label>
-        <label><input type="checkbox" data-id="d" data-type="4"/><span data-i18n>Muu TV-ohjelma</span></label>
-        <label><input type="checkbox" data-id="g" data-type="7"/><span data-i18n>Pelit</span></label>
-        <label><input type="checkbox" data-id="e" data-type="5"/><span data-i18n>Extrat</span></label>
-        <label><input type="checkbox" data-id="c" data-type="3"/><span data-i18n>TV-sarjan jakso</span></label>
-        <label><input type="checkbox" data-id="h" data-type="0"/><span data-i18n>Kategorisoimattomat</span></label>
-      </div>
-      <div class="public-query-filters">
+      <div class="advanced-search"><i class="rotating fa fa-play"></i><span data-i18n>Tarkennettu haku</span></div>
+      <div class="advanced-search-controls">
         <div class="filters">
-          <div>
-            <label data-i18n>Ohjaajat</label><input type="hidden" name="director" /><br>
-            <label data-i18n>Rekisteröintipäivä</label><span class="datepicker"><span></span><i class="icon fa fa-calendar"></i><i class="icon clear-date-picker"></i></span>
+          <label><input class="searchFromSynopsis" type="checkbox"/><span data-i18n>Hae myös synopsis-kentästä</span></label>
+        </div>
+        <br />
+        <div class="filters" style="max-width: 650px;">
+          <label><input type="checkbox" data-id="a" data-type="1"/><span data-i18n>Elokuvat</span></label>
+          <label><input type="checkbox" data-id="f" data-type="6"/><span data-i18n>Trailerit</span></label>
+          <label><input type="checkbox" data-id="b" data-type="2"/><span data-i18n>TV-sarjan nimi</span></label>
+          <label><input type="checkbox" data-id="d" data-type="4"/><span data-i18n>Muu TV-ohjelma</span></label>
+          <label><input type="checkbox" data-id="g" data-type="7"/><span data-i18n>Pelit</span></label>
+          <label><input type="checkbox" data-id="e" data-type="5"/><span data-i18n>Extrat</span></label>
+          <label><input type="checkbox" data-id="c" data-type="3"/><span data-i18n>TV-sarjan jakso</span></label>
+          <label><input type="checkbox" data-id="h" data-type="0"/><span data-i18n>Kategorisoimattomat</span></label>
+        </div>
+        <div class="public-query-filters">
+          <div class="filters">
+            <div>
+              <label data-i18n>Ohjaajat</label><input type="hidden" name="director" /><br>
+              <label data-i18n>Rekisteröintipäivä</label><span class="datepicker"><span></span><i class="icon fa fa-calendar"></i><i class="icon clear-date-picker"></i></span>
+            </div>
+          </div>
+          <div class="filters">
+            <div>
+              <label data-i18n>Ikäraja</label>
+              <button data-id="0"  class="filterbutton agelimit-filter"><img class="agelimit-0" src="images/agelimit-0.png"/></button>
+              <button data-id="7"  class="filterbutton agelimit-filter"><img src="images/agelimit-7.png"/></button>
+              <button data-id="12" class="filterbutton agelimit-filter"><img src="images/agelimit-12.png"/></button>
+              <button data-id="16" class="filterbutton agelimit-filter"><img src="images/agelimit-16.png"/></button>
+              <button data-id="18" class="filterbutton agelimit-filter"><img src="images/agelimit-18.png"/></button>
+              <button data-id="violence" class="filterbutton warning-filter pad"><img src="images/violence.png"/></button>
+              <button data-id="sex" class="filterbutton warning-filter"><img src="images/sex.png"/></button>
+              <button data-id="fear" class="filterbutton warning-filter"><img src="images/fear.png"/></button>
+              <button data-id="drugs" class="filterbutton warning-filter"><img src="images/drugs.png"/></button>
+            </div>
+
+            <label class="reclassified"><input type="checkbox" name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label> <br />
+            <div class="kavi-query-filters">
+              <input class="hide" type="hidden" name="reclassified-by" />
+            </div>
           </div>
         </div>
+        <div class="user-query-filters">
+          <label><input type="checkbox" name="own-classifications-only"><span data-i18n>Näytä vain omat luokittelut</span></label>
+        </div>
         <div class="filters">
-          <div>
-            <label data-i18n>Ikäraja</label>
-            <button data-id="0"  class="filterbutton agelimit-filter"><img class="agelimit-0" src="images/agelimit-0.png"/></button>
-            <button data-id="7"  class="filterbutton agelimit-filter"><img src="images/agelimit-7.png"/></button>
-            <button data-id="12" class="filterbutton agelimit-filter"><img src="images/agelimit-12.png"/></button>
-            <button data-id="16" class="filterbutton agelimit-filter"><img src="images/agelimit-16.png"/></button>
-            <button data-id="18" class="filterbutton agelimit-filter"><img src="images/agelimit-18.png"/></button>
-            <button data-id="violence" class="filterbutton warning-filter pad"><img src="images/violence.png"/></button>
-            <button data-id="sex" class="filterbutton warning-filter"><img src="images/sex.png"/></button>
-            <button data-id="fear" class="filterbutton warning-filter"><img src="images/fear.png"/></button>
-            <button data-id="drugs" class="filterbutton warning-filter"><img src="images/drugs.png"/></button>
-          </div>
-
-          <label class="reclassified"><input type="checkbox" name="reclassified" /><span data-i18n>Uudelleenluokitellut</span></label> <br />
           <div class="kavi-query-filters">
-            <input class="hide" type="hidden" name="reclassified-by" />
+            <div>
+              <label data-i18n>Luokittelija</label><input type="hidden" name="classifier" />
+            </div>
+            <div>
+              <label data-i18n>Tilaaja</label><input type="hidden" name="buyer" />
+            </div>
           </div>
         </div>
-
-
-      </div>
-      <div class="user-query-filters">
-        <label><input type="checkbox" name="own-classifications-only"><span data-i18n>Näytä vain omat luokittelut</span></label>
-      </div>
-      <div class="filters">
-        <div class="kavi-query-filters">
-          <div>
-            <label data-i18n>Luokittelija</label><input type="hidden" name="classifier" />
+        <div class="root-query-filters">
+          <div class="filters">
+            <label><input class="showDeleted" type="checkbox"/><span data-i18n>Hae vain poistettuja ohjelmia</span></label>
           </div>
-          <div>
-            <label data-i18n>Tilaaja</label><input type="hidden" name="buyer" />
-          </div>
-        </div>
-        </div>
-      <div class="root-query-filters">
-        <div class="filters">
-          <label><input class="showDeleted" type="checkbox"/><span data-i18n>Hae vain poistettuja ohjelmia</span></label>
         </div>
       </div>
     </div>

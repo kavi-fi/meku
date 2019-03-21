@@ -2,6 +2,7 @@ function publicSearchPage() {
   searchPage()
 
   var $page = $('#search-page')
+  $page.find('.advanced-search').click(function() { toggleAdvancedSearchOpen() })
   $page.find('.new-classification').remove()
   $page.find('.drafts').remove()
   $page.find('.recent').remove()
@@ -14,6 +15,11 @@ function publicSearchPage() {
     $(this).find('.request-reclassification').on('click', function () { openSurvey(program) })
     $(this).find('.request-reclassification').show()
   })
+
+  function toggleAdvancedSearchOpen() {
+    $page.find('.advanced-search').toggleClass('selected')
+    $page.find('.advanced-search-controls').slideToggle()
+  }
 
   function openSurvey(program) {
     sendPageview('/#surveymonkey/' + program._id)

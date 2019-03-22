@@ -987,8 +987,17 @@ textarea.invalid:disabled,
 }
 
 @media all and (min-width: 540px) and (max-width: 1023px) {
+  #header .kavi-logo {
+    width: 110px;
+    margin-left: 20px;
+  }
+
+  .toggleLanguage {
+    margin-right: 20px;
+  }
+
   .content {
-    width: 90%;
+    width: 100%;
   }
 
   .page {
@@ -997,13 +1006,25 @@ textarea.invalid:disabled,
     margin: 30px auto;
   }
 
+  #header h1 {
+    margin-left: 30px;
+  }
+
   #header .content .links-area {
     margin-top: 50px;
     width: 200px;
+    margin-right: 20px;
   }
 
   #header .content .links-area .links-anchor {
     width: 136px;
+  }
+
+  #search-page .new-classification {
+    float: none;
+    border-bottom: 2px solid #e8e8e8;
+    margin-bottom: 22px;
+    padding-bottom: 15px;
   }
 
   #search-page .advanced-search { display: block; }
@@ -1016,6 +1037,77 @@ textarea.invalid:disabled,
 
   .program-box .basic-information {
     margin-right: 0;
+  }
+
+  .left, .right {
+    width: 100%;
+  }
+
+  .right {
+    float: none;
+  }
+
+  .program-details-form label {
+    text-align: left;
+    width: 100%;
+  }
+
+  .program-details-form .addExtraName, .program-details-form .removeExtraName {
+    margin-bottom: 5px;
+  }
+
+  .program-details-form .comments textarea {
+    width: 90%;
+    box-sizing: border-box;
+  }
+
+  .program-details-form input[type=text], .program-details-form input[type=number] {
+    width: 90%;
+    box-sizing: border-box;
+  }
+
+  .program-details-form .textified-field {
+    width: 90%;
+  }
+
+  .program-details-form .user-comments .field-hint {
+    width: 90%;
+  }
+
+  .program-details-form .field-hint {
+    float: none;
+  }
+
+  .program-details-form .user-comments .field-hint {
+    float: left;
+  }
+
+  .program-details-form textarea {
+    width: 90%;
+    box-sizing: border-box;
+  }
+
+  .classification-criteria .category .criteria textarea {
+    width: 90%;
+    box-sizing: border-box;
+  }
+
+  .select2-container {
+    width: 90%;
+  }
+
+  .classification-email dl .select2-container {
+    width: 90%;
+  }
+
+  .classification-criteria .warning-order {
+    float: left;
+    width: 100%;
+  }
+
+  .classification-criteria .category {
+    width: 100%;
+    padding-top: 20px;
   }
 
   .training-ribbon, .development-ribbon {
@@ -1033,6 +1125,46 @@ textarea.invalid:disabled,
 }
 
 @media all and (max-width: 539px) {
+  #header .kavi-logo {
+    margin-left: 20px;
+  }
+
+  .toggleLanguage {
+    margin-right: 20px;
+  }
+
+  #header .user-info {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    background: #444444;
+    border-top: solid 3px #00AA77;
+    height: 33px;
+    text-align: center;
+    line-height: 16px;
+    white-space: nowrap;
+    z-index: 10000;
+  }
+
+  #header .user-info .username {
+    display: none;
+  }
+
+  #header .user-info .name {
+    display: inline-block;
+    max-width: 64%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #header .user-info a {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 9px;
+  }
+
   #header .content .links-area {
     display: block;
     position: fixed;
@@ -1053,13 +1185,18 @@ textarea.invalid:disabled,
   }
 
   .content {
-    width: 90%;
+    width: 100%;
   }
 
   .page {
     padding: 10px;
     width: 90%;
     margin: 10px auto;
+  }
+
+  #header h1 {
+    margin-left: 20px;
+    margin-right: 20px;
   }
 
   #search-page input.query {

@@ -2,7 +2,7 @@ function publicSearchPage() {
   searchPage()
 
   var $page = $('#search-page')
-  $page.find('.advanced-search').click(function() { toggleAdvancedSearchOpen() })
+  $page.find('.advanced-search').click(function() { toggleAdvancedSearchOpen($page) })
   $page.find('.new-classification').remove()
   $page.find('.drafts').remove()
   $page.find('.recent').remove()
@@ -16,11 +16,6 @@ function publicSearchPage() {
     $(this).find('.request-reclassification').show()
   })
 
-  function toggleAdvancedSearchOpen() {
-    $page.find('.advanced-search').toggleClass('selected')
-    $page.find('.advanced-search-controls').slideToggle()
-  }
-
   function openSurvey(program) {
     sendPageview('/#surveymonkey/' + program._id)
     window.open('https://fi.surveymonkey.com/r/ikarajapalaute')
@@ -32,10 +27,16 @@ function setAgelimit0IconByLanguage($page) {
   $page.find('.agelimit-0').attr('src', 'images/agelimit-'+ zeroAge +'.png')
 }
 
+function toggleAdvancedSearchOpen($page) {
+  $page.find('.advanced-search').toggleClass('selected')
+  $page.find('.advanced-search-controls').slideToggle()
+}
+
 function internalSearchPage() {
   var searchPageApi = searchPage()
 
   var $page = $('#search-page')
+  $page.find('.advanced-search').click(function() { toggleAdvancedSearchOpen($page) })
   var $results = $page.find('.results').add($page.find('.recent'))
   var $newClassificationType = $page.find('.new-classification input[name=new-classification-type]')
   var $newClassificationButton = $page.find('.new-classification button')

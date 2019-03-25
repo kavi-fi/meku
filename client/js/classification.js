@@ -368,7 +368,8 @@ function classificationFormUtils() {
     var lang = langCookie()
     $.get('/classification/criteria').done(function (storedCriteria) {
       storedCriteria.forEach(function (criteria) {
-        var isVet = enums.classificationCriteria.find(function (c) { return c.id == criteria.id}).category === 'vet'
+        var i = enums.classificationCriteria.map(function (c) { return c.id}).indexOf(criteria.id)
+        var isVet = i !== -1 && enums.classificationCriteria[i].category === 'vet'
         var $div = $form.find('div[data-id=' + criteria.id + ']')
         $div.find('h5').empty().append($('<h5>').text(criteria[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + criteria.id + ')')))
         $div.find('p').html(isVet ? '' : criteria[lang].description)

@@ -1554,7 +1554,7 @@ var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
         body: '<p>Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.<br/>' +
           '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
           '<p>Terveisin,<br/>KAVI</p>'
-      }, user, logError)
+      }, undefined, logError)
     })
   })
 })
@@ -1586,7 +1586,7 @@ var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
           '<p>Om du inte slutför fortbildningen under klassificeringsrättigheternas giltighetstid slutar användarnamnet att fungera när giltighetstiden går ut.  Du kan fönya din behörighet genom att delta i fortbildningen även efter att din klassificeringsbehörighet upphört.</p>' +
           '<p>Du behöver inte reagera på detta meddelande om du redan anmält dig till fortbildning, nyligen har deltagit i fortbildning eller inte vill förnya din klassificeringsbehörighet.</p>' +
           '<p>Svara inte på detta meddelande, utan skicka eventuella frågor till meku@kavi.fi.</p>'
-      }, user, function(err) {
+      }, undefined, function(err) {
         if (err) console.error(err)
         else user.update({ certExpiryReminderSent: new Date() }, logError)
       })
@@ -1713,6 +1713,7 @@ function sendEmail(opts, user, callback) {
   if (process.env.EMAIL_TO != undefined) {
     msg.to = process.env.EMAIL_TO
   } else if (process.env.NODE_ENV === 'training') {
+    if (!user) return callback()
     msg.to = user.email || user.emails[0]
   }
 

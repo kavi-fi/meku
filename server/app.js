@@ -1469,7 +1469,8 @@ app.get('/agelimit/:q?', function (req, res, next) {
   var filtersByType = _.map(req.query.type ? _.isArray(req.query.type) ? req.query.type : [req.query.type] : [], function (t) { return types.indexOf(t) })
   var queryParams = {
     "q": req.params.q,
-    "filters": filtersByType
+    "filters": filtersByType,
+    "directors": req.query.directors
   }
   var q = constructQuery(queryParams)
   var count = req.query.count ? parseInt(req.query.count) : undefined

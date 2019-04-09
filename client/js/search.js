@@ -581,6 +581,7 @@ function searchPage() {
         openDetail($selected, false)
         var top = $selected.offset().top - 25
         $('body,html').animate({ scrollTop: top })
+        callback()
       } else if (state.page < 20) {
         state.page++
         loadUntil(selectedProgramId, callback)

@@ -424,7 +424,7 @@ function searchPage() {
     queryChanged($input.val().trim())
     loadUntil(programId, function() {
       $('.search-excel-export-form:visible').find('input[name="_csrf"]').val($.cookie('_csrf_token'))
-      if ($results.find('.result').length === 1) {
+      if (!programId && $results.find('.result').length === 1) {
         openDetail($results.find('.result:first'), false)
       }
       if ($('#login').is(':hidden')) $input.focus()

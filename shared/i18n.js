@@ -212,6 +212,7 @@ var i18n = {
     'Ei jaksoja.': 'Inga avsnitt',
     'Tuotantokausi': 'Produktionssäsong',
     'Tuntematon tuotantokausi': 'Okänd produktionssäsong',
+    'Tarkennettu haku': 'Avancerad sökning',
 
     // Classification-page:
     'Kuvaohjelman tiedot': 'Information om bildprogrammet',

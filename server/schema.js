@@ -403,7 +403,7 @@ var InvoiceSchema = new Schema({
 InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, price) {
   var row = new this({
     type: rowType, program: program._id, programSequenceId: program.sequenceId,
-    name: program.name, programType: program.programType, duration: durationSeconds, price: price,
+    name: _.first(program.name), programType: program.programType, duration: durationSeconds, price: price,
     registrationDate: program.classifications[0].registrationDate
   })
   row.account = program.classifications[0].billing

@@ -452,7 +452,7 @@ app.get('/episodes/:seriesId', function(req, res, next) {
 })
 
 app.get('/programs/drafts', function(req, res, next) {
-  if (!req.user) return res.send([])
+  if (!req.user) return res.sendStatus(403)
   Program.find({ draftsBy: req.user._id, deleted: { $ne:true } }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
     if (err) return next(err)
     res.send(programs.map(function(p) {
@@ -462,7 +462,7 @@ app.get('/programs/drafts', function(req, res, next) {
 })
 
 app.get('/programs/recent', function(req, res, next) {
-  if (!req.user) return res.send([])
+  if (!req.user) return res.sendStatus(403)
   var ObjectId = mongoose.Types.ObjectId
   Program.find({ "classifications.author._id": ObjectId(req.user._id), deleted: { $ne: true } }).sort('-classifications.registrationDate').limit(1).lean().exec(function (err, program) {
     if (err) next(err)

@@ -195,7 +195,6 @@ function internalSearchPage() {
   })
 
   function loadDrafts() {
-    if (!window.user) return loginPage().show()
     $.get('/programs/drafts', function(drafts) {
       $drafts.find('.draft').remove()
       drafts.forEach(function(draft) {

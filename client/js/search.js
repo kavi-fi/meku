@@ -393,6 +393,10 @@ function searchPage() {
   var $page = $('#search-page').html($('#templates .search-page').clone())
   var $input = $page.find('.query')
   var $button = $page.find('button.search')
+  var $sort_name_col = $page.find('.searchResultSortCols .col_name')
+  var $sort_duration_col = $page.find('.searchResultSortCols .col_duration')
+  var $sort_type_col = $page.find('.searchResultSortCols .col_type')
+  var $sort_age_col = $page.find('.searchResultSortCols .col_agelimit')
   var $exportbutton = $page.find('button.export')
   var $asCsv = $page.find('.ascsv')
   var $showDeleted = $page.find('input[type=checkbox].showDeleted')
@@ -411,7 +415,7 @@ function searchPage() {
   var $noMoreResults = $page.find('.no-more-results')
   var $loading = $page.find('.loading')
   var detailRenderer = programBox()
-  var state = { q:'', page: 0 }
+  var state = { q:'', page: 0, sortBy: '', sortOrder: 'ascending'}
 
   setupPublicFilters()
   setupKaviFilters()
@@ -431,6 +435,24 @@ function searchPage() {
   })
 
   $button.click(function() { $input.trigger('fire') })
+  $sort_name_col.click(function(){sortChanged('col_name')})
+  $sort_duration_col.click(function(){sortChanged('col_duration')})
+  $sort_type_col.click(function(){sortChanged('col_type')})
+  $sort_age_col.click(function(){sortChanged('col_agelimit')})
+
+  function sortChanged(column){
+    var newOrder = $(`.searchResultSortCols .${column}`).hasClass('ascending') ? 'descending' : 'ascending'
+    $(`.searchResultSortCols .${column}`).removeClass('ascending descending')
+    $(`.searchResultSortCols .${column}`).siblings().removeClass('ascending descending')
+    $(`.searchResultSortCols .${column}`).addClass(newOrder)
+
+    var icon = newOrder == 'ascending' ? 'fa-sort-asc' : 'fa-sort-desc'
+    $(`.searchResultSortCols .${column}`).find(`#${column}_icon`).removeClass('fa-sort-asc fa-sort-desc').addClass(icon)
+
+    state = _.extend(state, {sortBy: column, sortOrder: newOrder})
+    $input.trigger('fire')
+  }
+
   $exportbutton.on('click', function(){
 
     var $form = $(".search-excel-export-form:visible")
@@ -488,7 +510,7 @@ function searchPage() {
            updateProgramIfVisible: updateProgramIfVisible, updateLocationHash: updateLocationHash }
 
   function queryChanged(q) {
-    state = { q:q, page: 0 }
+    state = { q:q, page: 0, sortBy: state.sortBy, sortOrder: state.sortOrder }
     $noResults.add($noMoreResults).hide()
   }
 
@@ -626,7 +648,9 @@ function searchPage() {
       reclassifiedBy: currentReClassifier(),
       buyer: currentBuyer(),
       searchFromSynopsis: $searchFromSynopsis.is(':checked'),
-      directors: currentDirectors()
+      directors: currentDirectors(),
+      sortBy: state.sortBy,
+      sortOrder: state.sortOrder
     }
   }
 

@@ -284,7 +284,15 @@
     <span class="search-export" data-i18n>Tarkenna hakua luodaksesi Excel-tiedoston</span>
     <div class="program-count"><label data-i18n>Hakutuloksia</label><span class="num"></span></div>
   </div>
-  <div class="results"></div>
+  <div class="result_header" id="searchResultStickyHeader">
+    <div class="searchResultSortCols">
+      <div class="col_name"><i id="col_name_icon" class="rotating fa fa-sort-asc"></i> Ohjelman nimi</div>
+      <div class="col_duration"><i id="col_duration_icon" class="rotating fa fa-sort-asc"></i> Kesto</div>
+      <div class="col_type"><i id="col_type_icon" class="rotating fa fa-sort-asc"></i> Tyyppi</div>
+      <div class="col_agelimit"><i id="col_agelimit_icon" class="rotating fa fa-sort-asc"></i> Ikäraja</div>
+    </div>
+  </div>
+  <div class="results" id="searchResult"></div>
   <div class="loading" data-i18n>Ladataan...</div>
   <div class="no-results" data-i18n>Ei hakutuloksia.</div>
   <div class="no-more-results"><i data-i18n>FIN</i></div>
@@ -881,4 +889,16 @@
   function sendPageview(path) {
     if (trackingCode[APP_ENVIRONMENT]) ga('send', 'pageview', path);
   }
+
+  window.onscroll = function() {stickySearchResultHeader()};
+
+  function stickySearchResultHeader() {
+    if (window.pageYOffset > $('#searchResult').offset().top && !$('#searchResultStickyHeader').hasClass('sticky')) {
+      $('#searchResultStickyHeader').addClass('sticky')
+    } else if (window.pageYOffset <= $('#searchResult').offset().top && $('#searchResultStickyHeader').hasClass('sticky')) {
+      $('#searchResultStickyHeader').removeClass('sticky')
+    }
+  }
+
+
 </script>

@@ -206,7 +206,9 @@ function searchQueryParams(req, data) {
     showCount: data.showCount === 'true',
     sorted: data.sorted === 'true',
     buyer: data.buyer,
-    directors: data.directors
+    directors: data.directors,
+    sortBy: data.sortBy,
+    sortOrder: data.sortOrder
   }
 }
 
@@ -214,9 +216,21 @@ function processQuery(req, res, next, data, filename) {
   var queryParams = searchQueryParams(req, data)
   var query = constructQuery(queryParams)
   var sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
-  var sortBy = queryParams.sorted ? sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name' : ''
+  var sortOrder = queryParams.sortOrder == 'ascending' ? '' : '-'
+  var sortedColumn = resolveColumnSort(queryParams.sortBy, sortOrder)
+  var sortBy = sortedColumn ? `${sortOrder}${sortedColumn}` : queryParams.sorted ? sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name' : ''
   sendOrExport(query, queryParams, sortBy, filename, req.cookies.lang || 'fi', res, next)
 
+}
+
+function resolveColumnSort(fieldName){
+  const fieldMapping = {
+    col_name: 'name',
+    col_duration: 'classifications.0.duration',
+    col_type: 'programType',
+    col_agelimit: 'classifications.0.agelimit'
+  }
+  return _.get(fieldMapping, fieldName, undefined)
 }
 
 app.post('/program/excel/export', function(req, res, next) {

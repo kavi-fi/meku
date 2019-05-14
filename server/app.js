@@ -216,10 +216,10 @@ function processQuery(req, res, next, data, filename) {
   var queryParams = searchQueryParams(req, data)
   var query = constructQuery(queryParams)
   var sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
-  var sortOrder = queryParams.sortOrder == 'ascending' ? '' : '-'
   var sortedColumn = resolveColumnSort(queryParams.sortBy, sortOrder)
-  var sortBy = sortedColumn ? `${sortOrder}${sortedColumn}` : queryParams.sorted ? sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name' : ''
-  sendOrExport(query, queryParams, sortBy, filename, req.cookies.lang || 'fi', res, next)
+  var sortOrder = sortedColumn ? queryParams.sortOrder == 'ascending' ? 1 : -1 : sortByRegistrationDate ? -1 : 1
+  var sortBy = sortedColumn ? sortedColumn : queryParams.sorted ? sortByRegistrationDate ? 'classifications.0.registrationDate' : 'name' : ''
+  sendOrExport(query, queryParams, sortBy, sortOrder, filename, req.cookies.lang || 'fi', res, next)
 
 }
 
@@ -228,7 +228,7 @@ function resolveColumnSort(fieldName){
     col_name: 'name',
     col_duration: 'classifications.0.duration',
     col_type: 'programType',
-    col_agelimit: 'classifications.0.agelimit'
+    col_agelimit: 'agelimit'
   }
   return _.get(fieldMapping, fieldName, undefined)
 }
@@ -242,13 +242,14 @@ app.get('/programs/search/:q?', function(req, res, next) {
   processQuery(req, res, next, _.extend(req.query, {q: req.params.q}))
 })
 
-function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
-
+function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, next){
   var isAdminUser = utils.hasRole(queryData.user, 'root')
   var showClassificationAuthor = isAdminUser
+  var sort = {}
+  sort[sortBy] = sortOrder
 
   if (filename) {
-    Program.find(query, queryData.fields).limit(5000).sort(sortBy).lean().exec(function (err, docs) {
+    Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, {$limit: 5000}, { $project: queryData.fields ? queryData.fields : {showOnlyMe: 0}} ]).exec(function (err, docs) {
       if (err) return next(err)
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -258,7 +259,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
       res.send(result)
     })
   } else {
-    Program.find(query, queryData.fields).skip(queryData.page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
+    Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, { $skip: queryData.page * 100 }, {$limit: 100}, { $project: queryData.fields ? queryData.fields : {showOnlyMe: 0}} ]).exec(function (err, docs) {
       if (err) return next(err)
 
       replaceFearToAnxiety(docs)

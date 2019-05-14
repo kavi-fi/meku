@@ -225,6 +225,7 @@ label.top { vertical-align: top; }
 #search-page .searchResultSortCols .col_duration { font-size: 14px; padding: 0 20px 0 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; min-width: 100px; text-align: right;}
 #search-page .searchResultSortCols .col_type { flex: 0 0 auto; font-size: 14px; text-align: left; padding: 0 10px 0 0px; min-width: 120px; }
 #search-page .searchResultSortCols .col_agelimit { flex: 0 0 auto; font-size: 14px; padding: 0 0px 0 0px; text-align: right; float: right; width: 10%; min-width: 100px;}
+#search-page .searchResultSortCols .fa {display: none;}
 #search-page .searchResultSortCols .ascending {color: white;}
 #search-page .searchResultSortCols .descending {color: white;}
 

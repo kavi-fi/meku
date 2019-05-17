@@ -447,7 +447,8 @@ function searchPage() {
     $(`.searchResultSortCols .${column}`).addClass(newOrder)
 
     var icon = newOrder == 'ascending' ? 'fa-sort-asc' : 'fa-sort-desc'
-    $(`.searchResultSortCols .${column}`).find(`#${column}_icon`).removeClass('fa-sort-asc fa-sort-desc').addClass(icon)
+    $(`.searchResultSortCols .${column}`).find(`#${column}_icon`).removeClass('fa-sort-asc fa-sort-desc').addClass(icon).toggle(true)
+    $(`.searchResultSortCols .${column}`).siblings().find('i').removeClass('fa-sort-asc fa-sort-desc').addClass('fa-sort-asc')
 
     state = _.extend(state, {sortBy: column, sortOrder: newOrder})
     $input.trigger('fire')

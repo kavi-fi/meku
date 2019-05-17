@@ -357,7 +357,7 @@ function constructProgramTypeFilter(filters){
   var filt = {}
 
   var filters = filters || []
-  if (filters.length > 0) filt = ({"programType": { $in: filters }})
+  if (filters.length > 0) filt = ({"programType": { $in: _.map(filters, (value) => parseInt(value)) }})
 
   return filt
 }

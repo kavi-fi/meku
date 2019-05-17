@@ -5,6 +5,7 @@ var bcrypt = require('bcryptjs')
 var mongoose = require('mongoose')
 var enums = require('../shared/enums')
 var latinize = require('latinize')
+var _ = require('lodash')
 var ObjectId = mongoose.Schema.Types.ObjectId
 var Schema = mongoose.Schema
 var bcryptSaltFactor = 12
@@ -165,7 +166,8 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
   if (!callback) { callback = series; series = undefined }
   var program = this
   if (program.series._id) {
-    if (series && program.series.name !== series.name) program.series.name = series.name
+    var seriesName = series ? _.isArray(series.name) ? series.name[0] : series.name : undefined
+    if (seriesName && program.series.name !== seriesName) program.series.name = seriesName
     loadSeries(function(err, parent) {
       if (err) return callback(err)
       populate(program, concatNames(parent))

@@ -1785,8 +1785,8 @@ function updateInvoicerows(program, callback) {
     if (err) return next(err)
     var billing = program.classifications.length > 0 ? program.classifications[0].billing : undefined
     async.forEach(invoiceRows, function(invoiceRow, callback) {
-      if (invoiceRow.name !== program.name || (billing && invoiceRow.account.name !== billing.name)) {
-        invoiceRow.name = program.name
+      if (invoiceRow.name !== _.first(program.name) || (billing && invoiceRow.account.name !== billing.name)) {
+        invoiceRow.name = _.first(program.name)
         if (billing) {
           invoiceRow.account._id = billing._id
           invoiceRow.account.name = billing.name

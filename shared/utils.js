@@ -52,11 +52,13 @@ utils.isValidUsername = function(txt) {
 }
 
 utils.isValidDuration = function(txt) {
-  var m = /(?:(\d+)?:)(\d+):(\d+)$/.exec(txt)
+  var m = /(\d+):(\d+):(\d+)$/.exec(txt)
   if (m) {
+    const validLength = m[1].length == 2 && m[2].length == 2 && m[3].length == 2
+    var hours = parseInt(m[1])
     var mins = parseInt(m[2])
     var seconds = parseInt(m[3])
-    return mins < 60 && seconds < 60
+    return validLength && hours < 24 && mins < 60 && seconds < 60
   } else {
     return false
   }

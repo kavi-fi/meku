@@ -43,10 +43,10 @@ stream.on('data', function (program) {
   })
 
   const updatedProgram = _.extend(program, {classifications: fixedClassifications})
-  /*updatedProgram.save(function (err) {
+  updatedProgram.save(function (err) {
     if (err) console.error(err)
     stream.resume()
-  })*/
+  })
 })
 stream.on('error', function (err) {
    console.error('Error: ' + err)

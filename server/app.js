@@ -36,7 +36,7 @@ var validation = require('./validation')
 var srvUtils = require('./server-utils')
 var env = require('./env').get()
 var NodeCache = require('node-cache')
-var programCache = new NodeCache({stdTTL: 3600, checkperiod: 600})
+var programCache = new NodeCache({stdTTL: 21600, checkperiod: 600})
 
 var testEnvEmailQueue = []
 
@@ -307,6 +307,10 @@ function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, 
 }
 
 app.get('/cache', requireRole('root'), function(req, res) {
+  const reset = req.query.action == 'reset'
+  if(reset){
+    programCache.flushAll()
+  }
   var programStats = programCache.getStats()
   function keysWithTTL(cache) {
     return cache.keys().map(function (key) { return {key: key, ttl: new Date(cache.getTtl(key))} })

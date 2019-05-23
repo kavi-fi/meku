@@ -35,6 +35,9 @@ var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 var validation = require('./validation')
 var srvUtils = require('./server-utils')
 var env = require('./env').get()
+var NodeCache = require('node-cache')
+var programCache = new NodeCache({stdTTL: 3600, checkperiod: 600})
+
 var testEnvEmailQueue = []
 
 sendgrid.setApiKey(process.env.SENDGRID_APIKEY)
@@ -242,11 +245,19 @@ app.get('/programs/search/:q?', function(req, res, next) {
   processQuery(req, res, next, _.extend(req.query, {q: req.params.q}))
 })
 
+function keyFrom(query) {
+  return JSON.stringify(query, function(key, value) {
+    return value instanceof RegExp ? value.toString() : value
+  })
+}
+
 function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, next){
-  var isAdminUser = utils.hasRole(queryData.user, 'root')
-  var showClassificationAuthor = isAdminUser
+  const cacheKey = keyFrom(query)
+  const isAdminUser = utils.hasRole(queryData.user, 'root')
+  const showClassificationAuthor = isAdminUser
   var sort = {}
   sort[sortBy] = sortOrder
+  const cacheKeyOptions = JSON.stringify(sort) + JSON.stringify(queryData.fields ? queryData.fields : {showOnlyMe: 0})
 
   if (filename) {
     Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, {$limit: 5000}, { $project: queryData.fields ? queryData.fields : {showOnlyMe: 0}} ]).exec(function (err, docs) {
@@ -259,22 +270,51 @@ function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, 
       res.send(result)
     })
   } else {
-    Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, { $skip: queryData.page * 100 }, {$limit: 100}, { $project: queryData.fields ? queryData.fields : {showOnlyMe: 0}} ]).exec(function (err, docs) {
-      if (err) return next(err)
+    function findProgramsByQueryWithCache(callback) {
+      var cachedResult = programCache.get(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`)
+      if (cachedResult !== undefined) return callback(undefined, cachedResult, true)
+        Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, { $skip: queryData.page * 100 }, {$limit: 100}, { $project: queryData.fields ? queryData.fields : {showOnlyMe: 0}} ]).exec(function (err, docs) {
+        if (err) return callback(err)
+        programCache.set(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`, docs)
+        callback(undefined, docs)
+      })
+    }
+    function countProgramsByQueryWithCache(callback) {
+      var cachedResult = programCache.get(`${cacheKey}-count-${cacheKeyOptions}`)
+      if (cachedResult !== undefined) return callback(undefined, cachedResult)
+      Program.count(query, function(err, count) {
+        if (err) return callback(err)
+        programCache.set(cacheKey + '-count', count)
+        callback(undefined, count)
+      })
+    }
 
+    findProgramsByQueryWithCache(function(err, docs, cached) {
+      if (err) return next(err)
       replaceFearToAnxiety(docs)
       if(!queryData.isKavi) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, queryData.user) })
 
       if (queryData.page == 0 && queryData.showCount) {
-        Program.count(query, function(err, count) {
-          res.send({ count: count, programs: docs })
+        countProgramsByQueryWithCache(function (err, count) {
+          res.send({ count: count, programs: docs, cached: cached })
         })
       } else {
-        res.send({ programs: docs })
+        res.send({ programs: docs, cached: cached })
       }
     })
+
   }
 }
+
+app.get('/cache', requireRole('root'), function(req, res) {
+  var programStats = programCache.getStats()
+  function keysWithTTL(cache) {
+    return cache.keys().map(function (key) { return {key: key, ttl: new Date(cache.getTtl(key))} })
+  }
+  programStats.items = keysWithTTL(programCache)
+  res.send({programs: programStats})
+})
+
 
 function fearToAnxiety(w) {
   return w.replace(/^fear$/, 'anxiety')
@@ -1999,6 +2039,7 @@ var start = exports.start = function(callback) {
 var shutdown = exports.shutdown = function(callback) {
   mongoose.disconnect(function() {
     server.close(function() {
+      programCache.close()
       callback()
     })
   })

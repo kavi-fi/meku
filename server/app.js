@@ -36,7 +36,7 @@ var validation = require('./validation')
 var srvUtils = require('./server-utils')
 var env = require('./env').get()
 var NodeCache = require('node-cache')
-var programCache = new NodeCache({stdTTL: 21600, checkperiod: 600})
+var programCache = new NodeCache({stdTTL: 3600, checkperiod: 600})
 
 var testEnvEmailQueue = []
 

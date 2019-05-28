@@ -181,7 +181,9 @@ app.get('/fixedKaviRecipients', function (req, res) {
 })
 
 function programFields(req, isUser, isKavi) {
-  var fields = isKavi ? null : { 'classifications.comments': 0 }
+  // There is actually no field "showOnlyMe". This fake field is used in aggregate projection to get all other fields.
+  // Aggregate projection always requires at least one field to show or to hide.
+  var fields = isKavi ? {showOnlyMe: 0} : { 'classifications.comments': 0 }
   return isUser ? fields : Program.publicFields
 }
 
@@ -221,7 +223,7 @@ function processQuery(req, res, next, data, filename) {
   var sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
   var sortedColumn = resolveColumnSort(queryParams.sortBy, sortOrder)
   var sortOrder = sortedColumn ? queryParams.sortOrder == 'ascending' ? 1 : -1 : sortByRegistrationDate ? -1 : 1
-  var sortBy = sortedColumn ? sortedColumn : queryParams.sorted ? sortByRegistrationDate ? 'classifications.0.registrationDate' : 'name' : ''
+  var sortBy = sortedColumn ? sortedColumn : queryParams.sorted ? sortByRegistrationDate ? 'classifications.0.registrationDate' : 'name' : {}
   sendOrExport(query, queryParams, sortBy, sortOrder, filename, req.cookies.lang || 'fi', res, next)
 
 }
@@ -257,10 +259,10 @@ function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, 
   const showClassificationAuthor = isAdminUser
   var sort = {}
   sort[sortBy] = sortOrder
-  const cacheKeyOptions = JSON.stringify(sort) + JSON.stringify(queryData.fields ? queryData.fields : {showOnlyMe: 0})
+  const cacheKeyOptions = JSON.stringify(sort) + JSON.stringify(queryData.fields)
 
   if (filename) {
-    Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, {$limit: 5000}, { $project: queryData.fields ? queryData.fields : {showOnlyMe: 0}} ]).exec(function (err, docs) {
+    Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, {$limit: 5000}, { $project: queryData.fields } ]).exec(function (err, docs) {
       if (err) return next(err)
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -273,7 +275,7 @@ function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, 
     function findProgramsByQueryWithCache(callback) {
       var cachedResult = programCache.get(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`)
       if (cachedResult !== undefined) return callback(undefined, cachedResult, true)
-        Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, { $skip: queryData.page * 100 }, {$limit: 100}, { $project: queryData.fields ? queryData.fields : {showOnlyMe: 0}} ]).exec(function (err, docs) {
+        Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, { $skip: queryData.page * 100 }, {$limit: 100}, { $project: queryData.fields } ]).exec(function (err, docs) {
         if (err) return callback(err)
         programCache.set(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`, docs)
         callback(undefined, docs)

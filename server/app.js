@@ -270,7 +270,7 @@ function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, 
   .filter(Boolean)
 
   if (filename) {
-    Program.aggregate([{$match: query}, {$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}, {$sort: sort}, {$limit: 5000}, { $project: queryData.fields } ]).exec(function (err, docs) {
+    Program.aggregate(aggregateFunctions).exec(function (err, docs) {
       if (err) return next(err)
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -283,7 +283,7 @@ function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, 
     function findProgramsByQueryWithCache(callback) {
       var cachedResult = programCache.get(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`)
       if (cachedResult !== undefined) return callback(undefined, cachedResult, true)
-        Program.aggregate(aggregateFunctions.filter(Boolean)).exec(function (err, docs) {
+        Program.aggregate(aggregateFunctions).exec(function (err, docs) {
         if (err) return callback(err)
         programCache.set(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`, docs)
         callback(undefined, docs)

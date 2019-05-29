@@ -228,7 +228,7 @@ function resolveColumnSort(fieldName){
     col_name: 'name',
     col_duration: 'classifications.0.duration',
     col_type: 'programType',
-    col_agelimit: 'classifications.0.agelimit'
+    col_agelimit: 'agelimitForSorting'
   }
   return _.get(fieldMapping, fieldName, undefined)
 }

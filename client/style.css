@@ -209,8 +209,8 @@ label.top { vertical-align: top; }
 
 #search-page .result_header {
   padding: 10px 10px;
-  background: #00AA77;
-  color: #f1f1f1;
+  background: #444444;
+  color: #00BB88;
   border-radius: 3px;
   height: 15px;
 }
@@ -225,8 +225,8 @@ label.top { vertical-align: top; }
 #search-page .searchResultSortCols .col_duration { font-size: 14px; padding: 0 20px 0 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; min-width: 100px; text-align: right;}
 #search-page .searchResultSortCols .col_type { flex: 0 0 auto; font-size: 14px; text-align: left; padding: 0 10px 0 0px; min-width: 120px; }
 #search-page .searchResultSortCols .col_agelimit { flex: 0 0 auto; font-size: 14px; padding: 0 0px 0 0px; text-align: right; float: right; width: 10%; min-width: 100px;}
-#search-page .searchResultSortCols .ascending {color: lightgreen;}
-#search-page .searchResultSortCols .descending {color: lightgreen;}
+#search-page .searchResultSortCols .ascending {color: white;}
+#search-page .searchResultSortCols .descending {color: white;}
 
 #search-page .row { border-bottom: none; padding-bottom: 0; }
 #search-page .content { border-bottom: 1px solid #D3D3D3; padding: 0 0 20px 0; }

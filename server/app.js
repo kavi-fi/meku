@@ -35,9 +35,6 @@ var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
 var validation = require('./validation')
 var srvUtils = require('./server-utils')
 var env = require('./env').get()
-var NodeCache = require('node-cache')
-var programCache = new NodeCache({stdTTL: 3600, checkperiod: 600})
-
 var testEnvEmailQueue = []
 
 sendgrid.setApiKey(process.env.SENDGRID_APIKEY)
@@ -181,9 +178,7 @@ app.get('/fixedKaviRecipients', function (req, res) {
 })
 
 function programFields(req, isUser, isKavi) {
-  // There is actually no field "showOnlyMe". This fake field is used in aggregate projection to get all fields.
-  // Aggregate projection always requires at least one field to show or to hide.
-  var fields = isKavi ? {showOnlyMe: 0} : { 'classifications.comments': 0 }
+  var fields = isKavi ? null : { 'classifications.comments': 0 }
   return isUser ? fields : Program.publicFields
 }
 
@@ -221,10 +216,10 @@ function processQuery(req, res, next, data, filename) {
   var queryParams = searchQueryParams(req, data)
   var query = constructQuery(queryParams)
   var sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
+  var sortOrder = queryParams.sortOrder == 'ascending' ? '' : '-'
   var sortedColumn = resolveColumnSort(queryParams.sortBy, sortOrder)
-  var sortOrder = sortedColumn ? queryParams.sortOrder == 'ascending' ? 1 : -1 : sortByRegistrationDate ? -1 : 1
-  var sortBy = sortedColumn ? sortedColumn : queryParams.sorted ? sortByRegistrationDate ? 'classifications.0.registrationDate' : 'name' : ''
-  sendOrExport(query, queryParams, sortBy, sortOrder, filename, req.cookies.lang || 'fi', res, next)
+  var sortBy = sortedColumn ? `${sortOrder}${sortedColumn}` : queryParams.sorted ? sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name' : ''
+  sendOrExport(query, queryParams, sortBy, filename, req.cookies.lang || 'fi', res, next)
 
 }
 
@@ -233,7 +228,7 @@ function resolveColumnSort(fieldName){
     col_name: 'name',
     col_duration: 'classifications.0.duration',
     col_type: 'programType',
-    col_agelimit: 'agelimit'
+    col_agelimit: 'classifications.0.agelimit'
   }
   return _.get(fieldMapping, fieldName, undefined)
 }
@@ -247,30 +242,13 @@ app.get('/programs/search/:q?', function(req, res, next) {
   processQuery(req, res, next, _.extend(req.query, {q: req.params.q}))
 })
 
-function keyFrom(query) {
-  return JSON.stringify(query, function(key, value) {
-    return value instanceof RegExp ? value.toString() : value
-  })
-}
+function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
 
-function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, next){
-  const cacheKey = keyFrom(query)
-  const isAdminUser = utils.hasRole(queryData.user, 'root')
-  const showClassificationAuthor = isAdminUser
-  var sort = {}
-  sort[sortBy] = sortOrder
-  const cacheKeyOptions = JSON.stringify(sort) + JSON.stringify(queryData.fields)
-
-  var aggregateFunctions = [].concat([{$match: query}])
-  .concat([{$addFields: {agelimit: {$cond: {if: {$eq: ["$programType", 2]}, then: ["$episodes.agelimit"], else: "$classifications.agelimit"}}}}])
-  .concat(sortBy === '' ? [undefined] : [{$sort: sort}])
-  .concat([{$skip: queryData.page * 100}])
-  .concat(filename ? [{$limit: 5000}] : [{$limit: 100}])
-  .concat(filename ? [undefined] : {$project: queryData.fields})
-  .filter(Boolean)
+  var isAdminUser = utils.hasRole(queryData.user, 'root')
+  var showClassificationAuthor = isAdminUser
 
   if (filename) {
-    Program.aggregate(aggregateFunctions).exec(function (err, docs) {
+    Program.find(query, queryData.fields).limit(5000).sort(sortBy).lean().exec(function (err, docs) {
       if (err) return next(err)
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -280,55 +258,22 @@ function sendOrExport(query, queryData, sortBy, sortOrder, filename, lang, res, 
       res.send(result)
     })
   } else {
-    function findProgramsByQueryWithCache(callback) {
-      var cachedResult = programCache.get(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`)
-      if (cachedResult !== undefined) return callback(undefined, cachedResult, true)
-        Program.aggregate(aggregateFunctions).exec(function (err, docs) {
-        if (err) return callback(err)
-        programCache.set(`${cacheKey}-${queryData.page}-${cacheKeyOptions}`, docs)
-        callback(undefined, docs)
-      })
-    }
-    function countProgramsByQueryWithCache(callback) {
-      var cachedResult = programCache.get(`${cacheKey}-count-${cacheKeyOptions}`)
-      if (cachedResult !== undefined) return callback(undefined, cachedResult)
-      Program.count(query, function(err, count) {
-        if (err) return callback(err)
-        programCache.set(cacheKey + '-count', count)
-        callback(undefined, count)
-      })
-    }
-
-    findProgramsByQueryWithCache(function(err, docs, cached) {
+    Program.find(query, queryData.fields).skip(queryData.page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
       if (err) return next(err)
+
       replaceFearToAnxiety(docs)
       if(!queryData.isKavi) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, queryData.user) })
 
       if (queryData.page == 0 && queryData.showCount) {
-        countProgramsByQueryWithCache(function (err, count) {
-          res.send({ count: count, programs: docs, cached: cached })
+        Program.count(query, function(err, count) {
+          res.send({ count: count, programs: docs })
         })
       } else {
-        res.send({ programs: docs, cached: cached })
+        res.send({ programs: docs })
       }
     })
-
   }
 }
-
-app.get('/cache', requireRole('root'), function(req, res) {
-  const reset = req.query.action == 'reset'
-  if(reset){
-    programCache.flushAll()
-  }
-  var programStats = programCache.getStats()
-  function keysWithTTL(cache) {
-    return cache.keys().map(function (key) { return {key: key, ttl: new Date(cache.getTtl(key))} })
-  }
-  programStats.items = keysWithTTL(programCache)
-  res.send({programs: programStats})
-})
-
 
 function fearToAnxiety(w) {
   return w.replace(/^fear$/, 'anxiety')
@@ -412,7 +357,7 @@ function constructProgramTypeFilter(filters){
   var filt = {}
 
   var filters = filters || []
-  if (filters.length > 0) filt = ({"programType": { $in: _.map(filters, (value) => parseInt(value)) }})
+  if (filters.length > 0) filt = ({"programType": { $in: filters }})
 
   return filt
 }
@@ -2053,7 +1998,6 @@ var start = exports.start = function(callback) {
 var shutdown = exports.shutdown = function(callback) {
   mongoose.disconnect(function() {
     server.close(function() {
-      programCache.close()
       callback()
     })
   })

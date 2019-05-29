@@ -146,9 +146,6 @@ var i18n = {
     'Tarkenna hakua luodaksesi Excel-tiedoston': 'Specificera sökning',
     'Vastuuvapauslauseke' : 'Ansvarsfriskrivning',
     'Hakuohje' : 'Sökning Hjälp',
-    'Tyyppi': 'Typ',
-    'Ohjelman nimi': 'Programmets namn',
-    'Ikäraja': 'Åldersgräns',
 
   // public.html:
 

@@ -66,7 +66,8 @@ var ProgramSchema = new Schema({
   series: { _id: { type: ObjectId, index:true }, name: String, draft: { name: String, nameFi: String, nameSv: String, nameOther: String } }, // in programType == episode(3)
   episodes: { count: Number, criteria: [Number], legacyAgeLimit: Number, agelimit:Number, warnings:[String], warningOrder: [String] }, // in programType == series(2)
   sentRegistrationEmailAddresses: [String],
-  createdBy: { _id: ObjectId, name: String, username: String, role: String }
+  createdBy: { _id: ObjectId, name: String, username: String, role: String },
+  agelimitForSorting: Number
 })
 ProgramSchema.set('versionKey', false)
 ProgramSchema.index({ 'customersId.account': 1, 'customersId.id': 1 })
@@ -196,6 +197,11 @@ ProgramSchema.methods.populateAllNames = function(series, callback) {
     return p.name.concat(p.nameFi || []).concat(p.nameSv || []).concat(p.nameOther || [])
   }
 }
+
+ProgramSchema.pre('save', function (next) {
+  this.agelimitForSorting = enums.util.isTvSeriesName(this) ? (this.episodes ? this.episodes.agelimit : 0) : (this.classifications && this.classifications.length > 0 ? this.classifications[0].agelimit : 0)
+  next()
+})
 
 var Program = exports.Program = mongoose.model('programs', ProgramSchema)
 

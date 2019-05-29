@@ -441,13 +441,14 @@ function searchPage() {
   $sort_age_col.click(function(){sortChanged('col_agelimit')})
 
   function sortChanged(column){
-    var newOrder = $(`.searchResultSortCols .${column}`).hasClass('ascending') ? 'descending' : 'ascending'
-    $(`.searchResultSortCols .${column}`).removeClass('ascending descending')
-    $(`.searchResultSortCols .${column}`).siblings().removeClass('ascending descending')
-    $(`.searchResultSortCols .${column}`).addClass(newOrder)
+    var newOrder = $('.searchResultSortCols .' + column).hasClass('ascending') ? 'descending' : 'ascending'
+    $('.searchResultSortCols .' + column).removeClass('ascending descending')
+    $('.searchResultSortCols .' + column).siblings().removeClass('ascending descending')
+    $('.searchResultSortCols .' + column).addClass(newOrder)
 
     var icon = newOrder == 'ascending' ? 'fa-sort-asc' : 'fa-sort-desc'
-    $(`.searchResultSortCols .${column}`).find(`#${column}_icon`).removeClass('fa-sort-asc fa-sort-desc').addClass(icon)
+    $('.searchResultSortCols .' + column).find('#' + column + '_icon').removeClass('fa-sort-asc fa-sort-desc').addClass(icon).toggle(true)
+    $('.searchResultSortCols .' + column).siblings().find('i').removeClass('fa-sort-asc fa-sort-desc').addClass('fa-sort-asc')
 
     state = _.extend(state, {sortBy: column, sortOrder: newOrder})
     $input.trigger('fire')

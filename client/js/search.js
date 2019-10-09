@@ -17,8 +17,8 @@ function publicSearchPage() {
   })
 
   function openSurvey(program) {
-    sendPageview('/#surveymonkey/' + program._id)
-    window.open('https://fi.surveymonkey.com/r/ikarajapalaute')
+    sendPageview('/#webropolsurveys/' + program._id)
+    window.open(`https://link.webropolsurveys.com/S/8A271C1FFF26AFB4?q1=${encodeURIComponent(program.name + ' (' + program.sequenceId + ')')}`)
   }
 }
 
@@ -468,7 +468,7 @@ function searchPage() {
   $asCsv.on('click', function () {
     $('.search-excel-export-form:visible input[name=csv]').val('' + $('.ascsv:checked').length)
   })
-  
+
   $filters.on('change', function() { $input.trigger('fire') })
   $ownClassificationsOnly.on('change', function() { $input.trigger('fire') })
 

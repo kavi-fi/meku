@@ -314,6 +314,7 @@ function constructQuery(queryData) {
   mainQuery.$and.push(constructClassifierQuery(queryData.classifier, queryData.reclassified))
   mainQuery.$and.push(constructReclassifiedByQuery(queryData.reclassified, queryData.reclassifiedBy))
   mainQuery.$and.push(constructBuyerQuery(queryData.buyer))
+  mainQuery.$and.push(constructProductionYearQuery(queryData.year))
 
   if(queryData.isUser) mainQuery.$and.push(constructOwnClassifications(queryData.ownClassificationsOnly, queryData.user._id))
   mainQuery.$and.push(constructDeletedQuery(queryData.showDeleted))
@@ -322,7 +323,7 @@ function constructQuery(queryData) {
 
   return mainQuery
 }
-  
+
   function constructClassificationsExistQuery(user) {
     return user ? {} : {$or: [{$and: [{episodes: {$exists: true}}, {'episodes.count': {$gt: 0}}]}, {$and: [{classifications:{$exists: true}}, {'classifications.0': {$exists: true}}]}]}
   }
@@ -342,6 +343,10 @@ function constructBuyerQuery(buyer){
     buyers = { 'classifications': { $elemMatch: { 'buyer._id': buyer }}}
   }
   return buyers
+}
+
+function constructProductionYearQuery(year) {
+  return year ? { year: year } : {}
 }
 
 function constructOwnClassifications(ownClassifications, userid){
@@ -1484,7 +1489,8 @@ app.get('/agelimit/:q?', function (req, res, next) {
   var queryParams = {
     "q": req.params.q,
     "filters": filtersByType,
-    "directors": req.query.directors
+    "directors": req.query.directors,
+    "year": parseInt(req.query.year)
   }
   var q = constructQuery(queryParams)
   var count = req.query.count ? parseInt(req.query.count) : undefined
@@ -1516,6 +1522,7 @@ app.get('/agelimit/:q?', function (req, res, next) {
       directors: trimmedList(program.directors),
       productionCompanies: trimmedList(program.productionCompanies),
       duration: classsification.duration,
+      registrationDate: classsification.registrationDate ? classsification.registrationDate.toISOString().split('T')[0] : undefined,
       durationInSeconds: durationInSeconds > 0 ? durationInSeconds : undefined,
       agelimit: agelimit > 0 ? agelimit : undefined,
       warnings: warnings ? warnings.map(fearToAnxiety) : undefined

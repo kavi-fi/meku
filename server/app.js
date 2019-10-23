@@ -1500,13 +1500,13 @@ app.get('/agelimit/:q?', function (req, res, next) {
       return origList && origList.length > 0 ? origList[0].trim() : undefined
     }
     function trimmedList(origList) {
-      return origList && origList.length > 0 ? _.remove(origList.map(function (p) { return p && p.trim().length > 0 ? p.trim() : undefined }), undefined) : undefined
+      return origList && origList.length > 0 ? _.compact(origList.map(_.trim)) : undefined
     }
     var classsification = enums.util.isTvSeriesName(program) ? program.episodes : program.classifications[0] || {}
     var agelimit = classsification.agelimit || classsification.legacyAgeLimit || 0
     var countryCode = trimmedList(program.country)
     var durationInSeconds = classificationUtils.durationToSeconds(classsification.duration)
-    var warnings = trimmedList(classsification.warningOrder)
+    var warnings = _.isEmpty(classsification.warningOrder) ? trimmedList(classsification.warnings) : trimmedList(classsification.warningOrder)
     return {
       id: program.sequenceId,
       type: enums.programType[program.programType].type,

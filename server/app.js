@@ -1525,7 +1525,8 @@ app.get('/agelimit/:q?', function (req, res, next) {
       registrationDate: classsification.registrationDate ? moment(classsification.registrationDate.toISOString()).add(3, 'hours').toISOString().split('T')[0] : undefined,
       durationInSeconds: durationInSeconds > 0 ? durationInSeconds : undefined,
       agelimit: agelimit > 0 ? agelimit : undefined,
-      warnings: warnings ? warnings.map(fearToAnxiety) : undefined
+      warnings: warnings ? warnings.map(fearToAnxiety) : undefined,
+      format: classsification.format
     }
   }
 

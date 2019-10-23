@@ -1522,7 +1522,7 @@ app.get('/agelimit/:q?', function (req, res, next) {
       directors: trimmedList(program.directors),
       productionCompanies: trimmedList(program.productionCompanies),
       duration: classsification.duration,
-      registrationDate: classsification.registrationDate ? classsification.registrationDate.toISOString().split('T')[0] : undefined,
+      registrationDate: classsification.registrationDate ? moment(classsification.registrationDate.toISOString()).add(3, 'hours').toISOString().split('T')[0] : undefined,
       durationInSeconds: durationInSeconds > 0 ? durationInSeconds : undefined,
       agelimit: agelimit > 0 ? agelimit : undefined,
       warnings: warnings ? warnings.map(fearToAnxiety) : undefined

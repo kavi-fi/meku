@@ -431,7 +431,10 @@ function constructDateRangeQuery(registrationDateRange) {
   var dtQuery = {}
   if (registrationDateRange) {
     var range = utils.parseDateRange(registrationDateRange)
-    dtQuery = {classifications: {$elemMatch: {registrationDate: {$gte: range.begin.toDate(), $lt: range.end.toDate()}} }}
+    var registrationDate = {}
+    if (range.begin) registrationDate.$gte = range.begin.toDate()
+    if (range.end) registrationDate.$lt = range.end.toDate()
+    dtQuery = {classifications: {$elemMatch: {registrationDate: registrationDate}}}
   }
   return dtQuery
 }
@@ -1490,7 +1493,8 @@ app.get('/agelimit/:q?', function (req, res, next) {
     "q": req.params.q,
     "filters": filtersByType,
     "directors": req.query.directors,
-    "year": parseInt(req.query.year)
+    "year": parseInt(req.query.year),
+    "registrationDateRange": req.query.registrationDateRange
   }
   var q = constructQuery(queryParams)
   var count = req.query.count ? parseInt(req.query.count) : undefined

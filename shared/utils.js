@@ -128,7 +128,10 @@ utils.asDate = function(date) {
 
 utils.parseDateRange = function(obj) {
   var format = 'DD.MM.YYYY'
-  return { begin:  moment(obj.begin, format), end: moment(obj.end, format).add(1, 'days') }
+  var dateRange = {}
+  if (obj.begin) dateRange.begin = moment(obj.begin, format)
+  if (obj.end) dateRange.end = moment(obj.end, format).add(1, 'days')
+  return dateRange
 }
 
 utils.withinDateRange = function(date, beginDate, endDate) {

@@ -180,15 +180,12 @@ function programBox() {
       .find('.userComments').labeledText(c.userComments).end()
       .find('.publicComments').labeledText(c.publicComments).end()
       .find('.commentHeader').toggle(!!(c.comments || c.userComments || c.publicComments)).end()
-    if (!window.user) {
-      $e.find('.program-classification-details').addClass('hide')
-    }
 
     function txtIfNotCurrent(txt) { return (p.classifications[0]._id == c._id) ? '' : txt }
   }
 
   function renderClassificationCriteria(c, criteria) {
-    if (!c.criteria || c.safe || !window.user) return ''
+    if (!c.criteria || c.safe) return ''
     var lang = langCookie()
     return c.criteria.map(function(id) {
       var enumCriteria = enums.classificationCriteria[id - 1]

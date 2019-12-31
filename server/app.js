@@ -73,7 +73,7 @@ app.post('/login', function(req, res, next) {
     if (err) return next(err)
     if (!user) return res.sendStatus(403)
     if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
-      user.update({ active: false }, respond(res, next, 403))
+      user.updateOne({ active: false }, respond(res, next, 403))
     } else {
       user.checkPassword(password, function(err, ok) {
         if (err) return next(err)
@@ -265,7 +265,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
       if(!queryData.isKavi) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, queryData.user) })
 
       if (queryData.page == 0 && queryData.showCount) {
-        Program.count(query, function(err, count) {
+        Program.countDocuments(query, function(err, count) {
           res.send({ count: count, programs: docs })
         })
       } else {
@@ -1571,7 +1571,7 @@ var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
   ]}, function(err, users) {
     if (err) throw err
     users.forEach(function(user) {
-      user.update({ active: false }, function(err) {
+      user.updateOne({ active: false }, function(err) {
         if (err) return logError(err)
         logUpdateOperation({ username: 'cron', ip: 'localhost' }, user, { active: { old: user.active, new: false } })
       })
@@ -1615,7 +1615,7 @@ var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
           '<p>Svara inte på detta meddelande, utan skicka eventuella frågor till meku@kavi.fi.</p>'
       }, undefined, function(err) {
         if (err) console.error(err)
-        else user.update({ certExpiryReminderSent: new Date() }, logError)
+        else user.updateOne({ certExpiryReminderSent: new Date() }, logError)
       })
     })
   })
@@ -2001,7 +2001,7 @@ if (env.isDev) {
 var server
 
 var start = exports.start = function(callback) {
-  mongoose.connect(process.env.MONGOHQ_URL || env.mongoUrl)
+  mongoose.connect(process.env.MONGOHQ_URL || env.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false, keepAlive: 300000})
   checkExpiredCerts.start()
   checkCertsExpiringSoon.start()
   server = app.listen(process.env.PORT || env.port, callback)

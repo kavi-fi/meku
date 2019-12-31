@@ -145,7 +145,7 @@ ProgramSchema.statics.updateTvSeriesClassification = function(seriesId, callback
       count: programs.length, criteria: data.criteria, legacyAgeLimit: data.legacyAgeLimit,
       agelimit: summary.age, warnings: _.map(summary.warnings, 'category'), warningOrder: data.warningOrder
     }
-    Program.update({ _id: seriesId }, { episodes: episodeSummary }, callback)
+    Program.updateOne({ _id: seriesId }, { episodes: episodeSummary }, callback)
   })
 }
 ProgramSchema.statics.updateClassificationSummary = function(classification) {
@@ -419,7 +419,7 @@ InvoiceSchema.statics.fromProgram = function(program, rowType, durationSeconds, 
 }
 
 InvoiceSchema.statics.removeProgram = function (program, callback) {
-  this.remove({program: program._id}, callback)
+  this.deleteOne({program: program._id}, callback)
 }
 
 var InvoiceRow = exports.InvoiceRow = mongoose.model('invoicerows', InvoiceSchema)
@@ -450,7 +450,7 @@ function updateNamedIndex(array, callback) {
   async.forEach(docs, updateDoc, callback)
 
   function updateDoc(doc, callback) {
-    that.update({ name: doc.name }, doc, { upsert: true }, function(_err) { callback() })
+    that.updateOne({ name: doc.name }, doc, { upsert: true }, function(_err) { callback() })
   }
 }
 

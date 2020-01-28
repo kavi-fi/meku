@@ -16,7 +16,7 @@ exports.constructUserExportData = function (tmpFile, users) {
 }
 
 function userDetails(user) {
-  const userData = [user.active === true ? '1': '', user.name, user.username, user.role, user.emails.join(', '), user.phone]
+  const userData = [user.active === true ? '1': '', user.name, user.username, user.role, _.compact(user.emails).join(', '), user.phone]
   if (enums.util.isClassifier(user.role)) userData.push(user.certificateStartDate, user.certificateEndDate, _.map(user.employers, 'name').join(', '))
   return userData
 }

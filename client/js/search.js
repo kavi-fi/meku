@@ -18,7 +18,7 @@ function publicSearchPage() {
 
   function openSurvey(program) {
     sendPageview('/#webropolsurveys/' + program._id)
-    window.open(`https://link.webropolsurveys.com/S/8A271C1FFF26AFB4?q1=${encodeURIComponent(program.name + ' (' + program.sequenceId + ')')}`)
+    window.open('https://link.webropolsurveys.com/S/8A271C1FFF26AFB4?q1=' + encodeURIComponent(program.name + ' (' + program.sequenceId + ')'))
   }
 }
 

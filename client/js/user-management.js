@@ -41,6 +41,12 @@ function userManagementPage() {
     }
   })
 
+  $page.find('button.export').on('click', function(e) {
+    var $form = $(".users-excel-export-form:visible")
+    $form.find('input[name="_csrf"]').val($.cookie('_csrf_token'))
+    $form.submit()
+  })
+
   $page.find('.new-user button').on('click', function() {
     var $newUserForm = renderNewUserForm($newUserType.select2('val'))
     closeDetails()

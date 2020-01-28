@@ -18,6 +18,7 @@ var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var kieku = require('./kieku')
 var programExport = require('./program-export')
+var userExport = require('./user-export')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid = require('@sendgrid/mail')
@@ -1237,6 +1238,22 @@ app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
   })
 })
 
+app.post('/users/excel/export', requireRole('root'), function (req, res, next) {
+  const regexp = new RegExp(utils.escapeRegExp(req.body.query), 'i')
+  var q = _.isEmpty(req.body.query) ? {} : { $or:[{ name: regexp }, { username: regexp }] }
+  const roleFilters = _.compact(_.map(['user', 'kavi', 'root'], (k) => req.body[k] === 'on' ? k : undefined))
+  var activeFilter = req.body.active === 'on'
+  var filters = _.merge(q, _.isEmpty(roleFilters) ? {} : { role: { $in: roleFilters }}, activeFilter ? {active: true} : {})
+  User.find(filters, User.noPrivateFields).sort('name').lean().exec((err, data) => {
+    if (err) return next(err)
+    var filename = 'users.xlsx'
+    var result = userExport.constructUserExportData(filename, data)
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.send(result)
+  })
+})
+
 app.get('/apiToken', requireRole('root'), function(req, res, next) {
   bcrypt.genSalt(1, function(err, s) {
     if (err) return next(err)
@@ -1975,7 +1992,7 @@ function getIpAddress(req) {
 }
 
 function isUrlEncodedBody(req) {
-  var paths = ['POST:/program/excel/export', 'POST:/kieku', 'POST:/providers/billing/kieku', 'POST:/providers/yearlyBilling/kieku']
+  var paths = ['POST:/program/excel/export', 'POST:/users/excel/export', 'POST:/kieku', 'POST:/providers/billing/kieku', 'POST:/providers/yearlyBilling/kieku']
   return _.includes(paths, req.method + ':' + req.path)
 }
 

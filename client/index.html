@@ -124,24 +124,30 @@
   </div>
 
   <div id="user-management-page" class="page">
-    <h2 class="main">Käyttäjähallinta</h2>
-    <div class="controls">
-      <div class="new-user right">
-        <label for="new-user-type" class="search-label">Käyttäjäryhmä</label>
-        <input name="new-user-type" type="hidden" id="new-user-type"><button class="button">Luo</button>
+    <form method="POST" action="/users/excel/export" class="users-excel-export-form">
+      <h2 class="main">Käyttäjähallinta</h2>
+      <div class="controls">
+        <div class="new-user right">
+          <label for="new-user-type" class="search-label">Käyttäjäryhmä</label>
+          <input name="new-user-type" type="hidden" id="new-user-type"><button class="button">Luo</button>
+        </div>
+        <div class="search">
+          <label for="user-name-query" class="search-label">Nimi</label>
+          <input class="query" name="query" type="text" id="user-name-query" placeholder="Hae nimellä...">
+        </div>
+        <div class="filters">
+          <label><input type="checkbox" class="role" name="root">Pääkäyttäjät</label>
+          <label><input type="checkbox" class="role" name="kavi">Kavilaiset</label>
+          <label><input type="checkbox" class="role" name="user">Luokittelijat</label>
+          <label><input type="checkbox" name="active" checked>Aktiiviset</label>
+        </div>
       </div>
-      <div class="search">
-        <label for="user-name-query" class="search-label">Nimi</label>
-        <input class="query" type="text" id="user-name-query" placeholder="Hae nimellä...">
-      </div>
-      <div class="filters">
-        <label><input type="checkbox" class="role" name="root">Pääkäyttäjät</label>
-        <label><input type="checkbox" class="role" name="kavi">Kavilaiset</label>
-        <label><input type="checkbox" class="role" name="user">Luokittelijat</label>
-        <label><input type="checkbox" name="active" checked>Aktiiviset</label>
-      </div>
-    </div>
-    <div class="user-list results"></div>
+      <div class="user-list results"></div>
+      <div>&nbsp;</div>
+      <input type="hidden" name="_csrf">
+      <input type="hidden" name="export" value="1">
+      <button class="button export">Lataa Excel -tiedosto</button>
+    </form>
   </div>
 
   <div id="subscriber-management-page" class="page">

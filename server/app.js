@@ -19,6 +19,7 @@ var utils = require('../shared/utils')
 var kieku = require('./kieku')
 var programExport = require('./program-export')
 var userExport = require('./user-export')
+var providerExport = require('./provider-export')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid = require('@sendgrid/mail')
@@ -888,6 +889,37 @@ app.get('/providers', requireRole('kavi'), function(req, res, next) {
       if: {$and: [{$not: '$locations'}, {$eq: ['$deleted', true]}]},
       then: '$$PRUNE', else: '$$DESCEND'}}}
   ], respond(res, next))
+})
+
+app.post('/providers/excel/export', function (req, res, next) {
+  const regexp = new RegExp(utils.escapeRegExp(req.body.query), 'i')
+  const q = _.isEmpty(req.body.query) ? {} : {$or: [{ name: regexp }, { 'locations.name': regexp }]}
+  const k18 = req.body.k18 === 'on' ? { 'locations.adultContent': true} : {}
+  const providingTypeKeys = _.compact(_.map(Object.keys(enums.providingType), (key) => req.body[key] === 'on' ? key : undefined))
+  const providingTypes = providingTypeKeys.length > 0 ? {'locations.providingType': {$in: providingTypeKeys}} : {}
+
+  Provider.aggregate([
+    {$match: q}, {$match: k18}, {$match: providingTypes},
+    {$match: {deleted: false, registrationDate: { $exists: true }}},
+    {$redact: {$cond: {
+          if: {$and: [{$not: '$locations'}, {$eq: ['$deleted', true]}]},
+          then: '$$PRUNE', else: '$$DESCEND'}}},
+    {$sort: {name: 1}}
+  ], (err, providers) => {
+    if (err) return next(err)
+    const providersFiltered = _.filter(providers, (provider) => {
+      provider.locations = _.filter(provider.locations, (location) =>
+        (_.isEmpty(req.body.query) || regexp.test(location.name)) &&
+        (providingTypeKeys.length === 0 || _.intersection(providingTypeKeys, location.providingType).length > 0))
+      return !_.isEmpty(provider.locations)
+    })
+
+    const filename = 'providers.xlsx'
+    const result = providerExport.constructProviderExportData(filename, providersFiltered)
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.send(result)
+  })
 })
 
 app.post('/providers', requireRole('kavi'), function(req, res, next) {
@@ -1992,8 +2024,8 @@ function getIpAddress(req) {
 }
 
 function isUrlEncodedBody(req) {
-  var paths = ['POST:/program/excel/export', 'POST:/users/excel/export', 'POST:/kieku', 'POST:/providers/billing/kieku', 'POST:/providers/yearlyBilling/kieku']
-  return _.includes(paths, req.method + ':' + req.path)
+  var paths = ['POST:/.*/excel/export', 'POST:/kieku', 'POST:/providers/.*[Bb]illing/kieku']
+  return _.some(_.map(paths, (path) => new RegExp(path).test(req.method + ':' + req.path)))
 }
 
 function isWhitelisted(req) {

@@ -74,6 +74,12 @@ function providerPage() {
     $providerDetails.slideDown()
   })
 
+  $page.find('button.export').on('click', function(e) {
+    var $form = $(".providers-excel-export-form:visible")
+    $form.find('input[name="_csrf"]').val($.cookie('_csrf_token'))
+    $form.submit()
+  })
+
   $providerNameQuery.on('input', function() {
     var searchString = $(this).val().toLowerCase()
     var providingTypes = _.map($('#provider-page .filters input').filter(':checked'), function (input) { return $(input).attr('data-providing-type') })
@@ -368,7 +374,7 @@ function providerPage() {
   function renderFilters() {
     var $filters = $('#provider-page .filters')
     var $providingTypes = _.map(Object.keys(enums.providingType), function (providingType) {
-      var $input = $('<input>').attr({'type': 'checkbox', 'data-providing-type': providingType})
+      var $input = $('<input>').attr({'type': 'checkbox', 'name': providingType, 'data-providing-type': providingType})
       $input.on('change', function() {
         $providerNameQuery.trigger('input')
       })

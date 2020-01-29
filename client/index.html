@@ -231,16 +231,22 @@
 
     <h2 class="main">Tarjoajat</h2>
     <div class="controls">
-      <div class="search">
-        <label for="provider-name-query" class="search-label">Nimi</label>
-        <input class="query" type="search" id="provider-name-query" placeholder="Hae nimellä...">
-        <div class="filters">
+      <form method="POST" action="/providers/excel/export" class="providers-excel-export-form">
+        <div class="search">
+          <label for="provider-name-query" class="search-label">Nimi</label>
+          <input class="query" name="query" type="search" id="provider-name-query" placeholder="Hae nimellä...">
+          <div class="filters">
+          </div>
+          <div>
+            <div class="result-count"><label>Hakutuloksia</label> <span class="num"></span></div>
+            <label class="k18-label"><input name="k18" type="checkbox" />Vain K-18 ohjelmien tarjoajat</label>
+          </div>
         </div>
         <div>
-          <div class="result-count"><label>Hakutuloksia</label> <span class="num"></span></div>
-          <label class="k18-label"><input type="checkbox" />Vain K-18 ohjelmien tarjoajat</label>
+          <input type="hidden" name="_csrf">
+          <button class="button export">Lataa Excel -tiedosto</button>
         </div>
-      </div>
+      </form>
     </div>
     <div class="providers-list results"></div>
   </div>

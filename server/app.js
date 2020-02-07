@@ -17,10 +17,7 @@ var ClassificationCriteria = schema.ClassificationCriteria
 var enums = require('../shared/enums')
 var utils = require('../shared/utils')
 var kieku = require('./kieku')
-var programExport = require('./program-export')
-var userExport = require('./user-export')
-var providerExport = require('./provider-export')
-var subscriberExport = require('./subscriber-export')
+var excelExport = require('./excel-export')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid = require('@sendgrid/mail')
@@ -255,7 +252,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
       if (err) return next(err)
       var ext = filename.substring(filename.lastIndexOf(('.')))
       var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      var result = programExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
+      var result = excelExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
       res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
       res.setHeader('Content-Type', contentType)
       res.send(result)
@@ -886,9 +883,8 @@ app.post('/subscribers/excel/export', function (req, res, next) {
   const roleQuery = { roles: _.isEmpty(selectedRoles) ? {$in: ['Classifier', 'Subscriber']} : { $all: selectedRoles }}
   Account.find(_.merge(q, roleQuery, {deleted: {$ne: true}})).sort('name').lean().exec((err, data) => {
     if (err) return next(err)
-    var filename = 'subscribers.xlsx'
-    var result = subscriberExport.constructSubscriberExportData(filename, data)
-    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    var result = excelExport.constructSubscriberExportData(data)
+    res.setHeader('Content-Disposition', 'attachment; filename=subscribers.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })
@@ -930,9 +926,8 @@ app.post('/providers/excel/export', function (req, res, next) {
       return !_.isEmpty(provider.locations)
     })
 
-    const filename = 'providers.xlsx'
-    const result = providerExport.constructProviderExportData(filename, providersFiltered)
-    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    const result = excelExport.constructProviderExportData(providersFiltered)
+    res.setHeader('Content-Disposition', 'attachment; filename=providers.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })
@@ -1294,9 +1289,8 @@ app.post('/users/excel/export', requireRole('root'), function (req, res, next) {
   var filters = _.merge(q, _.isEmpty(roleFilters) ? {} : { role: { $in: roleFilters }}, activeFilter ? {active: true} : {})
   User.find(filters, User.noPrivateFields).sort('name').lean().exec((err, data) => {
     if (err) return next(err)
-    var filename = 'users.xlsx'
-    var result = userExport.constructUserExportData(filename, data)
-    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    var result = excelExport.constructUserExportData(data)
+    res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })

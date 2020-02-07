@@ -151,19 +151,23 @@
   </div>
 
   <div id="subscriber-management-page" class="page">
-    <h2 class="main">Tilaajienhallinta</h2>
-    <div class="controls">
-      <button class="button" name="new-subscriber">Luo uusi</button>
-      <div class="search">
-        <label for="subscriber-name-query" class="search-label">Nimi</label>
-        <input class="query" type="search" id="subscriber-name-query" placeholder="Hae nimellä...">
+    <form method="POST" action="/subscribers/excel/export" class="subscribers-excel-export-form">
+      <h2 class="main">Tilaajienhallinta</h2>
+      <div class="controls">
+        <button class="button" name="new-subscriber">Luo uusi</button>
+        <div class="search">
+          <label for="subscriber-name-query" class="search-label">Nimi</label>
+          <input class="query" name="query" type="search" id="subscriber-name-query" placeholder="Hae nimellä...">
+        </div>
+        <div class="filters">
+          <label><input type="checkbox" name="Classifier">Työnantaja/Luokitteluyritys</label>
+          <label><input type="checkbox" name="Subscriber">Tilaaja</label>
+        </div>
+        <input type="hidden" name="_csrf">
+        <button class="button export">Lataa Excel -tiedosto</button>
       </div>
-      <div class="filters">
-        <label><input type="checkbox" name="Classifier">Työnantaja/Luokitteluyritys</label>
-        <label><input type="checkbox" name="Subscriber">Tilaaja</label>
-      </div>
-    </div>
-    <div class="subscribers-list results"></div>
+      <div class="subscribers-list results"></div>
+    </form>
   </div>
 
   <div id="provider-page" class="page">

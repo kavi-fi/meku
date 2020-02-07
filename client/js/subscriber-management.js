@@ -31,6 +31,12 @@ function subscriberManagementPage() {
 
   $page.find('.filters').change(function() { $page.trigger('show') })
 
+  $page.find('button.export').on('click', function(e) {
+    var $form = $(".subscribers-excel-export-form:visible")
+    $form.find('input[name="_csrf"]').val($.cookie('_csrf_token'))
+    $form.submit()
+  })
+
   $subscribers.on('click', '.result', function() {
     var $this = $(this)
     var wasSelected = $this.hasClass('selected')

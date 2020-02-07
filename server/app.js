@@ -20,6 +20,7 @@ var kieku = require('./kieku')
 var programExport = require('./program-export')
 var userExport = require('./user-export')
 var providerExport = require('./provider-export')
+var subscriberExport = require('./subscriber-export')
 var classificationUtils = require('../shared/classification-utils')
 var xml = require('./xml-import')
 var sendgrid = require('@sendgrid/mail')
@@ -876,6 +877,21 @@ app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
     ? { roles: { $in: ['Classifier', 'Subscriber'] }}
     : { roles: { $all: selectedRoles }}
   Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
+})
+
+app.post('/subscribers/excel/export', function (req, res, next) {
+  const regexp = new RegExp(utils.escapeRegExp(req.body.query), 'i')
+  const q = _.isEmpty(req.body.query) ? {} : {name: regexp}
+  const selectedRoles = _.compact(_.map(Object.keys(req.body), (key) => req.body[key] === 'on' ? key : undefined))
+  const roleQuery = { roles: _.isEmpty(selectedRoles) ? {$in: ['Classifier', 'Subscriber']} : { $all: selectedRoles }}
+  Account.find(_.merge(q, roleQuery, {deleted: {$ne: true}})).sort('name').lean().exec((err, data) => {
+    if (err) return next(err)
+    var filename = 'subscribers.xlsx'
+    var result = subscriberExport.constructSubscriberExportData(filename, data)
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.send(result)
+  })
 })
 
 app.get('/providers/unapproved', requireRole('kavi'), function(req, res, next) {

@@ -129,7 +129,7 @@
       <div class="controls">
         <div class="new-user right">
           <label for="new-user-type" class="search-label">Käyttäjäryhmä</label>
-          <input name="new-user-type" type="hidden" id="new-user-type"><button class="button">Luo</button>
+          <input name="new-user-type" type="hidden" id="new-user-type"><button type="button" class="button">Luo</button>
         </div>
         <div class="search">
           <label for="user-name-query" class="search-label">Nimi</label>
@@ -142,7 +142,7 @@
           <label><input type="checkbox" name="active" checked>Aktiiviset</label>
         </div>
         <input type="hidden" name="export" value="1">
-        <button class="button export">Lataa Excel -tiedosto</button>
+        <button type="button" class="button export">Lataa Excel -tiedosto</button>
       </div>
       <div class="user-list results"></div>
       <div>&nbsp;</div>
@@ -154,7 +154,7 @@
     <form method="POST" action="/subscribers/excel/export" class="subscribers-excel-export-form">
       <h2 class="main">Tilaajienhallinta</h2>
       <div class="controls">
-        <button class="button" name="new-subscriber">Luo uusi</button>
+        <button type="button" class="button" name="new-subscriber">Luo uusi</button>
         <div class="search">
           <label for="subscriber-name-query" class="search-label">Nimi</label>
           <input class="query" name="query" type="search" id="subscriber-name-query" placeholder="Hae nimellä...">
@@ -164,7 +164,7 @@
           <label><input type="checkbox" name="Subscriber">Tilaaja</label>
         </div>
         <input type="hidden" name="_csrf">
-        <button class="button export">Lataa Excel -tiedosto</button>
+        <button type="button" class="button export">Lataa Excel -tiedosto</button>
       </div>
       <div class="subscribers-list results"></div>
     </form>
@@ -248,7 +248,7 @@
         </div>
         <div>
           <input type="hidden" name="_csrf">
-          <button class="button export">Lataa Excel -tiedosto</button>
+          <button type="button" class="button export">Lataa Excel -tiedosto</button>
         </div>
       </form>
     </div>

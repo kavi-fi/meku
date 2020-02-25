@@ -18,6 +18,7 @@ function subscriberManagementPage() {
         $('body,html').animate({ scrollTop: top })
       }
     })
+    $page.find('form input[name="_csrf"]').val($.cookie('_csrf_token'))
   })
 
   $subscriberNameQuery.on('input', function() {
@@ -33,7 +34,6 @@ function subscriberManagementPage() {
 
   $page.find('button.export').on('click', function(e) {
     var $form = $(".subscribers-excel-export-form:visible")
-    $form.find('input[name="_csrf"]').val($.cookie('_csrf_token'))
     $form.submit()
   })
 

@@ -29,6 +29,7 @@ function userManagementPage() {
         $('body,html').animate({ scrollTop: top })
       }
     })
+    $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
   })
 
   $userList.on('click', '.result', function() {
@@ -43,7 +44,6 @@ function userManagementPage() {
 
   $page.find('button.export').on('click', function(e) {
     var $form = $(".users-excel-export-form:visible")
-    $form.find('input[name="_csrf"]').val($.cookie('_csrf_token'))
     $form.submit()
   })
 

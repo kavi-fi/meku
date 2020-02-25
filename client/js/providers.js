@@ -76,7 +76,6 @@ function providerPage() {
 
   $page.find('button.export').on('click', function(e) {
     var $form = $(".providers-excel-export-form:visible")
-    $form.find('input[name="_csrf"]').val($.cookie('_csrf_token'))
     $form.submit()
   })
 

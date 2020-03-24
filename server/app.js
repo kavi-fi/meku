@@ -258,7 +258,7 @@ function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
       res.send(result)
     })
   } else {
-    Program.find(query, queryData.fields).skip(queryData.page * 100).limit(100).sort(sortBy).lean().exec(function(err, docs) {
+    Program.find(query, queryData.fields).skip(queryData.page * 500).limit(500).sort(sortBy).lean().exec(function(err, docs) {
       if (err) return next(err)
 
       replaceFearToAnxiety(docs)

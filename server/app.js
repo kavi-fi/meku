@@ -1,46 +1,46 @@
-var express = require('express')
-var fs = require('fs')
-var _ = require('lodash')
-var async = require('async')
-var path = require('path')
-var moment = require('moment')
-var mongoose = require('mongoose')
-var schema = require('./schema')
-var Program = schema.Program
-var User = schema.User
-var Account = schema.Account
-var InvoiceRow = schema.InvoiceRow
-var ChangeLog = schema.ChangeLog
-var Provider = schema.Provider
-var ProviderMetadata = schema.ProviderMetadata
-var ClassificationCriteria = schema.ClassificationCriteria
-var enums = require('../shared/enums')
-var utils = require('../shared/utils')
-var kieku = require('./kieku')
-var excelExport = require('./excel-export')
-var classificationUtils = require('../shared/classification-utils')
-var xml = require('./xml-import')
-var sendgrid = require('@sendgrid/mail')
-var builder = require('xmlbuilder')
-var bcrypt = require('bcryptjs')
-var CronJob = require('cron').CronJob
-var providerUtils = require('./provider-utils')
-var upload = require('multer')({ dest: '/tmp/', limits: { fileSize: 5000000, files: 1 } })
-var providerImport = require('./provider-import')
-var csrf = require('csurf')
-var bodyParser = require('body-parser')
-var cookieParser = require('cookie-parser')
-var compression = require('compression')
-var buildRevision = fs.readFileSync(__dirname + '/../build.revision', 'utf-8')
-var validation = require('./validation')
-var srvUtils = require('./server-utils')
-var env = require('./env').get()
-var testEnvEmailQueue = []
+const express = require('express')
+const fs = require('fs')
+const _ = require('lodash')
+const async = require('async')
+const path = require('path')
+const moment = require('moment')
+const mongoose = require('mongoose')
+const schema = require('./schema')
+const Program = schema.Program
+const User = schema.User
+const Account = schema.Account
+const InvoiceRow = schema.InvoiceRow
+const ChangeLog = schema.ChangeLog
+const Provider = schema.Provider
+const ProviderMetadata = schema.ProviderMetadata
+const ClassificationCriteria = schema.ClassificationCriteria
+const enums = require('../shared/enums')
+const utils = require('../shared/utils')
+const kieku = require('./kieku')
+const excelExport = require('./excel-export')
+const classificationUtils = require('../shared/classification-utils')
+const xml = require('./xml-import')
+const sendgrid = require('@sendgrid/mail')
+const builder = require('xmlbuilder')
+const bcrypt = require('bcryptjs')
+const CronJob = require('cron').CronJob
+const providerUtils = require('./provider-utils')
+const upload = require('multer')({dest: '/tmp/', limits: {fileSize: 5000000, files: 1}})
+const providerImport = require('./provider-import')
+const csrf = require('csurf')
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const compression = require('compression')
+const buildRevision = fs.readFileSync(path.join(__dirname, '/../build.revision'), 'utf-8')
+const validation = require('./validation')
+const srvUtils = require('./server-utils')
+const env = require('./env').get()
+const testEnvEmailQueue = []
 
 sendgrid.setApiKey(process.env.SENDGRID_APIKEY)
-express.static.mime.define({ 'text/xml': ['xsd'] })
+express.static.mime.define({'text/xml': ['xsd']})
 
-var app = express()
+const app = express()
 
 app.use(rejectNonHttpMethods)
 app.use(nocache)
@@ -55,28 +55,27 @@ app.use(setCsrfTokenCookie)
 app.use(authenticate)
 app.set('view engine', 'ejs');
 
-app.get('/public.html', function(req, res) {
-  res.render('../client/public', {
-    searchHelpPageUrl: process.env.SEARCH_HELP_PAGE_URL || 'https://kavi.fi',
-    disclaimerPageUrl: process.env.DISCLAIMER_PAGE_URL || 'https://kavi.fi',
-    lang: req.cookies.lang
-  })
-});
+app.get('/public.html', (req, res) => res.render('../client/public', {
+  searchHelpPageUrl: process.env.SEARCH_HELP_PAGE_URL || 'https://kavi.fi',
+  disclaimerPageUrl: process.env.DISCLAIMER_PAGE_URL || 'https://kavi.fi',
+  lang: req.cookies.lang
+}))
+
 app.use(express.static(path.join(__dirname, '../client')))
 app.use('/shared', express.static(path.join(__dirname, '../shared')))
 
-app.post('/login', function(req, res, next) {
-  var username = req.body.username
-  var password = req.body.password
+app.post('/login', (req, res, next) => {
+  const username = req.body.username
+  const password = req.body.password
   if (!username || !password) return res.sendStatus(403)
-  User.findOne({ username: username.toUpperCase(), password: {$exists: true}, active: true }, function(err, user) {
+  User.findOne({username: username.toUpperCase(), password: {$exists: true}, active: true}, (err, user) => {
     if (err) return next(err)
     if (!user) return res.sendStatus(403)
-    if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment()) ) {
-      user.updateOne({ active: false }, respond(res, next, 403))
+    if (user.certificateEndDate && moment(user.certificateEndDate).isBefore(moment())) {
+      user.updateOne({active: false}, respond(res, next, 403))
     } else {
-      user.checkPassword(password, function(err, ok) {
-        if (err) return next(err)
+      user.checkPassword(password, (checkErr, ok) => {
+        if (checkErr) return next(checkErr)
         if (!ok) return res.sendStatus(403)
         logUserIn(req, res, user)
         res.send({})
@@ -85,8 +84,8 @@ app.post('/login', function(req, res, next) {
   })
 })
 
-function logUserIn(req, res, user) {
-  var weekInMs = 604800000
+function logUserIn (req, res, user) {
+  const weekInMs = 604800000
   res.cookie('user', {
     _id: user._id.toString(),
     username: user.username,
@@ -94,33 +93,33 @@ function logUserIn(req, res, user) {
     role: user.role,
     email: _.first(user.emails),
     employerName: utils.getProperty(user, 'employers.0.name')
-  }, { maxAge: weekInMs, signed: true })
-  saveChangeLogEntry(_.merge(user, { ip: getIpAddress(req) }), null, 'login')
+  }, {maxAge: weekInMs, signed: true})
+  saveChangeLogEntry(_.merge(user, {ip: getIpAddress(req)}), null, 'login')
 }
 
-app.post('/logout', function(req, res, next) {
+app.post('/logout', (req, res) => {
   res.clearCookie('user')
   res.send({})
 })
 
-app.post('/forgot-password', function(req, res, next) {
-  var username = req.body.username
+app.post('/forgot-password', (req, res, next) => {
+  const username = req.body.username
   if (!username) return res.sendStatus(403)
-  User.findOne({ username: username.toUpperCase(), active: true }, function(err, user) {
+  User.findOne({username: username.toUpperCase(), active: true}, (err, user) => {
     if (err) return next(err)
     if (!user) return res.sendStatus(403)
     if (_.isEmpty(user.emails)) {
       console.log(user.username + ' has no email address')
       return res.sendStatus(500)
     }
-    var subject = 'Salasanan uusiminen / Förnya lösenordet'
-    srvUtils.getTemplate('reset-password-email.tpl.html', function(err, tpl) {
-      if (err) return next(err)
+    const subject = 'Salasanan uusiminen / Förnya lösenordet'
+    srvUtils.getTemplate('reset-password-email.tpl.html', (templErr, tpl) => {
+      if (templErr) return next(templErr)
       if (user.resetHash) {
         sendHashLinkViaEmail(user, subject, tpl, respond(res, next, {}))
       } else {
-        createAndSaveHash(user, function(err) {
-          if (err) return next(err)
+        createAndSaveHash(user, (hashErr) => {
+          if (hashErr) return next(hashErr)
           sendHashLinkViaEmail(user, subject, tpl, respond(res, next, {}))
         })
       }
@@ -128,42 +127,43 @@ app.post('/forgot-password', function(req, res, next) {
   })
 })
 
-function sendHashLinkViaEmail(user, subject, template, callback) {
-  var url = env.hostname + '/reset-password.html#' + user.resetHash
-  var emailData = {
+function sendHashLinkViaEmail (user, subject, template, callback) {
+  const url = env.hostname + '/reset-password.html#' + user.resetHash
+  const emailData = {
     recipients: user.emails,
     subject: subject,
-    body: _.template(template)({ link: url, username: user.username })
+    body: _.template(template)({link: url, username: user.username})
   }
   sendEmail(emailData, user, callback)
 }
 
-function createAndSaveHash(user, callback) {
-  bcrypt.genSalt(1, function (err, s) {
-    user.resetHash = new Buffer(s, 'base64').toString('hex')
+function createAndSaveHash (user, callback) {
+  bcrypt.genSalt(1, (saltErr, s) => {
+    if (saltErr) return callback(saltErr)
+    user.resetHash = Buffer.from(s, 'base64').toString('hex')
     user.save(callback)
   })
 }
 
-app.get('/check-reset-hash/:hash', function(req, res, next) {
-  User.findOne({ resetHash: req.params.hash, active: true }).lean().exec(function(err, user) {
+app.get('/check-reset-hash/:hash', (req, res, next) => {
+  User.findOne({resetHash: req.params.hash, active: true}).lean().exec((err, user) => {
     if (err) return next(err)
     if (!user) return res.sendStatus(403)
-    if (user.password) return res.send({ name: user.name })
-    res.send({ newUser: true, name: user.name })
+    if (user.password) return res.send({name: user.name})
+    res.send({newUser: true, name: user.name})
   })
 })
 
-app.post('/reset-password', function(req, res, next) {
-  var resetHash = req.body.resetHash
+app.post('/reset-password', (req, res, next) => {
+  const resetHash = req.body.resetHash
   if (resetHash) {
-    User.findOne({ resetHash: resetHash, active: true }, function (err, user) {
+    User.findOne({resetHash: resetHash, active: true}, (err, userToResetPassword) => {
       if (err) return next(err)
-      if (!user) return res.sendStatus(403)
-      user.password = req.body.password
-      user.resetHash = null
-      user.save(function (err, user) {
-        if (err) return next(err)
+      if (!userToResetPassword) return res.sendStatus(403)
+      userToResetPassword.password = req.body.password
+      userToResetPassword.resetHash = null
+      userToResetPassword.save((saveErr, user) => {
+        if (saveErr) return next(saveErr)
         logUserIn(req, res, user)
         res.send({})
       })
@@ -173,18 +173,18 @@ app.post('/reset-password', function(req, res, next) {
   }
 })
 
-app.get('/fixedKaviRecipients', function (req, res) {
+app.get('/fixedKaviRecipients', (req, res) => {
   res.send(schema.fixedKaviRecipients())
 })
 
-function programFields(req, isUser, isKavi) {
-  var fields = isKavi ? null : { 'classifications.comments': 0 }
+function programFields (req, isUser, isKavi) {
+  const fields = isKavi ? null : {'classifications.comments': 0}
   return isUser ? fields : Program.publicFields
 }
 
-function searchQueryParams(req, data) {
-  var isUser = !!req.user
-  var isKavi = utils.hasRole(req.user, 'kavi')
+function searchQueryParams (req, data) {
+  const isUser = !!req.user
+  const isKavi = utils.hasRole(req.user, 'kavi')
   return {
     page: parseInt(data.page),
     isUser: isUser,
@@ -212,18 +212,17 @@ function searchQueryParams(req, data) {
   }
 }
 
-function processQuery(req, res, next, data, filename) {
-  var queryParams = searchQueryParams(req, data)
-  var query = constructQuery(queryParams)
-  var sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
-  var sortOrder = queryParams.sortOrder == 'ascending' ? '' : '-'
-  var sortedColumn = resolveColumnSort(queryParams.sortBy, sortOrder)
-  var sortBy = sortedColumn ? `${sortOrder}${sortedColumn}` : queryParams.sorted ? sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name' : ''
+function processQuery (req, res, next, data, filename) {
+  const queryParams = searchQueryParams(req, data)
+  const query = constructQuery(queryParams)
+  const sortByRegistrationDate = !!queryParams.registrationDateRange || !!queryParams.classifier || queryParams.agelimits || queryParams.warnings || queryParams.reclassified || queryParams.ownClassificationsOnly
+  const sortOrder = queryParams.sortOrder === 'ascending' ? '' : '-'
+  const sortedColumn = resolveColumnSort(queryParams.sortBy, sortOrder)
+  const sortBy = sortedColumn ? `${sortOrder}${sortedColumn}` : queryParams.sorted ? sortByRegistrationDate ? '-classifications.0.registrationDate' : 'name' : ''
   sendOrExport(query, queryParams, sortBy, filename, req.cookies.lang || 'fi', res, next)
-
 }
 
-function resolveColumnSort(fieldName){
+function resolveColumnSort (fieldName) {
   const fieldMapping = {
     col_name: 'name',
     col_duration: 'classifications.0.duration',
@@ -233,75 +232,71 @@ function resolveColumnSort(fieldName){
   return _.get(fieldMapping, fieldName, undefined)
 }
 
-app.post('/program/excel/export', function(req, res, next) {
+app.post('/program/excel/export', (req, res, next) => {
   processQuery(req, res, next, JSON.parse(req.body.post_data), 'kavi_luokittelut' + (req.body.csv === "1" ? '.csv' : '.xlsx'))
 })
 
-
-app.get('/programs/search/:q?', function(req, res, next) {
+app.get('/programs/search/:q?', (req, res, next) => {
   processQuery(req, res, next, _.extend(req.query, {q: req.params.q}))
 })
 
-function sendOrExport(query, queryData, sortBy, filename, lang, res, next){
-
-  var isAdminUser = utils.hasRole(queryData.user, 'root')
-  var showClassificationAuthor = isAdminUser
+function sendOrExport (query, queryData, sortBy, filename, lang, res, next) {
+  const showClassificationAuthor = utils.hasRole(queryData.user, 'root')
 
   if (filename) {
-    Program.find(query, queryData.fields).limit(5000).sort(sortBy).lean().exec(function (err, docs) {
+    Program.find(query, queryData.fields).limit(5000).sort(sortBy).lean().exec((err, docs) => {
       if (err) return next(err)
-      var ext = filename.substring(filename.lastIndexOf(('.')))
-      var contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      var result = excelExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
+      const ext = filename.substring(filename.lastIndexOf('.'))
+      const contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      const result = excelExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
       res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
       res.setHeader('Content-Type', contentType)
       res.send(result)
     })
   } else {
-    Program.find(query, queryData.fields).skip(queryData.page * 500).limit(500).sort(sortBy).lean().exec(function(err, docs) {
+    Program.find(query, queryData.fields).skip(queryData.page * 500).limit(500).sort(sortBy).lean().exec((err, docs) => {
       if (err) return next(err)
 
       replaceFearToAnxiety(docs)
-      if(!queryData.isKavi) docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, queryData.user) })
+      if (!queryData.isKavi) docs.forEach((doc) => removeOtherUsersComments(doc.classifications, queryData.user))
 
-      if (queryData.page == 0 && queryData.showCount) {
-        Program.countDocuments(query, function(err, count) {
-          res.send({ count: count, programs: docs })
-        })
+      if (queryData.page === 0 && queryData.showCount) {
+        Program.countDocuments(query, (countErr, count) => res.send({count: count, programs: docs, err: countErr}))
       } else {
-        res.send({ programs: docs })
+        res.send({programs: docs})
       }
     })
   }
 }
 
-function fearToAnxiety(w) {
+function fearToAnxiety (w) {
   return w.replace(/^fear$/, 'anxiety')
 }
 
-function replaceFearToAnxiety(docs) {
-  docs.forEach(function (doc) {
-    var classifications = enums.util.isTvSeriesName(doc) ? [doc.episodes] : doc.classifications
-    classifications.forEach(function (classification) {
+function replaceFearToAnxiety (docs) {
+  docs.forEach((doc) => {
+    const classifications = enums.util.isTvSeriesName(doc) ? [doc.episodes] : doc.classifications
+    classifications.forEach((classification) => {
       classification.warnings = classification.warnings ? classification.warnings.map(fearToAnxiety) : undefined
       classification.warningOrder = classification.warningOrder ? classification.warningOrder.map(fearToAnxiety) : undefined
     })
   })
 }
 
-function constructReclassifiedByQuery(reclassified, reclassifiedBy) {
-  var reclassifiedByQuery = {}
+function constructReclassifiedByQuery (reclassified, reclassifiedBy) {
+  let reclassifiedByQuery = {}
   if (reclassified) {
     reclassifiedByQuery = {$and: []}
-    reclassifiedByQuery.$and.push({"classifications.isReclassification": {$eq: true}})    // At least one reclassification in the classifications list 
-    if (reclassifiedBy == 2) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: true}})
-    if (reclassifiedBy == 3) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: false}})
+    reclassifiedByQuery.$and.push({"classifications.isReclassification": {$eq: true}}) // At least one reclassification in the classifications list
+
+    if (reclassifiedBy === 2) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: true}})
+    if (reclassifiedBy === 3) reclassifiedByQuery.$and.push({"classifications.authorOrganization": {$exists: false}})
   }
   return reclassifiedByQuery
 }
 
-function constructQuery(queryData) {
-  var mainQuery = {$and: []}
+function constructQuery (queryData) {
+  const mainQuery = {$and: []}
 
   mainQuery.$and.push(constructClassificationsExistQuery(queryData.user))
   mainQuery.$and.push(constructNameQueries(queryData.q, queryData.searchFromSynopsis))
@@ -316,177 +311,140 @@ function constructQuery(queryData) {
   mainQuery.$and.push(constructBuyerQuery(queryData.buyer))
   mainQuery.$and.push(constructProductionYearQuery(queryData.year))
 
-  if(queryData.isUser) mainQuery.$and.push(constructOwnClassifications(queryData.ownClassificationsOnly, queryData.user._id))
+  if (queryData.isUser) mainQuery.$and.push(constructOwnClassifications(queryData.ownClassificationsOnly, queryData.user._id))
   mainQuery.$and.push(constructDeletedQuery(queryData.showDeleted))
 
-  mainQuery.$and = _.filter(mainQuery.$and, function (andItem) { return !_.isEmpty(andItem)})
+  mainQuery.$and = _.filter(mainQuery.$and, (andItem) => !_.isEmpty(andItem))
 
   return mainQuery
 }
 
-  function constructClassificationsExistQuery(user) {
-    return user ? {} : {$or: [{$and: [{episodes: {$exists: true}}, {'episodes.count': {$gt: 0}}]}, {$and: [{classifications:{$exists: true}}, {'classifications.0': {$exists: true}}]}]}
-  }
-
-function constructDeletedQuery(showDeleted){
-  var deleted = {deleted: { $ne: true }}
-  if (showDeleted) {
-    deleted = { deleted: true }
-  }
-
-  return deleted
+function constructClassificationsExistQuery (user) {
+  return user ? {} : {$or: [{$and: [{episodes: {$exists: true}}, {'episodes.count': {$gt: 0}}]}, {$and: [{classifications: {$exists: true}}, {'classifications.0': {$exists: true}}]}]}
 }
 
-function constructBuyerQuery(buyer){
-  var buyers = {}
-  if (buyer){
-    buyers = { 'classifications': { $elemMatch: { 'buyer._id': buyer }}}
-  }
-  return buyers
+function constructDeletedQuery (showDeleted) {
+  if (showDeleted) return {deleted: true}
+  return {deleted: {$ne: true}}
 }
 
-function constructProductionYearQuery(year) {
-  return year ? { year: year } : {}
+function constructBuyerQuery (buyer) {
+  if (buyer) return {'classifications': {$elemMatch: {'buyer._id': buyer}}}
+  return {}
 }
 
-function constructOwnClassifications(ownClassifications, userid){
-  var owns = {}
-  if (ownClassifications){
-    owns = { classifications: { $elemMatch: { 'author._id': userid }}}
-  }
-
-  return owns
+function constructProductionYearQuery (year) {
+  return year ? {year: year} : {}
 }
 
-function constructProgramTypeFilter(filters){
-  var filt = {}
-
-  var filters = filters || []
-  if (filters.length > 0) filt = ({"programType": { $in: filters }})
-
-  return filt
+function constructOwnClassifications (ownClassifications, userid) {
+  if (ownClassifications) return {classifications: {$elemMatch: {'author._id': userid}}}
+  return {}
 }
 
-function toSearchTermQuery(string, primaryField, secondaryField, fromBeginning, ignoreCase) {
-  var searchString = (string || '').trim().toLowerCase()
-  var parts = searchString.match(/"[^"]*"|[^ ]+/g)
+function constructProgramTypeFilter (filters) {
+  if (filters && filters.length > 0) return {"programType": {$in: filters}}
+  return {}
+}
+
+function toSearchTermQuery (string, primaryField, secondaryField, fromBeginning, ignoreCase) {
+  const searchString = (string || '').trim().toLowerCase()
+  const parts = searchString.match(/"[^"]*"|[^ ]+/g)
   if (!parts) return undefined
-  return parts.reduce(function(result, s) {
-    if (/^".+"$/.test(s)) {
-      var withoutQuotes = s.substring(1, s.length - 1)
-      if (s.indexOf(' ') == -1) {
-        return addToAll(result, primaryField, withoutQuotes)
-      } else {
-        return addToAll(result, primaryField, new RegExp(utils.escapeRegExp(withoutQuotes), ignoreCase ? 'i' : ''))
-      }
-    } else {
-      return addToAll(result, secondaryField, new RegExp((fromBeginning ? '^' : '') + utils.escapeRegExp(s), ignoreCase ? 'i' : ''))
+  return parts.reduce((result, s) => {
+    if ((/^".+"$/).test(s)) {
+      const withoutQuotes = s.substring(1, s.length - 1)
+      if (s.indexOf(' ') === -1) return addToAll(result, primaryField, withoutQuotes)
+      return addToAll(result, primaryField, new RegExp(utils.escapeRegExp(withoutQuotes), ignoreCase ? 'i' : ''))
     }
+    return addToAll(result, secondaryField, new RegExp((fromBeginning ? '^' : '') + utils.escapeRegExp(s), ignoreCase ? 'i' : ''))
   }, {})
 
-  function addToAll(obj, key, value) {
-    if (!obj[key]) obj[key] = { $all: [] }
+  function addToAll (obj, key, value) {
+    if (!obj[key]) obj[key] = {$all: []}
     obj[key].$all.push(value)
     return obj
   }
 }
 
-function agelimitQuery(agelimits) {
-  var limits = {}
+function agelimitQuery (agelimits) {
   if (agelimits && !_.isEmpty(agelimits)) {
-    var agelimitsIn = { $in: agelimits.map(function(s) { return parseInt(s) }) }
-    limits = ({$or: [{ 'classifications.0.agelimit': agelimitsIn }, { 'episodes.agelimit': agelimitsIn }]})
+    const agelimitsIn = {$in: agelimits.map((s) => parseInt(s))}
+    return {$or: [{'classifications.0.agelimit': agelimitsIn}, {'episodes.agelimit': agelimitsIn}]}
   }
-
-  return limits
+  return {}
 }
 
-function warningsQuery(w) {
-  var warnings = {}
-
+function warningsQuery (w) {
   if (w && !_.isEmpty(w)) {
-    var warnings = { $all: w }
-    warnings = ({ $or: [{ 'classifications.0.warnings': warnings }, { 'episodes.warnings': warnings } ] })
+    const warnings = {$all: w}
+    return {$or: [{'classifications.0.warnings': warnings}, {'episodes.warnings': warnings}]}
   }
-
-  return warnings
+  return {}
 }
 
-  function constructClassifierQuery(classifier) {
-    var classifierQuery = {}
-    if (classifier) {
-      classifierQuery = {"classifications.author._id": classifier}
-    }
-    return classifierQuery
-  }
+function constructClassifierQuery (classifier) {
+  if (classifier) return {"classifications.author._id": classifier}
+  return {}
+}
 
-function constructDirectorFilter(directors) {
+function constructDirectorFilter (directors) {
   if (directors && directors.length > 0) {
     return {directors: {$in: directors.split(',')}}
   }
   return {}
 }
 
-function constructDateRangeQuery(registrationDateRange) {
-  var dtQuery = {}
+function constructDateRangeQuery (registrationDateRange) {
   if (registrationDateRange) {
-    var range = utils.parseDateRange(registrationDateRange)
-    var registrationDate = {}
+    const range = utils.parseDateRange(registrationDateRange)
+    const registrationDate = {}
     if (range.begin) registrationDate.$gte = range.begin.toDate()
     if (range.end) registrationDate.$lt = range.end.toDate()
-    dtQuery = {classifications: {$elemMatch: {registrationDate: registrationDate}}}
+    return {classifications: {$elemMatch: {registrationDate: registrationDate}}}
   }
-  return dtQuery
+  return {}
 }
 
-function constructNameQueries(terms, useSynopsis){
-  var nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true, false)
-  var finalQuery = parseInt(terms) == terms ? {$or: [nameQueries, { sequenceId: parseInt(terms) }]} : nameQueries
+function constructNameQueries (terms, useSynopsis) {
+  const nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true, false)
+  const finalQuery = _.isNumber(terms) ? {$or: [nameQueries, {sequenceId: parseInt(terms)}]} : nameQueries
   if (useSynopsis) {
-    var synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis', false, true)
-    if(synopsisQueries) return {$or: [finalQuery, synopsisQueries]}
+    const synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis', false, true)
+    if (synopsisQueries) return {$or: [finalQuery, synopsisQueries]}
   }
   return finalQuery
 }
 
-function getQueryUserRoleDependencies(userid, role){
-  var roleQuery = {}
-  var ObjectId = mongoose.Types.ObjectId
-
-  if (role === 'trainee') roleQuery = ({$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': ObjectId(userid)}]})
-  if (role === 'user') roleQuery = ({ 'createdBy.role': { $ne: 'trainee' }})
-
-  return roleQuery
+function getQueryUserRoleDependencies (userid, role) {
+  const objectId = mongoose.Types.ObjectId
+  if (role === 'trainee') return {$or: [{'createdBy.role': {$ne: 'trainee'}}, {'createdBy._id': objectId(userid)}]}
+  if (role === 'user') return {'createdBy.role': {$ne: 'trainee'}}
+  return {}
 }
 
-app.get('/episodes/:seriesId', function(req, res, next) {
-  var fields = !req.user ? Program.publicFields
-    : utils.hasRole(req.user, 'kavi') ? {} : {'classifications.comments': 0}
-  var query = { deleted: { $ne:true }, 'series._id': req.params.seriesId }
-  if (!req.user) query.classifications = { $exists: true, $nin: [[]] }
-  Program.find(query, fields).sort({ season:1, episode:1 }).lean().exec(function (err, docs) {
+app.get('/episodes/:seriesId', (req, res, next) => {
+  const query = {deleted: {$ne: true}, 'series._id': req.params.seriesId}
+  if (!req.user) query.classifications = {$exists: true, $nin: [[]]}
+  Program.find(query, programFields(req, !!req.user, utils.hasRole(req.user, 'kavi'))).sort({season: 1, episode: 1}).lean().exec((err, docs) => {
     if (err) return next(err)
-    else {
-      docs.forEach(function (doc) { removeOtherUsersComments(doc.classifications, req.user)  })
-      res.send(docs)
-    }
+    docs.forEach((doc) => { removeOtherUsersComments(doc.classifications, req.user) })
+    res.send(docs)
   })
 })
 
-app.get('/programs/drafts', function(req, res, next) {
+app.get('/programs/drafts', (req, res, next) => {
   if (!req.user) return res.sendStatus(403)
-  Program.find({ draftsBy: req.user._id, deleted: { $ne:true } }, { name:1, draftClassifications:1 }).lean().exec(function(err, programs) {
+  Program.find({draftsBy: req.user._id, deleted: {$ne: true}}, {name: 1, draftClassifications: 1}).lean().exec((err, programs) => {
     if (err) return next(err)
-    res.send(programs.map(function(p) {
-      return {_id: p._id, name: p.name, creationDate: p.draftClassifications[req.user._id].creationDate}
-    }))
+    res.send(programs.map((p) => ({_id: p._id, name: p.name, creationDate: p.draftClassifications[req.user._id].creationDate})))
   })
 })
 
-app.get('/programs/recent', function(req, res, next) {
+app.get('/programs/recent', (req, res, next) => {
   if (!req.user) return res.sendStatus(403)
-  var ObjectId = mongoose.Types.ObjectId
-  Program.find({ "classifications.author._id": ObjectId(req.user._id), deleted: { $ne: true } }).sort('-classifications.registrationDate').limit(1).lean().exec(function (err, program) {
+  const objectId = mongoose.Types.ObjectId
+  Program.find({"classifications.author._id": objectId(req.user._id), deleted: {$ne: true}}).sort('-classifications.registrationDate').limit(1).lean().exec((err, program) => {
     if (err) next(err)
     else {
       removeOtherUsersComments(program.classifications, req.user)
@@ -495,8 +453,8 @@ app.get('/programs/recent', function(req, res, next) {
   })
 })
 
-function removeOtherUsersComments(classifications, user) {
-  if (classifications) return classifications.forEach(function (c) {
+function removeOtherUsersComments (classifications, user) {
+  if (classifications) return classifications.forEach((c) => {
     if (!utils.hasRole(user, 'kavi')) {
       c.comments = ''
       if (!user || !c.author || user.username !== c.author.username) {
@@ -506,12 +464,12 @@ function removeOtherUsersComments(classifications, user) {
   })
 }
 
-app.delete('/programs/drafts/:id', function(req, res, next) {
-  var pull = { draftsBy: req.user._id }
-  var unset = utils.keyValue('draftClassifications.' + req.user._id, "")
-  Program.findByIdAndUpdate(req.params.id, { $pull: pull, $unset: unset }, function(err, p) {
+app.delete('/programs/drafts/:id', (req, res, next) => {
+  const pull = {draftsBy: req.user._id}
+  const unset = utils.keyValue('draftClassifications.' + req.user._id, "")
+  Program.findByIdAndUpdate(req.params.id, {$pull: pull, $unset: unset}, (err, p) => {
     if (err) return next(err)
-    if (p.classifications.length == 0 && p.draftsBy.length == 0) {
+    if (p.classifications.length === 0 && p.draftsBy.length === 0) {
       softDeleteAndLog(p, req.user, respond(res, next))
     } else {
       res.send(p)
@@ -519,21 +477,21 @@ app.delete('/programs/drafts/:id', function(req, res, next) {
   })
 })
 
-app.get('/programs/:id', function(req, res, next) {
+app.get('/programs/:id', (req, res, next) => {
   Program.findById(req.params.id, programFields(req, !!req.user, utils.hasRole(req.user, 'kavi'))).lean().exec(respond(res, next))
 })
 
-app.post('/programs/new', function(req, res, next) {
-  var programType = parseInt(req.body.programType)
+app.post('/programs/new', (req, res, next) => {
+  const programType = parseInt(req.body.programType)
   if (!enums.util.isDefinedProgramType(programType)) return res.sendStatus(400)
-  var p = new Program({ programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.name, role: req.user.role}})
-  var draftClassification = p.newDraftClassification(req.user)
-  var origProgram = req.body.origProgram
+  const p = new Program({programType: programType, sentRegistrationEmails: [], createdBy: {_id: req.user._id, username: req.user.username, name: req.user.name, role: req.user.role}})
+  const draftClassification = p.newDraftClassification(req.user)
+  const origProgram = req.body.origProgram
   if (origProgram) {
-    var seriesFieldsToCopy = ['series']
-    var fieldsToCopy = ['country', 'year', 'productionCompanies', 'genre', 'directors', 'actors']
-    _.forEach(fieldsToCopy, function (field) { p[field] = origProgram[field] })
-    if (enums.util.isTvEpisode(p)) _.forEach(seriesFieldsToCopy, function (field) { p[field] = origProgram[field] })
+    const seriesFieldsToCopy = ['series']
+    const fieldsToCopy = ['country', 'year', 'productionCompanies', 'genre', 'directors', 'actors']
+    _.forEach(fieldsToCopy, (field) => { p[field] = origProgram[field] })
+    if (enums.util.isTvEpisode(p)) _.forEach(seriesFieldsToCopy, (field) => { p[field] = origProgram[field] })
     if (origProgram.classifications.length > 0) {
       draftClassification.buyer = undefined
       draftClassification.billing = undefined
@@ -544,22 +502,21 @@ app.post('/programs/new', function(req, res, next) {
 
     }
   }
-  p.save(function(err, program) {
+  p.save((err, program) => {
     if (err) return next(err)
     logCreateOperation(req.user, program)
     res.send(program)
   })
 })
 
-app.post('/programs/:id/register', function(req, res, next) {
-  Program.findById(req.params.id, function(err, program) {
-    if (err) return next(err)
-
-    var newClassification = program.draftClassifications[req.user._id]
+app.post('/programs/:id/register', (req, res, next) => {
+  Program.findById(req.params.id, (findErr, program) => {
+    if (findErr) return next(findErr)
+    const newClassification = program.draftClassifications[req.user._id]
     if (!newClassification) return res.sendStatus(409)
 
     newClassification.status = 'registered'
-    newClassification.author = { _id: req.user._id, name: req.user.name, username: req.user.username }
+    newClassification.author = {_id: req.user._id, name: req.user.name, username: req.user.username}
     if (newClassification.isReclassification && !utils.hasRole(req.user, 'kavi')) {
       newClassification.reason = 4
     }
@@ -568,25 +525,25 @@ app.post('/programs/:id/register', function(req, res, next) {
     program.draftClassifications = {}
     program.draftsBy = []
     program.classifications.unshift(newClassification)
-    program.classifications.sort(function (c1, c2) { return c2.registrationDate - c1.registrationDate })
+    program.classifications.sort((c1, c2) => c2.registrationDate - c1.registrationDate)
     program.markModified('draftClassifications')
     program.preventSendingEmail = req.body.preventSendingEmail
 
-    populateSentRegistrationEmailAddresses(program, function (err, program) {
+    populateSentRegistrationEmailAddresses(program, (err, p) => {
       if (err) return next(err)
-      verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
-        if (err) return next(err)
-        program.save(function(err) {
-          if (err) return next(err)
-          updateTvSeriesClassification(program, function(err) {
-            if (err) return next(err)
-            addInvoicerows(newClassification, function(err) {
-              if (err) return next(err)
-              sendRegistrationEmail(function(err) {
-                if (err) return next(err)
-                updateMetadataIndexesForNewProgram(program, function() {
-                  logUpdateOperation(req.user, program, { 'classifications': { new: 'Luokittelu rekisteröity' } })
-                  return res.send(program)
+      verifyTvSeriesExistsOrCreate(p, req.user, (existErr) => {
+        if (existErr) return next(existErr)
+        p.save((saveErr) => {
+          if (saveErr) return next(saveErr)
+          updateTvSeriesClassification(p, (updateErr) => {
+            if (updateErr) return next(updateErr)
+            addInvoicerows(newClassification, (invoiceErr) => {
+              if (invoiceErr) return next(invoiceErr)
+              sendRegistrationEmail((sendErr) => {
+                if (sendErr) return next(sendErr)
+                updateMetadataIndexesForNewProgram(p, () => {
+                  logUpdateOperation(req.user, p, {'classifications': {new: 'Luokittelu rekisteröity'}})
+                  return res.send(p)
                 })
               })
             })
@@ -595,30 +552,30 @@ app.post('/programs/:id/register', function(req, res, next) {
       })
     })
 
-    function updateMetadataIndexesForNewProgram(program, callback) {
-      if (program.classifications.length > 1) return callback()
-      updateMetadataIndexes(program, callback)
+    function updateMetadataIndexesForNewProgram (p, callback) {
+      if (p.classifications.length > 1) return callback()
+      updateMetadataIndexes(p, callback)
     }
 
-    function addInvoicerows(currentClassification, callback) {
+    function addInvoicerows (currentClassification, callback) {
       if (utils.hasRole(req.user, 'root')) return process.nextTick(callback)
 
-      var seconds = classificationUtils.durationToSeconds(currentClassification.duration)
+      const seconds = classificationUtils.durationToSeconds(currentClassification.duration)
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
           InvoiceRow.fromProgram(program, 'reclassification', seconds, srvUtils.currentPrices().reclassificationFee).save(callback)
-        } else if (!utils.hasRole(req.user, 'kavi')) {
-          InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(callback)
-        } else {
+        } else if (utils.hasRole(req.user, 'kavi')) {
           callback()
+        } else {
+          InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(callback)
         }
       } else {
-        InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(function(err, saved) {
-          if (err) return next(err)
+        InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save((saveErr) => {
+          if (saveErr) return next(saveErr)
           if (utils.hasRole(req.user, 'kavi')) {
             // duraation mukaan laskutus
-            var classificationPrice = classificationUtils.price(program, seconds, srvUtils.currentPrices())
+            const classificationPrice = classificationUtils.price(program, seconds, srvUtils.currentPrices())
             InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
           } else {
             callback()
@@ -627,29 +584,29 @@ app.post('/programs/:id/register', function(req, res, next) {
       }
     }
 
-    function populateSentRegistrationEmailAddresses(program, callback) {
-      if (utils.hasRole(req.user, 'root') && program.preventSendingEmail) return process.nextTick(callback.bind(null, null, program))
-      program.populateSentRegistrationEmailAddresses(function(err, program) {
+    function populateSentRegistrationEmailAddresses (prg, callback) {
+      if (utils.hasRole(req.user, 'root') && prg.preventSendingEmail) return process.nextTick(callback.bind(null, null, prg))
+      prg.populateSentRegistrationEmailAddresses((err, p) => {
         if (err) return callback(err)
-        var valid = validation.registration(program.toObject(), newClassification, req.user)
+        const valid = validation.registration(p.toObject(), newClassification, req.user)
         if (!valid.valid) {
-          var msg = "Invalid program. Field: " + valid.field
+          const msg = "Invalid program. Field: " + valid.field
           console.error(msg)
           return res.status(400).send(msg)
         }
-        callback(null, program)
+        callback(null, p)
       })
     }
 
-    function sendRegistrationEmail(callback) {
+    function sendRegistrationEmail (callback) {
       if (utils.hasRole(req.user, 'root') && program.preventSendingEmail) return process.nextTick(callback)
       sendEmail(classificationUtils.registrationEmail(program, newClassification, req.user, env.hostname), req.user, callback)
     }
   })
 })
 
-app.post('/programs/:id/classification', function(req, res, next) {
-  Program.findById(req.params.id, function(err, program) {
+app.post('/programs/:id/classification', (req, res, next) => {
+  Program.findById(req.params.id, (err, program) => {
     if (err) next(err)
     if (program.classifications.length > 0) return res.sendStatus(400)
     program.deleted = false
@@ -658,38 +615,40 @@ app.post('/programs/:id/classification', function(req, res, next) {
   })
 })
 
-app.post('/programs/:id/reclassification', function(req, res, next) {
-  Program.findById(req.params.id, function(err, program) {
+app.post('/programs/:id/reclassification', (req, res, next) => {
+  Program.findById(req.params.id, (err, program) => {
     if (err) return next(err)
     if (!classificationUtils.canReclassify(program, req.user)) return res.sendStatus(400)
     program.deleted = false
     program.newDraftClassification(req.user)
-    program.populateSentRegistrationEmailAddresses(function(err) {
-      if (err) return next(err)
+    program.populateSentRegistrationEmailAddresses((populateErr) => {
+      if (populateErr) return next(populateErr)
       program.save(respond(res, next))
     })
   })
 })
 
-app.post('/programs/:id/categorization', function(req, res, next) {
-  Program.findById(req.params.id, function(err, program) {
+app.post('/programs/:id/categorization', (req, res, next) => {
+  Program.findById(req.params.id, (err, program) => {
     if (err) return next(err)
-    var oldSeries = program.toObject().series
-    var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
-    var updates = _.merge(_.pick(req.body, ['programType', 'series', 'episode', 'season']), {deleted: false})
+    const oldSeries = program.toObject().series
+    const watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
+    const updates = _.merge(_.pick(req.body, ['programType', 'series', 'episode', 'season']), {deleted: false})
     watcher.applyUpdates(updates)
     if (!enums.util.isTvEpisode(program)) {
-      program.series = program.episode = program.season = undefined
+      program.series = undefined
+      program.episode = undefined
+      program.season = undefined
     }
-    verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
-      if (err) return next(err)
-      program.populateAllNames(function(err) {
-        if (err) return next(err)
-        watcher.saveAndLogChanges(function(err, program) {
-          if (err) return next(err)
-          updateTvSeriesClassification(program, function(err) {
-            if (err) return next(err)
-            updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, respond(res, next, program))
+    verifyTvSeriesExistsOrCreate(program, req.user, (verifyErr) => {
+      if (verifyErr) return next(verifyErr)
+      program.populateAllNames((populateErr) => {
+        if (populateErr) return next(populateErr)
+        watcher.saveAndLogChanges((saveErr, p) => {
+          if (saveErr) return next(saveErr)
+          updateTvSeriesClassification(p, (updateErr) => {
+            if (updateErr) return next(updateErr)
+            updateTvSeriesClassificationIfEpisodeRemovedFromSeries(p, oldSeries, respond(res, next, p))
           })
         })
       })
@@ -697,33 +656,34 @@ app.post('/programs/:id/categorization', function(req, res, next) {
   })
 })
 
-app.post('/programs/:id', requireRole('root'), function(req, res, next) {
-  Program.findById(req.params.id, function(err, program) {
+app.post('/programs/:id', requireRole('root'), (req, res, next) => {
+  Program.findById(req.params.id, (err, program) => {
     if (err) return next(err)
-    var oldSeries = program.toObject().series
-    var watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
+    const oldSeries = program.toObject().series
+    const watcher = watchChanges(program, req.user, Program.excludedChangeLogPaths)
     watcher.applyUpdates(_.merge(req.body, {deleted: false}))
-    program.classifications.forEach(function(c) {
+    program.classifications.forEach((c) => {
       if (enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c)) {
         c.reason = undefined
         c.buyer = undefined
         c.billing = undefined
       }
-      Program.updateClassificationSummary(c) })
-    verifyTvSeriesExistsOrCreate(program, req.user, function(err) {
-      if (err) return next(err)
-      program.populateAllNames(function(err) {
-        if (err) return next(err)
-        updateTvEpisodeAllNamesOnParentNameChange(program, function(err) {
-          if (err) return next(err)
-          watcher.saveAndLogChanges(function(err, program) {
-            if (err) return next(err)
-            updateMetadataIndexes(program, function() {
-              updateTvSeriesClassification(program, function(err) {
-                if (err) return next(err)
-                updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, oldSeries, function (err) {
-                  if (err) return next(err)
-                  updateInvoicerows(program, respond(res, next, program))
+      Program.updateClassificationSummary(c)
+    })
+    verifyTvSeriesExistsOrCreate(program, req.user, (verifyErr) => {
+      if (verifyErr) return next(verifyErr)
+      program.populateAllNames((populateErr) => {
+        if (populateErr) return next(populateErr)
+        updateTvEpisodeAllNamesOnParentNameChange(program, (updateErr) => {
+          if (updateErr) return next(updateErr)
+          watcher.saveAndLogChanges((saveErr, p) => {
+            if (saveErr) return next(saveErr)
+            updateMetadataIndexes(p, () => {
+              updateTvSeriesClassification(p, (updateSeriesClassificationErr) => {
+                if (updateSeriesClassificationErr) return next(updateSeriesClassificationErr)
+                updateTvSeriesClassificationIfEpisodeRemovedFromSeries(p, oldSeries, (updateEpisodeRemovedClassificationErr) => {
+                  if (updateEpisodeRemovedClassificationErr) return next(updateEpisodeRemovedClassificationErr)
+                  updateInvoicerows(p, respond(res, next, p))
                 })
               })
             })
@@ -733,83 +693,75 @@ app.post('/programs/:id', requireRole('root'), function(req, res, next) {
     })
   })
 
-  function updateTvEpisodeAllNamesOnParentNameChange(parent, callback) {
+  function updateTvEpisodeAllNamesOnParentNameChange (parent, callback) {
     if (!enums.util.isTvSeriesName(parent)) return callback()
     if (!parent.hasNameChanges()) return callback()
-    Program.find({ 'series._id': parent._id }).exec(function(err, episodes) {
-      if (err) return callback(err)
-      async.forEach(episodes, function(e, callback) { e.populateAllNames(parent, callback) }, function() {
-        async.forEach(episodes, function(e, callback) { e.save(callback) }, callback)
-      })
+    Program.find({'series._id': parent._id}).exec((findErr, episodes) => {
+      if (findErr) return callback(findErr)
+      async.forEach(episodes, (e, cb) => e.populateAllNames(parent, cb), () => async.forEach(episodes, (e, cb) => e.save(cb), callback))
     })
   }
 })
 
-app.post('/programs/autosave/:id', function(req, res, next) {
-  Program.findOne({ _id: req.params.id, draftsBy: req.user._id }, function(err, program) {
-    if (err) return next(err)
+app.post('/programs/autosave/:id', (req, res, next) => {
+  Program.findOne({_id: req.params.id, draftsBy: req.user._id}, (findErr, program) => {
+    if (findErr) return next(findErr)
     if (!program) return res.sendStatus(409)
     if (!isValidUpdate(req.body, program, req.user)) return res.sendStatus(400)
     watchChanges(program, req.user).applyUpdates(req.body)
-    program.verifyAllNamesUpToDate(function(err) {
-      if (err) return next(err)
+    program.verifyAllNamesUpToDate((verifyErr) => {
+      if (verifyErr) return next(verifyErr)
       program.save(respond(res, next))
     })
   })
 
-  function isValidUpdate(update, p, user) {
-    var allowedFields = allowedAutosaveFields(p, user)
-    return _.every(Object.keys(update), function(updateField) {
-      return _.some(allowedFields, function(allowedField) {
-        return allowedField[allowedField.length-1] == '*'
-          ? updateField.indexOf(allowedField.substring(0, allowedField.length-1)) == 0
-          : updateField == allowedField
-      })
-    })
+  function isValidUpdate (update, p, user) {
+    const allowedFields = allowedAutosaveFields(p, user)
+    return _.every(Object.keys(update), (updateField) => _.some(allowedFields, (allowedField) => (allowedField[allowedField.length - 1] === '*'
+      ? updateField.indexOf(allowedField.substring(0, allowedField.length - 1)) === 0
+      : updateField === allowedField)))
   }
 
-  function allowedAutosaveFields(p, user) {
-    var programFields = ['name', 'nameFi', 'nameSv', 'nameOther', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
-    var classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationDate', 'registrationEmailAddresses', 'comments', 'userComments', 'criteriaComments*', 'kaviType']
-    var kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
-    if (p.classifications.length == 0) {
-      return programFields.concat(classificationFields.map(asDraftField))
-    } else {
-      return utils.hasRole(user, 'kavi')
-        ? classificationFields.concat(kaviReclassificationFields).map(asDraftField)
-        : classificationFields.map(asDraftField)
-    }
-    function asDraftField(s) { return 'draftClassifications.'+user._id+'.'+s }
+  function allowedAutosaveFields (p, user) {
+    const progFields = ['name', 'nameFi', 'nameSv', 'nameOther', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
+    const classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationDate', 'registrationEmailAddresses', 'comments', 'userComments', 'criteriaComments*', 'kaviType']
+    const kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
+    if (p.classifications.length === 0) return progFields.concat(classificationFields.map(asDraftField))
+    return utils.hasRole(user, 'kavi')
+      ? classificationFields.concat(kaviReclassificationFields).map(asDraftField)
+      : classificationFields.map(asDraftField)
+
+    function asDraftField (s) { return 'draftClassifications.' + user._id + '.' + s }
   }
 })
 
-app.delete('/programs/:id', requireRole('root'), function(req, res, next) {
-  Program.findById(req.params.id, function(err, program) {
+app.delete('/programs/:id', requireRole('root'), (req, res, next) => {
+  Program.findById(req.params.id, (err, program) => {
     if (err) return next(err)
-    softDeleteAndLog(program, req.user, function(err, program) {
-      if (err) return next(err)
-      InvoiceRow.removeProgram(program, function (err) {
-        if (err) return next(err)
-        updateTvSeriesClassification(program, respond(res, next, program))
+    softDeleteAndLog(program, req.user, (deleteErr, p) => {
+      if (deleteErr) return next(deleteErr)
+      InvoiceRow.removeProgram(p, (removeErr) => {
+        if (removeErr) return next(removeErr)
+        updateTvSeriesClassification(p, respond(res, next, p))
       })
     })
   })
 })
 
-app.delete('/programs/:programId/classification/:classificationId', requireRole('root'), function(req, res, next) {
-  var classificationId = req.params.classificationId
-  Program.findById(req.params.programId, function(err, program) {
+app.delete('/programs/:programId/classification/:classificationId', requireRole('root'), (req, res, next) => {
+  const classificationId = req.params.classificationId
+  Program.findById(req.params.programId, (err, program) => {
     if (err) return next(err)
-    var watcher = watchChanges(program, req.user, ['deletedClassifications', 'sentRegistrationEmailAddresses'])
-    var classification = program.classifications.id(classificationId)
+    const watcher = watchChanges(program, req.user, ['deletedClassifications', 'sentRegistrationEmailAddresses'])
+    const classification = program.classifications.id(classificationId)
     program.classifications.pull(classificationId)
     program.deletedClassifications.push(classification)
-    program.populateSentRegistrationEmailAddresses(function(err) {
-      if (err) return next(err)
-      watcher.saveAndLogChanges(function(err) {
-        if (err) return next(err)
-        if (program.classifications.length === 0) InvoiceRow.removeProgram(program, function (err) {
-          if (err) return next(err)
+    program.populateSentRegistrationEmailAddresses((populateErr) => {
+      if (populateErr) return next(populateErr)
+      watcher.saveAndLogChanges((saveErr) => {
+        if (saveErr) return next(saveErr)
+        if (program.classifications.length === 0) InvoiceRow.removeProgram(program, (removeErr) => {
+          if (removeErr) return next(removeErr)
           updateTvSeriesClassification(program, respond(res, next, program))
         })
         else updateTvSeriesClassification(program, respond(res, next, program))
@@ -818,101 +770,101 @@ app.delete('/programs/:programId/classification/:classificationId', requireRole(
   })
 })
 
-app.get('/series/search', function(req, res, next) {
-  var q = { programType: 2, deleted: { $ne: true } }
-  var parts = toMongoArrayQuery(req.query.q)
+app.get('/series/search', (req, res, next) => {
+  const q = {programType: 2, deleted: {$ne: true}}
+  const parts = toMongoArrayQuery(req.query.q)
   if (parts) q.allNames = parts
-  Program.find(q, { name: 1 }).lean().limit(20).sort('name').exec(function(err, data) {
+  Program.find(q, {name: 1}).lean().limit(20).sort('name').exec((err, data) => {
     if (err) return next(err)
-    res.send(_.map(data, function(d) { return { _id: d._id, name: d.name[0] } }))
+    res.send(_.map(data, (d) => ({_id: d._id, name: d.name[0]})))
   })
 })
 
-app.get('/accounts/access/:id', function(req, res, next) {
+app.get('/accounts/access/:id', (req, res) => {
   if (utils.hasRole(req.user, 'kavi')) {
     res.send({access: true})
   } else {
-    Account.findById(req.params.id, function(err, account) {
-      res.send({access: err === null && account.users.id(req.user._id) !== null})
+    Account.findById(req.params.id, (err, account) => {
+      res.send({access: !err && account.users.id(req.user._id) !== null})
     })
   }
 })
 
-app.put('/accounts/:id', requireRole('kavi'), function(req, res, next) {
+app.put('/accounts/:id', requireRole('kavi'), (req, res, next) => {
   if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
-  Account.findById(req.params.id, function(err, account) {
+  Account.findById(req.params.id, (err, account) => {
     if (err) return next(err)
     updateAndLogChanges(account, req.body, req.user, respond(res, next))
   })
 })
 
-app.post('/accounts', requireRole('kavi'), function(req, res, next) {
+app.post('/accounts', requireRole('kavi'), (req, res, next) => {
   if (!utils.hasRole(req.user, 'root')) delete req.body.apiToken
-  new Account(req.body).save(function(err, account) {
+  new Account(req.body).save((err, account) => {
     if (err) return next(err)
     logCreateOperation(req.user, account)
     res.send(account)
   })
 })
 
-app.delete('/accounts/:id', requireRole('root'), function(req, res, next) {
-  Account.findById(req.params.id, function (err, account) {
+app.delete('/accounts/:id', requireRole('root'), (req, res, next) => {
+  Account.findById(req.params.id, (err, account) => {
     if (err) return next(err)
     softDeleteAndLog(account, req.user, respond(res, next))
   })
 })
 
-app.get('/accounts', requireRole('kavi'), function(req, res, next) {
-  var selectedRoles = req.query.roles
-  var query = selectedRoles ? { roles: { $all: selectedRoles }} : {}
-  Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
+app.get('/accounts', requireRole('kavi'), (req, res, next) => {
+  const selectedRoles = req.query.roles
+  const query = selectedRoles ? {roles: {$all: selectedRoles}} : {}
+  Account.find(_.merge(query, {deleted: {$ne: true}})).lean().exec(respond(res, next))
 })
 
-app.get('/subscribers', requireRole('kavi'), function(req, res, next) {
-  var selectedRoles = req.query.roles
-  var query = _.isEmpty(selectedRoles)
-    ? { roles: { $in: ['Classifier', 'Subscriber'] }}
-    : { roles: { $all: selectedRoles }}
-  Account.find(_.merge(query, { deleted: { $ne: true }})).lean().exec(respond(res, next))
+app.get('/subscribers', requireRole('kavi'), (req, res, next) => {
+  const selectedRoles = req.query.roles
+  const query = _.isEmpty(selectedRoles)
+    ? {roles: {$in: ['Classifier', 'Subscriber']}}
+    : {roles: {$all: selectedRoles}}
+  Account.find(_.merge(query, {deleted: {$ne: true}})).lean().exec(respond(res, next))
 })
 
-app.post('/subscribers/excel/export', function (req, res, next) {
+app.post('/subscribers/excel/export', (req, res, next) => {
   const regexp = new RegExp(utils.escapeRegExp(req.body.query), 'i')
   const q = _.isEmpty(req.body.query) ? {} : {name: regexp}
-  const selectedRoles = _.compact(_.map(Object.keys(req.body), (key) => req.body[key] === 'on' ? key : undefined))
-  const roleQuery = { roles: _.isEmpty(selectedRoles) ? {$in: ['Classifier', 'Subscriber']} : { $all: selectedRoles }}
+  const selectedRoles = _.compact(_.map(Object.keys(req.body), (key) => (req.body[key] === 'on' ? key : undefined)))
+  const roleQuery = {roles: _.isEmpty(selectedRoles) ? {$in: ['Classifier', 'Subscriber']} : {$all: selectedRoles}}
   Account.find(_.merge(q, roleQuery, {deleted: {$ne: true}})).sort('name').lean().exec((err, data) => {
     if (err) return next(err)
-    var result = excelExport.constructSubscriberExportData(data)
+    const result = excelExport.constructSubscriberExportData(data)
     res.setHeader('Content-Disposition', 'attachment; filename=subscribers.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })
 })
 
-app.get('/providers/unapproved', requireRole('kavi'), function(req, res, next) {
-  Provider.find({deleted: false, active: false, registrationDate: { $exists: false }}, '', respond(res, next))
+app.get('/providers/unapproved', requireRole('kavi'), (req, res, next) => {
+  Provider.find({deleted: false, active: false, registrationDate: {$exists: false}}, '', respond(res, next))
 })
 
-app.get('/providers', requireRole('kavi'), function(req, res, next) {
+app.get('/providers', requireRole('kavi'), (req, res, next) => {
   Provider.aggregate([
-    {$match: {deleted: false, registrationDate: { $exists: true }}},
+    {$match: {deleted: false, registrationDate: {$exists: true}}},
     {$redact: {$cond: {
       if: {$and: [{$not: '$locations'}, {$eq: ['$deleted', true]}]},
       then: '$$PRUNE', else: '$$DESCEND'}}}
   ], respond(res, next))
 })
 
-app.post('/providers/excel/export', function (req, res, next) {
+app.post('/providers/excel/export', (req, res, next) => {
   const regexp = new RegExp(utils.escapeRegExp(req.body.query), 'i')
-  const q = _.isEmpty(req.body.query) ? {} : {$or: [{ name: regexp }, { 'locations.name': regexp }]}
-  const k18 = req.body.k18 === 'on' ? { 'locations.adultContent': true} : {}
-  const providingTypeKeys = _.compact(_.map(Object.keys(enums.providingType), (key) => req.body[key] === 'on' ? key : undefined))
+  const q = _.isEmpty(req.body.query) ? {} : {$or: [{name: regexp}, {'locations.name': regexp}]}
+  const k18 = req.body.k18 === 'on' ? {'locations.adultContent': true} : {}
+  const providingTypeKeys = _.compact(_.map(Object.keys(enums.providingType), (key) => (req.body[key] === 'on' ? key : undefined)))
   const providingTypes = providingTypeKeys.length > 0 ? {'locations.providingType': {$in: providingTypeKeys}} : {}
 
   Provider.aggregate([
     {$match: q}, {$match: k18}, {$match: providingTypes},
-    {$match: {deleted: false, registrationDate: { $exists: true }}},
+    {$match: {deleted: false, registrationDate: {$exists: true}}},
     {$redact: {$cond: {
           if: {$and: [{$not: '$locations'}, {$eq: ['$deleted', true]}]},
           then: '$$PRUNE', else: '$$DESCEND'}}},
@@ -920,8 +872,7 @@ app.post('/providers/excel/export', function (req, res, next) {
   ], (err, providers) => {
     if (err) return next(err)
     const providersFiltered = _.filter(providers, (provider) => {
-      provider.locations = _.filter(provider.locations, (location) =>
-        (_.isEmpty(req.body.query) || regexp.test(location.name)) &&
+      provider.locations = _.filter(provider.locations, (location) => (_.isEmpty(req.body.query) || regexp.test(location.name)) &&
         (providingTypeKeys.length === 0 || _.intersection(providingTypeKeys, location.providingType).length > 0))
       return !_.isEmpty(provider.locations)
     })
@@ -933,44 +884,43 @@ app.post('/providers/excel/export', function (req, res, next) {
   })
 })
 
-app.post('/providers', requireRole('kavi'), function(req, res, next) {
-  new Provider(utils.merge(req.body, { deleted: false, active: false, creationDate: new Date() })).save(function(err, provider) {
+app.post('/providers', requireRole('kavi'), (req, res, next) => {
+  new Provider(utils.merge(req.body, {deleted: false, active: false, creationDate: new Date()})).save((err, provider) => {
     if (err) return next(err)
     logCreateOperation(req.user, provider)
     res.send(provider)
   })
 })
 
-app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.id, function(err, provider) {
+app.put('/providers/:id/active', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.id, (err, provider) => {
     if (err) return next(err)
-    var isFirstActivation = !provider.registrationDate
-    var newActive = !provider.active
-    var updates = {active: {old: provider.active, new: newActive}}
+    const isFirstActivation = !provider.registrationDate
+    const newActive = !provider.active
+    const updates = {active: {old: provider.active, new: newActive}}
     provider.active = newActive
     if (isFirstActivation) {
-      var now = new Date()
+      const now = new Date()
       provider.registrationDate = now
       updates.registrationDate = {old: undefined, new: now}
-      _.filter(provider.locations, function(l) {
-        return !l.deleted && l.active
-      }).forEach(function(l) {
+      _.filter(provider.locations, (l) => !l.deleted && l.active).forEach((l) => {
         l.registrationDate = now
-        var updates = {registrationDate: {old: undefined, new: now}}
-        saveChangeLogEntry(req.user, l, 'update', {targetCollection: 'providerlocations', updates: updates})
+        const changeLogUpdates = {registrationDate: {old: undefined, new: now}}
+        saveChangeLogEntry(req.user, l, 'update', {targetCollection: 'providerlocations', updates: changeLogUpdates})
       })
     }
     saveChangeLogEntry(req.user, provider, 'update', {updates: updates})
-    provider.save(function(err, saved) {
+    provider.save((saveErr, saved) => {
+      if (saveErr) return next(saveErr)
       if (isFirstActivation) {
-        var provider = saved.toObject()
-        var providerHasEmails = !_.isEmpty(provider.emailAddresses)
+        const savedProvider = saved.toObject()
+        const providerHasEmails = !_.isEmpty(savedProvider.emailAddresses)
         if (providerHasEmails) {
-          providerUtils.registrationEmail(provider, env.hostname, logErrorOrSendEmail(req.user))
+          providerUtils.registrationEmail(savedProvider, env.hostname, logErrorOrSendEmail(req.user))
         }
-        sendProviderLocationEmails(provider)
-        var withEmail = providerUtils.payingLocationsWithEmail(provider.locations)
-        var withoutEmail = providerUtils.payingLocationsWithoutEmail(provider.locations)
+        sendProviderLocationEmails(savedProvider)
+        const withEmail = providerUtils.payingLocationsWithEmail(savedProvider.locations)
+        const withoutEmail = providerUtils.payingLocationsWithoutEmail(savedProvider.locations)
         return res.send({
           active: true,
           wasFirstActivation: true,
@@ -983,81 +933,78 @@ app.put('/providers/:id/active', requireRole('kavi'), function(req, res, next) {
     })
   })
 
-  function sendProviderLocationEmails(provider) {
-    _.filter(provider.locations, function(l) {
-      return !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0
-    }).forEach(function(l) {
+  function sendProviderLocationEmails (provider) {
+    _.filter(provider.locations, (l) => !l.deleted && l.isPayer && l.active && l.emailAddresses.length > 0).forEach((l) => {
       providerUtils.registrationEmailProviderLocation(utils.merge(l, {provider: provider}), env.hostname, logErrorOrSendEmail(req.user))
     })
   }
 })
 
-app.put('/providers/:id', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.id, function(err, provider) {
+app.put('/providers/:id', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.id, (err, provider) => {
     if (err) return next(err)
     updateAndLogChanges(provider, req.body, req.user, respond(res, next))
   })
 })
 
-app.delete('/providers/:id', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.id, function (err, provider) {
+app.delete('/providers/:id', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.id, (err, provider) => {
     if (err) return next(err)
     softDeleteAndLog(provider, req.user, respond(res, next))
   })
 })
 
-app.get('/providers/metadata', requireRole('kavi'), function(req, res, next) {
+app.get('/providers/metadata', requireRole('kavi'), (req, res, next) => {
   ProviderMetadata.getAll(respond(res, next))
 })
 
-app.post('/providers/yearlyBilling/kieku', requireRole('kavi'), function(req, res, next) {
-  Provider.getForBilling(function(err, data) {
-    var year = moment().year()
-    var accountRows = getProviderBillingRows(data)
-    var result = kieku.createYearlyProviderRegistration(year, accountRows)
+app.post('/providers/yearlyBilling/kieku', requireRole('kavi'), (req, res, next) => {
+  Provider.getForBilling((billingErr, data) => {
+    if (billingErr) next(billingErr)
+    const year = moment().year()
+    const accountRows = getProviderBillingRows(data)
+    const result = kieku.createYearlyProviderRegistration(year, accountRows)
     res.setHeader('Content-Disposition', 'attachment; filename=kieku_valvontamaksut_vuosi' + moment().year() + '.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    ProviderMetadata.setYearlyBillingCreated(new Date(), function() {
-      res.send(result)
-    })
+    ProviderMetadata.setYearlyBillingCreated(new Date(), () => res.send(result))
   })
 })
 
-app.post('/providers/billing/kieku', requireRole('kavi'), function(req, res, next) {
-  var dateFormat = 'DD.MM.YYYY'
-  var dates = { begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat), inclusiveEnd: moment(req.body.end, dateFormat).add(1, 'day') }
-  var dateRangeQ = { $gte: dates.begin, $lt: dates.inclusiveEnd }
-  var registrationDateFilters = { $or: [
-    { registrationDate: dateRangeQ },
-    { 'locations.registrationDate': dateRangeQ }
+app.post('/providers/billing/kieku', requireRole('kavi'), (req, res, next) => {
+  const dateFormat = 'DD.MM.YYYY'
+  const dates = {begin: moment(req.body.begin, dateFormat), end: moment(req.body.end, dateFormat), inclusiveEnd: moment(req.body.end, dateFormat).add(1, 'day')}
+  const dateRangeQ = {$gte: dates.begin, $lt: dates.inclusiveEnd}
+  const registrationDateFilters = {$or: [
+    {registrationDate: dateRangeQ},
+    {'locations.registrationDate': dateRangeQ}
   ]}
-  Provider.getForBilling(registrationDateFilters, function(err, data) {
+  Provider.getForBilling(registrationDateFilters, (err, data) => {
     if (err) return next(err)
 
-    data.providers = _(data.providers).map(function(p) {
-      p.locations = _.filter(p.locations, function(l) { return utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
+    data.providers = _(data.providers).map((p) => {
+      p.locations = _.filter(p.locations, (l) => utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd))
       return p
-    }).reject(function(p) { return _.isEmpty(p.locations) }).value()
+    }).reject((p) => _.isEmpty(p.locations)).value()
 
-    data.locations = _.filter(data.locations, function(l) { return utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd) })
+    data.locations = _.filter(data.locations, (l) => utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd))
 
-    var accountRows = getProviderBillingRows(data)
-    var result = kieku.createProviderRegistration(accountRows)
-    var filename = 'kieku_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.xlsx'
+    const accountRows = getProviderBillingRows(data)
+    const result = kieku.createProviderRegistration(accountRows)
+    const filename = 'kieku_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.xlsx'
     res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    ProviderMetadata.setPreviousMidYearBilling(new Date(), dates.begin, dates.end, function() {
+    ProviderMetadata.setPreviousMidYearBilling(new Date(), dates.begin, dates.end, () => {
       res.send(result)
     })
   })
 })
 
-app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res, next) {
-  Provider.getForBilling(function(err, data) {
+app.get('/providers/yearlyBilling/info', requireRole('kavi'), (req, res, next) => {
+  Provider.getForBilling((err, data) => {
     if (err) return next(err)
 
-    var providers = _.groupBy(data.providers, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
-    var locations = _.groupBy(data.locations, function(p) { return _.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail' })
+    const providers = _.groupBy(data.providers, (p) => (_.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail'))
+    const locations = _.groupBy(data.locations, (p) => (_.isEmpty(p.emailAddresses) ? 'noMail' : 'withMail'))
 
     res.json({
       providerCount: providers.withMail ? providers.withMail.length : 0,
@@ -1068,14 +1015,14 @@ app.get('/providers/yearlyBilling/info', requireRole('kavi'), function(req, res,
   })
 })
 
-app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function(req, res, next) {
-  Provider.getForBilling(function(err, data) {
+app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), (req, res, next) => {
+  Provider.getForBilling((err, data) => {
     if (err) return next(err)
 
-    _(data.providers).reject(function(p) { return _.isEmpty(p.emailAddresses) }).value().forEach(function(p) {
+    _(data.providers).reject((p) => _.isEmpty(p.emailAddresses)).value().forEach((p) => {
       providerUtils.yearlyBillingProviderEmail(p, env.hostname, logErrorOrSendEmail(req.user))
     })
-    _(data.locations).reject(function(l) { return _.isEmpty(l.emailAddresses) }).value().forEach(function(l) {
+    _(data.locations).reject((l) => _.isEmpty(l.emailAddresses)).value().forEach((l) => {
       providerUtils.yearlyBillingProviderLocationEmail(l, env.hostname, logErrorOrSendEmail(req.user))
     })
 
@@ -1083,50 +1030,50 @@ app.post('/providers/yearlyBilling/sendReminders', requireRole('kavi'), function
   })
 })
 
-app.get('/providers/billing/:begin/:end', requireRole('kavi'), function(req, res, next) {
-  var format = 'DD.MM.YYYY'
+app.get('/providers/billing/:begin/:end', requireRole('kavi'), (req, res, next) => {
+  const format = 'DD.MM.YYYY'
 
-  var beginMoment = moment(req.params.begin, format)
-  var endMoment = moment(req.params.end, format).add(1, 'day')
-  var dates = {
+  const beginMoment = moment(req.params.begin, format)
+  const endMoment = moment(req.params.end, format).add(1, 'day')
+  const dates = {
     $gte: beginMoment,
     $lt: endMoment
   }
 
-  var terms = {
+  const terms = {
     active: true, deleted: false,
     $or: [
-      { registrationDate: dates },
-      { 'locations.registrationDate': dates }
+      {registrationDate: dates},
+      {'locations.registrationDate': dates}
     ]
   }
 
-  Provider.find(terms).lean().exec(function(err, providers) {
+  Provider.find(terms).lean().exec((err, providers) => {
     if (err) return next(err)
-    _.forEach(providers, function(provider) {
+    _.forEach(providers, (provider) => {
       provider.locations = _(provider.locations)
-        .filter({ active: true, deleted: false })
-        .filter(function(l) { return utils.withinDateRange(l.registrationDate, beginMoment, endMoment) })
+        .filter({active: true, deleted: false})
+        .filter((l) => utils.withinDateRange(l.registrationDate, beginMoment, endMoment))
         .sortBy('name').value()
     })
-    res.send(_.filter(providers, function(provider) { return !_.isEmpty(provider.locations) }))
+    res.send(_.filter(providers, (provider) => !_.isEmpty(provider.locations)))
   })
 })
 
-app.get('/providers/:id', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.id).lean().exec(function(err, provider) {
+app.get('/providers/:id', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.id).lean().exec((err, provider) => {
     if (err) return next(err)
-    provider.locations = _(provider.locations).filter({ deleted: false }).sortBy('name').value()
+    provider.locations = _(provider.locations).filter({deleted: false}).sortBy('name').value()
     res.send(provider)
   })
 })
 
-app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.pid, function(err, provider) {
+app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.pid, (err, provider) => {
     if (err) return next(err)
-    var location = provider.locations.id(req.params.lid)
-    var firstActivation = isFirstActivation(provider, location)
-    var updates = {}
+    const location = provider.locations.id(req.params.lid)
+    const firstActivation = isFirstActivation(provider, location)
+    const updates = {}
     if (firstActivation) {
       location.registrationDate = new Date()
       updates.registrationDate = {old: undefined, new: location.registrationDate}
@@ -1136,7 +1083,8 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
     updates.active = {old: !location.active, new: location.active}
     saveChangeLogEntry(req.user, location, 'update', {targetCollection: 'providerlocations', updates: updates})
 
-    provider.save(function(err, saved) {
+    provider.save((saveErr, saved) => {
+      if (saveErr) return next(saveErr)
       if (firstActivation) {
         sendRegistrationEmails(saved.toObject(), location.toObject(), respond(res, next))
       } else {
@@ -1145,161 +1093,168 @@ app.put('/providers/:pid/locations/:lid/active', requireRole('kavi'), function(r
     })
   })
 
-  function sendRegistrationEmails(provider, location, callback) {
+  function sendRegistrationEmails (provider, location, callback) {
     if (location.isPayer && !_.isEmpty(location.emailAddresses)) {
       // a paying location provider: send email to location
       providerUtils.registrationEmailProviderLocation(utils.merge(location, {provider: provider}), env.hostname, logErrorOrSendEmail(req.user))
       callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else if (!location.isPayer && !_.isEmpty(provider.emailAddresses)) {
       // email the provider
-      var providerData = _.clone(provider)
+      const providerData = _.clone(provider)
       providerData.locations = [location]
       providerUtils.registrationEmail(providerData, env.hostname, logErrorOrSendEmail(req.user))
       callback(null, {active: true, wasFirstActivation: true, emailSent: true, registrationDate: location.registrationDate})
     } else {
-      // location is the payer, but the location has no email addresses
-      // or the provider has no email addresses
+
+      /*
+       * location is the payer, but the location has no email addresses
+       * or the provider has no email addresses
+       */
       callback(null, {active: true, wasFirstActivation: true, emailSent: false, registrationDate: location.registrationDate})
     }
   }
 
-  function isFirstActivation(provider, location) {
+  function isFirstActivation (provider, location) {
     return provider.registrationDate && !location.active && !location.registrationDate
   }
 })
 
-app.put('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.pid, function(err, provider) {
-    var flatUpdates = utils.flattenObject(req.body)
-    var location = provider.locations.id(req.params.lid)
-    var watcher = watchChanges(location, req.user)
-    _.forEach(flatUpdates, function(value, key) { location.set(key, value) })
+app.put('/providers/:pid/locations/:lid', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.pid, (findErr, provider) => {
+    if (findErr) return next(findErr)
+    const flatUpdates = utils.flattenObject(req.body)
+    const location = provider.locations.id(req.params.lid)
+    const watcher = watchChanges(location, req.user)
+    _.forEach(flatUpdates, (value, key) => location.set(key, value))
     provider.save(respond(res, next))
     saveChangeLogEntry(req.user, location, 'update', {updates: watcher.getChanges(), targetCollection: 'providerlocations'})
   })
 })
 
-app.post('/providers/:id/locations', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.id, function(err, p) {
+app.post('/providers/:id/locations', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.id, (err, prov) => {
     if (err) return next(err)
-    var active = !p.registrationDate
-    p.locations.push(utils.merge(req.body, { deleted: false, active: active }))
-    p.save(function(err, p) {
-      if (err) return next(err)
+    const active = !prov.registrationDate
+    prov.locations.push(utils.merge(req.body, {deleted: false, active: active}))
+    prov.save((saveErr, p) => {
+      if (saveErr) return next(saveErr)
       logCreateOperation(req.user, _.last(p.locations))
       res.send(_.last(p.locations))
     })
   })
 })
 
-app.delete('/providers/:pid/locations/:lid', requireRole('kavi'), function(req, res, next) {
-  Provider.findById(req.params.pid, function(err, provider) {
+app.delete('/providers/:pid/locations/:lid', requireRole('kavi'), (req, res, next) => {
+  Provider.findById(req.params.pid, (err, provider) => {
     if (err) return next(err)
-    var location = provider.locations.id(req.params.lid)
+    const location = provider.locations.id(req.params.lid)
     location.deleted = true
     saveChangeLogEntry(req.user, location, 'delete')
     provider.save(respond(res, next))
   })
 })
 
-app.get('/accounts/search', function(req, res, next) {
-  var roles = req.query.roles ? req.query.roles.split(',') : []
-  var q = { roles: { $in: roles }, deleted: { $ne: true }}
+app.get('/accounts/search', (req, res, next) => {
+  const roles = req.query.roles ? req.query.roles.split(',') : []
+  const q = {roles: {$in: roles}, deleted: {$ne: true}}
   if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
   }
   if (req.query.q && req.query.q.length > 0) q.name = new RegExp("^" + utils.escapeRegExp(req.query.q), 'i')
-  Account.find(q, { _id:1, name:1 }).sort('name').limit(parseInt(process.env.SELECT_DROPDOWN_SIZE || '50')).lean().exec(respond(res, next))
+  Account.find(q, {_id: 1, name: 1}).sort('name').limit(parseInt(process.env.SELECT_DROPDOWN_SIZE || '50')).lean().exec(respond(res, next))
 })
 
-app.get('/accounts/:id/emailAddresses', function(req, res, next) {
-  Account.findById(req.params.id, { emailAddresses: 1, users: 1 }).exec(function(err, account) {
+app.get('/accounts/:id/emailAddresses', (req, res, next) => {
+  Account.findById(req.params.id, {emailAddresses: 1, users: 1}).exec((err, account) => {
     if (err) return next(err)
     if (!account) return res.sendStatus(404)
     if (!utils.hasRole(req.user, 'kavi') && !account.users.id(req.user._id)) return res.sendStatus(400)
-    res.send({ _id: account._id, emailAddresses: account.emailAddresses })
+    res.send({_id: account._id, emailAddresses: account.emailAddresses})
   })
 })
 
-app.get('/users', requireRole('root'), function(req, res, next) {
-  var roleFilters = req.query.roles
-  var activeFilter = req.query.active ? req.query.active === 'true' : false
-  var filters = _.merge({}, roleFilters ? { role: { $in: roleFilters }} : {}, activeFilter ? {active: true} : {})
+app.get('/users', requireRole('root'), (req, res, next) => {
+  const roleFilters = req.query.roles
+  const activeFilter = req.query.active ? req.query.active === 'true' : false
+  const filters = _.merge({}, roleFilters ? {role: {$in: roleFilters}} : {}, activeFilter ? {active: true} : {})
   User.find(filters, User.noPrivateFields).sort('name').lean().exec(respond(res, next))
 })
 
-app.get('/users/search', requireRole('kavi'), function(req, res, next) {
-  var regexp = new RegExp(utils.escapeRegExp(req.query.q), 'i')
-  var q = { $or:[{ name: regexp }, { username: regexp }] }
+app.get('/users/search', requireRole('kavi'), (req, res, next) => {
+  const regexp = new RegExp(utils.escapeRegExp(req.query.q), 'i')
+  const q = {$or: [{name: regexp}, {username: regexp}]}
   User.find(q, 'name username active').limit(parseInt(process.env.SELECT_DROPDOWN_SIZE || '50')).sort('name').lean().exec(respond(res, next))
 })
 
-app.get('/users/exists/:username', requireRole('root'), function(req, res, next) {
-  var q = (req.params.username || '').toUpperCase()
-  User.findOne({ username: q }, { _id:1 }).lean().exec(function(err, user) {
+app.get('/users/exists/:username', requireRole('root'), (req, res, next) => {
+  const q = (req.params.username || '').toUpperCase()
+  User.findOne({username: q}, {_id: 1}).lean().exec((err, user) => {
     if (err) return next(err)
-    res.send({ exists: !!user })
+    res.send({exists: !!user})
   })
 })
 
-app.post('/users/new', requireRole('root'), function(req, res, next) {
-  var hasRequiredFields = (req.body.username != '' && req.body.emails[0].length > 0 && req.body.name != '')
+app.post('/users/new', requireRole('root'), (req, res, next) => {
+  const hasRequiredFields = !!req.body.username && req.body.emails[0].length > 0 && !!req.body.name
   if (!hasRequiredFields || !utils.isValidUsername(req.body.username)) return res.sendStatus(400)
   req.body.username = req.body.username.toUpperCase()
-  new User(req.body).save(function(err, user) {
+  new User(req.body).save((err, user) => {
     if (err) return next(err)
-    createAndSaveHash(user, function(err) {
-      if (err) return next(err)
+    createAndSaveHash(user, (saveErr) => {
+      if (saveErr) return next(saveErr)
       logCreateOperation(req.user, user)
-      var subject = 'Käyttäjätunnuksen aktivointi / Aktivering av användarnamn'
-      srvUtils.getTemplate('user-created-email.tpl.html', function(err, tpl) {
-        if (err) return next(err)
+      const subject = 'Käyttäjätunnuksen aktivointi / Aktivering av användarnamn'
+      srvUtils.getTemplate('user-created-email.tpl.html', (templErr, tpl) => {
+        if (templErr) return next(templErr)
         sendHashLinkViaEmail(user, subject, tpl, respond(res, next, user))
       })
     })
   })
 })
 
-app.post('/users/:id', requireRole('root'), function(req, res, next) {
-  User.findById(req.params.id, function (err, user) {
-    var updates = _.omit(req.body, 'username', 'emekuId', 'role', 'password', 'resetHash', 'certExpiryReminderSent')
-    updateAndLogChanges(user, updates, req.user, function(err, saved) {
-      if (err) return next(err)
-      var cleaned = saved.toObject()
-      User.privateFields.forEach(function(key) { delete cleaned[key] })
+app.post('/users/:id', requireRole('root'), (req, res, next) => {
+  User.findById(req.params.id, (err, user) => {
+    if (err) return next(err)
+    const updates = _.omit(req.body, 'username', 'emekuId', 'role', 'password', 'resetHash', 'certExpiryReminderSent')
+    updateAndLogChanges(user, updates, req.user, (updateErr, saved) => {
+      if (updateErr) return next(updateErr)
+      const cleaned = saved.toObject()
+      User.privateFields.forEach((key) => delete cleaned[key])
       res.send(cleaned)
     })
   })
 })
 
-app.get('/users/names/:names', requireRole('kavi'), function(req, res, next) {
-  User.find({ username: {$in: req.params.names.toUpperCase().split(',')}}, 'name username active').lean().exec(function(err, users) {
+app.get('/users/names/:names', requireRole('kavi'), (req, res, next) => {
+  User.find({username: {$in: req.params.names.toUpperCase().split(',')}}, 'name username active').lean().exec((err, users) => {
     if (err) return next(err)
-    var result = {}
-    users.forEach(function(user) { result[user.username] = { name: user.name, active: user.active } })
+    const result = users.reduce((user, acc) => {
+      acc[user.username] = {name: user.name, active: user.active}
+      return acc
+    }, {})
     res.send(result)
   })
 })
 
-app.post('/users/excel/export', requireRole('root'), function (req, res, next) {
+app.post('/users/excel/export', requireRole('root'), (req, res, next) => {
   const regexp = new RegExp(utils.escapeRegExp(req.body.query), 'i')
-  var q = _.isEmpty(req.body.query) ? {} : { $or:[{ name: regexp }, { username: regexp }] }
-  const roleFilters = _.compact(_.map(['user', 'kavi', 'root'], (k) => req.body[k] === 'on' ? k : undefined))
-  var activeFilter = req.body.active === 'on'
-  var filters = _.merge(q, _.isEmpty(roleFilters) ? {} : { role: { $in: roleFilters }}, activeFilter ? {active: true} : {})
+  const q = _.isEmpty(req.body.query) ? {} : {$or: [{name: regexp}, {username: regexp}]}
+  const roleFilters = _.compact(_.map(['user', 'kavi', 'root'], (k) => (req.body[k] === 'on' ? k : undefined)))
+  const activeFilter = req.body.active === 'on'
+  const filters = _.merge(q, _.isEmpty(roleFilters) ? {} : {role: {$in: roleFilters}}, activeFilter ? {active: true} : {})
   User.find(filters, User.noPrivateFields).sort('name').lean().exec((err, data) => {
     if (err) return next(err)
-    var result = excelExport.constructUserExportData(data)
+    const result = excelExport.constructUserExportData(data)
     res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx')
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })
 })
 
-app.get('/apiToken', requireRole('root'), function(req, res, next) {
-  bcrypt.genSalt(1, function(err, s) {
+app.get('/apiToken', requireRole('root'), (req, res, next) => {
+  bcrypt.genSalt(1, (err, s) => {
     if (err) return next(err)
-    res.send({ apiToken: new Buffer(s, 'base64').toString('hex') })
+    res.send({apiToken: Buffer.from(s, 'base64').toString('hex')})
   })
 })
 
@@ -1307,102 +1262,105 @@ app.get('/actors/search', queryNameIndex('Actor'))
 app.get('/directors/search', queryNameIndex('Director'))
 app.get('/productionCompanies/search', queryNameIndex('ProductionCompany'))
 
-app.get('/emails/search', function(req, res, next) {
-  var terms = asTerms(req.query.q)
-  async.parallel([loadUsers, loadAccounts], function(err, results) {
+app.get('/emails/search', (req, res, next) => {
+  const terms = asTerms(req.query.q)
+  async.parallel([loadUsers, loadAccounts], (err, results) => {
     if (err) return next(err)
     res.send(_(results).flatten().sortBy('name').value())
   })
 
-  function loadUsers(callback) {
-    var q = { $or: [ { name: terms }, { 'emails.0': terms } ], 'emails.0': { $exists: true }, deleted: { $ne:true } }
-    User.find(q, { name: 1, emails:1 }).sort('name').limit(25).lean().exec(function(err, res) {
+  function loadUsers (callback) {
+    const q = {$or: [{name: terms}, {'emails.0': terms}], 'emails.0': {$exists: true}, deleted: {$ne: true}}
+    User.find(q, {name: 1, emails: 1}).sort('name').limit(25).lean().exec((err, result) => {
       if (err) return callback(err)
-      callback(null, res.map(function(u) { return { id: u.emails[0], name: u.name, role: 'user' } }))
-    })
-  }
-  function loadAccounts(callback) {
-    var q = { $or: [ { name: terms }, { 'emailAddresses.0': terms } ], 'emailAddresses.0': { $exists: true }, roles: 'Subscriber', deleted: { $ne:true } }
-    Account.find(q, { name: 1, emailAddresses: 1 }).sort('name').limit(25).lean().exec(function(err, res) {
-      if (err) return callback(err)
-      callback(null, res.map(function(a) { return { id: a.emailAddresses[0], name: a.name, role: 'account' } }))
+      callback(null, result.map((u) => ({id: u.emails[0], name: u.name, role: 'user'})))
     })
   }
 
-  function asTerms(q) {
-    var words = (q || '').trim().toLowerCase()
-    return words ? { $all: words.split(/\s+/).map(asRegex) } : undefined
+  function loadAccounts (callback) {
+    const q = {$or: [ {name: terms}, {'emailAddresses.0': terms} ], 'emailAddresses.0': {$exists: true}, roles: 'Subscriber', deleted: {$ne: true}}
+    Account.find(q, {name: 1, emailAddresses: 1}).sort('name').limit(25).lean().exec((err, result) => {
+      if (err) return callback(err)
+      callback(null, result.map((a) => ({id: a.emailAddresses[0], name: a.name, role: 'account'})))
+    })
   }
-  function asRegex(s) {
+
+  function asTerms (q) {
+    const words = (q || '').trim().toLowerCase()
+    return words ? {$all: words.split(/\s+/).map(asRegex)} : undefined
+  }
+
+  function asRegex (s) {
     return new RegExp('(^|\\s|\\.|@)' + utils.escapeRegExp(s), 'i')
   }
 })
 
-app.get('/invoicerows/:begin/:end', requireRole('kavi'), function(req, res, next) {
-  var range = utils.parseDateRange(req.params)
+app.get('/invoicerows/:begin/:end', requireRole('kavi'), (req, res, next) => {
+  const range = utils.parseDateRange(req.params)
   InvoiceRow.find({registrationDate: {$gte: range.begin, $lt: range.end}}).sort('registrationDate').lean().exec(respond(res, next))
 })
 
-app.post('/kieku', requireRole('kavi'), function(req, res, next) {
-  var dates = { begin: req.body.begin, end: req.body.end }
-  var invoiceIds = req.body.invoiceId
+app.post('/kieku', requireRole('kavi'), (req, res, next) => {
+  const dates = {begin: req.body.begin, end: req.body.end}
+  let invoiceIds = req.body.invoiceId
   if (!Array.isArray(invoiceIds)) invoiceIds = [invoiceIds]
-  InvoiceRow.find({ _id: { $in: invoiceIds }}).sort('registrationDate').lean().exec(function(err, rows) {
-    var accountIds = _(rows).map(function(i) { return i.account._id.toString() }).uniq().value()
-    Account.find({ _id: { $in: accountIds } }).lean().exec(function(err, accounts) {
-      var accountMap = _.keyBy(accounts, '_id')
+  InvoiceRow.find({_id: {$in: invoiceIds}}).sort('registrationDate').lean().exec((err, rows) => {
+    if (err) next(err)
+    const accountIds = _(rows).map((i) => i.account._id.toString()).uniq().value()
+    Account.find({_id: {$in: accountIds}}).lean().exec((findErr, accounts) => {
+      if (findErr) return next(findErr)
+      const accountMap = _.keyBy(accounts, '_id')
+      function accountId (row) { return row.account._id }
+      function toNamedTuple (pair) { return {account: accountMap[pair[0]], rows: _.sortBy(pair[1], ['type', 'name'])} }
+      function accountName (tuple) { return tuple.account.name }
 
-      function accountId(row) { return row.account._id }
-      function toNamedTuple(pair) { return { account: accountMap[pair[0]], rows: _.sortBy(pair[1], ['type', 'name']) } }
-      function accountName(tuple) { return tuple.account.name }
-
-      var data = _(rows).groupBy(accountId).toPairs().map(toNamedTuple).sortBy(accountName).value()
-      var result = kieku.createClassificationRegistration(dates, data)
-      res.setHeader('Content-Disposition', 'attachment; filename=kieku-'+dates.begin+'-'+dates.end+'.xlsx')
+      const data = _(rows).groupBy(accountId).toPairs().map(toNamedTuple).sortBy(accountName).value()
+      const result = kieku.createClassificationRegistration(dates, data)
+      res.setHeader('Content-Disposition', 'attachment; filename=kieku-' + dates.begin + '-' + dates.end + '.xlsx')
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       res.send(result)
     })
   })
 })
 
-app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next) {
-  var now = new Date()
-  var account = { _id: req.account._id, name: req.account.name }
-  var root = builder.create("ASIAKAS")
-  var xmlDoc = ""
-  req.on('data', function(chunk) { xmlDoc += chunk })
-  req.on('end', function() {
-    var doc = { xml: xmlDoc.toString('utf-8'), date: now, account: account }
-    new schema.XmlDoc(doc).save(function(err) {
+app.post('/xml/v1/programs/:token', authenticateXmlApi, (req, res) => {
+  const now = new Date()
+  const account = {_id: req.account._id, name: req.account.name}
+  const root = builder.create("ASIAKAS")
+  let xmlDoc = ""
+  req.on('data', (chunk) => { xmlDoc += chunk; return undefined })
+  req.on('end', () => {
+    const doc = {xml: xmlDoc.toString('utf-8'), date: now, account: account}
+    new schema.XmlDoc(doc).save((err) => {
       if (err) console.error(err)
     })
   })
 
-  xml.readPrograms(req, function(err, programs) {
-    if (err) return console.error(err)
-    if (programs.length == 0) {
+  xml.readPrograms(req, (err, programs) => {
+    if (err) return writeError('Järjestelmävirhe: ' + err, root)
+    if (programs.length === 0) {
       writeError('Yhtään kuvaohjelmaa ei voitu lukea', root)
-      return res.send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
+      return res.send(root.end({pretty: true, indent: '  ', newline: '\n'}))
     }
 
-    async.eachSeries(programs, handleXmlProgram, function(err) {
-      if (err) {
-        writeError('Järjestelmävirhe: ' + err, root)
+    async.eachSeries(programs, handleXmlProgram, (handleErr) => {
+      if (handleErr) {
+        writeError('Järjestelmävirhe: ' + handleErr, root)
       }
       res.set('Content-Type', 'application/xml');
-      res.status(err ? 500 : 200).send(root.end({ pretty: true, indent: '  ', newline: '\n' }))
+      res.status(handleErr ? 500 : 200).send(root.end({pretty: true, indent: '  ', newline: '\n'}))
     })
   })
   req.resume()
 
-  function writeError(err, parent) {
+  function writeError (err, parent) {
     console.error(err)
     parent.ele('VIRHE', err)
   }
 
-  function handleXmlProgram(data, callback) {
-    var program = data.program
-    var ele = root.ele('KUVAOHJELMA')
+  function handleXmlProgram (data, callback) {
+    const program = data.program
+    const ele = root.ele('KUVAOHJELMA')
     ele.ele('ASIAKKAANTUNNISTE', program.externalId)
 
     if (data.errors.length > 0) {
@@ -1413,46 +1371,46 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       return writeErrAndReturn("Virheellinen vuosi: " + program.year)
     }
 
-    program.customersId = { account: req.account._id, id: program.externalId }
-    Program.findOne(utils.flattenObject({ customersId: program.customersId })).exec(function(err, existingProgram) {
+    program.customersId = {account: req.account._id, id: program.externalId}
+    Program.findOne(utils.flattenObject({customersId: program.customersId})).exec((err, existingProgram) => {
       if (err) return callback(err)
 
       if (existingProgram && !existingProgram.deleted && existingProgram.classifications.length > 0) {
         return writeErrAndReturn("Luokiteltu kuvaohjelma on jo olemassa asiakkaan tunnisteella: " + program.externalId)
       }
 
-      verifyValidAuthor(program, function (err) {
-        if (err) return callback(err)
-        verifyParentProgram(program, function (err) {
-          if (err) return callback(err)
+      verifyValidAuthor(program, (verifyAuthErr) => {
+        if (verifyAuthErr) return callback(verifyAuthErr)
+        verifyParentProgram(program, (verifyErr) => {
+          if (verifyErr) return callback(verifyErr)
           ele.ele('STATUS', 'OK')
-          var p = new Program(program)
+          let prg = new Program(program)
           if (existingProgram) {
             existingProgram.series = program.series
-            _.each(existingProgram.classifications, function (p) { existingProgram.deletedClassifications.push(p) })
+            _.each(existingProgram.classifications, (p) => existingProgram.deletedClassifications.push(p))
             existingProgram.classifications = program.classifications
             existingProgram.createdBy = program.createdBy
             existingProgram.deleted = false
-            p = existingProgram
+            prg = existingProgram
           }
-          p.classifications[0].status = 'registered'
-          p.classifications[0].creationDate = now
-          p.classifications[0].registrationDate = now
-          p.classifications[0].billing = account
-          p.classifications[0].buyer = account
-          p.classifications[0].isReclassification = false
-          Program.updateClassificationSummary(p.classifications[0])
-          p.populateAllNames(function (err) {
-            if (err) return callback(err)
-            p.save(function (err) {
-              if (err) return callback(err)
-              existingProgram ? logUpdateOperation(req.user, p, { 'classifications': { new: p.classifications } }) : logCreateOperation(req.user, p)
-              updateTvSeriesClassification(p, function(err) {
-                if (err) return callback(err)
-                var seconds = classificationUtils.durationToSeconds(_.first(p.classifications).duration)
-                InvoiceRow.fromProgram(p, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(function (err, saved) {
-                  if (err) return callback(err)
-                  updateActorAndDirectorIndexes(p, callback)
+          prg.classifications[0].status = 'registered'
+          prg.classifications[0].creationDate = now
+          prg.classifications[0].registrationDate = now
+          prg.classifications[0].billing = account
+          prg.classifications[0].buyer = account
+          prg.classifications[0].isReclassification = false
+          Program.updateClassificationSummary(prg.classifications[0])
+          prg.populateAllNames((populateErr) => {
+            if (populateErr) return callback(populateErr)
+            prg.save((saveErr) => {
+              if (saveErr) return callback(saveErr)
+              existingProgram ? logUpdateOperation(req.user, prg, {'classifications': {new: prg.classifications}}) : logCreateOperation(req.user, prg)
+              updateTvSeriesClassification(prg, (updateErr) => {
+                if (updateErr) return callback(updateErr)
+                const seconds = classificationUtils.durationToSeconds(_.first(prg.classifications).duration)
+                InvoiceRow.fromProgram(prg, 'registration', seconds, srvUtils.currentPrices().registrationFee).save((invoiceErr) => {
+                  if (invoiceErr) return callback(invoiceErr)
+                  updateActorAndDirectorIndexes(prg, callback)
                 })
               })
             })
@@ -1461,115 +1419,115 @@ app.post('/xml/v1/programs/:token', authenticateXmlApi, function(req, res, next)
       })
     })
 
-    function verifyValidAuthor(program, callback) {
-      var username = program.classifications[0].author.name.toUpperCase()
-      var user = _.find(req.account.users, { username: username })
+    function verifyValidAuthor (p, cb) {
+      const username = p.classifications[0].author.name.toUpperCase()
+      const user = _.find(req.account.users, {username: username})
       if (user) {
-        User.findOne({ username: username, active: true }, { _id: 1, username: 1, name: 1, role: 1 }).lean().exec(function(err, doc) {
-          if (err) return callback(err)
+        User.findOne({username: username, active: true}, {_id: 1, username: 1, name: 1, role: 1}).lean().exec((err, doc) => {
+          if (err) return cb(err)
           if (doc) {
-            program.classifications[0].author = { _id: doc._id, username: doc.username, name: doc.name }
-            program.createdBy = { _id: doc._id, username: doc.username, name: doc.name, role: doc.role }
-            return callback()
-          } else {
-            return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
+            p.classifications[0].author = {_id: doc._id, username: doc.username, name: doc.name}
+            p.createdBy = {_id: doc._id, username: doc.username, name: doc.name, role: doc.role}
+            return cb()
           }
+          return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
         })
       } else {
         return writeErrAndReturn("Virheellinen LUOKITTELIJA: " + username)
       }
     }
 
-    function verifyParentProgram(program, callback) {
-      if (!enums.util.isTvEpisode(program)) return callback()
-      var parentName = program.parentTvSeriesName.trim()
-      Program.findOne({ programType: 2, name: parentName, deleted: { $ne: true } }, function(err, parent) {
-        if (err) return callback(err)
-        if (!parent) {
-          var user = _.merge({ ip: req.user.ip }, program.createdBy)
-          createParentProgram(program, { name:[parentName] }, user, callback)
+    function verifyParentProgram (p, cb) {
+      if (!enums.util.isTvEpisode(p)) return cb()
+      const parentName = p.parentTvSeriesName.trim()
+      Program.findOne({programType: 2, name: parentName, deleted: {$ne: true}}, (err, parent) => {
+        if (err) return cb(err)
+        if (parent) {
+          p.series = {_id: parent._id, name: parent.name[0]}
+          cb()
         } else {
-          program.series = { _id: parent._id, name: parent.name[0] }
-          callback()
+          const user = _.merge({ip: req.user.ip}, p.createdBy)
+          createParentProgram(p, {name: [parentName]}, user, cb)
         }
       })
     }
 
-    function writeErrAndReturn(errors) {
+    function writeErrAndReturn (errors) {
       ele.ele('STATUS', 'VIRHE')
-      if (!_.isArray(errors)) errors = [errors]
-      errors.forEach(function(msg) { writeError(msg, ele) })
+      const errorList = _.isArray(errors) ? errors : [errors]
+      errorList.forEach((msg) => writeError(msg, ele))
       callback()
     }
   }
 })
 
-app.get('/changelogs/:documentId', requireRole('root'), function(req, res, next) {
-  ChangeLog.find({ documentId: req.params.documentId }).sort({ date: -1 }).lean().exec(respond(res, next))
+app.get('/changelogs/:documentId', requireRole('root'), (req, res, next) => {
+  ChangeLog.find({documentId: req.params.documentId}).sort({date: -1}).lean().exec(respond(res, next))
 })
 
-app.get('/environment', function(req, res) {
+app.get('/environment', (req, res) => {
   res.set('Content-Type', 'text/javascript')
   res.send('var APP_ENVIRONMENT = "' + app.get('env') + '";')
 })
 
-app.post('/files/provider-import', upload.single('providerFile'), function(req, res, next) {
+app.post('/files/provider-import', upload.single('providerFile'), (req, res) => {
   if (_.isEmpty(req.file) || !req.file.path) return res.sendStatus(400)
   if (req.file.truncated) return res.sendStatus(400)
-  providerImport.import(req.file, function(err, provider) {
-    if (err) return res.send({ error: err })
-    var providerData = utils.merge(provider, {message: req.body.message ? req.body.message : undefined})
-    new schema.Provider(providerData).save(function(err, saved) {
-      res.send({
-        message: 'Ilmoitettu tarjoaja sekä ' + provider.locations.length + ' tarjoamispaikkaa.'
-      })
+  providerImport.import(req.file, (err, provider) => {
+    if (err) return res.send({error: err})
+    const providerData = utils.merge(provider, {message: req.body.message ? req.body.message : undefined})
+    new schema.Provider(providerData).save((saveErr) => {
+      if (saveErr) return res.send({error: saveErr})
+      res.send({message: 'Ilmoitettu tarjoaja sekä ' + provider.locations.length + ' tarjoamispaikkaa.'})
     })
   })
 })
 
-app.get('/report/:name', requireRole('root'), function(req, res, next) {
-  var range = utils.parseDateRange(req.query)
-  var reports = require('./reports')
+app.get('/report/:name', requireRole('root'), (req, res, next) => {
+  const range = utils.parseDateRange(req.query)
+  const reports = require('./reports')
   reports[req.params.name](range, respond(res, next))
 })
 
-app.get('/classification/criteria', function (req, res, next) {
-  if (!req.user) res.send([])
-  else ClassificationCriteria.find({}, respond(res, next))
+app.get('/classification/criteria', (req, res, next) => {
+  if (req.user) ClassificationCriteria.find({}, respond(res, next))
+  else res.send([])
 })
 
-app.post('/classification/criteria/:id', requireRole('root'), function (req, res, next) {
-  var id = parseInt(req.params.id)
-  ClassificationCriteria.findOneAndUpdate({ id: id }, {
-    $set: {id: id, fi: req.body.fi, sv: req.body.sv, date: new Date() }
+app.post('/classification/criteria/:id', requireRole('root'), (req, res, next) => {
+  const id = parseInt(req.params.id)
+  ClassificationCriteria.findOneAndUpdate({id: id}, {
+    $set: {id: id, fi: req.body.fi, sv: req.body.sv, date: new Date()}
   }, {upsert: true}, respond(res, next))
 })
 
-app.get('/agelimit/:q?', function (req, res, next) {
-  var types = _.map(enums.programType, function (t) { return t.type } )
-  var filtersByType = _.map(req.query.type ? _.isArray(req.query.type) ? req.query.type : [req.query.type] : [], function (t) { return types.indexOf(t) })
-  var queryParams = {
+app.get('/agelimit/:q?', (req, res, next) => {
+  const types = _.map(enums.programType, (t) => t.type)
+  const filtersByType = _.map(req.query.type ? _.isArray(req.query.type) ? req.query.type : [req.query.type] : [], (t) => types.indexOf(t))
+  const queryParams = {
     "q": req.params.q,
     "filters": filtersByType,
     "directors": req.query.directors,
     "year": parseInt(req.query.year),
     "registrationDateRange": req.query.registrationDateRange
   }
-  var q = constructQuery(queryParams)
-  var count = req.query.count ? parseInt(req.query.count) : undefined
+  const q = constructQuery(queryParams)
+  const count = req.query.count ? parseInt(req.query.count) : undefined
 
-  function asCriteria(program) {
-    function firstTrimmedFrom(origList) {
+  function asCriteria (program) {
+    function firstTrimmedFrom (origList) {
       return origList && origList.length > 0 ? origList[0].trim() : undefined
     }
-    function trimmedList(origList) {
+
+    function trimmedList (origList) {
       return origList && origList.length > 0 ? _.compact(origList.map(_.trim)) : undefined
     }
-    var classsification = enums.util.isTvSeriesName(program) ? program.episodes : program.classifications[0] || {}
-    var agelimit = classsification.agelimit || classsification.legacyAgeLimit || 0
-    var countryCode = trimmedList(program.country)
-    var durationInSeconds = classificationUtils.durationToSeconds(classsification.duration)
-    var warnings = _.isEmpty(classsification.warningOrder) ? trimmedList(classsification.warnings) : trimmedList(classsification.warningOrder)
+
+    const classsification = enums.util.isTvSeriesName(program) ? program.episodes : program.classifications[0] || {}
+    const agelimit = classsification.agelimit || classsification.legacyAgeLimit || 0
+    const countryCode = trimmedList(program.country)
+    const durationInSeconds = classificationUtils.durationToSeconds(classsification.duration)
+    const warnings = _.isEmpty(classsification.warningOrder) ? trimmedList(classsification.warnings) : trimmedList(classsification.warningOrder)
     return {
       id: program.sequenceId,
       type: enums.programType[program.programType].type,
@@ -1580,7 +1538,7 @@ app.get('/agelimit/:q?', function (req, res, next) {
       series: enums.util.isTvEpisode(program) && program.series && program.series.name ? program.series.name.trim() : undefined,
       season: enums.util.isTvEpisode(program) ? program.season : undefined,
       episode: enums.util.isTvEpisode(program) ? program.episode : undefined,
-      country: countryCode ? countryCode.map(function (c) { return { code: c, name: enums.countries[c] } }) : undefined,
+      country: countryCode ? countryCode.map((c) => ({code: c, name: enums.countries[c]})) : undefined,
       year: isNaN(program.year) ? undefined : parseInt(program.year),
       directors: trimmedList(program.directors),
       productionCompanies: trimmedList(program.productionCompanies),
@@ -1593,49 +1551,49 @@ app.get('/agelimit/:q?', function (req, res, next) {
     }
   }
 
-  Program.find(q, Program.publicFields).limit(100).sort('name').lean().exec(function (err, docs) {
+  Program.find(q, Program.publicFields).limit(100).sort('name').lean().exec((err, docs) => {
     if (err) return next(err)
     res.send(_.take(docs, count || docs.length).map(asCriteria))
   })
 })
 
 if (env.isTest) {
-  app.get('/emails/latest', function(req, res) { res.send(_.last(testEnvEmailQueue)) })
+  app.get('/emails/latest', (req, res) => res.send(_.last(testEnvEmailQueue)))
 }
 
 // Error handler
-app.use(function(err, req, res, next) {
+app.use((err, req, res) => {
   console.error(err.stack || err)
-  res.status(err.status || 500).send({ message: err.message || err })
+  res.status(err.status || 500).send({message: err.message || err})
 })
 
-function createParentProgram(program, data, user, callback) {
-  var parent = new Program(_.merge({ programType: 2, createdBy: {_id: user._id, username: user.username, name: user.name, role: user.role} }, data))
-  parent.populateAllNames(function(err) {
+function createParentProgram (program, data, user, callback) {
+  const parent = new Program(_.merge({programType: 2, createdBy: {_id: user._id, username: user.username, name: user.name, role: user.role}}, data))
+  parent.populateAllNames((err) => {
     if (err) return callback(err)
-    parent.save(function(err, saved) {
-      if (err) return callback(err)
+    parent.save((saveErr, saved) => {
+      if (saveErr) return callback(saveErr)
       logCreateOperation(user, parent)
-      program.series = { _id: saved._id, name: saved.name[0] }
+      program.series = {_id: saved._id, name: saved.name[0]}
       callback()
     })
   })
 }
 
-var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
-  User.find({ $and: [
-    { certificateEndDate: { $lt: new Date() }},
-    { active: true},
-    {'emails.0': { $exists: true }}
-  ]}, function(err, users) {
+const checkExpiredCerts = new CronJob('0 */30 * * * *', () => {
+  User.find({$and: [
+    {certificateEndDate: {$lt: new Date()}},
+    {active: true},
+    {'emails.0': {$exists: true}}
+  ]}, (err, users) => {
     if (err) throw err
-    users.forEach(function(user) {
-      user.updateOne({ active: false }, function(err) {
-        if (err) return logError(err)
-        logUpdateOperation({ username: 'cron', ip: 'localhost' }, user, { active: { old: user.active, new: false } })
+    users.forEach((user) => {
+      user.updateOne({active: false}, (updateErr) => {
+        if (updateErr) return logError(updateErr)
+        logUpdateOperation({username: 'cron', ip: 'localhost'}, user, {active: {old: user.active, new: false}})
       })
       sendEmail({
-        recipients: [ user.emails[0] ],
+        recipients: [user.emails[0]],
         subject: 'Luokittelusertifikaattisi on vanhentunut',
         body: '<p>Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.<br/>' +
           '<p>Lisätietoja voit kysyä KAVI:lta: <a href="mailto:meku@kavi.fi">meku@kavi.fi</a></p>' +
@@ -1645,19 +1603,19 @@ var checkExpiredCerts = new CronJob('0 */30 * * * *', function() {
   })
 })
 
-var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
-  User.find({ $and: [
-    { certificateEndDate: { $lt: moment().add(6, 'months').toDate(), $gt: new Date() }},
-    { active: true},
-    {'emails.0': { $exists: true }},
-    { $or: [
-      { certExpiryReminderSent: { $exists: false }},
-      { certExpiryReminderSent: { $lt: moment().subtract(1, 'months').toDate() }}]}
-  ]}, function(err, users) {
+const checkCertsExpiringSoon = new CronJob('0 */30 * * * *', () => {
+  User.find({$and: [
+    {certificateEndDate: {$lt: moment().add(6, 'months').toDate(), $gt: new Date()}},
+    {active: true},
+    {'emails.0': {$exists: true}},
+    {$or: [
+      {certExpiryReminderSent: {$exists: false}},
+      {certExpiryReminderSent: {$lt: moment().subtract(1, 'months').toDate()}}]}
+  ]}, (err, users) => {
     if (err) throw err
-    users.forEach(function(user) {
+    users.forEach((user) => {
       sendEmail({
-        recipients: [ user.emails[0] ],
+        recipients: [user.emails[0]],
         subject: 'Luokittelusertifikaattisi on vanhentumassa',
         body: '<p>Tämä on KAVIn kuvaohjelmaluokittelujärjestelmästä (IKLU) lähetetty automaattinen muistutusviesti luokitteluoikeutesi päättymisestä. Luokitteluoikeutesi päättyy ' + moment(user.certificateEndDate).format('DD.MM.YYYY') + '.</p>' +
           '<p>Jos haluat jatkaa kuvaohjelmien luokittelua, on sinun osallistuttava KAVin järjestämään kertauskoulutukseen ennen luokitteluoikeutesi viimeistä voimassaolopäivää. Tietoja kertauskoulutuksesta: https://kavi.fi/fi/meku/kuvaohjelmat/luokittelu/kertauskoulutus tai meku@kavi.fi</p>' +
@@ -1672,138 +1630,116 @@ var checkCertsExpiringSoon = new CronJob('0 */30 * * * *', function() {
           '<p>Om du inte slutför fortbildningen under klassificeringsrättigheternas giltighetstid slutar användarnamnet att fungera när giltighetstiden går ut.  Du kan fönya din behörighet genom att delta i fortbildningen även efter att din klassificeringsbehörighet upphört.</p>' +
           '<p>Du behöver inte reagera på detta meddelande om du redan anmält dig till fortbildning, nyligen har deltagit i fortbildning eller inte vill förnya din klassificeringsbehörighet.</p>' +
           '<p>Svara inte på detta meddelande, utan skicka eventuella frågor till meku@kavi.fi.</p>'
-      }, undefined, function(err) {
-        if (err) console.error(err)
-        else user.updateOne({ certExpiryReminderSent: new Date() }, logError)
+      }, undefined, (sendErr) => {
+        if (sendErr) console.error(sendErr)
+        else user.updateOne({certExpiryReminderSent: new Date()}, logError)
       })
     })
   })
 })
 
-function nocache(req, res, next) {
+function nocache (req, res, next) {
   res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate')
   res.header('Expires', '-1')
   res.header('Pragma', 'no-cache')
   next()
 }
 
-function authenticate(req, res, next) {
-  var optionalList = ['GET:/programs/', 'POST:/program/excel/export', 'GET:/episodes/', 'GET:/classification/criteria']
-  var url = req.method + ':' + req.path
-  if (url == 'GET:/') return next()
+function authenticate (req, res, next) {
+  const optionalList = ['GET:/programs/', 'POST:/program/excel/export', 'GET:/episodes/', 'GET:/classification/criteria']
+  const url = req.method + ':' + req.path
+  if (url === 'GET:/') return next()
   if (isWhitelisted(req)) return next()
-  var isOptional =  _.some(optionalList, function(p) { return url.indexOf(p) == 0 })
-  var cookie = req.signedCookies.user
+  const isOptional = _.some(optionalList, (p) => url.indexOf(p) === 0)
+  const cookie = req.signedCookies.user
   if (cookie) {
     req.user = cookie
     req.user.ip = getIpAddress(req)
     return next()
   } else if (isOptional) {
     return next()
-  } else {
-    return res.sendStatus(403)
   }
+  return res.sendStatus(403)
 }
 
-function authenticateXmlApi(req, res, next) {
+function authenticateXmlApi (req, res, next) {
   req.pause()
-  Account.findOne({apiToken: req.params.token}).lean().exec(function(err, data) {
+  Account.findOne({apiToken: req.params.token}).lean().exec((err, data) => {
+    if (err) console.error(err)
     if (data) {
       req.account = data
       req.user = {username: 'xml-api', ip: getIpAddress(req)}
       return next()
-    } else {
-      res.sendStatus(403)
     }
+    res.sendStatus(403)
   })
 }
 
-function rejectNonHttpMethods(req, res, next) {
+function rejectNonHttpMethods (req, res, next) {
   if (['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'].indexOf(req.method) === -1) res.sendStatus(405)
   else next()
 }
 
-function forceSSL(req, res, next) {
+function forceSSL (req, res, next) {
   // trust the proxy (Heroku) about X-Forwarded-Proto
   if (env.forceSSL && req.headers['x-forwarded-proto'] !== 'https') {
-    if (req.method === 'GET') {
-      return res.redirect(301, 'https://' + req.get('host') + req.originalUrl)
-    } else {
-      return res.status(403).send("Please use HTTPS")
-    }
-  } else {
-    return next()
+    if (req.method === 'GET') return res.redirect(301, 'https://' + req.get('host') + req.originalUrl)
+    return res.status(403).send("Please use HTTPS")
   }
+  return next()
 }
 
-function buildRevisionCheck(req, res, next) {
-  var entryPoints = ['/', '/public.html', '/index.html', '/register-provider.html', '/reset-password.html', 'classification-criteria/.html']
+function buildRevisionCheck (req, res, next) {
+  const entryPoints = ['/', '/public.html', '/index.html', '/register-provider.html', '/reset-password.html', 'classification-criteria/.html']
   if (_.includes(entryPoints, req.path)) {
     res.cookie('build.revision', buildRevision)
-  } else if (req.xhr && req.path != '/templates.html') {
-    var clientRevision = req.cookies['build.revision']
-    if (!clientRevision || clientRevision != buildRevision) {
+  } else if (req.xhr && req.path !== '/templates.html') {
+    const clientRevision = req.cookies['build.revision']
+    if (!clientRevision || clientRevision !== buildRevision) {
       return res.sendStatus(418)
     }
   }
   next()
 }
 
-function setupUrlEncodedBodyParser() {
-  var parser = bodyParser.urlencoded({ parameterLimit: Infinity, arrayLimit: Infinity, limit: '10mb', extended: false })
-  return function(req, res, next) {
-    return isUrlEncodedBody(req) ? parser(req, res, next) : next()
-  }
+function setupUrlEncodedBodyParser () {
+  const parser = bodyParser.urlencoded({parameterLimit: Infinity, arrayLimit: Infinity, limit: '10mb', extended: false})
+  return (req, res, next) => (isUrlEncodedBody(req) ? parser(req, res, next) : next())
 }
 
-function setupCsrfMiddleware() {
-  var csrfMiddleware = csrf({ cookie: { httpOnly: true, secure: env.forceSSL, signed: true } })
-  return function(req, res, next) {
-    if (isWhitelisted(req)) {
-      return next()
-    } else {
-      return csrfMiddleware(req, res, next)
-    }
-  }
+function setupCsrfMiddleware () {
+  const csrfMiddleware = csrf({cookie: {httpOnly: true, secure: env.forceSSL, signed: true}})
+  return (req, res, next) => (isWhitelisted(req) ? next() : csrfMiddleware(req, res, next))
 }
 
-function setCsrfTokenCookie(req, res, next) {
-  if (req.csrfToken && req.method === 'GET') {
-    var csrf = req.csrfToken()
-    res.cookie('_csrf_token', csrf)
-  }
+function setCsrfTokenCookie (req, res, next) {
+  if (req.csrfToken && req.method === 'GET') res.cookie('_csrf_token', req.csrfToken())
   next()
 }
 
-function requireRole(role) {
-  return function(req, res, next) {
-    if (!utils.hasRole(req.user, role)) return res.sendStatus(403)
-    else return next()
-  }
+function requireRole (role) {
+  return (req, res, next) => (utils.hasRole(req.user, role) ? next() : res.sendStatus(403))
 }
 
-function logErrorOrSendEmail(user) {
-  return function(err, email) {
-    if (err) return console.error(err)
-    sendEmail(email, user, logError)
-  }
+function logErrorOrSendEmail (user) {
+  return (err, email) => (err ? logError(err) : sendEmail(email, user, logError))
 }
 
-function sendEmail(opts, user, callback) {
-  var msg = {
+function sendEmail (opts, user, callback) {
+  const msg = {
     from: opts.from || 'no-reply@kavi.fi',
     to: opts.recipients,
     subject: opts.subject,
     html: opts.body
   }
-  if (process.env.EMAIL_TO != undefined) {
+  if (process.env.EMAIL_TO !== undefined) {
     msg.to = process.env.EMAIL_TO
   } else if (process.env.NODE_ENV === 'training') {
     if (!user) return callback()
     msg.to = user.email || user.emails[0]
   }
 
-  if (env.sendEmail || process.env.EMAIL_TO != undefined) {
+  if (env.sendEmail || process.env.EMAIL_TO !== undefined) {
     sendgrid.send(msg, callback)
   } else if (env.isTest) {
     testEnvEmailQueue.push(msg)
@@ -1814,90 +1750,84 @@ function sendEmail(opts, user, callback) {
   }
 }
 
-function updateActorAndDirectorIndexes(program, callback) {
-  schema.Actor.updateWithNames(program.actors, function() {
+function updateActorAndDirectorIndexes (program, callback) {
+  schema.Actor.updateWithNames(program.actors, () => {
     schema.Director.updateWithNames(program.directors, callback)
   })
 }
-function updateMetadataIndexes(program, callback) {
-  schema.ProductionCompany.updateWithNames(program.productionCompanies, function() {
+
+function updateMetadataIndexes (program, callback) {
+  schema.ProductionCompany.updateWithNames(program.productionCompanies, () => {
     updateActorAndDirectorIndexes(program, callback)
   })
 }
 
-function queryNameIndex(schemaName) {
-  return function(req, res, next) {
-    var q = {}
-    var parts = toMongoArrayQuery(req.query.q)
+function queryNameIndex (schemaName) {
+  return (req, res, next) => {
+    const q = {}
+    const parts = toMongoArrayQuery(req.query.q)
     if (parts) q.parts = parts
-    schema[schemaName].find(q, { name: 1 }).limit(parseInt(process.env.SELECT_DROPDOWN_SIZE || '100')).sort('name').lean().exec(function(err, docs) {
+    schema[schemaName].find(q, {name: 1}).limit(parseInt(process.env.SELECT_DROPDOWN_SIZE || '100')).sort('name').lean().exec((err, docs) => {
       if (err) return next(err)
       res.send(_.map(docs || [], 'name'))
     })
   }
 }
 
-function toMongoArrayQuery(string) {
-  var words = (string || '').trim().toLowerCase()
-  return words ? { $all: words.match(/"[^"]*"|[^ ]+/g).map(toTerm) } : undefined
+function toMongoArrayQuery (string) {
+  const words = (string || '').trim().toLowerCase()
+  return words ? {$all: words.match(/"[^"]*"|[^ ]+/g).map(toTerm)} : undefined
 
-  function toTerm(s) {
-    if (/^".+"$/.test(s)) {
-      return s.substring(1, s.length - 1)
-    } else {
-      return new RegExp('^' + utils.escapeRegExp(s))
-    }
+  function toTerm (s) {
+    if ((/^".+"$/).test(s)) return s.substring(1, s.length - 1)
+    return new RegExp('^' + utils.escapeRegExp(s))
   }
 }
 
-function respond(res, next, overrideData) {
-  return function(err, data) {
+function respond (res, next, overrideData) {
+  return (err, data) => {
     if (err) return next(err)
     res.send(overrideData || data)
   }
 }
 
-function updateTvSeriesClassificationIfEpisodeRemovedFromSeries(program, previousSeries, callback) {
-  if (previousSeries && previousSeries._id && String(previousSeries._id) != String(program.series._id)) {
+function updateTvSeriesClassificationIfEpisodeRemovedFromSeries (program, previousSeries, callback) {
+  if (previousSeries && previousSeries._id && String(previousSeries._id) !== String(program.series._id)) {
     Program.updateTvSeriesClassification(previousSeries._id, callback)
   } else {
     callback()
   }
 }
 
-function updateInvoicerows(program, callback) {
-  InvoiceRow.find({'program': program._id}, function (err, invoiceRows) {
-    if (err) return next(err)
-    var billing = program.classifications.length > 0 ? program.classifications[0].billing : undefined
-    async.forEach(invoiceRows, function(invoiceRow, callback) {
-      if (invoiceRow.name !== _.first(program.name) || (billing && invoiceRow.account.name !== billing.name)) {
+function updateInvoicerows (program, callback) {
+  InvoiceRow.find({'program': program._id}, (err, invoiceRows) => {
+    if (err) return callback(err)
+    const billing = program.classifications.length > 0 ? program.classifications[0].billing : undefined
+    async.forEach(invoiceRows, (invoiceRow, cb) => {
+      if (invoiceRow.name !== _.first(program.name) || billing && invoiceRow.account.name !== billing.name) {
         invoiceRow.name = _.first(program.name)
         if (billing) {
           invoiceRow.account._id = billing._id
           invoiceRow.account.name = billing.name
         }
-        invoiceRow.save(callback)
-      } else callback()
-    },function (err) {
-      if (err) return callback(err)
-      callback()
-    })
+        invoiceRow.save(cb)
+      } else cb()
+    }, callback)
   })
-
 }
 
-function updateTvSeriesClassification(program, callback) {
+function updateTvSeriesClassification (program, callback) {
   if (!enums.util.isTvEpisode(program)) return callback()
-  var seriesId = program.series && program.series._id
+  const seriesId = program.series && program.series._id
   if (!seriesId) return callback()
   Program.updateTvSeriesClassification(seriesId, callback)
 }
 
-function verifyTvSeriesExistsOrCreate(program, user, callback) {
-  if (enums.util.isTvEpisode(program) && !!program.series.name && program.series._id == null) {
-    var series = program.series || {}
-    var draft = series.draft || {}
-    var data = {
+function verifyTvSeriesExistsOrCreate (program, user, callback) {
+  if (enums.util.isTvEpisode(program) && !!program.series.name && !program.series._id) {
+    const series = program.series || {}
+    const draft = series.draft || {}
+    const data = {
       name: [draft.name || program.series.name],
       nameFi: draft.nameFi ? [draft.nameFi] : [],
       nameSv: draft.nameSv ? [draft.nameSv] : [],
@@ -1910,102 +1840,96 @@ function verifyTvSeriesExistsOrCreate(program, user, callback) {
   }
 }
 
-function getProviderBillingRows(data) {
-  var accountRows = []
+function getProviderBillingRows (data) {
+  const accountRows = []
 
-  data.providers.forEach(function(provider) {
-    var account = _.omit(provider, 'locations')
-    var rows = _(provider.locations).filter({ isPayer: false }).map(function(l) {
-      return _.map(l.providingType, function(p) {
-        return utils.merge(l, { providingType: p, price: enums.providingTypePrices[p] * 100 })
-      })
-    }).flatten().value()
-    accountRows.push({ account: account, rows: rows })
+  data.providers.forEach((provider) => {
+    const account = _.omit(provider, 'locations')
+    const rows = _(provider.locations).filter({isPayer: false}).map((l) => _.map(l.providingType, (p) => utils.merge(l, {providingType: p, price: enums.providingTypePrices[p] * 100}))).flatten().value()
+    accountRows.push({account: account, rows: rows})
   })
 
-  data.locations.forEach(function(location) {
-    var rows = _.map(location.providingType, function(p) {
-      return utils.merge(location, { providingType: p, price: enums.providingTypePrices[p] * 100 })
-    })
-    accountRows.push({ account: location, rows: rows })
+  data.locations.forEach((location) => {
+    const rows = _.map(location.providingType, (p) => utils.merge(location, {providingType: p, price: enums.providingTypePrices[p] * 100}))
+    accountRows.push({account: location, rows: rows})
   })
   return accountRows
 }
 
-function logError(err) {
+function logError (err) {
   if (err) console.error(err)
 }
 
-function watchChanges(document, user, excludedLogPaths) {
-  var oldObject = document.toObject()
-  return { applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges, getChanges: getChanges }
+function watchChanges (document, user, excludedLogPaths) {
+  const oldObject = document.toObject()
+  return {applyUpdates: applyUpdates, saveAndLogChanges: saveAndLogChanges, getChanges: getChanges}
 
-  function applyUpdates(updates) {
-    var flatUpdates = utils.flattenObject(updates)
-    _.forEach(flatUpdates, function(value, key) { document.set(key, value) })
+  function applyUpdates (updates) {
+    const flatUpdates = utils.flattenObject(updates)
+    _.forEach(flatUpdates, (value, key) => document.set(key, value))
   }
 
-  function saveAndLogChanges(callback) {
-    var changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
-    document.save(function(err, saved) {
+  function saveAndLogChanges (callback) {
+    const changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
+    document.save((err, saved) => {
       if (err) return callback(err)
       log(changedPaths, oldObject, saved, callback)
     })
   }
 
-  function getChanges() {
-    var changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
+  function getChanges () {
+    const changedPaths = document.modifiedPaths().filter(isIncludedLogPath)
     return asChanges(changedPaths, oldObject, document)
   }
 
-  function isIncludedLogPath(p) {
-    return document.isDirectModified(p) && document.schema.pathType(p) != 'nested' && !_.includes(excludedLogPaths, p)
+  function isIncludedLogPath (p) {
+    return document.isDirectModified(p) && document.schema.pathType(p) !== 'nested' && !_.includes(excludedLogPaths, p)
   }
 
-  function log(changedPaths, oldObject, updatedDocument, callback) {
-    var changes = asChanges(changedPaths, oldObject, updatedDocument)
+  function log (changedPaths, oldDocument, updatedDocument, callback) {
+    const changes = asChanges(changedPaths, oldDocument, updatedDocument)
     logUpdateOperation(user, updatedDocument, changes)
     callback(undefined, updatedDocument)
   }
 
-  function asChanges(changedPaths, oldObject, updatedDocument) {
-    var newObject = updatedDocument.toObject()
+  function asChanges (changedPaths, oldDocument, updatedDocument) {
+    const newObject = updatedDocument.toObject()
     return _.zipObject(_(changedPaths).map(asPath).value(), _(changedPaths).map(asChange).value())
 
-    function asPath(path) {
-      return path.replace(/\./g, ',')
+    function asPath (p) {
+      return p.replace(/\./g, ',')
     }
 
-    function asChange(path) {
-      var newValue = utils.getProperty(newObject, path)
-      var oldValue = utils.getProperty(oldObject, path)
-      if (_.isEqual(newValue, oldValue) || (oldValue == null && newValue === "")) return []
-      return { new: newValue, old: oldValue }
+    function asChange (p) {
+      const newValue = utils.getProperty(newObject, p)
+      const oldValue = utils.getProperty(oldDocument, p)
+      if (_.isEqual(newValue, oldValue) || !oldValue && newValue === "") return []
+      return {new: newValue, old: oldValue}
     }
   }
 }
 
-function updateAndLogChanges(document, updates, user, callback) {
-  var watcher = watchChanges(document, user)
+function updateAndLogChanges (document, updates, user, callback) {
+  const watcher = watchChanges(document, user)
   watcher.applyUpdates(updates)
   watcher.saveAndLogChanges(callback)
 }
 
-function softDeleteAndLog(document, user, callback) {
+function softDeleteAndLog (document, user, callback) {
   document.deleted = true
-  document.save(function(err, document) {
+  document.save((err, doc) => {
     if (err) return callback(err)
-    saveChangeLogEntry(user, document, 'delete')
-    callback(undefined, document)
+    saveChangeLogEntry(user, doc, 'delete')
+    callback(undefined, doc)
   })
 }
 
-function saveChangeLogEntry(user, document, operation, operationData) {
-  var data = {
-    user: { _id: user._id, username: user.username, ip: user.ip },
+function saveChangeLogEntry (user, document, operation, operationData) {
+  const data = {
+    user: {_id: user._id, username: user.username, ip: user.ip},
     date: new Date(),
     operation: operation,
-    targetCollection: document ? document.constructor.modelName : undefined,
+    targetCollection: document ? document.constructor.modelName : undefined,
     documentId: document ? document._id : undefined
   }
   if (operationData) {
@@ -2014,32 +1938,30 @@ function saveChangeLogEntry(user, document, operation, operationData) {
   new ChangeLog(data).save(logError)
 }
 
-function logCreateOperation(user, document) {
+function logCreateOperation (user, document) {
   saveChangeLogEntry(user, document, 'create')
 }
 
-function logUpdateOperation(user, document, updates) {
-  saveChangeLogEntry(user, document, 'update', { updates: updates })
+function logUpdateOperation (user, document, updates) {
+  saveChangeLogEntry(user, document, 'update', {updates: updates})
 }
 
-function getIpAddress(req) {
-  var ipAddr = req.headers['x-forwarded-for']
-  if (ipAddr){
-    var list = ipAddr.split(",")
-    ipAddr = list[list.length-1]
-  } else {
-    ipAddr = req.connection.remoteAddress
+function getIpAddress (req) {
+  const ipAddr = req.headers['x-forwarded-for']
+  if (ipAddr) {
+    const list = ipAddr.split(",")
+    return list[list.length - 1]
   }
-  return ipAddr
+  return req.connection.remoteAddress
 }
 
-function isUrlEncodedBody(req) {
-  var paths = ['POST:/.*/excel/export', 'POST:/kieku', 'POST:/providers/.*[Bb]illing/kieku']
-  return _.some(_.map(paths, (path) => new RegExp(path).test(req.method + ':' + req.path)))
+function isUrlEncodedBody (req) {
+  const paths = ['POST:/.*/excel/export', 'POST:/kieku', 'POST:/providers/.*[Bb]illing/kieku']
+  return _.some(_.map(paths, (p) => new RegExp(p).test(req.method + ':' + req.path)))
 }
 
-function isWhitelisted(req) {
-  var whitelist = [
+function isWhitelisted (req) {
+  const whitelist = [
     'GET:/index.html', 'GET:/favicon.ico', 'GET:/robots.txt', 'GET:/public.html', 'GET:/templates.html', 'GET:/environment',
     'GET:/vendor/', 'GET:/shared/', 'GET:/images/', 'GET:/style.css', 'GET:/js/', 'GET:/xml/schema', 'GET:/apple-touch-icon',
     'POST:/login', 'POST:/logout', 'POST:/xml', 'POST:/forgot-password', 'GET:/reset-password.html',
@@ -2047,36 +1969,35 @@ function isWhitelisted(req) {
     'GET:/register-provider.html', 'GET:/KAVI-tarjoajaksi-ilmoittautuminen.xls', 'GET:/KAVI-koulutus-tarjoajaksi-ilmoittautuminen.xls',
     'GET:/upgrade-browser.html', 'GET:/emails/latest', 'GET:/directors/search', 'GET:/agelimit/'
   ]
-  var url = req.method + ':' + req.path
-  return _.some(whitelist, function(p) { return url.indexOf(p) == 0 })
+  const url = req.method + ':' + req.path
+  return _.some(whitelist, (p) => url.indexOf(p) === 0)
 }
 
 if (env.isDev) {
-  var livereload = require('livereload')
-  var server = livereload.createServer()
+  const livereload = require('livereload')
+  const server = livereload.createServer()
   server.watch(path.join(__dirname, '../client'))
 }
 
-var server
+let server
 
-var start = exports.start = function(callback) {
+exports.start = function (callback) {
   mongoose.connect(process.env.MONGOHQ_URL || env.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false, keepAlive: 300000})
-  checkExpiredCerts.start()
-  checkCertsExpiringSoon.start()
-  server = app.listen(process.env.PORT || env.port, callback)
+    .then(() => {
+      checkExpiredCerts.start()
+      checkCertsExpiringSoon.start()
+      server = app.listen(process.env.PORT || env.port, callback)
+    })
+    .catch((err) => callback(err))
 }
 
-var shutdown = exports.shutdown = function(callback) {
-  mongoose.disconnect(function() {
-    server.close(function() {
-      callback()
-    })
-  })
+exports.shutdown = function (callback) {
+  mongoose.disconnect(() => server.close(callback))
 }
 
 if (!module.parent) {
-  start(function(err) {
+  exports.start((err) => {
     if (err) throw err
-    console.log('['+env.name+'] Listening on port ' + server.address().port)
+    console.log('[' + env.name + '] Listening on port ' + server.address().port)
   })
 }

@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node server/app.js",
     "postinstall": "date +%s > build.revision",
-    "test": "./scripts/test.sh"
+    "test": "./scripts/test.sh",
+    "eslint": "./node_modules/.bin/eslint server test"
   },
   "engines": {
     "node": "8.x"
@@ -33,6 +34,7 @@
   "devDependencies": {
     "chai": "4.2.0",
     "chromedriver": "2.43.1",
+    "eslint": "^5.14.1",
     "livereload": "0.8.2",
     "mocha": "6.2.2",
     "mysql": "2.17.1",

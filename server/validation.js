@@ -1,18 +1,18 @@
-var _ = require('lodash')
-var enums = require('../shared/enums')
-var utils = require('../shared/utils')
-var classificationUtils = require('../shared/classification-utils')
+const _ = require('lodash')
+const enums = require('../shared/enums')
+const utils = require('../shared/utils')
+const classificationUtils = require('../shared/classification-utils')
 
-var validation = {}
+const validation = {}
 
-validation.registration = function(program, classification, user) {
-  function isReclassification() {
+validation.registration = function (program, classification, user) {
+  function isReclassification () {
     return classificationUtils.isReclassification(program, classification)
   }
 
   return all(
     when(not(isReclassification), programV()),
-    function() { return classificationV(program, user)(classification) }
+    () => classificationV(program, user)(classification)
   )(program)
 }
 
@@ -33,9 +33,7 @@ function programV() {
 
 function classificationV(p, user) {
   return all(
-    when(function(c) {
-      return !isInternalReclassification(c) || enums.isOikaisupyynto(c.reason)
-    }, all(
+    when((c) => !isInternalReclassification(c) || enums.isOikaisupyynto(c.reason), all(
       requiredRef('buyer'),
       requiredRef('billing')
     )),
@@ -63,106 +61,106 @@ function classificationV(p, user) {
   }
 }
 
-function Fail(field) {
+function fail(field) {
   return {valid: false, field: field}
 }
 
-function Ok() {
+function success() {
   return {valid: true}
 }
 
 function bind(v, v2) {
-  return function(p) {
-    var res = v(p)
+  return function (p) {
+    const res = v(p)
     if (!res.valid) return res
-    else return v2(p)
+    return v2(p)
   }
 }
 
-function all(vs) {
+function all() {
   return _.reduce(arguments, bind, ok())
 }
 
 function ok() {
-  return function(p) {
-    return Ok()
+  return function () {
+    return success()
   }
 }
 
 function requiredString(name) {
-  return function(p) {
-    if (p[name] && p[name].length > 0) return Ok()
-    else return Fail(name)
+  return function (p) {
+    if (p[name] && p[name].length > 0) return success()
+    return fail(name)
   }
 }
 
 function requiredNumber(name) {
-  return function(p) {
-    if (_.has(p, name)) return Ok()
-    else return Fail(name)
+  return function (p) {
+    if (_.has(p, name)) return success()
+    return fail(name)
   }
 }
 
 function requiredArray(name) {
-  return function(p) {
-    var val = p[name]
-    if (_.isArray(val) && !_.isEmpty(val) && val[0].length > 0) return Ok()
-    else return Fail(name)
+  return function (p) {
+    const val = p[name]
+    if (_.isArray(val) && !_.isEmpty(val) && val[0].length > 0) return success()
+    return fail(name)
   }
 }
 
 function arrayEach(name, f) {
-  return function(p) {
-    if (_.every(p[name], f)) return Ok()
-    else return Fail(name)
+  return function (p) {
+    if (_.every(p[name], f)) return success()
+    return fail(name)
   }
 }
 
 function requiredRef(name) {
-  return function(p) {
-    if (p[name] && p[name]._id) return Ok()
-    else return Fail(name)
+  return function (p) {
+    if (p[name] && p[name]._id) return success()
+    return fail(name)
   }
 }
 
 function check(name, f) {
-  return function(p) {
-    if (f(p[name])) return Ok()
-    else return Fail(name)
+  return function (p) {
+    if (f(p[name])) return success()
+    return fail(name)
   }
 }
 
 function when(f, v) {
-  return function(p) {
+  return function (p) {
     if (f(p)) return v(p)
-    else return Ok()
+    return success()
   }
 }
 
 function and(v1, v2) {
-  return function(p) {
+  return function (p) {
     return v1(p) && v2(p)
   }
 }
 
 function or(v1, v2) {
-  return function(p) {
-    var res = v1(p)
+  return function (p) {
+    const res = v1(p)
     if (res.valid) return res
-    else return v2(p)
+    return v2(p)
   }
 }
 
 function newSeries(p) {
-  var series = p.series
+  const series = p.series
   if (series && series.draft && series.draft.name && series.draft.name.length > 0
       && series.draft.nameFi && series.draft.nameFi.length > 0) {
-    return Ok()
-  } else {
-    return Fail('series')
+    return success()
   }
+    return fail('series')
+
 }
 
-function not(f) { return function(p) { return !f(p) }}
+function not(f) { return function (p) { return !f(p) } }
 
 module.exports = validation

@@ -1,13 +1,10 @@
-var mongoose = require('mongoose')
-var schema = require('../server/schema')
-var utils = require('../shared/utils')
-var _ = require('lodash')
-var xlsx = require('xlsx')
-var async = require('async')
-var enums = require('../shared/enums')
+const utils = require('../shared/utils')
+const _ = require('lodash')
+const xlsx = require('xlsx')
+const enums = require('../shared/enums')
 
 // NOTE: field order matters
-var providerFieldMap = [
+const providerFieldMap = [
   'name',
   'yTunnus',
   'address.street',
@@ -21,7 +18,7 @@ var providerFieldMap = [
 ]
 
 // NOTE: field order matters
-var billingFieldMap = [
+const billingFieldMap = [
   'billing.address.street',
   'billing.address.zip',
   'billing.address.city',
@@ -29,13 +26,13 @@ var billingFieldMap = [
 ]
 
 // NOTE: field order matters
-var eInvoiceFieldMap = [
+const eInvoiceFieldMap = [
   'eInvoice.address',
   'eInvoice.operator'
 ]
 
 // NOTE: field order matters
-var locationFieldMap = [
+const locationFieldMap = [
   'name',
   'address.street',
   'address.zip',
@@ -54,7 +51,7 @@ var locationFieldMap = [
   'adultContent'
 ]
 
-var fieldNames = {
+const fieldNames = {
   'name': 'Nimi',
   'yTunnus': 'Y-tunnus',
   'address.street': 'lähiosoite',
@@ -67,7 +64,7 @@ var fieldNames = {
 }
 
 // These need to match exactly with the labels in the provider Excel file
-var i18n = {
+const i18n = {
   sv: {
     'Tarjoaja': 'Leverantör',
     'Lasku eri osoitteeseen kuin Tarjoajan osoite': 'Faktura till annan adress än Leverantörens',
@@ -81,37 +78,36 @@ function sv(txt) {
 }
 
 exports.import = function(file, callback) {
-  var parser = false
+  let parser = false
 
-  if (file.originalname.search(/.xlsx{0,1}$/) > 1) parser = xlsx
-  else return callback({ message: '.xlsx or .xls required' })
+  if (file.originalname.search(/.xlsx?$/) > 1) parser = xlsx
+  else return callback({message: '.xlsx or .xls required'})
 
-  var allSheets = parser.readFile(file.path)
-  var sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
-  var sheetSv = allSheets.Sheets['Leverant&#xF6;rsanm&#xE4;lan'] || allSheets.Sheets['Leverantörsanmälan']
-  var useFi = isEmptySheet(sheetSv, i18n.sv['Tarjoaja'])
+  const allSheets = parser.readFile(file.path)
+  const sheetFi = allSheets.Sheets['Tarjoajaksi ilmoittautuminen']
+  const sheetSv = allSheets.Sheets['Leverant&#xF6;rsanm&#xE4;lan'] || allSheets.Sheets['Leverantörsanmälan']
+  const useFi = isEmptySheet(sheetSv, i18n.sv.Tarjoaja)
 
-  getProviderAndLocationsFromSpreadSheet(useFi ? sheetFi : sheetSv, useFi ? identity : sv, function(err, providerAndLocations) {
+  getProviderAndLocationsFromSpreadSheet(useFi ? sheetFi : sheetSv, useFi ? identity : sv, (err, providerAndLocations) => {
     if (err) return callback(err)
-    var provider = createProvider(providerAndLocations.provider, providerAndLocations.billing)
+    const provider = createProvider(providerAndLocations.provider, providerAndLocations.billing)
     provider.locations = createLocations(providerAndLocations.locations)
     return callback(null, provider)
   })
 
   function createProvider(providerData, billingData) {
-    var provider = createObjectAndSetValuesWithMap(providerData, providerFieldMap)
+    let provider = createObjectAndSetValuesWithMap(providerData, providerFieldMap)
     provider.deleted = false
     provider.active = false
     provider.creationDate = new Date()
-    provider.language = (provider.language && provider.language.toLowerCase() == 'svenska') ? 'SV' : 'FI'
-    provider.address.country = enums.getCountryCode(provider.address.country) || 'FI'
+    provider.language = provider.language && provider.language.toLowerCase() === 'svenska' ? 'SV' : 'FI'
+    provider.address.country = enums.getCountryCode(provider.address.country) || 'FI'
 
-    var billing = createObjectAndSetValuesWithMap(billingData, billingFieldMap)
+    const billing = createObjectAndSetValuesWithMap(billingData, billingFieldMap)
 
     provider = utils.merge(provider, billing)
 
     if (provider.billing && provider.billing.address) {
-      var address = provider.billing.address
       provider.billingPreference = 'address'
     }
 
@@ -123,14 +119,14 @@ exports.import = function(file, callback) {
   }
 
   function createLocations(locationsData) {
-    return _.map(locationsData, function(location) {
-      var location = createObjectAndSetValuesWithMap(location, locationFieldMap, { providingType: _.keys(enums.providingType) })
+    return _.map(locationsData, (location) => {
+      const loc = createObjectAndSetValuesWithMap(location, locationFieldMap, {providingType: _.keys(enums.providingType)})
 
-      return utils.merge(location, {
+      return utils.merge(loc, {
         deleted: false,
         active: true,
-        isPayer: stringXToBoolean(location.isPayer),
-        adultContent: stringXToBoolean(location.adultContent),
+        isPayer: stringXToBoolean(loc.isPayer),
+        adultContent: stringXToBoolean(loc.adultContent)
       })
     })
   }
@@ -138,42 +134,42 @@ exports.import = function(file, callback) {
 }
 
 function getProviderAndLocationsFromSpreadSheet(providerSheet, text, callback) {
-  var requiredProviderFields = {
+  const requiredProviderFields = {
     name: 'Tarjoajan tiedot:',
     values: ['name', 'yTunnus', 'contactName', 'address.street', 'address.zip', 'address.city', 'address.country', 'phoneNumber', 'language']
   }
 
-  var requiredLocationFields = {
+  const requiredLocationFields = {
     name: 'Tarjoamispaikan tiedot:',
     values: ['name', 'contactName', 'address.street', 'address.zip', 'address.city', 'phoneNumber']
   }
 
-  var noRequiredFields = { name: '', values: [] }
+  const noRequiredFields = {name: '', values: []}
 
-  var errors = []
+  const errors = []
 
-  var providerData = parseFieldRowAndValueRowAfterColumn(text('Tarjoaja'), providerFieldMap, requiredProviderFields)
-  var billingData = parseFieldRowAndValueRowAfterColumn(text('Lasku eri osoitteeseen kuin Tarjoajan osoite'), billingFieldMap, noRequiredFields)
-  var eInvoiceData = parseFieldRowAndValueRowAfterColumn(text('TAI verkkolasku'), eInvoiceFieldMap, noRequiredFields)
-  var locationsData = parseFieldRowAndValueRowsAfterColumn(text('Tarjoamispaikkojen tiedot ja tarjoamistavat'), locationFieldMap, requiredLocationFields)
+  const providerData = parseFieldRowAndValueRowAfterColumn(text('Tarjoaja'), providerFieldMap, requiredProviderFields)
+  const billingData = parseFieldRowAndValueRowAfterColumn(text('Lasku eri osoitteeseen kuin Tarjoajan osoite'), billingFieldMap, noRequiredFields)
+  const eInvoiceData = parseFieldRowAndValueRowAfterColumn(text('TAI verkkolasku'), eInvoiceFieldMap, noRequiredFields)
+  const locationsData = parseFieldRowAndValueRowsAfterColumn(text('Tarjoamispaikkojen tiedot ja tarjoamistavat'), locationFieldMap, requiredLocationFields)
 
   if (locationsData.length === 0) errors.push('Tarjoamispaikkojen tiedot puuttuvat')
 
   if (errors.length > 0) {
-    return callback({ messages: errors })
-  } else {
+    return callback({messages: errors})
+  }
     return callback(null, {
       provider: providerData,
       billing: utils.merge(billingData, eInvoiceData),
       locations: locationsData
     })
-  }
+
 
   function parseFieldRowAndValueRowAfterColumn(column, fieldMap, requiredFields) {
-    var rowNumber = findColumnRowByValue(providerSheet, column)
-    var row = toObject(providerSheet, rowNumber + 2, fieldMap)
-    var errorMessages = validate(row, requiredFields, rowNumber + 2, fieldMap)
-    errorMessages.forEach(function(msg) {
+    const rowNumber = findColumnRowByValue(providerSheet, column)
+    const row = toObject(providerSheet, rowNumber + 2, fieldMap)
+    const errorMessages = validate(row, requiredFields, rowNumber + 2, fieldMap)
+    errorMessages.forEach((msg) => {
       errors.push(msg)
     })
 
@@ -181,64 +177,61 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, text, callback) {
   }
 
   function parseFieldRowAndValueRowsAfterColumn(column, fieldMap, requiredFields) {
-    var rowNumber = findColumnRowByValue(providerSheet, column)
+    const rowNumber = findColumnRowByValue(providerSheet, column)
 
-    var rows = values([], rowNumber + 2)
-    
-    var errorMessages = _.reduce(rows, function(acc, val) {
-      var index = acc[0], errors = acc[1]
-      var fieldErrors = validate(val, requiredFields, index, fieldMap)
-      return [index + 1, errors.concat(fieldErrors)
+    const rows = values([], rowNumber + 2)
+
+    const errorMessages = _.reduce(rows, (acc, val) => {
+      const index = acc[0], errs = acc[1]
+      const fieldErrors = validate(val, requiredFields, index, fieldMap)
+      return [index + 1, errs.concat(fieldErrors)
         .concat(validateProvidingType(val, index))
         .concat(validateRequiredEmail(val, index))]
     }, [rowNumber + 2, []])[1]
 
-    errorMessages.forEach(function(msg) {
+    errorMessages.forEach((msg) => {
       errors.push(msg)
     })
 
     return rows
 
     function values(xs, row) {
-      var currentValues = toObject(providerSheet, row, fieldMap)
-      if (_.every(currentValues, function(x) { return x === null})) {
+      const currentValues = toObject(providerSheet, row, fieldMap)
+      if (_.every(currentValues, (x) => !x)) {
         return xs
-      } else {
-        return values(xs.concat([currentValues]), row + 1)
       }
+      return values(xs.concat([currentValues]), row + 1)
     }
 
     function validateProvidingType(val, index) {
-      var providingTypeFields = _.keys(enums.providingType)
-      var present = _.keys(val)
-      var hasAtLeastOneProvidingType = _(providingTypeFields).map(function(name) {
-        return _.indexOf(present, name) > 0
-      }).some()
+      const providingTypeFields = _.keys(enums.providingType)
+      const present = _.keys(val)
+      const hasAtLeastOneProvidingType = _(providingTypeFields).map((name) => _.indexOf(present, name) > 0).some()
 
       if (!hasAtLeastOneProvidingType) {
         return ['Tarjoamispaikan tiedot rivillä ' + index + ': tarjoamispaikalla täytyy olla ainakin yksi tajoamistapa.']
-      } else {
-        return []
       }
+        return []
+
     }
 
     function validateRequiredEmail(val, row) {
-      var msg = 'Tarjoamispaikan tiedot rivillä ' + row + ': sähköpostiosoite on pakollinen jos lasku lähetetään tarjoamispaikalle.'
+      const msg = 'Tarjoamispaikan tiedot rivillä ' + row + ': sähköpostiosoite on pakollinen jos lasku lähetetään tarjoamispaikalle.'
       if (val.isPayer && !val.emailAddresses) return [msg]
-      else return []
+      return []
     }
   }
 
 
-  function validate(values, requiredFields, index, fieldMap) {
-    var present = _.keys(values)
-    var missing = _.reduce(requiredFields.values, function(acc, r) {
+  function validate(values, requiredFields, index) {
+    const present = _.keys(values)
+    const missing = _.reduce(requiredFields.values, (acc, r) => {
       if (_.indexOf(present, r) === -1) return acc.concat(r)
-      else return acc
+      return acc
     }, [])
 
-    return _.map(missing, function (field) {
-      var errorString = 'Rivillä <%- row %>. <%- name %> pakollinen kenttä "<%- field %>" puuttuu'
+    return _.map(missing, (field) => {
+      const errorString = 'Rivillä <%- row %>. <%- name %> pakollinen kenttä "<%- field %>" puuttuu'
       return _.template(errorString)({
         name: requiredFields.name,
         field: fieldNames[field],
@@ -250,10 +243,10 @@ function getProviderAndLocationsFromSpreadSheet(providerSheet, text, callback) {
 }
 
 function findColumnRowByValue(from, value) {
-  var columnRowNumber = undefined
+  let columnRowNumber
 
-  _.find(from, function(field, key) {
-    if (field.v && (field.v.trim().toLowerCase() == value.toLowerCase())) {
+  _.find(from, (field, key) => {
+    if (field.v && field.v.trim().toLowerCase() === value.toLowerCase()) {
       columnRowNumber = parseRowNumber(key)
       return true
     }
@@ -265,58 +258,56 @@ function findColumnRowByValue(from, value) {
 }
 
 function toObject(from, row, fields) {
-  var fst = function(x) { return x[0] }
-  var snd = function(x) { return x[1] }
-  
-  var ob = _.reduce(from, function(result, field, key) {
+  const fst = function (x) { return x[0] }
+  const snd = function (x) { return x[1] }
+
+  const ob = _.reduce(from, (result, field, key) => {
     if (key.match(new RegExp('.' + row))) {
       return utils.merge(result, utils.keyValue(key.substr(0, 1), field.v))
     }
-    else return result
+    return result
   }, emptyRow(fields.length))
 
-  var values = _(ob).toPairs().sortBy(fst).map(snd).value()
+  const values = _(ob).toPairs().sortBy(fst).map(snd).value()
 
   return _.pickBy(_.zipObject(fields, values), _.identity)
 }
 
 function emptyRow(count) {
-  return _('BCDEFGHIJKLMNOPQRSTU'.split('')).take(count).reduce(function(ob, c) {
-    return utils.merge(ob, utils.keyValue(c, null)) 
-  }, {})
+  return _('BCDEFGHIJKLMNOPQRSTU'.split('')).take(count).reduce((ob, c) => utils.merge(ob, utils.keyValue(c, null)), {})
 }
 
 function isEmptySheet(s, heading) {
-  var rowNumber = findColumnRowByValue(s, heading)
-  var row = toObject(s, rowNumber + 2, providerFieldMap)
+  const rowNumber = findColumnRowByValue(s, heading)
+  const row = toObject(s, rowNumber + 2, providerFieldMap)
   return _.isEmpty(row)
 }
 
 function identity(x) { return x }
 
 function createObjectAndSetValuesWithMap(object, map, enumProperties) {
-  var enumProps = _.reduce(_.toPairs(enumProperties), function(ob, x) {
-    var propName = x[0], fields = x[1]
+  const enumProps = _.reduce(_.toPairs(enumProperties), (ob, x) => {
+    const propName = x[0], fields = x[1]
     return utils.merge(ob, utils.keyValue(propName, toArray(fields)))
 
-    function toArray(fields) {
-      return _.reduce(fields, function(acc, field) {
+    function toArray(flds) {
+      return _.reduce(flds, (acc, field) => {
         if (object[field]) return acc.concat(field)
-        else return acc
+        return acc
       }, [])
     }
   }, {})
 
-  var props = _.reduce(_.toPairs(utils.flattenObject(object)), function(ob, pair) {
-    var key = pair[0], val = pair[1], prop = {}
+  const properties = _.reduce(_.toPairs(utils.flattenObject(object)), (ob, pair) => {
+    const key = pair[0], val = pair[1], prop = {}
     utils.setValueForPath(key.split('.'), prop, val)
     return utils.merge(ob, prop)
   }, {})
 
-  return utils.merge(enumProps, omitEnumProps(props))
+  return utils.merge(enumProps, omitEnumProps(properties))
 
   function omitEnumProps(props) {
-    var enumPropNames = _(enumProperties).toPairs().map(function (x) { return x[1] }).flatten().value()
+    const enumPropNames = _(enumProperties).toPairs().map((x) => x[1]).flatten().value()
     return _.omit(props, enumPropNames)
   }
 }

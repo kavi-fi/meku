@@ -1,8 +1,11 @@
 #!/bin/bash
 
-command -v java >/dev/null 2>&1 || { echo >&2 "Java required but it's not installed. Aborting."; exit 1; }
-command -v docker >/dev/null 2>&1 || { echo >&2 "Docker required but it's not installed. Aborting."; exit 1; }
 if [ ! -f ./node_modules/chromedriver/bin/chromedriver ]; then echo "Run 'npm install' first"; exit 1; fi
+
+./node_modules/.bin/eslint server test
+if [ "$?" != 0 ]; then
+  exit "$?"
+fi
 
 BASE_DIR=`dirname $0`
 cd $BASE_DIR/..

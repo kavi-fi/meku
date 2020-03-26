@@ -1,5 +1,5 @@
 
-var envs = {
+const envs = {
   production: {
     port: 3000,
     hostname: 'https://luokittelu.kavi.fi',
@@ -44,7 +44,7 @@ var envs = {
   }
 }
 
-Object.keys(envs).forEach(function(k) { envs[k].name = k })
+Object.keys(envs).forEach((k) => { envs[k].name = k })
 
-exports.get = function() { return envs[process.env.NODE_ENV ? process.env.NODE_ENV : 'development'] }
+exports.get = function () { return envs[process.env.NODE_ENV ? process.env.NODE_ENV : 'development'] }
 

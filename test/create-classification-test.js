@@ -1,26 +1,26 @@
-var moment = require('moment')
-var webdriver = require('./client-ext')
-var db = require('./mongo-ext')
-var app = require('../server/app')
+const moment = require('moment')
+const webdriver = require('./client-ext')
+const db = require('./mongo-ext')
+const app = require('../server/app')
 
-describe('create-classification-test', function() {
+describe('create-classification-test', function () {
   this.timeout(40000)
 
-  var date = moment().format('D.M.YYYY')
+  const date = moment().format('D.M.YYYY')
 
-  before(function(done) {
-    app.start(function(err) {
+  before((done) => {
+    app.start((err) => {
       if (err) return done(err)
       db.reset(done)
     })
   })
 
-  after(function(done) { app.shutdown(done) })
+  after((done) => { app.shutdown(done) })
 
-  describe('classification', function() {
-    it('registers a classification as KAVI', function(done) {
+  describe('classification', () => {
+    it('registers a classification as KAVI', (done) => {
       webdriver.client()
-        .login('kavi','kavi','kavi')
+        .login('kavi', 'kavi', 'kavi')
         .ajaxClick('#search-page .new-classification button')
         .assertText('#classification-page .program-info h2', 'Uusi kuvaohjelma - Elokuva')
         .assertText('#classification-page .classification-details h2', 'Luokittelu')
@@ -63,9 +63,9 @@ describe('create-classification-test', function() {
         .end(done)
     })
 
-    it('registers a reclassification as KAVI', function(done) {
+    it('registers a reclassification as KAVI', (done) => {
       webdriver.client()
-        .login('kavi','kavi','kavi')
+        .login('kavi', 'kavi', 'kavi')
         .waitForVisible('#search-page .results .result')
         .ajaxClick('#search-page .program-box .reclassify')
         .assertText('#classification-page .program-info h2', 'Kuvaohjelman tiedot - Elokuva')
@@ -117,23 +117,23 @@ describe('create-classification-test', function() {
         .end(done)
     })
 
-    var expectedClassificationRow = {
+    const expectedClassificationRow = {
       name: 'Ghostbusters XVI',
       duration: '1 t 23 min 45 s',
       ageAndWarnings: '7 violence sex',
-      countryYearDate: '('+date+', Suomi, 2014)',
+      countryYearDate: '(' + date + ', Suomi, 2014)',
       type: 'Elokuva'
     }
 
-    var expectedReclassificationRow = {
+    const expectedReclassificationRow = {
       name: 'Ghostbusters XVI',
       duration: '2 t 22 min 22 s',
       ageAndWarnings: '0',
-      countryYearDate: '('+date+', Suomi, 2014)',
+      countryYearDate: '(' + date + ', Suomi, 2014)',
       type: 'Elokuva'
     }
 
-    var expectedProgramBox = {
+    const expectedProgramBox = {
       name: 'Ghostbusters XVI',
       nameFi: 'Haamujengi 16',
       nameSv: 'Spökgänget 16',
@@ -151,16 +151,17 @@ describe('create-classification-test', function() {
       buyer: 'DEMO tilaaja 1',
       billing: 'DEMO tilaaja 1',
       ageAndWarnings: '7 violence sex',
-      criteria: ['Väkivalta (12)','Komediaväkivaltaa...','Seksi (19)']
+      criteria: ['Väkivalta (12)', 'Komediaväkivaltaa...', 'Seksi (19)']
     }
-    var expectedClassificationEmail = {
+
+    const expectedClassificationEmail = {
       to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'tuula.roos@kavi.fi'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta (12), seksi (19)',
       body: [
         date,
         'DEMO tilaaja 1',
         'Ilmoitus kuvaohjelman luokittelusta',
-        'Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on '+date+'  luokitellut kuvaohjelman ',
+        'Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on ' + date + '  luokitellut kuvaohjelman ',
         'Ghostbusters XVI',
         '. Kuvaohjelman ikäraja on 7 ja haitallisuuskriteerit väkivalta (12), seksi (19). ',
         'Lisätietoja: ',
@@ -168,7 +169,7 @@ describe('create-classification-test', function() {
         'Liitteet:',
         'Valitusosoitus',
         'Meddelande om klassificering av bildprogram',
-        'Nationella audiovisuella institutets (KAVI) enhet för mediefostran och bildprogram har '+date+' klassificerat bildprogrammet ',
+        'Nationella audiovisuella institutets (KAVI) enhet för mediefostran och bildprogram har ' + date + ' klassificerat bildprogrammet ',
         'Ghostbusters XVI',
         '. Bildprogrammet har åldersgränsen 7 och det skadliga innehållet våld (12), sexuellt innehåll (19). ',
         'Mera information: ',
@@ -180,25 +181,25 @@ describe('create-classification-test', function() {
       ].join('\n')
     }
 
-    var expectedReclassificationEmail = {
+    const expectedReclassificationEmail = {
       to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'tuula.roos@kavi.fi'],
       subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, S ',
       body: [
         date,
         'Ilmoitus kuvaohjelman uudelleenluokittelusta',
-        'Kuvaohjelmalautakunta on '+date+' uudelleenluokitellut kuvaohjelman ',
+        'Kuvaohjelmalautakunta on ' + date + ' uudelleenluokitellut kuvaohjelman ',
         'Ghostbusters XVI',
         '. Kuvaohjelma on sallittu.',
-        ' Kuvaohjelmaluokittelija oli '+date+' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta (12), seksi (19). ',
+        ' Kuvaohjelmaluokittelija oli ' + date + ' arvioinut kuvaohjelman ikärajaksi 7 ja haitallisuuskriteereiksi väkivalta (12), seksi (19). ',
         'Syy uudelleenluokittelulle: Yleisöpalaute.',
         'Perustelut: PUBLIC COMMENTS',
         'Liitteet:',
         'Valitusosoitus',
         'Meddelande om omklassificering av bildprogram',
-        'Bildprogramsnämnden har '+date+' omklassificerat bildprogrammet ',
+        'Bildprogramsnämnden har ' + date + ' omklassificerat bildprogrammet ',
         'Ghostbusters XVI',
         '. Bildprogrammet är tillåtet.',
-        ' Bildprogramsklassificeraren hade '+date+' som åldergräns för bildprogrammet bedömt 7 och som skadligt innehåll våld (12), sexuellt innehåll (19). ',
+        ' Bildprogramsklassificeraren hade ' + date + ' som åldergräns för bildprogrammet bedömt 7 och som skadligt innehåll våld (12), sexuellt innehåll (19). ',
         'Orsak till omklassificering: Respons.',
         'Grunder: PUBLIC COMMENTS',
         'Bilaga:',

@@ -1,27 +1,27 @@
-function reportsPage() {
-  var $page = $('#reports-page')
-  var $datePicker = $page.find('.datepicker')
-  var $spinner = spinner().appendTo($page.find('.date-selection'))
-  var $reportSelection = $page.find('.report-selection')
-  var $report = $page.find('.report')
+window.reportsPage = function () {
+  const $page = $('#reports-page')
+  const $datePicker = $page.find('.datepicker')
+  const $spinner = shared.spinner().appendTo($page.find('.date-selection'))
+  const $reportSelection = $page.find('.report-selection')
+  const $report = $page.find('.report')
 
-  var format = 'DD.MM.YYYY'
-  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month', 'year'] }, customShortcuts: yearShortcuts() }
-  var latestAjax = switchLatestDeferred()
+  const format = 'DD.MM.YYYY'
+  const datePickerOpts = {shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month', 'year']}, customShortcuts: shared.yearShortcuts()}
+  const latestAjax = meku.switchLatestDeferred()
 
-  $page.on('show', function(e, reportName, begin, end) {
+  $page.on('show', function (e, reportName, begin, end) {
     if (reportName) {
-      setSelectedReport($reportSelection.find('div[data-name="'+reportName+'"]'))
+      setSelectedReport($reportSelection.find('div[data-name="' + reportName + '"]'))
     }
-    var range = (begin && end)
-      ? { begin: moment(begin, format), end: moment(end, format) }
-      : { begin: moment().subtract(1, 'months').startOf('month'), end: moment().subtract(1, 'months').endOf('month') }
-    setDatePickerSelection($datePicker, range, update)
+    const range = begin && end
+      ? {begin: moment(begin, format), end: moment(end, format)}
+      : {begin: moment().subtract(1, 'months').startOf('month'), end: moment().subtract(1, 'months').endOf('month')}
+    meku.setDatePickerSelection($datePicker, range, update)
   })
 
-  setupDatePicker($datePicker, datePickerOpts, update, true)
+  shared.setupDatePicker($datePicker, datePickerOpts, update, true)
 
-  $reportSelection.find('div').click(function() {
+  $reportSelection.find('div').click(function () {
     setSelectedReport($(this))
     update()
   })
@@ -32,24 +32,24 @@ function reportsPage() {
   }
 
   function update() {
-    var reportName = $reportSelection.find('.selected').data('name')
-    var range = $datePicker.data('selection')
+    const reportName = $reportSelection.find('.selected').data('name')
+    const range = $datePicker.data('selection')
     updateLocation(reportName, range)
-    latestAjax($.get('/report/' + reportName, $.param(range)), $spinner).done(function(report) {
+    latestAjax($.get('/report/' + reportName, $.param(range)), $spinner).done(function (report) {
       render(reportName, report)
     })
   }
 
   function updateLocation(reportName, stringRange) {
-    setLocation('#raportit/'+reportName+'/'+stringRange.begin+'/'+stringRange.end)
+    shared.setLocation('#raportit/' + reportName + '/' + stringRange.begin + '/' + stringRange.end)
   }
 
   function render(reportName, report) {
-    if (reportName == 'durations') {
+    if (reportName === 'durations') {
       renderDurations(report)
-    } else if (reportName == 'kaviDurations') {
+    } else if (reportName === 'kaviDurations') {
       renderKaviDurations(report)
-    } else if (reportName == 'kaviClassificationList') {
+    } else if (reportName === 'kaviClassificationList') {
       renderKaviClassificationList(report)
     } else {
       renderDefaultReport(reportName, report)
@@ -57,22 +57,22 @@ function reportsPage() {
   }
 
   function renderDurations(report) {
-    var $table = $('#templates > .report-durations-table').clone()
-    var $rowTemplate = $table.find('tbody tr').clone()
+    const $table = $('#templates > .report-durations-table').clone()
+    const $rowTemplate = $table.find('tbody tr').clone()
     $table.find('thead .id').text($reportSelection.find('.selected').text())
-    var $tbody = $table.find('tbody').empty()
+    const $tbody = $table.find('tbody').empty()
     $tbody.append((report || []).map(renderRow))
 
     function renderRow(row) {
       return $rowTemplate.clone()
         .find('.id').text(enums.programType[row._id].fi).end()
         .find('.count').text(row.count).end()
-        .find('.duration').text(classificationUtils.secondsToDuration(row.value)).end()
+        .find('.duration').text(window.classificationUtils.secondsToDuration(row.value)).end()
     }
     $report.html($table)
   }
   function renderKaviDurations(report) {
-    var $table = $('#templates > .report-kavi-durations-table').clone()
+    const $table = $('#templates > .report-kavi-durations-table').clone()
     $table.find('thead .id').text($reportSelection.find('.selected').text())
     fillRow($table.find('tr.classifications'), report.classifications)
     fillRow($table.find('tr.reclassifications'), report.reclassifications)
@@ -82,30 +82,28 @@ function reportsPage() {
     $report.html($table)
 
     function fillRow($row, data) {
-      if (!data) data = { count: 0, duration: 0 }
+      const d = data ? data : {count: 0, duration: 0}
       $row
-        .find('.count').text(data.count).end()
-        .find('.duration').text(classificationUtils.secondsToDuration(data.duration)).end()
+        .find('.count').text(d.count).end()
+        .find('.duration').text(window.classificationUtils.secondsToDuration(d.duration)).end()
     }
   }
 
   function renderKaviClassificationList(report) {
-    var $table = $('#templates > .report-classification-list-table').clone()
-    var $rowTemplate = $table.find('tbody tr').clone()
-    var $tbody = $table.find('tbody').empty()
-    var totalDuration = report.reduce(function(acc, row) {
-      return acc + classificationUtils.durationToSeconds(row.duration)
-    }, 0)
+    const $table = $('#templates > .report-classification-list-table').clone()
+    const $rowTemplate = $table.find('tbody tr').clone()
+    const $tbody = $table.find('tbody').empty()
+    const totalDuration = report.reduce(function (acc, row) { return acc + window.classificationUtils.durationToSeconds(row.duration) }, 0)
 
     $table.find('thead .id').text($reportSelection.find('.selected').text())
-    $table.find('thead .duration').text('Kesto ' + classificationUtils.secondsToDuration(totalDuration))
+    $table.find('thead .duration').text('Kesto ' + window.classificationUtils.secondsToDuration(totalDuration))
     $tbody.append((report || []).map(renderRow))
     $report.html($table)
 
     function renderRow(row) {
-      var href = '#haku/'+row.sequenceId+'//'+row._id
+      const href = '#haku/' + row.sequenceId + '//' + row._id
       return $rowTemplate.clone()
-        .find('.id').html($('<a>', { href: href, target:'_blank' }).text(row.name[0])).end()
+        .find('.id').html($('<a>', {href: href, target: '_blank'}).text(row.name[0])).end()
         .find('.sequenceId').text(row.sequenceId).end()
         .find('.programType').text(enums.programType[row.programType].fi).end()
         .find('.date').text(moment(row.date).format(format)).end()
@@ -120,18 +118,18 @@ function reportsPage() {
   }
 
   function authorColumn(c) {
-    return (enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c)) ? enums.authorOrganization[c.authorOrganization] : c.author
+    return enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c) ? enums.authorOrganization[c.authorOrganization] : c.author
   }
 
   function renderDefaultReport(reportName, report) {
-    var idMapper = idMappers[reportName] || function(id) { return id || 'Ei tiedossa' }
-    var $table = $('#templates > .report-table').clone()
-    var $rowTemplate = $table.find('tbody tr').clone()
+    const idMapper = idMappers[reportName] || function (id) { return id || 'Ei tiedossa' }
+    const $table = $('#templates > .report-table').clone()
+    const $rowTemplate = $table.find('tbody tr').clone()
 
-    var $tbody = $table.find('tbody').empty()
+    const $tbody = $table.find('tbody').empty()
     $table.find('thead .id').text($reportSelection.find('.selected').text())
 
-    var total = report.reduce(function(acc, row) { return acc + row.value }, 0)
+    const total = report.reduce(function (acc, row) { return acc + row.value }, 0)
     $table.find('thead .count').text(total)
     $tbody.append((report || []).map(renderRow))
     $report.html($table)
@@ -140,33 +138,33 @@ function reportsPage() {
       return $rowTemplate.clone()
         .find('.id').text(idMapper(row._id)).end()
         .find('.count').text(row.value).end()
-        .find('.percent').text(((row.value * 100) / total).toFixed(2)).end()
+        .find('.percent').text((row.value * 100 / total).toFixed(2)).end()
     }
   }
 
-  var idMappers = {
-    programType: function(id) { return enums.programType[id].fi },
+  const idMappers = {
+    programType: function (id) { return enums.programType[id].fi },
     agelimit: agelimitMapper,
     kaviAgelimit: agelimitMapper,
     warnings: warningMapper,
     agelimitChanges: agelimitChangeMapper,
     kaviAgelimitChanges: agelimitChangeMapper,
-    kaviReclassificationReason: function(id) { return utils.getProperty(enums.reclassificationReason[id], 'uiText') || 'Ei tiedossa' }
+    kaviReclassificationReason: function (id) { return utils.getProperty(enums.reclassificationReason[id], 'uiText') || 'Ei tiedossa' }
   }
 
   function agelimitMapper(id) {
-    return id == null ? 'Ei tiedossa' : classificationUtils.ageAsText(id)
+    return id === null || id === undefined ? 'Ei tiedossa' : window.classificationUtils.ageAsText(id)
   }
   function warningMapper(id) {
-    if (id == '-') return 'Ei varoituksia'
+    if (id === '-') return 'Ei varoituksia'
     return enums.warnings[id]
       ? enums.warnings[id] + ' yksin'
       : enums.warnings[id.substring(0, id.length - 1)] + ' muita'
   }
 
   function agelimitChangeMapper(id) {
-    if (id == 'up') return 'Nousi'
-    if (id == 'down') return 'Laski'
+    if (id === 'up') return 'Nousi'
+    if (id === 'down') return 'Laski'
     return 'Pysyi'
   }
 }

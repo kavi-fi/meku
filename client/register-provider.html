@@ -10,20 +10,20 @@
   <script src="shared/i18n.js"></script>
   <script src="/environment"></script>
   <script>
-    if (location.hostname == 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
+    if (location.hostname === 'localhost') { var s = document.createElement('script'); s.src='http://localhost:35729/livereload.js'; document.head.appendChild(s) }
   </script>
   <script>
     $(function() {
-      localize()
-      registerLanguageChangers()
-      registerRevisionMismatchAjaxErrorHandler()
+      shared.localize()
+      shared.registerLanguageChangers()
+      shared.registerRevisionMismatchAjaxErrorHandler()
 
-      var $form = $('form')
-      var $button = $form.find('button')
-      var $feedback = $form.find('.feedback')
-      var $invalid = $feedback.find('.invalid')
-      var $error = $feedback.find('.error')
-      var $success = $feedback.find('.success')
+      const $form = $('form')
+      const $button = $form.find('button')
+      const $feedback = $form.find('.feedback')
+      const $invalid = $feedback.find('.invalid')
+      const $error = $feedback.find('.error')
+      const $success = $feedback.find('.success')
 
       if (APP_ENVIRONMENT === 'training') $('.training-ribbon').show()
       else if (APP_ENVIRONMENT === 'development') $('.development-ribbon').show()

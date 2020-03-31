@@ -880,13 +880,13 @@
           m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  var trackingCode = {
+  const trackingCode = {
     training: 'UA-68316537-1',
     production: 'UA-68316537-2'
   };
   ga('create', trackingCode[APP_ENVIRONMENT], 'auto');
 
-  function sendPageview(path) {
+  window.sendPageview = function (path) {
     if (trackingCode[APP_ENVIRONMENT]) ga('send', 'pageview', path);
   }
 

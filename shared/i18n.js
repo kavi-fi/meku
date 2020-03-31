@@ -1,4 +1,4 @@
-var i18n = {
+const i18n = {
   fi: {
     // Excel export
     'violence': 'väkivalta',
@@ -300,7 +300,7 @@ var i18n = {
 }
 i18n.se = i18n.sv // fix language = "SE" problem
 
-var i18nDateRangePicker = {
+const i18nDateRangePicker = {
   fi: {
     'selected': 'Valittu:',
     'day':'Päivä',
@@ -367,7 +367,7 @@ var i18nDateRangePicker = {
   }
 }
 
-var i18nPikaday = {
+const i18nPikaday = {
   fi: {
     previousMonth: 'Edellinen kuukausi',
     nextMonth: 'Seuraava kuukausi',
@@ -385,5 +385,9 @@ var i18nPikaday = {
 }
 
 if (isNodeJs()) module.exports = i18n
-
+else {
+  window.i18n = i18n
+  window.i18nDateRangePicker = i18nDateRangePicker
+  window.i18nPikaday = i18nPikaday
+}
 function isNodeJs() { return typeof module !== 'undefined' && module.exports }

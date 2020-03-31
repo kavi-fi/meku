@@ -1,32 +1,32 @@
-function billingPage() {
-  var $page = $('#billing-page')
-  var $datePicker = $page.find('.datepicker')
-  var $kiekuButton = $page.find('button')
-  var $accounts = $page.find('.accounts')
-  var $noResults = $page.find('.no-results')
-  var detailRenderer = programBox()
-  var datePickerOpts = { shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']}, customShortcuts: yearShortcuts() }
-  var format = 'DD.MM.YYYY'
-  var $spinner = spinner().appendTo($page.find('.date-selection'))
-  var latestAjax = switchLatestDeferred()
+window.billingPage = function () {
+  const $page = $('#billing-page')
+  const $datePicker = $page.find('.datepicker')
+  const $kiekuButton = $page.find('button')
+  const $accounts = $page.find('.accounts')
+  const $noResults = $page.find('.no-results')
+  const detailRenderer = window.programBox()
+  const datePickerOpts = {shortcuts: {'next-days': null, 'next': null, 'prev-days': null, prev: ['month']}, customShortcuts: shared.yearShortcuts()}
+  const format = 'DD.MM.YYYY'
+  const $spinner = shared.spinner().appendTo($page.find('.date-selection'))
+  const latestAjax = meku.switchLatestDeferred()
 
-  $page.on('click', 'input[name=invoiceId]', function() {
+  $page.on('click', 'input[name=invoiceId]', function () {
     updateSum($(this).parents('.rows'))
     $(this).parents('tr').toggleClass('deselected', !$(this).prop('checked'))
     toggleLoadButton()
   })
 
-  $page.on('click', 'input[name="account-select"]', function() {
-    var check = $(this).prop('checked')
-    var $rows = $(this).parent().find('.rows')
+  $page.on('click', 'input[name="account-select"]', function () {
+    const check = $(this).prop('checked')
+    const $rows = $(this).parent().find('.rows')
     $rows.find('input[name=invoiceId]').prop('checked', check)
     $rows.find('tbody tr').toggleClass('deselected', !check)
     updateSum($rows)
     toggleLoadButton()
   })
 
-  $page.on('click', '.rows .name', function() {
-    var $row = $(this).parents('tr')
+  $page.on('click', '.rows .name', function () {
+    const $row = $(this).parents('tr')
     if ($row.hasClass('selected')) {
       closeDetail()
     } else {
@@ -35,28 +35,28 @@ function billingPage() {
     }
   })
 
-  $page.find('form').submit(function() {
+  $page.find('form').submit(function () {
     $kiekuButton.prop('disabled', true)
-    setTimeout(function() { $kiekuButton.prop('disabled', false) }, 4000)
+    setTimeout(function () { $kiekuButton.prop('disabled', false) }, 4000)
   })
 
-  setupDatePicker($datePicker, datePickerOpts, fetchInvoiceRows, true)
+  shared.setupDatePicker($datePicker, datePickerOpts, fetchInvoiceRows, true)
 
   function fetchInvoiceRows(range) {
-    setLocation('#laskutus/'+range.begin+'/'+range.end)
-    latestAjax($.get('/invoicerows/' + range.begin + '/' + range.end), $spinner).done(function(rows) {
+    shared.setLocation('#laskutus/' + range.begin + '/' + range.end)
+    latestAjax($.get('/invoicerows/' + range.begin + '/' + range.end), $spinner).done(function (invoiceRows) {
       $page.find('input[name=begin]').val(range.begin)
       $page.find('input[name=end]').val(range.end)
-      var $accounts = $page.find('.accounts').empty()
-      $noResults.toggle(rows.length == 0)
-      _(rows).groupBy(function(x) { return x.account.name }).toPairs().sortBy(function(t) { return t[0] }).value().forEach(function(account) {
-        var name = account[0]
-        var rows = account[1]
-        var $account = $("#templates").find('.invoice-account').clone()
-        var $rows = $account.find('table')
+      $accounts.empty()
+      $noResults.toggle(invoiceRows.length === 0)
+      _(invoiceRows).groupBy(function (x) { return x.account.name }).toPairs().sortBy(function (t) { return t[0] }).value().forEach(function (account) {
+        const name = account[0]
+        const rows = account[1]
+        const $account = $("#templates").find('.invoice-account').clone()
+        const $rows = $account.find('table')
         $account.find('.name').text(name)
-        rows.forEach(function(row) {
-          var $row = $("#templates").find('.invoicerow tr').clone()
+        rows.forEach(function (row) {
+          const $row = $("#templates").find('.invoicerow tr').clone()
           $row.data(row)
             .find('input[type=checkbox]').val(row._id).end()
             .find('.type').text(enums.invoiceRowType[row.type]).end()
@@ -78,7 +78,7 @@ function billingPage() {
   }
 
   function updateSum($rows) {
-    var sum = $rows.find('input[name=invoiceId]:checked').parents('tr').map(function() { return $(this).data().price }).toArray().reduce(function(a,b) { return a + b }, 0)
+    const sum = $rows.find('input[name=invoiceId]:checked').parents('tr').map(function () { return $(this).data().price }).toArray().reduce(function (a, b) { return a + b }, 0)
     $rows.find('tfoot span').text(formatCentsAsEuros(sum))
   }
 
@@ -87,21 +87,21 @@ function billingPage() {
   }
 
   function openDetail($row, program) {
-    var $detail = detailRenderer.render(program)
+    const $detail = detailRenderer.render(program)
     $row.addClass('selected').after($detail)
     $detail.wrap('<tr><td colspan="6" class="program-box-container"></td></tr>').slideDown()
   }
 
   function closeDetail() {
     $accounts.find('.rows tr.selected').removeClass('selected')
-    $accounts.find('.program-box').slideUp(function() { $(this).parents('.program-box-container').remove() }).end()
+    $accounts.find('.program-box').slideUp(function () { $(this).parents('.program-box-container').remove() }).end()
   }
 
-  $page.on('show', function(e, begin, end) {
+  $page.on('show', function (e, begin, end) {
     $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
-    var range = (begin && end)
-      ? { begin: moment(begin, format), end: moment(end, format) }
-      : { begin: moment().subtract(1, 'months').startOf('month'), end: moment().subtract(1, 'months').endOf('month') }
-    setDatePickerSelection($datePicker, range, fetchInvoiceRows)
+    const range = begin && end
+      ? {begin: moment(begin, format), end: moment(end, format)}
+      : {begin: moment().subtract(1, 'months').startOf('month'), end: moment().subtract(1, 'months').endOf('month')}
+    meku.setDatePickerSelection($datePicker, range, fetchInvoiceRows)
   })
 }

@@ -1,21 +1,19 @@
-function userManagementPage() {
-  var $page = $('#user-management-page')
-  var $userList = $page.find('.user-list')
-  var $userNameQuery = $page.find('#user-name-query')
-  var $newUserType = $page.find('.new-user input[name="new-user-type"]')
+window.userManagementPage = function () {
+  const $page = $('#user-management-page')
+  const $userList = $page.find('.user-list')
+  const $userNameQuery = $page.find('#user-name-query')
+  const $newUserType = $page.find('.new-user input[name="new-user-type"]')
 
-  var userRoles = APP_ENVIRONMENT != 'training' ? _.omit(enums.userRoles, 'trainee') : enums.userRoles
+  const userRoles = APP_ENVIRONMENT === 'training' ? enums.userRoles : _.omit(enums.userRoles, 'trainee')
   $newUserType.select2({
-    data: _.map(userRoles, function(roleValue, roleKey) {
-      return { id: roleKey, text: roleValue.name }
-    }),
+    data: _.map(userRoles, function (roleValue, roleKey) { return {id: roleKey, text: roleValue.name} }),
     minimumResultsForSearch: -1
   }).select2('val', 'user')
 
-  $page.on('show', function(event, userId) {
+  $page.on('show', function (event, userId) {
     updateLocationHash(userId || '')
-    var active = $page.find('.filters input[name=active]').prop('checked')
-    $.get('/users?' + $.param({ active: active, roles: roleFilters() }), function(users) {
+    const active = $page.find('.filters input[name=active]').prop('checked')
+    $.get('/users?' + $.param({active: active, roles: roleFilters()}), function (users) {
       $userList.empty()
       renderUsers(users)
 
@@ -23,17 +21,17 @@ function userManagementPage() {
       $userNameQuery.trigger('input')
 
       if (userId) {
-        var $selected = $userList.find('.result[data-id=' + userId + ']')
+        const $selected = $userList.find('.result[data-id=' + userId + ']')
         openDetails($selected)
-        var top = $selected.offset().top - 25
-        $('body,html').animate({ scrollTop: top })
+        const top = $selected.offset().top - 25
+        $('body,html').animate({scrollTop: top})
       }
     })
     $page.find('form input[name=_csrf]').val($.cookie('_csrf_token'))
   })
 
-  $userList.on('click', '.result', function() {
-    var $this = $(this)
+  $userList.on('click', '.result', function () {
+    const $this = $(this)
     if ($this.hasClass('selected')) {
       closeDetails()
     } else {
@@ -42,46 +40,44 @@ function userManagementPage() {
     }
   })
 
-  $page.find('button.export').on('click', function(e) {
-    var $form = $(".users-excel-export-form:visible")
+  $page.find('button.export').on('click', function () { const $form = $(".users-excel-export-form:visible")
     $form.submit()
   })
 
-  $page.find('.new-user button').on('click', function() {
-    var $newUserForm = renderNewUserForm($newUserType.select2('val'))
+  $page.find('.new-user button').on('click', function () { const $newUserForm = renderNewUserForm($newUserType.select2('val'))
     closeDetails()
     $userList.addClass('selected').prepend($newUserForm)
     $newUserForm.slideDown()
   })
 
-  $userNameQuery.on('input', function() {
-    var searchString = $(this).val().toLowerCase()
-    $userList.find('.result').each(function() {
-      var name = $(this).children('.name').text().toLowerCase()
-      var username = $(this).children('.username').text().toLowerCase()
-      var match = _.includes(name, searchString) || _.includes(username, searchString)
+  $userNameQuery.on('input', function () {
+    const searchString = $(this).val().toLowerCase()
+    $userList.find('.result').each(function () {
+      const name = $(this).children('.name').text().toLowerCase()
+      const username = $(this).children('.username').text().toLowerCase()
+      const match = _.includes(name, searchString) || _.includes(username, searchString)
       $(this).toggle(match)
     })
     closeDetails()
   })
 
-  $page.find('.filters').change(function() { $page.trigger('show') })
+  $page.find('.filters').change(function () { $page.trigger('show') })
 
   function updateLocationHash(userId) {
-    setLocation('#kayttajat/' + userId)
+    shared.setLocation('#kayttajat/' + userId)
   }
 
   function renderUsers(users) {
-    _(users).sortBy('name').map(renderUser).value().forEach(function(u) { $userList.append(u) })
+    _(users).sortBy('name').map(renderUser).value().forEach(function (u) { $userList.append(u) })
   }
 
   function renderUser(user) {
-   return $('<div>', { class: 'result', 'data-id': user._id })
+   return $('<div>', {class: 'result', 'data-id': user._id})
      .data('user', user).data('id', user._id)
-     .append($('<span>', { class: 'name' }).text(user.name))
-     .append($('<span>', { class: 'username' }).text(user.username))
-     .append($('<span>', { class: 'role' }).html(enums.util.userRoleName(user.role) || '<i class="fa fa-warning"></i>'))
-     .append($('<span>', { class: 'cert-end' }).html(renderCertEnd(user)))
+     .append($('<span>', {class: 'name'}).text(user.name))
+     .append($('<span>', {class: 'username'}).text(user.username))
+     .append($('<span>', {class: 'role'}).html(enums.util.userRoleName(user.role) || '<i class="fa fa-warning"></i>'))
+     .append($('<span>', {class: 'cert-end'}).html(renderCertEnd(user)))
      .toggleClass('inactive', !user.active)
   }
 
@@ -89,17 +85,17 @@ function userManagementPage() {
     if (!enums.util.isClassifier(user.role)) return ''
 
     if (user.certificateEndDate) {
-      var certEnd = moment(user.certificateEndDate)
+      const certEnd = moment(user.certificateEndDate)
       return $('<span>').text(certEnd.format(utils.dateFormat))
         .toggleClass('expires-soon', certEnd.isBefore(moment().add(6, 'months')))
-    } else {
-      return '<i class="fa fa-warning"></i>'
     }
+      return '<i class="fa fa-warning"></i>'
+
   }
 
   function openDetails($row) {
-    var user = $row.data('user')
-    var $userDetails = renderExistingUserDetails(user)
+    const user = $row.data('user')
+    const $userDetails = renderExistingUserDetails(user)
     $row.addClass('selected').after($userDetails)
     updateLocationHash(user._id)
     $userDetails.slideDown()
@@ -107,18 +103,18 @@ function userManagementPage() {
 
   function closeDetails() {
     $userList.find('.result.selected').removeClass('selected')
-    $userList.find('.user-details').slideUp(function() { $(this).remove() })
+    $userList.find('.user-details').slideUp(function () { $(this).remove() })
     updateLocationHash('')
   }
 
   function renderNewUserForm(role) {
-    var $detailTemplate = renderUserDetails(null, role)
-    $detailTemplate.submit(function(event) {
+    const $detailTemplate = renderUserDetails(null, role)
+    $detailTemplate.submit(function (event) {
       event.preventDefault()
       $detailTemplate.find('button[type=submit]').prop('disabled', true)
 
-      var $this = $(this)
-      var userData = getUserData($this)
+      const $this = $(this)
+      let userData = getUserData($this)
       userData.role = role
       userData.active = true
 
@@ -126,9 +122,9 @@ function userManagementPage() {
         userData = _.merge(userData, getClassifierData($this))
       }
 
-      $.post('/users/new', JSON.stringify(userData), function(newUser) {
+      $.post('/users/new', JSON.stringify(userData), function (newUser) {
         $userList.find('.result.selected').data('user', newUser)
-        var $user = renderUser(newUser).css('display', 'none')
+        const $user = renderUser(newUser).css('display', 'none')
         $userList.prepend($user)
         $user.slideToggle()
         closeDetails()
@@ -138,20 +134,20 @@ function userManagementPage() {
   }
 
   function renderExistingUserDetails(selectedUser) {
-    var $detailTemplate = renderUserDetails(selectedUser)
-    $detailTemplate.find('input[name=active]').prop('disabled', selectedUser.username === user.username)
-    $detailTemplate.submit(function(event) {
+    const $detailTemplate = renderUserDetails(selectedUser)
+    $detailTemplate.find('input[name=active]').prop('disabled', selectedUser.username === window.user.username)
+    $detailTemplate.submit(function (event) {
       event.preventDefault()
       $detailTemplate.find('button[type=submit]').prop('disabled', true)
 
-      var $this = $(this)
-      var userData = getUserData($this)
+      const $this = $(this)
+      let userData = getUserData($this)
 
       if (enums.util.isClassifier(selectedUser.role)) {
         userData = _.merge(userData, getClassifierData($this))
       }
 
-      $.post('/users/' + selectedUser._id, JSON.stringify(userData), function(updatedUser) {
+      $.post('/users/' + selectedUser._id, JSON.stringify(userData), function (updatedUser) {
         $userList.find('.result.selected').replaceWith(renderUser(updatedUser))
         closeDetails()
       })
@@ -159,28 +155,28 @@ function userManagementPage() {
     return $detailTemplate
   }
 
-  function renderUserDetails(user, role) {
-    var $detailTemplate = $('#templates').find('.user-details').clone()
-    var isNewUser = user == null
-    var isClassifier = enums.util.isClassifier(role) || user && enums.util.isClassifier(user.role)
+  function renderUserDetails(selectedUser, role) {
+    const $detailTemplate = $('#templates').find('.user-details').clone()
+    const isNewUser = selectedUser === null
+    const isClassifier = enums.util.isClassifier(role) || selectedUser && enums.util.isClassifier(selectedUser.role)
 
     if (isClassifier) {
       $detailTemplate.find('form .classifier').append($('#templates').find('.classifier-details').clone())
 
-      var $endDate = $detailTemplate.find('input[name=certificateEndDate]')
-        .pikaday(_.defaults({ defaultDate: moment().add(5, 'years').toDate() }, pikadayDefaults))
+      const $endDate = $detailTemplate.find('input[name=certificateEndDate]')
+        .pikaday(_.defaults({defaultDate: moment().add(5, 'years').toDate()}, meku.pikadayDefaults))
 
       $detailTemplate.find('input[name=certificateStartDate]')
-        .pikaday(_.defaults({ onSelect: function(date) {
+        .pikaday(_.defaults({onSelect: function (date) {
           $endDate.pikaday('setMoment', moment(date).add(5, 'years'))
-      }}, pikadayDefaults))
+      }}, meku.pikadayDefaults))
 
-      select2Autocomplete({
+      shared.select2Autocomplete({
         $el: $detailTemplate.find('input[name=employers]'),
         path: employersSearch,
         multiple: true,
-        toOption: idNamePairToSelect2Option,
-        fromOption: select2OptionToIdNamePair,
+        toOption: meku.idNamePairToSelect2Option,
+        fromOption: meku.select2OptionToIdNamePair,
         termMinLength: 0
       })
     }
@@ -189,15 +185,14 @@ function userManagementPage() {
       $detailTemplate.find('.modify-only').remove()
       $detailTemplate.find('input:required:disabled').prop('disabled', false)
     } else {
-      populate($detailTemplate, user)
-      if (hasRole('root')) $detailTemplate.append(changeLog(user).render())
+      populate($detailTemplate, selectedUser)
+      if (shared.hasRole('root')) $detailTemplate.append(meku.changeLog(selectedUser).render())
     }
 
-    $detailTemplate.find('.active-toggle').on('click', function() {
-      $detailTemplate.find('.active-toggle').prop('disabled', true)
-      var $selected = $userList.find('.result.selected')
-      var active = $selected.next().find('.active-toggle').hasClass('inactive')
-      $.post('/users/' + user._id, JSON.stringify({active: active}), function(updatedUser) {
+    $detailTemplate.find('.active-toggle').on('click', function () { $detailTemplate.find('.active-toggle').prop('disabled', true)
+      const $selected = $userList.find('.result.selected')
+      const active = $selected.next().find('.active-toggle').hasClass('inactive')
+      $.post('/users/' + selectedUser._id, JSON.stringify({active: active}), function (updatedUser) {
         $selected.toggleClass('inactive', !updatedUser.active)
         toggleActiveButton($selected.next(), updatedUser.active)
         $selected.data('user', updatedUser)
@@ -205,18 +200,18 @@ function userManagementPage() {
       })
     })
 
-    $detailTemplate.find('form').on('input change', _.debounce(function() { $(this).trigger('validate') }, 200))
+    $detailTemplate.find('form').on('input change', _.debounce(function () { $(this).trigger('validate') }, 200))
 
-    $detailTemplate.find('form').on('validate', function() {
+    $detailTemplate.find('form').on('validate', function () {
       $(this).find('button[type=submit]').prop('disabled', !this.checkValidity())
     })
 
-    $detailTemplate.find('input').on('blur select2-blur', function() {
+    $detailTemplate.find('input').on('blur select2-blur', function () {
       $(this).addClass('touched')
     })
 
-    $detailTemplate.find('input[name=username]').on('input', function() {
-      var $username = $(this)
+    $detailTemplate.find('input[name=username]').on('input', function () {
+      const $username = $(this)
       validateUsername($username, $detailTemplate)
     })
 
@@ -229,8 +224,8 @@ function userManagementPage() {
     }
 
     function populate($element, user) {
-      var cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(utils.dateFormat) : ''
-      var cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(utils.dateFormat) : ''
+      const cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(utils.dateFormat) : ''
+      const cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(utils.dateFormat) : ''
 
       $element.find('input[name=name]').val(user.name).end()
         .find('input[name=email]').val(user.emails[0]).end()
@@ -269,16 +264,16 @@ function userManagementPage() {
     return {
       certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), utils.dateFormat),
       certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), utils.dateFormat),
-      employers: $details.find('input[name=employers]').select2('data').map(select2OptionToIdNamePair),
+      employers: $details.find('input[name=employers]').select2('data').map(meku.select2OptionToIdNamePair),
       comment: $details.find('textarea[name=comment]').val()
     }
   }
 
-  var usernameValidator = _.debounce((function() {
-    var getLatestAjax = switchLatestDeferred()
-    return function(username, $username, $detailTemplate) {
+  const usernameValidator = _.debounce((function () {
+    const getLatestAjax = meku.switchLatestDeferred()
+    return function (username, $username, $detailTemplate) {
       getLatestAjax($.get('/users/exists/' + encodeURIComponent(username)), $username.siblings('i.fa-spinner'))
-        .done(function(data) {
+        .done(function (data) {
           $username.get(0).setCustomValidity(data.exists ? 'Username taken' : '')
           $username.removeClass('pending')
           $detailTemplate.find('form').trigger('validate')
@@ -289,16 +284,16 @@ function userManagementPage() {
   function validateUsername($username, $detailTemplate) {
     $username.get(0).setCustomValidity('Checking username')
     $username.addClass('touched')
-    var username = $username.val()
-    if (!utils.isValidUsername(username)) {
-      $username.get(0).setCustomValidity('Invalid username')
-    } else {
+    const username = $username.val()
+    if (utils.isValidUsername(username)) {
       $username.addClass('pending')
       usernameValidator(username, $username, $detailTemplate)
+    } else {
+      $username.get(0).setCustomValidity('Invalid username')
     }
   }
 
   function roleFilters() {
-    return $page.find('.filters input.role').filter(':checked').map(function() { return $(this).attr('name') }).toArray()
+    return $page.find('.filters input.role').filter(':checked').map(function () { return $(this).attr('name') }).toArray()
   }
 }

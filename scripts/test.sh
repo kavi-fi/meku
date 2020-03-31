@@ -2,7 +2,7 @@
 
 if [ ! -f ./node_modules/chromedriver/bin/chromedriver ]; then echo "Run 'npm install' first"; exit 1; fi
 
-./node_modules/.bin/eslint server test
+./node_modules/.bin/eslint client/js server test
 if [ "$?" != 0 ]; then
   exit "$?"
 fi

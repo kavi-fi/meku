@@ -6,7 +6,7 @@
     "start": "node server/app.js",
     "postinstall": "date +%s > build.revision",
     "test": "./scripts/test.sh",
-    "eslint": "./node_modules/.bin/eslint server test"
+    "eslint": "./node_modules/.bin/eslint client/js server test"
   },
   "engines": {
     "node": "8.x"

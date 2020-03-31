@@ -8,7 +8,14 @@ module.exports = {
     },
     "extends": "eslint:recommended",
     "globals": {
-        "$": "readonly"
+        "$": "readonly",
+        "APP_ENVIRONMENT": "readonly",
+        "enums": "readonly",
+        "_": "readonly",
+        "moment": "readonly",
+        "utils": "readonly",
+        "meku": "readonly",
+        "shared": "readonly"
     },
     "parserOptions": {
         "ecmaVersion": 2018
@@ -224,7 +231,7 @@ module.exports = {
         "operator-linebreak": "off",
         "padded-blocks": "off",
         "padding-line-between-statements": "error",
-        "prefer-arrow-callback": "error",
+        "prefer-arrow-callback": "off",
         "prefer-const": "error",
         "prefer-destructuring": "off",
         "prefer-numeric-literals": "error",

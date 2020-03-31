@@ -1467,7 +1467,7 @@ app.get('/changelogs/:documentId', requireRole('root'), (req, res, next) => {
 
 app.get('/environment', (req, res) => {
   res.set('Content-Type', 'text/javascript')
-  res.send('var APP_ENVIRONMENT = "' + app.get('env') + '";')
+  res.send('const APP_ENVIRONMENT = "' + app.get('env') + '";')
 })
 
 app.post('/files/provider-import', upload.single('providerFile'), (req, res) => {

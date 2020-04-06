@@ -154,7 +154,7 @@ window.providerPage = function () {
   })
 
   $yearlyBilling.on('click', 'button.yearly-billing-kieku', function () {
-    $yearlyBilling.find('.most-recent .created').text(utils.asDateTime(moment()))
+    $yearlyBilling.find('.most-recent .created').text(window.utils.asDateTime(moment()))
     setTimeout(function () { updateMetadata() }, 10000)
   })
 
@@ -186,8 +186,8 @@ window.providerPage = function () {
           _.forEach(location.providingType, function (providingType) {
             const $providingType = $template.find('.invoice-providing-type-row').clone()
 
-            $providingType.find('.name').text(' - ' + enums.providingType[providingType])
-            $providingType.find('.price').text(enums.providingTypePrices[providingType] + '€')
+            $providingType.find('.name').text(' - ' + window.enums.providingType[providingType])
+            $providingType.find('.price').text(window.enums.providingTypePrices[providingType] + '€')
 
             $list.append($providingType)
           })
@@ -200,10 +200,10 @@ window.providerPage = function () {
   $billing.on('click', 'button[name="create-kieku"]', function () {
     const begin = $billingContainer.find('input[name=begin]').val()
     const end = $billingContainer.find('input[name=end]').val()
-    $billingContainer.find('.most-recent .created').text(utils.asDateTime(new Date()))
+    $billingContainer.find('.most-recent .created').text(window.utils.asDateTime(new Date()))
     $billingContainer.find('.most-recent .dates').text(formatDate(begin) + ' - ' + formatDate(end))
     setTimeout(function () { updateMetadata() }, 10000)
-    function formatDate(s) { return moment(s, format).format(utils.dateFormat) }
+    function formatDate(s) { return moment(s, format).format(window.utils.dateFormat) }
   })
 
   function openDetails($row) {
@@ -319,11 +319,11 @@ window.providerPage = function () {
 
   function updateMetadata() {
     $.get('/providers/metadata', function (metadata) {
-      $yearlyBilling.find('.most-recent .sent').text(metadata.yearlyBillingReminderSent ? utils.asDateTime(metadata.yearlyBillingReminderSent) : undefined)
-      $yearlyBilling.find('.most-recent .created').text(metadata.yearlyBillingCreated ? utils.asDateTime(metadata.yearlyBillingCreated) : undefined)
+      $yearlyBilling.find('.most-recent .sent').text(metadata.yearlyBillingReminderSent ? window.utils.asDateTime(metadata.yearlyBillingReminderSent) : undefined)
+      $yearlyBilling.find('.most-recent .created').text(metadata.yearlyBillingCreated ? window.utils.asDateTime(metadata.yearlyBillingCreated) : undefined)
       if (metadata.previousMidYearBilling) {
-        $billingContainer.find('.most-recent .created').text(utils.asDateTime(metadata.previousMidYearBilling.created))
-        $billingContainer.find('.most-recent .dates').text(utils.asDate(metadata.previousMidYearBilling.begin) + ' - ' + utils.asDate(metadata.previousMidYearBilling.end))
+        $billingContainer.find('.most-recent .created').text(window.utils.asDateTime(metadata.previousMidYearBilling.created))
+        $billingContainer.find('.most-recent .dates').text(window.utils.asDate(metadata.previousMidYearBilling.begin) + ' - ' + window.utils.asDate(metadata.previousMidYearBilling.end))
       }
     })
   }
@@ -334,9 +334,9 @@ window.providerPage = function () {
     const registeredLocationCount = _.reduce(registeredProviders, function (acc, p) { return acc + _.filter(p.locations, function (l) { return !!l.active }).length }, 0)
     const $rows = [$row('Rekisterissä', registeredProviders.length, registeredLocationCount).addClass('first')]
 
-    Object.keys(enums.providingType).forEach(function (type) {
+    Object.keys(window.enums.providingType).forEach(function (type) {
       const matchingLocationCounts = _(registeredProviders).map(countLocationsWithProvidingType(type)).compact().value()
-      $rows.push($row(enums.providingType[type], matchingLocationCounts.length, matchingLocationCounts.reduce(sum, 0)))
+      $rows.push($row(window.enums.providingType[type], matchingLocationCounts.length, matchingLocationCounts.reduce(sum, 0)))
     })
 
     const k18Counts = _(registeredProviders).map(countAdultContentLocations).compact().value()
@@ -363,12 +363,12 @@ window.providerPage = function () {
 
   function renderFilters() {
     const $filters = $('#provider-page .filters')
-    const $providingTypes = _.map(Object.keys(enums.providingType), function (providingType) {
+    const $providingTypes = _.map(Object.keys(window.enums.providingType), function (providingType) {
       const $input = $('<input>').attr({'type': 'checkbox', 'name': providingType, 'data-providing-type': providingType})
       $input.on('change', function () {
         $providerNameQuery.trigger('input')
       })
-      const $span = $('<span>').attr('data-i18n', '').text(enums.providingType[providingType])
+      const $span = $('<span>').attr('data-i18n', '').text(window.enums.providingType[providingType])
       return $('<label>').append($input, $span)
     })
     $filters.html($providingTypes)
@@ -393,7 +393,7 @@ window.providerPage = function () {
       .data('provider', provider)
       .find('.name').text(provider.name).end()
       .find('.address').text(provider.address.street + ', ' + provider.address.city).end()
-      .find('.date').text(utils.asDate(provider.registrationDate)).end().end()
+      .find('.date').text(window.utils.asDate(provider.registrationDate)).end().end()
       .find('.locations').replaceWith(renderProviderLocations($providerRow, provider)).end()
   }
 
@@ -402,7 +402,7 @@ window.providerPage = function () {
     return $providerRow.find('div:first-child').attr('data-id', provider._id).addClass('result unapproved')
       .data('provider', provider)
       .find('.name').text(provider.name).end()
-      .find('.date').text(utils.asDate(provider.registrationDate)).end().end()
+      .find('.date').text(window.utils.asDate(provider.registrationDate)).end().end()
       .find('.locations').replaceWith(renderProviderLocations($providerRow, provider)).end()
   }
 
@@ -412,11 +412,11 @@ window.providerPage = function () {
     $providerDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
 
     $providerDetails
-      .find('input[name="address.country"]').select2({data: meku.select2DataFromEnumObject(enums.countries)}).end()
+      .find('input[name="address.country"]').select2({data: meku.select2DataFromEnumObject(window.enums.countries)}).end()
       .find('input[name=emailAddresses]').select2({tags: [], multiple: true, tokenSeparators: [' ']}).end()
       .find('input[name=billing-extra]').prop('checked', provider && !!provider.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()
-      .find('input[name="language"]').select2({data: meku.select2DataFromEnumObject(enums.billingLanguages)}).end()
+      .find('input[name="language"]').select2({data: meku.select2DataFromEnumObject(window.enums.billingLanguages)}).end()
       .find('input[name=provider-active][value=' + (provider && provider.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
       .find('.locations-total').text(provider ? provider.locations.length : 0).end()
 
@@ -442,7 +442,7 @@ window.providerPage = function () {
 
   function setInputValWithProperty(object) {
     const name = $(this).attr('name')
-    const property = utils.getProperty(object, name)
+    const property = window.utils.getProperty(object, name)
 
     if ($(this).attr('type') === 'checkbox') {
       $(this).prop('checked', property || false)
@@ -488,7 +488,7 @@ window.providerPage = function () {
     const object = {}
 
     $form.find('textarea[name], input[name]').each(function (index, elem) {
-      utils.setValueForPath(elem.name.split('.'), object, elem.type === 'checkbox' ? elem.checked : elem.value)
+      window.utils.setValueForPath(elem.name.split('.'), object, elem.type === 'checkbox' ? elem.checked : elem.value)
     })
 
     return object
@@ -593,7 +593,7 @@ window.providerPage = function () {
       const $locationDetails = $('#templates').find('.location-details').clone()
       $locationDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, location))
       $locationDetails.find('input[name=emailAddresses]').select2({tags: [], multiple: true, tokenSeparators: [' ']}).end()
-        .find('input[name=providingType]').select2({data: meku.select2DataFromEnumObject(enums.providingType), multiple: true}).end()
+        .find('input[name=providingType]').select2({data: meku.select2DataFromEnumObject(window.enums.providingType), multiple: true}).end()
         .find('input[name=location-active][value=' + (location && location.active ? 'active' : 'inactive') + ']').prop('checked', true).end()
 
       $locationDetails.find('input[name=location-active]').iiToggle({onLabel: 'Rekisterissä', offLabel: 'Ei rekisterissä', callback: toggleLocationActiveButton})
@@ -632,9 +632,9 @@ window.providerPage = function () {
         .data('location', location).toggleClass('inactive', !location.active)
         .append($('<i>', {class: 'rotating fa fa-play'}))
         .append($('<span>').text(location.name))
-        .append($('<span>').text(utils.getProperty(location, 'address.street') ? location.address.street + ', ' + location.address.city : ''))
+        .append($('<span>').text(window.utils.getProperty(location, 'address.street') ? location.address.street + ', ' + location.address.city : ''))
         .append($('<span>').text(location.isPayer ? 'Laskutetaan' : ''))
-        .append($('<span>').text(utils.asDate(location.registrationDate)))
+        .append($('<span>').text(window.utils.asDate(location.registrationDate)))
     }
 
     function bindLocationEventHandlers($locationDetails, submitCallback) {

@@ -177,7 +177,7 @@ window.internalSearchPage = function () {
     const $row = $programBox.prev('.result')
     const program = $row.data('program')
     const classification = $programBox.find('.classification.selected').data('classification')
-    const registrationDate = utils.asDate(classification.registrationDate) || shared.i18nText('Tuntematon rekisteröintiaika')
+    const registrationDate = window.utils.asDate(classification.registrationDate) || shared.i18nText('Tuntematon rekisteröintiaika')
     shared.showDialog($('#templates').find('.remove-classification-dialog').clone()
       .find('.registration-date').text(registrationDate).end()
       .find('.program-name').text(program.name).end()
@@ -197,7 +197,7 @@ window.internalSearchPage = function () {
     $.get('/programs/drafts', function (drafts) {
       $drafts.find('.draft').remove()
       drafts.forEach(function (draft) {
-        const $date = $('<span>', {class: 'creationDate'}).text(utils.asDateTime(draft.creationDate))
+        const $date = $('<span>', {class: 'creationDate'}).text(window.utils.asDateTime(draft.creationDate))
         const $link = $('<span>', {class: 'name'}).text(draft.name)
         const $remove = $('<div>', {class: 'remove'}).append($('<button>', {class: 'button'}).i18nText('Poista'))
         const $draft = $('<div>', {class: 'result draft'}).data('id', draft._id).append($date).append($link).append($remove)
@@ -220,12 +220,12 @@ window.internalSearchPage = function () {
     })
 
     function renderRecentRow(p, c) {
-      const registrationDate = utils.asDate((c || {}).registrationDate) || shared.i18nText('Tuntematon rekisteröintiaika')
+      const registrationDate = window.utils.asDate((c || {}).registrationDate) || shared.i18nText('Tuntematon rekisteröintiaika')
       return $('<div>', {'data-id': p._id}).addClass('result').data('program', p)
         .append($('<span>', {class: 'registrationDate'}).text(registrationDate))
         .append($('<span>', {class: 'name'}).text(p.name[0]))
-        .append($('<span>', {class: 'duration-or-game'}).text(enums.util.isGameType(p) ? p.gameFormat || '' : utils.durationAsText((c || {}).duration)))
-        .append($('<span>', {class: 'program-type'}).i18nText(enums.util.programTypeName(p.programType)))
+        .append($('<span>', {class: 'duration-or-game'}).text(window.enums.util.isGameType(p) ? p.gameFormat || '' : window.utils.durationAsText((c || {}).duration)))
+        .append($('<span>', {class: 'program-type'}).i18nText(window.enums.util.programTypeName(p.programType)))
         .append($('<span>', {class: 'classification'}).append(shared.renderWarningSummary(window.classificationUtils.summary(c)) || ' - '))
         .data('renderer', rerenderRecentRow)
     }
@@ -242,11 +242,11 @@ window.internalSearchPage = function () {
   }
 
   function toggleDetailButtons($detail, p) {
-    if (enums.util.isUnknown(p)) {
+    if (window.enums.util.isUnknown(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').toggle(window.classificationUtils.canReclassify(p, window.user))
       $detail.find('button.recategorize').hide()
-    } else if (enums.util.isTvSeriesName(p)) {
+    } else if (window.enums.util.isTvSeriesName(p)) {
       $detail.find('button.continue-classification').hide()
       $detail.find('button.reclassify').hide()
       $detail.find('button.recategorize').hide()
@@ -264,10 +264,10 @@ window.internalSearchPage = function () {
       $detail.find('button.reclassify').toggle(window.classificationUtils.canReclassify(p, window.user))
       $detail.find('button.recategorize').toggle(shared.hasRole('kavi'))
     }
-    $detail.find('button.copy').toggle(enums.util.isTvEpisode(p) || enums.util.isTrailer(p))
-    $detail.find('button.categorize').toggle(enums.util.isUnknown(p))
+    $detail.find('button.copy').toggle(window.enums.util.isTvEpisode(p) || window.enums.util.isTrailer(p))
+    $detail.find('button.categorize').toggle(window.enums.util.isUnknown(p))
     $detail.find('button.edit').toggle(shared.hasRole('root'))
-    $detail.find('button.remove').toggle(shared.hasRole('root') && (!enums.util.isTvSeriesName(p) || p.episodes.count === 0))
+    $detail.find('button.remove').toggle(shared.hasRole('root') && (!window.enums.util.isTvSeriesName(p) || p.episodes.count === 0))
     $detail.find('button.remove-classification').toggle(shared.hasRole('root'))
 
   }
@@ -347,7 +347,7 @@ window.internalSearchPage = function () {
 
     $categorizationForm.show()
 
-    if (enums.util.isDefinedProgramType(program.programType)) {
+    if (window.enums.util.isDefinedProgramType(program.programType)) {
       $categorySelection.select2('val', program.programType).trigger('change')
       $series.select2('data', meku.idNamePairToSelect2Option(program.series)).trigger('validate')
       $season.val(program.season).trigger('validate')
@@ -374,15 +374,15 @@ window.internalSearchPage = function () {
       }
       $.post('/programs/' + program._id + '/categorization', JSON.stringify(categoryData)).done(function (newProgram) {
         const oldProgram = program
-        const oldSeriesId = utils.getProperty(oldProgram, 'series._id')
-        const newSeriesId = utils.getProperty(newProgram, 'series._id')
+        const oldSeriesId = window.utils.getProperty(oldProgram, 'series._id')
+        const newSeriesId = window.utils.getProperty(newProgram, 'series._id')
         if (oldSeriesId && oldSeriesId !== newSeriesId) searchPageApi.updateProgramIfVisible(oldSeriesId)
         searchPageApi.programDataUpdated(newProgram)
       })
     })
 
     function isTvEpisode() {
-      return enums.util.isTvEpisode({programType: $categorySelection.select2('val')})
+      return window.enums.util.isTvEpisode({programType: $categorySelection.select2('val')})
     }
 
   }
@@ -703,7 +703,7 @@ function searchPage() {
   }
 
   function programDataUpdated(program) {
-    const seriesId = utils.getProperty(program, 'series._id')
+    const seriesId = window.utils.getProperty(program, 'series._id')
     if (seriesId) updateProgramIfVisible(seriesId)
     const $rows = $page.find('.result[data-id=' + program._id + ']')
     if (_.isEmpty($rows)) return
@@ -772,9 +772,9 @@ function searchPage() {
     return $('<div>', {class: 'result', 'data-id': program._id}).data('program', program).append(series(program)).append(row(program))
 
     function series(p) {
-      if (!enums.util.isTvEpisode(p)) return undefined
+      if (!window.enums.util.isTvEpisode(p)) return undefined
       return $('<div>').addClass('series')
-        .text(_.compact([p.series && p.series.name, utils.seasonEpisodeCode(p)]).join(' '))
+        .text(_.compact([p.series && p.series.name, window.utils.seasonEpisodeCode(p)]).join(' '))
         .highlight(hilites, {beginningsOnly: true, caseSensitive: false})
     }
 
@@ -782,19 +782,19 @@ function searchPage() {
       return $('<div>').addClass('items')
         .append($('<span>', {class: 'name'}).text(p.name[0]).highlight(hilites, {beginningsOnly: true, caseSensitive: false}))
         .append($('<span>', {class: 'country-year-date'}).text(countryAndYearAndDate(p)))
-        .append($('<span>', {class: 'duration-or-game'}).text(enums.util.isGameType(p) ? p.gameFormat || '' : utils.programDurationAsText(p)))
-        .append($('<span>', {class: 'program-type'}).html(enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : shared.i18nText(enums.util.programTypeName(p.programType))))
+        .append($('<span>', {class: 'duration-or-game'}).text(window.enums.util.isGameType(p) ? p.gameFormat || '' : window.utils.programDurationAsText(p)))
+        .append($('<span>', {class: 'program-type'}).html(window.enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : shared.i18nText(window.enums.util.programTypeName(p.programType))))
         .append($('<span>').append(shared.renderWarningSummary(window.classificationUtils.fullSummary(p)) || ' - '))
     }
 
     function countryAndYearAndDate(p) {
-      const s = _([registrationDate(p), enums.util.toCountryString(p.country), p.year]).compact().join(', ')
+      const s = _([registrationDate(p), window.enums.util.toCountryString(p.country), p.year]).compact().join(', ')
       return s === '' ? s : '(' + s + ')'
     }
 
     function registrationDate(p) {
       if (!showRegistrationDate) return undefined
-      const date = utils.getProperty(p, 'classifications.0.registrationDate')
+      const date = window.utils.getProperty(p, 'classifications.0.registrationDate')
       return date ? moment(date).format('D.M.YYYY') : undefined
     }
   }

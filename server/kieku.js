@@ -16,7 +16,7 @@ exports.createYearlyProviderRegistration = function createYearlyProviderRegistra
   return createBilling(accountRows, _.curry(providerBillingHeader)(moment().year()), providerRowDescription, _.curry(providerBillingFooter)(accountRows))
 }
 
-function t(txt, lang) { return i18n[lang] ? i18n[lang][txt] || txt : txt }
+function t(txt, lang) { return i18n.translations[lang] ? i18n.translations[lang][txt] || txt : txt }
 function language(invoice) { return (invoice.billingLanguage || 'fi').toLowerCase() }
 
 function providerBillingHeader(year, invoice) {

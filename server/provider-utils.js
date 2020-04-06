@@ -5,7 +5,7 @@ const utils = require('../shared/utils')
 const moment = require('moment')
 const i18n = require('../shared/i18n')
 
-function sv(txt) { return i18n.sv[txt] || txt }
+function sv(txt) { return i18n.translations.sv[txt] || txt }
 
 exports.registrationEmail = function (provider, hostName, callback) {
   function emailHtml(prov, cb) {

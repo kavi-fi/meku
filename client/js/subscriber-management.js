@@ -223,7 +223,7 @@ window.subscriberManagementPage = function () {
 
     function renderRoles(roles) {
       if (_.isEmpty(roles)) return '<i class="fa fa-warning"></i>'
-      return _.map(roles, function (role) { return enums.roles[role] }).join(', ')
+      return _.map(roles, function (role) { return window.enums.roles[role] }).join(', ')
     }
   }
 
@@ -248,12 +248,12 @@ window.subscriberManagementPage = function () {
     })
 
     $subscriberDetails
-      .find('input[name="address.country"]').select2({data: meku.select2DataFromEnumObject(enums.countries)}).end()
+      .find('input[name="address.country"]').select2({data: meku.select2DataFromEnumObject(window.enums.countries)}).end()
       .find('input[name=emailAddresses]').select2({tags: [], multiple: true}).end()
-      .find('input[name="billing.address.country"]').select2({data: meku.select2DataFromEnumObject(enums.countries)}).end()
+      .find('input[name="billing.address.country"]').select2({data: meku.select2DataFromEnumObject(window.enums.countries)}).end()
       .find('input[name=billing-extra]').prop('checked', subscriber && !!subscriber.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (subscriber && subscriber.billingPreference || 'address') + ']').prop('checked', true).end()
-      .find('input[name="billing.language"]').select2({data: meku.select2DataFromEnumObject(enums.billingLanguages)}).end()
+      .find('input[name="billing.language"]').select2({data: meku.select2DataFromEnumObject(window.enums.billingLanguages)}).end()
 
     populateClassifiers(subscriber ? subscriber.users : [])
     toggleBillingExtra()
@@ -263,7 +263,7 @@ window.subscriberManagementPage = function () {
 
     function setInputValWithProperty(object) {
       const name = $(this).attr('name')
-      const property = utils.getProperty(object, name)
+      const property = window.utils.getProperty(object, name)
       if (property !== undefined) $(this).val(property)
     }
 

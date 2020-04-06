@@ -65,7 +65,7 @@ window.reportsPage = function () {
 
     function renderRow(row) {
       return $rowTemplate.clone()
-        .find('.id').text(enums.programType[row._id].fi).end()
+        .find('.id').text(window.enums.programType[row._id].fi).end()
         .find('.count').text(row.count).end()
         .find('.duration').text(window.classificationUtils.secondsToDuration(row.value)).end()
     }
@@ -105,20 +105,20 @@ window.reportsPage = function () {
       return $rowTemplate.clone()
         .find('.id').html($('<a>', {href: href, target: '_blank'}).text(row.name[0])).end()
         .find('.sequenceId').text(row.sequenceId).end()
-        .find('.programType').text(enums.programType[row.programType].fi).end()
+        .find('.programType').text(window.enums.programType[row.programType].fi).end()
         .find('.date').text(moment(row.date).format(format)).end()
         .find('.author').text(authorColumn(row)).end()
         .find('.duration').text(row.duration).end()
         .find('.type').text(row.isReclassification ? 'Uudelleenluokittelu' : 'Luokittelu').end()
-        .find('.kaviType').text(utils.getProperty(enums.kaviType[row.kaviType], 'uiText')).end()
-        .find('.reason').text(row.isReclassification ? utils.getProperty(enums.reclassificationReason[row.reason], 'uiText') || 'Ei tiedossa' : '').end()
+        .find('.kaviType').text(window.utils.getProperty(window.enums.kaviType[row.kaviType], 'uiText')).end()
+        .find('.reason').text(row.isReclassification ? window.utils.getProperty(window.enums.reclassificationReason[row.reason], 'uiText') || 'Ei tiedossa' : '').end()
         .find('.buyer').text(row.buyer ? row.buyer.name : '').end()
         .find('.comments').text(row.comments).end()
     }
   }
 
   function authorColumn(c) {
-    return enums.authorOrganizationIsElokuvalautakunta(c) || enums.authorOrganizationIsKuvaohjelmalautakunta(c) || enums.authorOrganizationIsKHO(c) ? enums.authorOrganization[c.authorOrganization] : c.author
+    return window.enums.authorOrganizationIsElokuvalautakunta(c) || window.enums.authorOrganizationIsKuvaohjelmalautakunta(c) || window.enums.authorOrganizationIsKHO(c) ? window.enums.authorOrganization[c.authorOrganization] : c.author
   }
 
   function renderDefaultReport(reportName, report) {
@@ -143,13 +143,13 @@ window.reportsPage = function () {
   }
 
   const idMappers = {
-    programType: function (id) { return enums.programType[id].fi },
+    programType: function (id) { return window.enums.programType[id].fi },
     agelimit: agelimitMapper,
     kaviAgelimit: agelimitMapper,
     warnings: warningMapper,
     agelimitChanges: agelimitChangeMapper,
     kaviAgelimitChanges: agelimitChangeMapper,
-    kaviReclassificationReason: function (id) { return utils.getProperty(enums.reclassificationReason[id], 'uiText') || 'Ei tiedossa' }
+    kaviReclassificationReason: function (id) { return window.utils.getProperty(window.enums.reclassificationReason[id], 'uiText') || 'Ei tiedossa' }
   }
 
   function agelimitMapper(id) {
@@ -157,9 +157,9 @@ window.reportsPage = function () {
   }
   function warningMapper(id) {
     if (id === '-') return 'Ei varoituksia'
-    return enums.warnings[id]
-      ? enums.warnings[id] + ' yksin'
-      : enums.warnings[id.substring(0, id.length - 1)] + ' muita'
+    return window.enums.warnings[id]
+      ? window.enums.warnings[id] + ' yksin'
+      : window.enums.warnings[id.substring(0, id.length - 1)] + ' muita'
   }
 
   function agelimitChangeMapper(id) {

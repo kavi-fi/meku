@@ -2,8 +2,8 @@ window.meku = {
   pikadayDefaults: {
     defaultDate: new Date(),
     firstDay: 1,
-    format: utils.dateFormat,
-    i18n: window.i18nPikaday[shared.langCookie()],
+    format: window.utils.dateFormat,
+    i18n: window.i18n.i18nPikaday[shared.langCookie()],
     setDefaultDate: true,
     showWeekNumber: true
   },
@@ -19,7 +19,7 @@ window.meku = {
     return val.trim().length > 0
   },
   isMultiEmail: function (xs) {
-    return _.every(xs.split(','), utils.isEmail)
+    return _.every(xs.split(','), window.utils.isEmail)
   },
   validateTextChange: function ($el, validatorFn) {
     const validator = validate(validatorFn)
@@ -180,8 +180,8 @@ function setup() {
   $.fn.select2.defaults.formatNoMatches = shared.i18nText('Ei tuloksia')
   $.fn.select2.defaults.formatSearching = shared.i18nText('Haetaan...')
   $.fn.select2.defaults.adaptDropdownCssClass = function (c) { return c === 'required' ? c : null }
-  $.dateRangePickerLanguages.fi = window.i18nDateRangePicker.fi
-  $.dateRangePickerLanguages.sv = window.i18nDateRangePicker.sv
+  $.dateRangePickerLanguages.fi = window.i18n.i18nDateRangePicker.fi
+  $.dateRangePickerLanguages.sv = window.i18n.i18nDateRangePicker.sv
 
   const login = loginPage()
   const error = errorDialog()

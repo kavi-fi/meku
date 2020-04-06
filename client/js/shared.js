@@ -39,14 +39,14 @@ $.fn.i18nText = function (key) {
 }
 $.fn.i18nHtml = function (key, fallback) {
   const lang = shared.langCookie()
-  const html = lang === 'fi' ? undefined : window.i18n[lang][key]
+  const html = lang === 'fi' ? undefined : window.i18n.translations[lang][key]
   return this.html(html || fallback).toggleClass('i18n-fail', lang !== 'fi' && !html)
 }
 
 window.shared = {
   i18nText: function (key) {
     const lang = shared.langCookie()
-    return lang === 'fi' ? key : window.i18n[lang][key]
+    return lang === 'fi' ? key : window.i18n.translations[lang][key]
   },
   langCookie: function () {
     return $.cookie('lang') === 'sv' ? 'sv' : 'fi'
@@ -78,7 +78,7 @@ window.shared = {
   },
   hasRole: function (role) {
     if (!window.utils) return false
-    return utils.hasRole(window.user, role)
+    return window.utils.hasRole(window.user, role)
   },
   loadTemplates: function(callback) {
     $.get('/templates.html').done(function (html) {
@@ -143,8 +143,8 @@ window.shared = {
     ]
   },
   setupDatePicker: function ($datePicker, opts, onChange, forceUpdate) {
-    $.dateRangePickerLanguages.fi = window.i18nDateRangePicker.fi
-    $.dateRangePickerLanguages.sv = window.i18nDateRangePicker.sv
+    $.dateRangePickerLanguages.fi = window.i18n.i18nDateRangePicker.fi
+    $.dateRangePickerLanguages.sv = window.i18n.i18nDateRangePicker.sv
     const defaults = {
       language: shared.langCookie(),
       format: 'DD.MM.YYYY',

@@ -8,7 +8,7 @@ window.classificationCriteria = function () {
     }
   })
   $.get('/classification/criteria').done(function (result) {
-    const $criteriaBlock = _.flatten(_.map(enums.classificationCriteria, function (enumCriteria) {
+    const $criteriaBlock = _.flatten(_.map(window.enums.classificationCriteria, function (enumCriteria) {
       const storedCriteria = _.find(result, function (c) { return c.id === enumCriteria.id })
       const criteria = storedCriteria ? storedCriteria : enumCriteria
       const $criteria = $('#templates .classification-criteria-edit').clone()
@@ -59,6 +59,6 @@ window.classificationCriteria = function () {
   }
 
   function setStored($elem, date) {
-    if (date) $elem.text('Viimeksi tallennettu ' + utils.asDate(date))
+    if (date) $elem.text('Viimeksi tallennettu ' + window.utils.asDate(date))
   }
 }

@@ -9,7 +9,7 @@ const i18n = require('../shared/i18n')
 const dateFormat = 'DD.MM.YYYY'
 
 exports.constructProgramExportData = function constructProgramExportData(docs, showClassificationAuthor, filename, lang) {
-  function translate(txt) { return i18n[lang] ? i18n[lang][txt] || txt : txt }
+  function translate(txt) { return i18n.translations[lang] ? i18n.translations[lang][txt] || txt : txt }
   const columnsOrig = ["Alkuperäinen nimi", "Suomenkielinen nimi", "Ruotsinkielinen nimi", "Jakso", "Jakson alkuperäinen nimi", "Rekisteröintipäivä", "Kesto", "Luokittelun tilaaja", "Luokittelija", "Uudelleenluokittelija", "Ikäraja", "Luokittelun kriteerit", "Perustelu", "Varoitukset", "Ohjelman tyyppi", "Maa", "Valmistumisvuosi", "Ohjaaja", "Tuotantoyhtiö", "Synopsis", "Id"]
   const columns = _.map(columnsOrig, translate)
   const columnWidths = [40, 40, 40, 10, 40, 15, 10, 40, 25, 25, 10, 40, 20, 20, 20, 10, 15, 20, 20, 40, 10]

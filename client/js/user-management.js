@@ -4,7 +4,7 @@ window.userManagementPage = function () {
   const $userNameQuery = $page.find('#user-name-query')
   const $newUserType = $page.find('.new-user input[name="new-user-type"]')
 
-  const userRoles = APP_ENVIRONMENT === 'training' ? enums.userRoles : _.omit(enums.userRoles, 'trainee')
+  const userRoles = APP_ENVIRONMENT === 'training' ? window.enums.userRoles : _.omit(window.enums.userRoles, 'trainee')
   $newUserType.select2({
     data: _.map(userRoles, function (roleValue, roleKey) { return {id: roleKey, text: roleValue.name} }),
     minimumResultsForSearch: -1
@@ -76,17 +76,17 @@ window.userManagementPage = function () {
      .data('user', user).data('id', user._id)
      .append($('<span>', {class: 'name'}).text(user.name))
      .append($('<span>', {class: 'username'}).text(user.username))
-     .append($('<span>', {class: 'role'}).html(enums.util.userRoleName(user.role) || '<i class="fa fa-warning"></i>'))
+     .append($('<span>', {class: 'role'}).html(window.enums.util.userRoleName(user.role) || '<i class="fa fa-warning"></i>'))
      .append($('<span>', {class: 'cert-end'}).html(renderCertEnd(user)))
      .toggleClass('inactive', !user.active)
   }
 
   function renderCertEnd(user) {
-    if (!enums.util.isClassifier(user.role)) return ''
+    if (!window.enums.util.isClassifier(user.role)) return ''
 
     if (user.certificateEndDate) {
       const certEnd = moment(user.certificateEndDate)
-      return $('<span>').text(certEnd.format(utils.dateFormat))
+      return $('<span>').text(certEnd.format(window.utils.dateFormat))
         .toggleClass('expires-soon', certEnd.isBefore(moment().add(6, 'months')))
     }
       return '<i class="fa fa-warning"></i>'
@@ -118,7 +118,7 @@ window.userManagementPage = function () {
       userData.role = role
       userData.active = true
 
-      if (enums.util.isClassifier(role)) {
+      if (window.enums.util.isClassifier(role)) {
         userData = _.merge(userData, getClassifierData($this))
       }
 
@@ -143,7 +143,7 @@ window.userManagementPage = function () {
       const $this = $(this)
       let userData = getUserData($this)
 
-      if (enums.util.isClassifier(selectedUser.role)) {
+      if (window.enums.util.isClassifier(selectedUser.role)) {
         userData = _.merge(userData, getClassifierData($this))
       }
 
@@ -158,7 +158,7 @@ window.userManagementPage = function () {
   function renderUserDetails(selectedUser, role) {
     const $detailTemplate = $('#templates').find('.user-details').clone()
     const isNewUser = selectedUser === null
-    const isClassifier = enums.util.isClassifier(role) || selectedUser && enums.util.isClassifier(selectedUser.role)
+    const isClassifier = window.enums.util.isClassifier(role) || selectedUser && window.enums.util.isClassifier(selectedUser.role)
 
     if (isClassifier) {
       $detailTemplate.find('form .classifier').append($('#templates').find('.classifier-details').clone())
@@ -224,8 +224,8 @@ window.userManagementPage = function () {
     }
 
     function populate($element, user) {
-      const cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(utils.dateFormat) : ''
-      const cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(utils.dateFormat) : ''
+      const cStartDate = user.certificateStartDate ? moment(user.certificateStartDate).format(window.utils.dateFormat) : ''
+      const cEndDate = user.certificateEndDate ? moment(user.certificateEndDate).format(window.utils.dateFormat) : ''
 
       $element.find('input[name=name]').val(user.name).end()
         .find('input[name=email]').val(user.emails[0]).end()
@@ -262,8 +262,8 @@ window.userManagementPage = function () {
 
   function getClassifierData($details) {
     return {
-      certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), utils.dateFormat),
-      certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), utils.dateFormat),
+      certificateStartDate: moment($details.find('input[name=certificateStartDate]').val(), window.utils.dateFormat),
+      certificateEndDate: moment($details.find('input[name=certificateEndDate]').val(), window.utils.dateFormat),
       employers: $details.find('input[name=employers]').select2('data').map(meku.select2OptionToIdNamePair),
       comment: $details.find('textarea[name=comment]').val()
     }
@@ -285,7 +285,7 @@ window.userManagementPage = function () {
     $username.get(0).setCustomValidity('Checking username')
     $username.addClass('touched')
     const username = $username.val()
-    if (utils.isValidUsername(username)) {
+    if (window.utils.isValidUsername(username)) {
       $username.addClass('pending')
       usernameValidator(username, $username, $detailTemplate)
     } else {

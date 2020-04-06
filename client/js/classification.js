@@ -51,10 +51,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('input[name=season]').val(p.season).end()
       .find('input[name=episode]').val(p.episode).end()
       .find('textarea[name=synopsis]').val(p.synopsis).end()
-      .find('input[name="series.draft.name"]').val(utils.getProperty(p, 'series.draft.name') || '').end()
-      .find('input[name="series.draft.nameFi"]').val(utils.getProperty(p, 'series.draft.nameFi') || '').end()
-      .find('input[name="series.draft.nameSv"]').val(utils.getProperty(p, 'series.draft.nameSv') || '').end()
-      .find('input[name="series.draft.nameOther"]').val(utils.getProperty(p, 'series.draft.nameOther') || '').end()
+      .find('input[name="series.draft.name"]').val(window.utils.getProperty(p, 'series.draft.name') || '').end()
+      .find('input[name="series.draft.nameFi"]').val(window.utils.getProperty(p, 'series.draft.nameFi') || '').end()
+      .find('input[name="series.draft.nameSv"]').val(window.utils.getProperty(p, 'series.draft.nameSv') || '').end()
+      .find('input[name="series.draft.nameOther"]').val(window.utils.getProperty(p, 'series.draft.nameOther') || '').end()
 
     cfu.nameFields.forEach(function (field) {
       p[field].forEach(function (val, index) {
@@ -74,10 +74,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     const authorOrgVal = typeof c.authorOrganization === 'number' ? c.authorOrganization.toString() : ''
     const reasonVal = typeof c.reason === 'number' ? c.reason.toString() : ''
     const kaviTypeVal = typeof c.kaviType === 'number' ? c.kaviType.toString() : ''
-    const isVetClassification = _.find(c.criteria.map(function (id) { return enums.classificationCriteria[id - 1].category === 'vet' })) !== undefined
+    const isVetClassification = _.find(c.criteria.map(function (id) { return window.enums.classificationCriteria[id - 1].category === 'vet' })) !== undefined
 
     $form
-      .find('span.author').text(utils.getProperty(c, 'author.name') || '-').end()
+      .find('span.author').text(window.utils.getProperty(c, 'author.name') || '-').end()
       .find('input[name="classification.duration"]').val(c.duration).end()
       .find('textarea[name="classification.comments"]').val(c.comments).end()
       .find('textarea[name="classification.userComments"]').val(c.userComments).end()
@@ -127,9 +127,9 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $form.find('button[name=register]').prop('disabled', (required.length > 0 || throttled.length > 0) && !$('input[name="classification.vet"]').is(':checked'))
     })
     meku.validateTextChange($form.find('.required'), meku.isNotEmpty)
-    meku.validateTextChange($form.find('input[name=year]'), utils.isValidYear)
-    meku.validateTextChange($form.find('input[name="classification.registrationDate"]'), utils.isEmptyOrValidDate)
-    meku.validateTextChange($form.find('.duration'), utils.isValidDuration)
+    meku.validateTextChange($form.find('input[name=year]'), window.utils.isValidYear)
+    meku.validateTextChange($form.find('input[name="classification.registrationDate"]'), window.utils.isEmptyOrValidDate)
+    meku.validateTextChange($form.find('.duration'), window.utils.isValidDuration)
     meku.validateTextChange($form.find('input[name="classification.registrationEmailAddresses"]'), meku.isMultiEmail)
     $form.on('select2-blur', function (e) { $(e.target).addClass('touched') })
     $form.find('.required').trigger('validate')
@@ -224,7 +224,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('input[name="classification.reason"]').on('change', function () {
       if (rootEditMode) return
       const $buyerAndBilling = $form.find('input[name="classification.buyer"], input[name="classification.billing"]')
-      $buyerAndBilling.removeClass('touched').select2('enable', shared.hasRole('root') || enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
+      $buyerAndBilling.removeClass('touched').select2('enable', shared.hasRole('root') || window.enums.isOikaisupyynto($(this).val())).select2('val', '').trigger('validate').trigger('change')
     })
     $form.on('click', '.category .criteria', function () {
       $(this).toggleClass('selected').toggleClass('has-comment', meku.isNotEmpty($(this).find('textarea').val() || ''))
@@ -259,7 +259,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   function saveRegistrationDate($registrationDate) {
     if ($registrationDate.hasClass('invalid')) return false
     const val = _.trim($registrationDate.val())
-    const date = val === '' ? '' : moment(val, utils.dateFormat).toJSON()
+    const date = val === '' ? '' : moment(val, window.utils.dateFormat).toJSON()
     save($registrationDate.attr('name'), date)
   }
 
@@ -268,13 +268,13 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       const classificationIndex = _.findIndex(program.classifications, {_id: selectedClassification._id})
       const fieldModified = field.replace(/^classification/, 'classifications.' + classificationIndex)
       rootModifiedFields[fieldModified] = value
-      utils.setValueForPath(fieldModified.split('.'), program, value)
+      window.utils.setValueForPath(fieldModified.split('.'), program, value)
       onProgramUpdated(program)
       $form.find('button[name=save]').prop('disabled', false)
     } else {
       const fieldModified = field.replace(/^classification/, 'draftClassifications.' + window.user._id)
       $form.find('button[name=register]').prop('disabled', true)
-      $.post('/programs/autosave/' + program._id, JSON.stringify(utils.keyValue(fieldModified, value))).done(function (p) {
+      $.post('/programs/autosave/' + program._id, JSON.stringify(window.utils.keyValue(fieldModified, value))).done(function (p) {
         if ($form.find('button[name=register]').is(':enabled') && $.active > 1) {
           $form.find('button[name=register]').prop('disabled', true)
         }
@@ -294,7 +294,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
   }
 
   function updateAuthorOrganizationDependantValidation() {
-    const isClassificationInfoRequired = !(enums.authorOrganizationIsElokuvalautakunta(selectedClassification) || enums.authorOrganizationIsKuvaohjelmalautakunta(selectedClassification) || enums.authorOrganizationIsKHO(selectedClassification))
+    const isClassificationInfoRequired = !(window.enums.authorOrganizationIsElokuvalautakunta(selectedClassification) || window.enums.authorOrganizationIsKuvaohjelmalautakunta(selectedClassification) || window.enums.authorOrganizationIsKHO(selectedClassification))
     const hiddenInputNames = ['classification.reason', 'classification.buyer', 'classification.billing']
     const hiddenInputs = hiddenInputNames.map(function (name) { return $('input[name="' + name + '"]') })
 
@@ -351,8 +351,8 @@ function classificationFormUtils() {
 
   function renderClassificationCriteria($form) {
     const lang = shared.langCookie()
-    enums.criteriaCategories.map(function (category) {
-      const classificationCriteria = enums.classificationCriteria.filter(function (c) { return c.category === category })
+    window.enums.criteriaCategories.map(function (category) {
+      const classificationCriteria = window.enums.classificationCriteria.filter(function (c) { return c.category === category })
       const $criteria = classificationCriteria.map(function (c) {
         const isVet = c.category === 'vet'
         const age = shared.langCookie() === 'sv' && c.age === 0 ? 't' : c.age
@@ -369,8 +369,8 @@ function classificationFormUtils() {
     const lang = shared.langCookie()
     $.get('/classification/criteria').done(function (storedCriteria) {
       storedCriteria.forEach(function (criteria) {
-        const i = enums.classificationCriteria.map(function (c) { return c.id }).indexOf(criteria.id)
-        const isVet = i !== -1 && enums.classificationCriteria[i].category === 'vet'
+        const i = window.enums.classificationCriteria.map(function (c) { return c.id }).indexOf(criteria.id)
+        const isVet = i !== -1 && window.enums.classificationCriteria[i].category === 'vet'
         const $div = $form.find('div[data-id=' + criteria.id + ']')
         $div.find('h5').empty().append($('<h5>').text(criteria[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + criteria.id + ')')))
         $div.find('p').html(isVet ? '' : criteria[lang].description)
@@ -380,12 +380,12 @@ function classificationFormUtils() {
   function filterFields($form, program, classification, editMode) {
     const isReclassification = window.classificationUtils.isReclassification(program, classification)
     const isInternalReclassification = isReclassification && shared.hasRole('kavi')
-    const isTvEpisode = enums.util.isTvEpisode(program)
-    const isGame = enums.util.isGameType(program)
+    const isTvEpisode = window.enums.util.isTvEpisode(program)
+    const isGame = window.enums.util.isGameType(program)
 
     const programInfoTitle = editMode || isReclassification ? 'Kuvaohjelman tiedot' : 'Uusi kuvaohjelma'
     $form.find('.program-info h2.main span:eq(0)').i18nText(programInfoTitle)
-    $form.find('.program-info h2.main span:eq(1)').i18nText(enums.util.programTypeName(program.programType))
+    $form.find('.program-info h2.main span:eq(1)').i18nText(window.enums.util.programTypeName(program.programType))
 
     const classificationTitle = editMode || !isReclassification ? 'Luokittelu' : 'Uudelleenluokittelu'
     $form.find('.classification-details h2.main').i18nText(classificationTitle)
@@ -399,9 +399,9 @@ function classificationFormUtils() {
     if (isGame) $form.find('.non-game-field').remove()
     if (!isGame) $form.find('.game-field').remove()
 
-    const showDuration = !enums.util.isGameType(program) || shared.hasRole('kavi')
+    const showDuration = !window.enums.util.isGameType(program) || shared.hasRole('kavi')
     if (!showDuration) $form.find('.duration-field').remove()
-    if (showDuration && enums.util.isGameType(program)) $form.find('.duration-field label').i18nText('Luokittelun kesto')
+    if (showDuration && window.enums.util.isGameType(program)) $form.find('.duration-field label').i18nText('Luokittelun kesto')
 
     if (shared.hasRole('root')) {
       $form.find('.vet-container').removeClass('hide')
@@ -409,7 +409,7 @@ function classificationFormUtils() {
     } else {
       $form.find('input[name="classification.registrationDate"]').prop('disabled', true)
     }
-    if (!shared.hasRole('root') && isInternalReclassification && !enums.isOikaisupyynto(classification.reason)) {
+    if (!shared.hasRole('root') && isInternalReclassification && !window.enums.isOikaisupyynto(classification.reason)) {
       $form.find('input[name="classification.buyer"], input[name="classification.billing"]').prop('disabled', true)
     }
     if (isInternalReclassification) {
@@ -437,7 +437,7 @@ function classificationFormUtils() {
     }
     if (_.isEmpty(p.classifications)) {
       $form.find('.classification-details, .classification-summary, .classification-criteria, .classification-email').remove()
-      if (!enums.util.isTvSeriesName(p)) {
+      if (!window.enums.util.isTvSeriesName(p)) {
         $form.find('.program-box-container').replaceWith($('<span>').text('Ohjelma ei näy ikärajat.fi-palvelussa, sillä sillä ei ole yhtään luokittelua.'))
       }
     }
@@ -601,7 +601,7 @@ function classificationFormUtils() {
       },
       countries: {
         $el: $form.find('input[name="country"]'),
-        data: Object.keys(enums.countries).map(function (key) { return {id: key, text: enums.countries[key]} }),
+        data: Object.keys(window.enums.countries).map(function (key) { return {id: key, text: window.enums.countries[key]} }),
         multiple: true
       },
       productionCompanies: {
@@ -613,10 +613,10 @@ function classificationFormUtils() {
       },
       gameFormat: {
         $el: $form.find('input[name=gameFormat]'),
-        data: enums.gameFormat.map(function (f) { return {id: f, text: f} })
+        data: window.enums.gameFormat.map(function (f) { return {id: f, text: f} })
       },
       genre: function (program) {
-        const data = enums.util.isMovieType(program) ? enums.movieGenre : enums.util.isGameType(program) ? enums.legacyGameGenres : enums.tvGenre
+        const data = window.enums.util.isMovieType(program) ? window.enums.movieGenre : window.enums.util.isGameType(program) ? window.enums.legacyGameGenres : window.enums.tvGenre
         return {
           $el: $form.find('input[name=genre]'),
           data: data.map(function (f) { return {id: f, text: f} }),
@@ -662,7 +662,7 @@ function classificationFormUtils() {
       },
       format: {
         $el: $form.find('input[name="classification.format"]'),
-        data: enums.format.map(function (f) { return {id: f, text: f} }),
+        data: window.enums.format.map(function (f) { return {id: f, text: f} }),
         formatResult: function (obj, $container, query) {
           if (query.term === '' && obj.text === 'Verkkoaineisto') {
             $container.addClass('space-below')
@@ -672,17 +672,17 @@ function classificationFormUtils() {
       },
       authorOrg: {
         $el: $form.find('input[name="classification.authorOrganization"]'),
-          data: _.map(_.chain(enums.authorOrganization).toPairs().tail().value(), function (pair) { return {id: pair[0], text: pair[1]} }),
+          data: _.map(_.chain(window.enums.authorOrganization).toPairs().tail().value(), function (pair) { return {id: pair[0], text: pair[1]} }),
         fromOption: meku.select2OptionToInt
       },
       reason: {
         $el: $form.find('input[name="classification.reason"]'),
-        data: _.map(enums.reclassificationReason, function (reason, id) { return {id: id, text: reason.uiText} }),
+        data: _.map(window.enums.reclassificationReason, function (reason, id) { return {id: id, text: reason.uiText} }),
         fromOption: meku.select2OptionToInt
       },
       kaviType: {
         $el: $form.find('input[name="classification.kaviType"]'),
-        data: _.map(enums.kaviType, function (reason, id) { return {id: id, text: reason.uiText} }),
+        data: _.map(window.enums.kaviType, function (reason, id) { return {id: id, text: reason.uiText} }),
         fromOption: meku.select2OptionToInt
       }
     }

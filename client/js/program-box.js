@@ -11,14 +11,14 @@ window.programBox = function () {
 
   function render(p, episodes) {
     const $e = renderProgram(p)
-    enums.util.isTvSeriesName(p) ? renderTvSeries($e, p, episodes) : renderClassifications($e, p)
+    window.enums.util.isTvSeriesName(p) ? renderTvSeries($e, p, episodes) : renderClassifications($e, p)
     return $e
   }
 
   function renderProgram(p) {
     const names = {n: join(p.name), fi: join(p.nameFi), sv: join(p.nameSv), other: join(p.nameOther)}
     const series = p.series && p.series.name || undefined
-    const episode = utils.seasonEpisodeCode(p)
+    const episode = window.utils.seasonEpisodeCode(p)
     const $details = $detailTemplate.clone()
       .data('id', p._id)
       .find('.sequenceId').text(p.sequenceId).end()
@@ -29,7 +29,7 @@ window.programBox = function () {
       .find('.nameOther').labeledText(names.other).end()
       .find('.series').labeledText(series).end()
       .find('.episode').labeledText(episode).end()
-      .find('.country').labeledText(enums.util.toCountryString(p.country)).end()
+      .find('.country').labeledText(window.enums.util.toCountryString(p.country)).end()
       .find('.year').labeledText(p.year).end()
       .find('.productionCompanies').labeledText(p.productionCompanies.join(', ')).end()
       .find('.genre').labeledText(p.genre.join(', ') || p.legacyGenre.join(', ')).end()
@@ -37,7 +37,7 @@ window.programBox = function () {
       .find('.actors').labeledText(p.actors.join(', ')).end()
       .find('.synopsis').labeledText(p.synopsis).end()
 
-    if (utils.getProperty(p, 'series._id')) $.get('/programs/' + p.series._id, function (s) {
+    if (window.utils.getProperty(p, 'series._id')) $.get('/programs/' + p.series._id, function (s) {
       $details.find('.series').attr('href', '#haku/' + s.sequenceId + '//')
     })
 
@@ -107,9 +107,9 @@ window.programBox = function () {
           .append($('<span>').append(shared.renderWarningSummary(window.classificationUtils.aggregateSummary(episodes)))))
           .append(episodes.map(function (prg) {
             return $('<div>').addClass('result').data('id', prg._id).data('program', prg)
-              .append($('<span>').text(utils.seasonEpisodeCode(prg)))
+              .append($('<span>').text(window.utils.seasonEpisodeCode(prg)))
               .append($('<span>').text(prg.name[0]))
-              .append($('<span>').text(utils.asDate(utils.getProperty(prg, 'classifications.0.registrationDate'))))
+              .append($('<span>').text(window.utils.asDate(window.utils.getProperty(prg, 'classifications.0.registrationDate'))))
               .append($('<span>').append(shared.renderWarningSummary(window.classificationUtils.fullSummary(prg)) || ' - '))
           }))
       })
@@ -120,10 +120,10 @@ window.programBox = function () {
     if (p.classifications[0]) {
       const c = p.classifications[0]
       $e.find('.classification-container').html($classificationTemplates.normal.clone()).end()
-        .find('.current-format').labeledText(enums.util.isGameType(p) && p.gameFormat || c.format).end()
+        .find('.current-format').labeledText(window.enums.util.isGameType(p) && p.gameFormat || c.format).end()
         .find('.current-duration').labeledText(c.duration).end()
         .find('.classifications').html(classificationLinks()).end()
-      if (!window.user && enums.util.isGameType(p)) {
+      if (!window.user && window.enums.util.isGameType(p)) {
         $e.find('.current-duration').prev('label').remove();
         $e.find('.current-duration').remove();
       }
@@ -144,15 +144,15 @@ window.programBox = function () {
 
     function classificationLinks() {
       return p.classifications.map(function (c, index) {
-        const registrationDate = utils.asDate(c.registrationDate) || shared.i18nText('Tuntematon rekisteröintiaika')
+        const registrationDate = window.utils.asDate(c.registrationDate) || window.shared.i18nText('Tuntematon rekisteröintiaika')
         return $('<span>', {'data-id': c._id}).addClass('classification').toggleClass('selected', index === 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
       })
     }
     function drafts() {
       return _.values(p.draftClassifications || {}).map(function (draft) {
         return $draftTemplate.clone().attr('data-userId', draft.author._id)
-          .find('b').text(draft.author.name + (shared.hasRole('kavi') ? ' (' + draft.author.username + ')' : '')).end()
-          .find('span').text(utils.asDateTime(draft.creationDate)).end()
+          .find('b').text(draft.author.name + (window.shared.hasRole('kavi') ? ' (' + draft.author.username + ')' : '')).end()
+          .find('span').text(window.utils.asDateTime(draft.creationDate)).end()
       })
     }
   }
@@ -165,15 +165,15 @@ window.programBox = function () {
 
   function renderClassificationWithStoredCriteria($e, program, classification, criteria) {
     const summary = window.classificationUtils.summary(classification)
-    const showAuthor = !(enums.authorOrganizationIsElokuvalautakunta(classification) || enums.authorOrganizationIsKuvaohjelmalautakunta(classification) || enums.authorOrganizationIsKHO(classification))
+    const showAuthor = !(window.enums.authorOrganizationIsElokuvalautakunta(classification) || window.enums.authorOrganizationIsKuvaohjelmalautakunta(classification) || window.enums.authorOrganizationIsKHO(classification))
     $e.find('.agelimit').attr('src', shared.ageLimitIcon(summary)).end()
       .find('.warnings').html(shared.warningIcons(summary)).end()
-      .find('.reason').labeledText(utils.getProperty(enums.reclassificationReason[classification.reason], 'uiText')).end()
+      .find('.reason').labeledText(window.utils.getProperty(window.enums.reclassificationReason[classification.reason], 'uiText')).end()
       .find('.author').labeledText(classification.author && showAuthor ? classification.author.name + (shared.hasRole('kavi') ? ' (' + classification.author.username + ')' : '') : '').end()
-      .find('.authorOrganization').labeledText(enums.authorOrganization[classification.authorOrganization]).end()
+      .find('.authorOrganization').labeledText(window.enums.authorOrganization[classification.authorOrganization]).end()
       .find('.buyer').labeledText(classification.buyer && classification.buyer.name || '').end()
       .find('.billing').labeledText(classification.billing && classification.billing.name || '').end()
-      .find('.format').labeledText(txtIfNotCurrent(enums.util.isGameType(program) && program.gameFormat || classification.format)).end()
+      .find('.format').labeledText(txtIfNotCurrent(window.enums.util.isGameType(program) && program.gameFormat || classification.format)).end()
       .find('.duration').labeledText(txtIfNotCurrent(classification.duration)).end()
       .find('.criteria').html(renderClassificationCriteria(classification, criteria)).end()
       .find('.comments').labeledText(classification.comments).end()
@@ -188,18 +188,18 @@ window.programBox = function () {
     if (!classification.criteria || classification.safe) return ''
     const lang = shared.langCookie()
     return classification.criteria.map(function (id) {
-      const enumCriteria = enums.classificationCriteria[id - 1]
+      const enumCriteria = window.enums.classificationCriteria[id - 1]
       if (enumCriteria.category === 'vet') return ''
       const storedCriteria = _.find(criteria, function (c) { return c.id === enumCriteria.id })
       const cr = storedCriteria ? storedCriteria : enumCriteria
-      const category = enums.classificationCategoriesFI[enumCriteria.category]
+      const category = window.enums.classificationCategoriesFI[enumCriteria.category]
 
       return $('<div>')
         .append($('<label>', {title: cr[lang].title + ': ' + $('<div>').html(cr[lang].description).text()}).text(shared.i18nText(category) + ' (' + cr.id + ')'))
         .append($('<p>').text(renderCriteriaComments()))
 
       function renderCriteriaComments() {
-        if (!shared.hasRole('kavi') && utils.getProperty(classification, 'author._id') !== utils.getProperty(this, 'user._id')) return ''
+        if (!shared.hasRole('kavi') && window.utils.getProperty(classification, 'author._id') !== window.utils.getProperty(this, 'user._id')) return ''
         return classification.criteriaComments && classification.criteriaComments[cr.id] || ''
       }
     })

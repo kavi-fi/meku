@@ -10,10 +10,8 @@ module.exports = {
     "globals": {
         "$": "readonly",
         "APP_ENVIRONMENT": "readonly",
-        "enums": "readonly",
-        "_": "readonly",
-        "moment": "readonly",
-        "utils": "readonly",
+        "_": "writable",
+        "moment": "writable",
         "meku": "readonly",
         "shared": "readonly"
     },

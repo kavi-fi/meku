@@ -12,7 +12,7 @@
 
       // Custom HTML-content texts:
 
-      'upgrade-reload': 'Ladda sidan på nytt <a href="javascript:window.location.reload(true)">här</a>.',
+      'upgrade-reload': 'Ladda sidan på nytt <a href="javascript:window.location.reload()">här</a>.',
       'error-reload': 'Ladda sidan på nytt <a href="#">här</a>,<br/>eller gå tillbaka till förstasidan <a href="/">här</a>.',
       'conflict-reload': 'Gå tillbaka till förstasidan <a href="/">här</a>.',
       'draft-notice': 'Klassificeringen inte klar hos användaren <b></b>. Utkastet sparat <span></span>.',

@@ -109,7 +109,7 @@ window.shared = {
   showRevisionMismatchDialog: function () {
     if (!$('.revision-mismatch-dialog').is(':visible')) {
       const html = $('<h2>').i18nText('Järjestelmä on päivitetty.')
-        .add($('<span>').html(shared.i18nText('upgrade-reload') || 'Lataa sivu uudelleen <a href="javascript:window.location.reload(true)">tästä</a>.'))
+        .add($('<span>').html(shared.i18nText('upgrade-reload') || 'Lataa sivu uudelleen <a href="javascript:window.location.reload()">tästä</a>.'))
       shared.showDialog($('<div>').addClass('dialog revision-mismatch-dialog').html(html))
     }
   },
@@ -121,7 +121,7 @@ window.shared = {
   registerLanguageChangers: function () {
     const lang = shared.langCookie()
     $('.toggleLanguage').text(lang === 'fi' ? 'På svenska' : 'Suomeksi').one('click', function () { $.cookie('lang', lang === 'fi' ? 'sv' : 'fi')
-      window.location.reload(true)
+      window.location.reload()
     })
   },
   yearShortcuts: function () {

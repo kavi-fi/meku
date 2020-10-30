@@ -75,10 +75,10 @@
     <div>
       <div class="toggleLanguage"></div>
       <h2 data-i18n>Tervetuloa!</h2>
-      <label><div data-i18n>Käyttäjätunnus</div><input type="text" name="username" class="invalid"/></label>
-      <label><div data-i18n>Salasana</div><input type="password" name="password" class="invalid" /></label>
+      <label><div data-i18n>Käyttäjätunnus</div><input type="text" name="username" class="invalid" data-cy="username"/></label>
+      <label><div data-i18n>Salasana</div><input type="password" name="password" class="invalid" data-cy="password"/></label>
       <div class="feedback"></div>
-      <button class="button login" data-i18n>Kirjaudu</button>
+      <button class="button login" data-i18n data-cy="login">Kirjaudu</button>
       <button disabled class="button forgot-password" data-i18n>Unohdin salasanani</button>
     </div>
   </form>
@@ -104,7 +104,7 @@
   <div id="search-page" class="page">
   </div>
 
-  <div id="classification-page" class="page">
+  <div id="classification-page" class="page" data-cy="classification-page">
   </div>
 
   <div id="billing-page" class="page">

@@ -74,7 +74,7 @@ window.shared = {
     return 'images/agelimit-' + age + '.png'
   },
   warningIcons: function (summary) {
-    return summary.warnings.map(function (w) { return $('<span>', {class: 'warning ' + w.category}) })
+    return summary.warnings.map(function (w) { return $('<span>', {class: 'warning ' + w.category, 'data-cy': 'warning'}) })
   },
   hasRole: function (role) {
     if (!window.utils) return false

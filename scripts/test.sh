@@ -1,23 +1,19 @@
 #!/bin/bash
 
-if [ ! -f ./node_modules/chromedriver/bin/chromedriver ]; then echo "Run 'npm install' first"; exit 1; fi
+if [ ! -f ./node_modules/.bin/cypress ]; then echo "Run 'npm install' first"; exit 1; fi
 
-./node_modules/.bin/eslint client/js server shared test
+./node_modules/.bin/eslint client/js server shared cypress/integration
 if [ "$?" != 0 ]; then
   exit "$?"
 fi
 
-BASE_DIR=`dirname $0`
-cd $BASE_DIR/..
+PORT=4000
+NODE_ENV=test node server/app.js &
+APP_PID=$!
 
-java -Dwebdriver.chrome.driver=./node_modules/chromedriver/bin/chromedriver -jar ./node_modules/selenium-server-standalone-jar/jar/selenium-server-standalone-3.141.59.jar &
-SELENIUM_PID=$!
-
-if [ "$1" == "" ]; then
-  TEST=""
-else
-  TEST="test/$1.js"
+NODE_ENV=test node cypress/fixtures
+if [ "$?" = 0 ]; then
+  CYPRESS_BASE_URL=http://localhost:$PORT/ node_modules/.bin/cypress run
 fi
 
-NODE_ENV=test ./node_modules/.bin/mocha $TEST --exit
-kill $SELENIUM_PID
+kill $APP_PID

@@ -3,8 +3,7 @@ module.exports = {
         "browser": true,
         "commonjs": true,
         "es6": true,
-        "node": true,
-        "mocha": true
+        "node": true
     },
     "extends": "eslint:recommended",
     "globals": {
@@ -13,7 +12,12 @@ module.exports = {
         "_": "writable",
         "moment": "writable",
         "meku": "readonly",
-        "shared": "readonly"
+        "shared": "readonly",
+        "cy": "readonly",
+        "describe": "readonly",
+        "it": "readonly",
+        "before": "readonly",
+        "beforeEach": "readonly"
     },
     "parserOptions": {
         "ecmaVersion": 2018

@@ -390,6 +390,7 @@ window.internalSearchPage = function () {
 
 function searchPage() {
   const $page = $('#search-page').html($('#templates .search-page').clone())
+  $page.attr('data-cy', 'search-page')
   const $input = $page.find('.query')
   const $button = $page.find('button.search')
   const $sort_name_col = $page.find('.searchResultSortCols .col_name')
@@ -769,7 +770,7 @@ function searchPage() {
   function render(program, query) {
     const hilites = highlights(query)
     const showRegistrationDate = !!window.user
-    return $('<div>', {class: 'result', 'data-id': program._id}).data('program', program).append(series(program)).append(row(program))
+    return $('<div>', {class: 'result', 'data-id': program._id, 'data-cy': 'result'}).data('program', program).append(series(program)).append(row(program))
 
     function series(p) {
       if (!window.enums.util.isTvEpisode(p)) return undefined
@@ -780,10 +781,10 @@ function searchPage() {
 
     function row(p) {
       return $('<div>').addClass('items')
-        .append($('<span>', {class: 'name'}).text(p.name[0]).highlight(hilites, {beginningsOnly: true, caseSensitive: false}))
-        .append($('<span>', {class: 'country-year-date'}).text(countryAndYearAndDate(p)))
-        .append($('<span>', {class: 'duration-or-game'}).text(window.enums.util.isGameType(p) ? p.gameFormat || '' : window.utils.programDurationAsText(p)))
-        .append($('<span>', {class: 'program-type'}).html(window.enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : shared.i18nText(window.enums.util.programTypeName(p.programType))))
+        .append($('<span>', {class: 'name', 'data-cy': 'name'}).text(p.name[0]).highlight(hilites, {beginningsOnly: true, caseSensitive: false}))
+        .append($('<span>', {class: 'country-year-date', 'data-cy': 'country-year-date'}).text(countryAndYearAndDate(p)))
+        .append($('<span>', {class: 'duration-or-game', 'data-cy': 'duration-or-game'}).text(window.enums.util.isGameType(p) ? p.gameFormat || '' : window.utils.programDurationAsText(p)))
+        .append($('<span>', {class: 'program-type', 'data-cy': 'program-type'}).html(window.enums.util.isUnknown(p) ? '<i class="fa fa-warning"></i>' : shared.i18nText(window.enums.util.programTypeName(p.programType))))
         .append($('<span>').append(shared.renderWarningSummary(window.classificationUtils.fullSummary(p)) || ' - '))
     }
 

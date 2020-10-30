@@ -144,11 +144,11 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $.post('/programs/' + program._id + '/register', JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})).done(function (savedProgram) {
         $form.hide()
         $("#search-page").trigger('show').show()
-        shared.showDialog($('<div>', {class: 'registration-confirmation dialog'})
+        shared.showDialog($('<div>', {class: 'registration-confirmation dialog', 'data-cy': 'registration-confirmation-dialog'})
           .append($('<span>', {class: 'name'}).text(savedProgram.name))
           .append(shared.renderWarningSummary(window.classificationUtils.fullSummary(savedProgram)))
           .append($('<p>', {class: 'registration-date'}).text(shared.i18nText('Rekisteröity') + ' ' + registrationDate))
-          .append($('<p>', {class: 'buttons'}).html($('<button>', {click: shared.closeDialog, class: 'button'}).i18nText('Sulje'))))
+          .append($('<p>', {class: 'buttons'}).html($('<button>', {click: shared.closeDialog, class: 'button', 'data-cy': 'button'}).i18nText('Sulje'))))
         $(window).scrollTop(0)
       })
     })
@@ -356,10 +356,10 @@ function classificationFormUtils() {
       const $criteria = classificationCriteria.map(function (c) {
         const isVet = c.category === 'vet'
         const age = shared.langCookie() === 'sv' && c.age === 0 ? 't' : c.age
-        return $('<div>', {class: 'criteria agelimit agelimit-' + age, 'data-id': c.id})
+        return $('<div>', {class: 'criteria agelimit agelimit-' + age, 'data-id': c.id, 'data-cy': 'criteria' + c.id})
           .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + c.id + ')')))
           .append($('<p>').html(isVet ? '' : c[lang].description))
-          .append(isVet ? '' : $('<textarea>', {name: 'classification.criteriaComments.' + c.id, placeholder: shared.i18nText('Kommentit...'), class: 'throttledInput'}))
+          .append(isVet ? '' : $('<textarea>', {name: 'classification.criteriaComments.' + c.id, placeholder: shared.i18nText('Kommentit...'), class: 'throttledInput', 'data-cy': 'criteria-text'}))
       })
       $form.find('.category-container .' + category).append($criteria)
     })

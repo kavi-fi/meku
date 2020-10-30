@@ -145,7 +145,7 @@ window.programBox = function () {
     function classificationLinks() {
       return p.classifications.map(function (c, index) {
         const registrationDate = window.utils.asDate(c.registrationDate) || window.shared.i18nText('Tuntematon rekisteröintiaika')
-        return $('<span>', {'data-id': c._id}).addClass('classification').toggleClass('selected', index === 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
+        return $('<span>', {'data-id': c._id, 'data-cy': 'classification' + index}).addClass('classification').toggleClass('selected', index === 0).data('classification', c).text(registrationDate).prepend($('<i>').addClass('fa fa-play'))
       })
     }
     function drafts() {

@@ -1,20 +1,20 @@
-<div class="program-box detail-box">
-  <span class="sequenceId"></span>
+<div class="program-box detail-box" data-cy="program-box">
+  <span class="sequenceId" data-cy="sequence-id"></span>
   <div class="header clearfix">
     <div class="buttons">
       <button class="button remove" data-i18n>Poista</button>
       <button class="button copy" data-i18n>Tee kopio</button>
-      <button class="button reclassify" data-i18n>Luokittele uudelleen</button>
+      <button class="button reclassify" data-i18n data-cy="reclassify">Luokittele uudelleen</button>
       <button class="button classify" data-i18n>Luokittele</button>
       <button class="button continue-classification" data-i18n>Jatka luokittelua</button>
-      <button class="button categorize" data-i18n>Määritä kategoria</button>
+      <button class="button categorize" data-i18n data-cy="categorize">Määritä kategoria</button>
       <button class="button recategorize" data-i18n>Muuta kategoriaa</button>
       <a href="#" class="button request-reclassification" data-i18n>Pyydä ikärajan tarkistusta</a>
     </div>
-    <h2 class="primary-name"></h2>
+    <h2 class="primary-name" data-cy="primary-name"></h2>
   </div>
   <div class="categorization-form">
-    <button class="button save-category" data-i18n>Tallenna</button>
+    <button class="button save-category" data-i18n data-cy="save-category">Tallenna</button>
     <div class="category-select-container">
       <label data-i18n>Valitse kuvaohjelman tyyppi</label>
       <input name="category-select" type="hidden" class="required x-category-select">
@@ -36,37 +36,37 @@
       <h3 style="" data-i18n>Kuvaohjelman perustiedot</h3>
       <div class="column">
         <label data-i18n>Alkuperäinen nimi</label>
-        <span class="name"></span>
+        <span class="name" data-cy="name"></span>
         <label data-i18n>Suomenkielinen nimi</label>
-        <span class="nameFi"></span>
+        <span class="nameFi" data-cy="name-fi"></span>
         <label data-i18n>Ruotsinkielinen nimi</label>
-        <span class="nameSv"></span>
+        <span class="nameSv" data-cy="name-sv"></span>
         <label data-i18n>Muu nimi</label>
-        <span class="nameOther"></span>
+        <span class="nameOther" data-cy="name-other"></span>
         <label data-i18n>Sarja</label>
         <a class="series" href=""></a>
         <label data-i18n>Episodi</label>
         <span class="episode"></span>
         <label data-i18n>Maa</label>
-        <span class="country"></span>
+        <span class="country" data-cy="country"></span>
         <label data-i18n>Valmistumisvuosi</label>
-        <span class="year"></span>
+        <span class="year" data-cy="year"></span>
         <label data-i18n>Tuotantoyhtiö</label>
         <span class="productionCompanies"></span>
         <label data-i18n>Genre</label>
-        <span class="genre"></span>
+        <span class="genre" data-cy="genre"></span>
         <label data-i18n>Ohjaaja</label>
-        <span class="directors"></span>
+        <span class="directors" data-cy="directors"></span>
         <label data-i18n>Näyttelijät</label>
-        <span class="actors"></span>
+        <span class="actors" data-cy="actors"></span>
       </div>
       <div class="column">
         <label data-i18n>Synopsis</label>
         <span class="synopsis"></span>
         <label data-i18n>Formaatti</label>
-        <span class="current-format"></span>
+        <span class="current-format" data-cy="current-format"></span>
         <label data-i18n>Kesto</label>
-        <span class="current-duration"></span>
+        <span class="current-duration" data-cy="current-duration"></span>
       </div>
     </div>
     <div class="column classification-container">
@@ -74,11 +74,11 @@
   </div>
   <div class="comment-container">
     <h3 class="commentHeader" data-i18n>Kommentit</h3>
-    <span class="publicComments"></span>
+    <span class="publicComments" data-cy="public-comments"></span>
     <label data-i18n>Luokittelijan kommentit</label>
-    <span class="userComments"></span>
+    <span class="userComments" data-cy="user-comments"></span>
     <label data-i18n>KAVI:n sisäiset kommentit</label>
-    <span class="comments"></span>
+    <span class="comments" data-cy="comments"></span>
     <span class="kaviType"></span>
   </div>
   <div class="episode-container">
@@ -87,35 +87,35 @@
   </div>
 </div>
 
-<div class="program-box-normal-classification-details">
+<div class="program-box-normal-classification-details" data-cy="program-box-normal-classification-details">
   <h3 data-i18n>Luokittelu</h3>
   <div class="drafts"></div>
   <label data-i18n>Luokittelu rekisteröity</label>
-  <div class="classifications"></div>
+  <div class="classifications" data-cy="classifications"></div>
   <label data-i18n>Ikäraja</label>
-  <div class="warning-summary">
-    <img class="agelimit" src="images/empty.png" /><div class="warnings"></div>
+  <div class="warning-summary" data-cy="warning-summary">
+    <img class="agelimit" src="images/empty.png" data-cy="agelimit"/><div class="warnings"></div>
   </div>
   <div class="classification-buttons">
     <button class="button edit" data-i18n>Muuta tietoja</button>
     <button class="button remove-classification" data-i18n>Poista luokittelu</button>
   </div>
   <label data-i18n>Uudelleenluokittelun peruste</label>
-  <span class="reason"></span>
+  <span class="reason" data-cy="reason"></span>
   <label data-i18n>Luokittelija</label>
   <span class="authorOrganization"></span>
   <div class="program-classification-details">
     <div class="criteria"></div>
     <label data-i18n>Formaatti</label>
-    <span class="format"></span>
+    <span class="format" data-cy="format"></span>
     <label data-i18n>Kesto</label>
-    <span class="duration"></span>
+    <span class="duration" data-cy="duration"></span>
     <label data-i18n>Luokittelijan nimi</label>
-    <span class="author"></span>
+    <span class="author" data-cy="author"></span>
     <label data-i18n>Luokittelun tilaaja</label>
-    <span class="buyer"></span>
+    <span class="buyer" data-cy="buyer"></span>
     <label data-i18n>Rekisteröinnistä laskutetaan</label>
-    <span class="billing"></span>
+    <span class="billing" data-cy="billing"></span>
   </div>
 </div>
 
@@ -185,8 +185,8 @@
   </table>
 </div>
 
-<div class="warning-summary">
-  <img class="agelimit" src="images/empty.png" /><div class="warnings"></div>
+<div class="warning-summary" data-cy="warning-summary">
+  <img class="agelimit" src="images/empty.png" data-cy="agelimit"/><div class="warnings" data-cy="warnings"></div>
 </div>
 
 <div class="search-page">
@@ -207,14 +207,14 @@
     <input type="hidden" name="csv">
   </form>
 
-  <div class="controls">
+  <div class="controls" data-cy="controls">
     <h2 class="main" data-i18n>Kuvaohjelmahaku</h2>
     <div class="new-classification">
-      <label data-i18n>Luo uusi kuvaohjelma</label><input name="new-classification-type" type="hidden"/><button class="button" data-i18n>Luo</button>
+      <label data-i18n>Luo uusi kuvaohjelma</label><input name="new-classification-type" type="hidden"/><button class="button" data-i18n data-cy="create">Luo</button>
     </div>
     <div>
       <label class="search-label" data-i18n>Nimi</label>
-      <input class="query" type="text" /><button class="button search" data-i18n>Hae</button>
+      <input class="query" type="text" data-cy="query"/><button class="button search" data-i18n>Hae</button>
       <div class="advanced-search"><i class="rotating fa fa-play"></i><span data-i18n>Tarkennettu haku</span></div>
       <div class="advanced-search-controls">
         <div class="filters">
@@ -292,9 +292,9 @@
       <div class="col_agelimit"><i id="col_agelimit_icon" class="rotating fa fa-sort-asc"></i> <label data-i18n>Ikäraja</label></div>
     </div>
   </div>
-  <div class="results" id="searchResult"></div>
+  <div class="results" id="searchResult" data-cy="results"></div>
   <div class="loading" data-i18n>Ladataan...</div>
-  <div class="no-results" data-i18n>Ei hakutuloksia.</div>
+  <div class="no-results" data-i18n data-cy="no-results">Ei hakutuloksia.</div>
   <div class="no-more-results"><i data-i18n>FIN</i></div>
 </div>
 
@@ -605,13 +605,13 @@
   </div>
 </div>
 
-<div class="program-details">
+<div class="program-details"  data-cy="program-details">
   <form class="program-details-form" data-id="">
-    <div class="program-info form content clearfix">
+    <div class="program-info form content clearfix" data-cy="program-info">
       <a href="#haku" class="back-to-search"><i class="fa fa-long-arrow-left"></i><span data-i18n>Takaisin hakuun</span></a>
       <button name="save" disabled class="button" data-i18n>Tallenna muutokset</button>
 
-      <h2 class="main"><span>Uusi kuvaohjelma</span> - <span>?</span></h2>
+      <h2 class="main" data-cy="title"><span>Uusi kuvaohjelma</span> - <span>?</span></h2>
 
       <div class="left">
         <div class="tv-episode-field">
@@ -624,20 +624,21 @@
           </div>
         </div>
         <div class="nameContainer">
-          <label data-i18n>Alkuperäinen nimi</label><input name="name" class="required throttledNameInput" type="text" />
+          <label data-i18n>Alkuperäinen nimi</label><input name="name" class="required throttledNameInput" type="text" data-cy="name"/>
         </div>
         <div class="nameFiContainer">
-          <label data-i18n>Suomalainen nimi</label><input name="nameFi" class="required throttledNameInput" type="text" />
+          <label data-i18n>Suomalainen nimi</label><input name="nameFi" class="required throttledNameInput" type="text" data-cy="name-fi"/>
         </div>
         <div class="nameSvContainer">
-          <label data-i18n>Ruotsinkielinen nimi</label><input name="nameSv" class="throttledNameInput" type="text" />
+          <label data-i18n>Ruotsinkielinen nimi</label><input name="nameSv" class="throttledNameInput" type="text" data-cy="name-sv"/>
         </div>
         <div class="nameOtherContainer">
-          <label data-i18n>Muu nimi</label><input name="nameOther" class="throttledNameInput" type="text" /><button tabindex="-1" data-name-type="nameOther" class="button addExtraName">+</button>
+          <label data-i18n>Muu nimi</label><input name="nameOther" class="throttledNameInput" type="text" data-cy="name-other"/>
+          <button tabindex="-1" data-name-type="nameOther" class="button addExtraName">+</button>
         </div>
-        <label class="select2-label" data-i18n>Maat</label><input name="country" class="country required" type="hidden" />
-        <label data-i18n>Valmistumisvuosi</label><input name="year" type="text" class="required throttledInput" />
-        <label class="select2-label" data-i18n>Tuotantoyhtiöt</label><input name="productionCompanies" class="required x-productionCompanies" type="hidden"/>
+        <label class="select2-label" data-i18n>Maat</label><input name="country" class="country required" type="hidden" data-cy="country"/>
+        <label data-i18n>Valmistumisvuosi</label><input name="year" type="text" class="required throttledInput" data-cy="year"/>
+        <label class="select2-label" data-i18n>Tuotantoyhtiöt</label><input name="productionCompanies" class="required x-productionCompanies" type="hidden" data-cy="production-companies"/>
       </div>
       <div class="right">
         <div class="tv-episode-field season-episode-fields">
@@ -645,17 +646,17 @@
           <label data-i18n>Jakso</label><input name="episode" type="number" class="required throttledInput" min="0" />
         </div>
         <div class="game-field"><label class="select2-label" data-i18n>Peliformaatti</label><input name="gameFormat" class="required" type="hidden" /></div>
-        <label class="select2-label" data-i18n>Genre</label><input name="genre" type="hidden" class="x-genre">
+        <label class="select2-label" data-i18n>Genre</label><input name="genre" type="hidden" class="x-genre" data-cy="genre">
         <div class="non-game-field">
-          <label class="select2-label" data-i18n>Ohjaajat</label><input name="directors" class="required x-directors" type="hidden"/>
-          <label class="select2-label" data-i18n>Näyttelijät</label><input name="actors" class="x-actors" type="hidden"/>
+          <label class="select2-label" data-i18n>Ohjaajat</label><input name="directors" class="required x-directors" type="hidden" data-cy="directors"/>
+          <label class="select2-label" data-i18n>Näyttelijät</label><input name="actors" class="x-actors" type="hidden" data-cy="actors"/>
         </div>
-        <label class="text-area-label" data-i18n>Synopsis</label><textarea class="required throttledInput" name="synopsis"></textarea>
+        <label class="text-area-label" data-i18n>Synopsis</label><textarea class="required throttledInput" name="synopsis" data-cy="synopsis"></textarea>
       </div>
     </div>
-    <div class="classification-details row">
+    <div class="classification-details row" data-cy="classification-details">
       <div class="form content clearfix">
-        <h2 class="main" data-i18n>Luokittelu</h2>
+        <h2 class="main" data-i18n data-cy="classification">Luokittelu</h2>
         <div class="classification-author-field">
           <label data-i18n>Luokittelijan nimi</label><span class="author textified-field"></span>
           <label data-i18n>Rekisteröintipäivä</label><input type="text" name="classification.registrationDate" />
@@ -675,17 +676,17 @@
             <label class="select2-label" data-i18n>Ohjelman formaatti</label><input name="classification.format" class="required format" type="hidden"/>
           </div>
           <div class="duration-field">
-            <label data-i18n>Kesto</label><input name="classification.duration" class="required duration throttledInput" data-type="duration" type="text" />
+            <label data-i18n>Kesto</label><input name="classification.duration" class="required duration throttledInput" data-type="duration" type="text" data-cy="duration"/>
             <span class="field-hint"  data-i18n>tt:mm:ss</span>
           </div>
         </div>
       </div>
       <div class="form comments">
         <div class="public-comments">
-          <label class="text-area-label" data-i18n>Julkiset kommentit</label><textarea placeholder="Perusteet uudelleenluokittelulle" data-i18n-placeholder name="classification.publicComments" class="throttledInput"></textarea>
+          <label class="text-area-label" data-i18n>Julkiset kommentit</label><textarea placeholder="Perusteet uudelleenluokittelulle" data-i18n-placeholder name="classification.publicComments" class="throttledInput" data-cy="public-comments"></textarea>
         </div>
         <div class="private-comments">
-          <label class="text-area-label" data-i18n>KAVI:n sisäiset kommentit</label><textarea placeholder="KAVI:n sisäiset kommentit" data-i18n-placeholder name="classification.comments" class="throttledInput"></textarea>
+          <label class="text-area-label" data-i18n>KAVI:n sisäiset kommentit</label><textarea placeholder="KAVI:n sisäiset kommentit" data-i18n-placeholder name="classification.comments" class="throttledInput" data-cy="comments"></textarea>
           <span class="field-hint" data-i18n>KAVI:n sisäiset kommentit näkyvät vain KAVI:n työntekijöille.</span>
         </div>
         <div class="user-comments">
@@ -698,7 +699,7 @@
         </div>
       </div>
     </div>
-    <div class="classification-criteria row">
+    <div class="classification-criteria row" data-cy="classification-criteria">
       <div class="content">
         <div class="warning-order">
           <div class="agelimit warning-summary">
@@ -708,7 +709,7 @@
         </div>
         <h2 class="main">
           <span data-i18n>Luokittelun kriteerit</span>
-          <div class="safe-container"><input name="classification.safe" type="checkbox" /><span data-i18n>Ei sisällä lapsille haitallista materiaalia</span></div>
+          <div class="safe-container"><input name="classification.safe" type="checkbox" data-cy="safe"/><span data-i18n>Ei sisällä lapsille haitallista materiaalia</span></div>
           <div class="vet-container hide"><input name="classification.vet" type="checkbox" /><span data-i18n>Näytä myös VET-ikärajat</span></div>
         </h2>
         <div class="category-container">
@@ -734,19 +735,19 @@
       <h2 class="main" data-i18n>Ikärajat.fi-näkymä</h2>
       <div class="program-box-container"></div>
     </div>
-    <div class="classification-email row">
+    <div class="classification-email row" data-cy="classification-email">
       <div class="content preview">
         <h3 class="main" data-i18n>Lähetä luokittelupäätös</h3>
         <div class="email-preview box">
           <dl>
-            <dt class="recipients" data-i18n>Vastaanottajat</dt><dd><input name="classification.registrationEmailAddresses" class="required x-registrationEmails" type="hidden" /></dd>
+            <dt class="recipients" data-i18n>Vastaanottajat</dt><dd><input name="classification.registrationEmailAddresses" class="required x-registrationEmails" type="hidden" data-cy="registration-emails"/></dd>
             <dt class="preventSendingEmail hide" data-i18n>Älä lähetä</dt><dd class="preventSendingEmail hide"><input name="classification.preventSendingEmail" type="checkbox" checked></dd>
             <dt  data-i18n>Aihe</dt><dd class="subject"></dd>
           </dl>
           <div class="body"></div>
         </div>
       </div>
-      <div class="register"><button name="register" disabled class="button"  data-i18n>Rekisteröi</button></div>
+      <div class="register"><button name="register" disabled class="button" data-i18n data-cy="register">Rekisteröi</button></div>
     </div>
   </form>
 </div>

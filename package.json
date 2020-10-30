@@ -6,7 +6,7 @@
     "start": "node server/app.js",
     "postinstall": "date +%s > build.revision",
     "test": "./scripts/test.sh",
-    "eslint": "./node_modules/.bin/eslint client/js server shared test"
+    "eslint": "./node_modules/.bin/eslint client/js server shared cypress/integration"
   },
   "engines": {
     "node": "12.x"
@@ -32,14 +32,10 @@
     "xmlbuilder": "15.1.1"
   },
   "devDependencies": {
-    "chai": "4.2.0",
-    "chromedriver": "2.43.1",
+    "axios": "^0.21.1",
+    "cypress": "^6.2.1",
     "eslint": "7.14.0",
     "livereload": "0.9.1",
-    "mocha": "7.1.1",
-    "mysql": "2.18.1",
-    "request": "2.88.2",
-    "selenium-server-standalone-jar": "3.141.59",
-    "webdriverio": "2.4.5"
+    "mysql": "2.18.1"
   }
 }

@@ -192,7 +192,7 @@
       function appendixLink() {
         if (enums.authorOrganizationIsKHO(classification)) return ''
         const linkOther = {url: "https://kavi.fi/fi/meku/luokittelu/oikaisuvaatimusohje", name: t('Oikaisuvaatimusohje')}
-        const linkKavi = {url: "https://kavi.fi/fi/meku/luokittelu/valitusosoitus", name: t('Valitusosoitus')}
+        const linkKavi = {url: "https://kavi.fi/ikarajat/ammattilaiset/luokittelijat/muutoksenhaku/valituskuvaohjelmalautakunnalle/", name: t('Valitusosoitus')}
         const link = user.role === 'kavi' ? linkKavi : linkOther
         return '<p>' + t('Liitteet') + ':<br/><a href="' + link.url + '">' + link.name + '</a></p>'
       }

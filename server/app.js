@@ -1562,7 +1562,8 @@ if (env.isTest) {
 }
 
 // Error handler
-app.use((err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
   console.error(err.stack || err)
   res.status(err.status || 500).send({message: err.message || err})
 })

@@ -408,7 +408,7 @@ function constructDateRangeQuery (registrationDateRange) {
 
 function constructNameQueries (terms, useSynopsis) {
   const nameQueries = toSearchTermQuery(terms, 'fullNames', 'allNames', true, false)
-  const finalQuery = _.isNumber(terms) ? {$or: [nameQueries, {sequenceId: parseInt(terms)}]} : nameQueries
+  const finalQuery = terms && terms.match(/^\s*\d+\s*$/) !== null ? {$or: [nameQueries, {sequenceId: parseInt(terms)}]} : nameQueries
   if (useSynopsis) {
     const synopsisQueries = toSearchTermQuery(terms, 'synopsis', 'synopsis', false, true)
     if (synopsisQueries) return {$or: [finalQuery, synopsisQueries]}

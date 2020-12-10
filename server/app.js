@@ -1228,7 +1228,7 @@ app.post('/users/:id', requireRole('root'), (req, res, next) => {
 app.get('/users/names/:names', requireRole('kavi'), (req, res, next) => {
   User.find({username: {$in: req.params.names.toUpperCase().split(',')}}, 'name username active').lean().exec((err, users) => {
     if (err) return next(err)
-    const result = users.reduce((user, acc) => {
+    const result = users.reduce((acc, user) => {
       acc[user.username] = {name: user.name, active: user.active}
       return acc
     }, {})

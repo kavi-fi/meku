@@ -15,7 +15,7 @@ function sheet_from_array_of_arrays (data) {
       if (range.e.r < R) range.e.r = R
       if (range.e.c < C) range.e.c = C
       const cell = {v: data[R][C]}
-      if (cell.v) {
+      if (cell.v !== undefined) {
         const cell_ref = xlsx.utils.encode_cell({c: C, r: R})
 
         /* TEST: proper cell types and value handling */

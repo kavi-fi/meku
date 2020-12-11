@@ -92,7 +92,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
     return _.map(rows, (row) => {
       const invoiceItem = enums.invoiceItem(row)
       return _.extend(row, {
-        first: _.includes(firstOfGroups, row) ? '1' : '0',
+        first: _.includes(firstOfGroups, row) ? 1 : 0,
         customerNumber: customerNumber,
         accountName: account.name,
         accountContactName: account.contactName,

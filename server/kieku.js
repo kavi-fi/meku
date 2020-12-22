@@ -8,12 +8,12 @@ const srvUtils = require('./server-utils')
 
 const dateFormat = 'DD.MM.YYYY'
 
-exports.createProviderRegistration = function createProviderRegistration(accountRows) {
-  return createBilling(accountRows, _.curry(providerBillingHeader)(null), providerRowDescription, _.curry(providerBillingFooter)(accountRows))
+exports.createProviderRegistration = function (filename, accountRows) {
+  return createBilling(accountRows, _.curry(providerBillingHeader)(null), providerRowDescription, _.curry(providerBillingFooter)(accountRows), filename)
 }
 
-exports.createYearlyProviderRegistration = function createYearlyProviderRegistration(year, accountRows) {
-  return createBilling(accountRows, _.curry(providerBillingHeader)(moment().year()), providerRowDescription, _.curry(providerBillingFooter)(accountRows))
+exports.createYearlyProviderRegistration = function (filename, year, accountRows) {
+  return createBilling(accountRows, _.curry(providerBillingHeader)(moment().year()), providerRowDescription, _.curry(providerBillingFooter)(accountRows), filename)
 }
 
 function t(txt, lang) { return i18n.translations[lang] ? i18n.translations[lang][txt] || txt : txt }
@@ -32,7 +32,7 @@ function providerBillingFooter(accountRows, invoice) {
   return t('Lasku yhteensä', language(invoice)) + ' ' + price(account.rows) + ' EUR'
 }
 
-exports.createClassificationRegistration = function createClassificationRegistration(dateRange, accountRows) {
+exports.createClassificationRegistration = function (filename, dateRange, accountRows) {
   function billingHeader(invoice) {
     const period = dateRange.begin + ' - ' + dateRange.end
     return t('KOONTILASKUTUS', language(invoice)) + ' ' + period
@@ -62,7 +62,7 @@ exports.createClassificationRegistration = function createClassificationRegistra
     const rowsPerType = _.groupBy(filteredAccountRows, 'type')
     return _.toPairs(rowsPerType).map((item) => summaryText(item[0], item[1])).join(' ')
   }
-  return createBilling(accountRows, billingHeader, rowDescription, billingFooter)
+  return createBilling(filename, accountRows, billingHeader, rowDescription, billingFooter)
 }
 
 function findAccountHavingInvoice(accountRows, invoice) {
@@ -77,7 +77,7 @@ function isRegistration(row) {
   return row.type === 'registration'
 }
 
-function createBilling(accounts, billingDescription, rowDescription, billingFooter) {
+function createBilling(filename, accounts, billingDescription, rowDescription, billingFooter) {
   const billingData = _.flatten(_.map(accounts, (ac) => {
     const account = ac.account
     const rows = ac.rows
@@ -192,7 +192,7 @@ function createBilling(accounts, billingDescription, rowDescription, billingFoot
   _.each(billingData, (invoice) => {
     xlsData.push(_.map(columns, (column) => (invoice.first || column.repeatable ? column.value(invoice) : '')))
   })
-  const tmpXlsxFile = 'kieku_' + Math.random() + '.xlsx'
+  const tmpXlsxFile = Math.random() + (filename || 'kieku.xlsx')
   const columnWidths = _.map(columns, (column) => ({wch: column.width || 10}))
 
   excelWriter.write(tmpXlsxFile, xlsData, columnWidths)

@@ -836,7 +836,8 @@ app.post('/subscribers/excel/export', (req, res, next) => {
   Account.find(_.merge(q, roleQuery, {deleted: {$ne: true}})).sort('name').lean().exec((err, data) => {
     if (err) return next(err)
     const result = excelExport.constructSubscriberExportData(data)
-    res.setHeader('Content-Disposition', 'attachment; filename=subscribers.xlsx')
+    const filename = 'subscribers' + (req.body.csv ? '.csv' : '.xlsx')
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })
@@ -878,7 +879,8 @@ app.post('/providers/excel/export', (req, res, next) => {
     })
 
     const result = excelExport.constructProviderExportData(providersFiltered)
-    res.setHeader('Content-Disposition', 'attachment; filename=providers.xlsx')
+    const filename = 'providers' + (req.body.csv ? '.csv' : '.xlsx')
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })
@@ -963,8 +965,9 @@ app.post('/providers/yearlyBilling/kieku', requireRole('kavi'), (req, res, next)
     if (billingErr) next(billingErr)
     const year = moment().year()
     const accountRows = getProviderBillingRows(data)
-    const result = kieku.createYearlyProviderRegistration(year, accountRows)
-    res.setHeader('Content-Disposition', 'attachment; filename=kieku_valvontamaksut_vuosi' + moment().year() + '.xlsx')
+    const filename = 'kieku_valvontamaksut_vuosi' + moment().year() + (req.body.csv ? '.csv' : '.xlsx')
+    const result = kieku.createYearlyProviderRegistration(filename, year, accountRows)
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     ProviderMetadata.setYearlyBillingCreated(new Date(), () => res.send(result))
   })
@@ -989,8 +992,8 @@ app.post('/providers/billing/kieku', requireRole('kavi'), (req, res, next) => {
     data.locations = _.filter(data.locations, (l) => utils.withinDateRange(l.registrationDate, dates.begin, dates.inclusiveEnd))
 
     const accountRows = getProviderBillingRows(data)
-    const result = kieku.createProviderRegistration(accountRows)
-    const filename = 'kieku_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + '.xlsx'
+    const filename = 'kieku_valvontamaksut_' + dates.begin.format(dateFormat) + '-' + dates.end.format(dateFormat) + (req.body.csv ? '.csv' : '.xlsx')
+    const result = kieku.createProviderRegistration(filename, accountRows)
     res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     ProviderMetadata.setPreviousMidYearBilling(new Date(), dates.begin, dates.end, () => {
@@ -1245,7 +1248,8 @@ app.post('/users/excel/export', requireRole('root'), (req, res, next) => {
   User.find(filters, User.noPrivateFields).sort('name').lean().exec((err, data) => {
     if (err) return next(err)
     const result = excelExport.constructUserExportData(data)
-    res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx')
+    const filename = 'users' + (req.body.csv ? '.csv' : '.xlsx')
+    res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.send(result)
   })
@@ -1302,10 +1306,10 @@ app.get('/invoicerows/:begin/:end', requireRole('kavi'), (req, res, next) => {
 
 app.post('/kieku', requireRole('kavi'), (req, res, next) => {
   const dates = {begin: req.body.begin, end: req.body.end}
-  let invoiceIds = req.body.invoiceId
-  if (!Array.isArray(invoiceIds)) invoiceIds = [invoiceIds]
-  InvoiceRow.find({_id: {$in: invoiceIds}}).sort('registrationDate').lean().exec((err, rows) => {
-    if (err) next(err)
+  const invoiceIds = req.body.invoiceId
+  const cond = invoiceIds ? {_id: {$in: Array.isArray(invoiceIds) ? invoiceIds : [invoiceIds]}} : {}
+  InvoiceRow.find(cond).sort('registrationDate').lean().exec((err, rows) => {
+    if (err) return next(err)
     const accountIds = _(rows).map((i) => i.account._id.toString()).uniq().value()
     Account.find({_id: {$in: accountIds}}).lean().exec((findErr, accounts) => {
       if (findErr) return next(findErr)
@@ -1315,8 +1319,9 @@ app.post('/kieku', requireRole('kavi'), (req, res, next) => {
       function accountName (tuple) { return tuple.account.name }
 
       const data = _(rows).groupBy(accountId).toPairs().map(toNamedTuple).sortBy(accountName).value()
-      const result = kieku.createClassificationRegistration(dates, data)
-      res.setHeader('Content-Disposition', 'attachment; filename=kieku-' + dates.begin + '-' + dates.end + '.xlsx')
+      const filename = 'kieku-' + dates.begin + '-' + dates.end + (req.body.csv ? '.csv' : '.xlsx')
+      const result = kieku.createClassificationRegistration(filename, dates, data)
+      res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       res.send(result)
     })

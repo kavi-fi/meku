@@ -121,6 +121,8 @@
         publicComments: classification.publicComments || t('ei määritelty') + '.',
         classifier: classifierName(),
         reason: classification.reason === undefined ? t('ei määritelty') : t(enums.reclassificationReason[classification.reason].emailText),
+        diaryNumber: diaryNumber(),
+        participants: participants(),
         extraInfoLink: extraInfoLink(),
         appendixLink: appendixLink(),
         previous: previous(),
@@ -183,9 +185,24 @@
         return _([user.employerName, user.name]).compact().join(', ')
       }
 
+      function diaryNumber() {
+        if (utils.hasRole(user, 'kavi') && !utils.hasRole(user, 'root')) {
+          return '<p>' + t('Diaarinumero') + ': ' + (classification.kaviDiaryNumber && classification.kaviDiaryNumber.length > 0 ? classification.kaviDiaryNumber : '-') + '</p>'
+        }
+        return ''
+      }
+
+      function participants() {
+        if (utils.hasRole(user, 'kavi') && !utils.hasRole(user, 'root')) {
+          const s = _.uniq(_.compact([user ? user.name : undefined, classification.billing ? classification.billing.name : undefined, classification.buyer ? classification.buyer.name : undefined])).join(', ')
+          return '<p>' + t('Asianosaiset') + ': ' + s + '</p>'
+        }
+        return ''
+      }
+
       function extraInfoLink() {
         if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification) || enums.authorOrganizationIsKHO(classification)) return ''
-        if (utils.hasRole(user, 'kavi') && !utils.hasRole(user, 'root')) return '<p>' + t('Lisätietoja') + ': <a href="mailto:' + user.email + '">' + user.email + '</a></p>'
+        if (utils.hasRole(user, 'kavi') && !utils.hasRole(user, 'root')) return '<p>' + t('Lisätietoja') + ': ' + user.name + ', <a href="mailto:kirjaamo@kavi.fi">kirjaamo@kavi.fi</a></p>'
         return ''
       }
 
@@ -248,11 +265,13 @@
     function generateText(lang) {
       const reclassification = exports.isReclassification(program, classification)
       if (lang === 'fi') {
-        return '<p>' + (reclassification ? 'Ilmoitus kuvaohjelman uudelleenluokittelusta' : 'Ilmoitus kuvaohjelman luokittelusta') + '</p>' +
+        return '<p>' + (reclassification ? 'Päätös kuvaohjelman uudelleenluokittelusta' : 'Päätös kuvaohjelman luokittelusta') + '</p>' +
           '<p><%- classifier %> on <%- date %> ' + (reclassification ? 'uudelleen' : ' ') + 'luokitellut kuvaohjelman <%= nameLink %>. <%- classification %></p>' +
           '<%= icons("fi") %>' +
           '<p>' + (reclassification ? ' <%- previous.author %> oli <%- previous.date %> arvioinut kuvaohjelman <%- previous.criteriaText %>' : '') + '</p>' +
           (utils.hasRole(user, 'kavi') && reclassification ? '<p>Syy uudelleenluokittelulle: <%- reason %>.<br/>Perustelut: <%- publicComments %></p>' : '') +
+          '<%= diaryNumber %>' +
+          '<%= participants %>' +
           '<%= extraInfoLink %>' +
           '<%= appendixLink %>'
       } else if (lang === 'sv') {
@@ -261,6 +280,8 @@
           '<%= icons("sv") %>' +
           '<p>' + (reclassification ? ' <%- previous.author %> hade <%- previous.date %> <%- previous.criteriaText %>' : '') + '</p>' +
           (utils.hasRole(user, 'kavi') && reclassification ? '<p>Orsak till omklassificering: <%- reason %>.<br/>Grunder: <%- publicComments %></p>' : '') +
+          '<%= diaryNumber %>' +
+          '<%= participants %>' +
           '<%= extraInfoLink %>' +
           '<%= appendixLink %>'
       }

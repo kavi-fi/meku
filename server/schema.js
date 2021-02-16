@@ -31,6 +31,7 @@ const classification = {
   publicComments: String,
   reason: Number,
   kaviType: Number,
+  kaviDiaryNumber: String,
   status: String,
   agelimit: Number,
   warnings: [String],
@@ -216,7 +217,7 @@ Program.publicFields = {
   createdBy: 0, sentRegistrationEmailAddresses: 0, deletedClassifications: 0,
   'classifications.emekuId': 0, 'classifications.author': 0,
   'classifications.billing': 0, 'classifications.buyer': 0,
-  'classifications.registrationEmailAddresses': 0, 'classifications.kaviType': 0,
+  'classifications.registrationEmailAddresses': 0, 'classifications.kaviType': 0, 'classifications.kaviDiaryNumber': 0,
   'classifications.comments': 0, 'classifications.userComments': 0, 'classifications.criteriaComments': 0
 }
 

@@ -79,7 +79,6 @@
     <span class="userComments" data-cy="user-comments"></span>
     <label data-i18n>KAVI:n sisäiset kommentit</label>
     <span class="comments" data-cy="comments"></span>
-    <span class="kaviType"></span>
   </div>
   <div class="episode-container">
     <h3><i class="fa fa-play"></i><span data-i18n>Sarjan jaksot</span></h3>
@@ -696,6 +695,11 @@
         <br>
         <div class="kavi-type">
           <label class="select2-label" data-i18n>KAVI:n peruste</label><input name="classification.kaviType" class="kaviType" type="hidden"/>
+        </div>
+      </div>
+      <div>
+        <div class="kavi-diary-number">
+          <label class="select2-label" data-i18n>Diaarinumero</label><input name="classification.kaviDiaryNumber" type="text" class="throttledInput"/>
         </div>
       </div>
     </div>

@@ -724,7 +724,7 @@ app.post('/programs/autosave/:id', (req, res, next) => {
 
   function allowedAutosaveFields (p, user) {
     const progFields = ['name', 'nameFi', 'nameSv', 'nameOther', 'country', 'year', 'productionCompanies', 'genre', 'legacyGenre', 'directors', 'actors', 'synopsis', 'gameFormat', 'season', 'episode', 'series*']
-    const classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationDate', 'registrationEmailAddresses', 'comments', 'userComments', 'criteriaComments*', 'kaviType']
+    const classificationFields = ['buyer', 'billing', 'format', 'duration', 'safe', 'criteria', 'warningOrder', 'registrationDate', 'registrationEmailAddresses', 'comments', 'userComments', 'criteriaComments*', 'kaviType', 'kaviDiaryNumber']
     const kaviReclassificationFields = ['authorOrganization', 'publicComments', 'reason']
     if (p.classifications.length === 0) return progFields.concat(classificationFields.map(asDraftField))
     return utils.hasRole(user, 'kavi')

@@ -82,6 +82,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('textarea[name="classification.comments"]').val(c.comments).end()
       .find('textarea[name="classification.userComments"]').val(c.userComments).end()
       .find('textarea[name="classification.publicComments"]').val(c.publicComments).end()
+      .find('input[name="classification.kaviDiaryNumber"]').val(c.kaviDiaryNumber).end()
       .find('input[name="classification.safe"]').prop('checked', !!c.safe).end()
       .find('input[name="classification.vet"]').prop('checked', isVetClassification).end()
       .find('.category-container').toggle(!c.safe).end()
@@ -422,6 +423,7 @@ function classificationFormUtils() {
     else {
       $form.find('.private-comments').remove()
       $form.find('.kavi-type').remove()
+      $form.find('.kavi-diary-number').remove()
     }
 
     if (isReclassification && !editMode) {
@@ -578,7 +580,7 @@ function classificationFormUtils() {
     const programClone = _.cloneDeep(p)
     const classificationClone = classificationFinder(programClone)
     delete programClone.draftClassifications
-    const sensitiveClassificationFields = ['author', 'billing', 'buyer', 'authorOrganization', 'reason', 'kaviType', 'comments', 'criteriaComments']
+    const sensitiveClassificationFields = ['author', 'billing', 'buyer', 'authorOrganization', 'reason', 'kaviType', 'kaviDiaryNumber', 'comments', 'criteriaComments']
     programClone.classifications.forEach(function (c) {
       sensitiveClassificationFields.forEach(function (f) { delete c[f] })
     })

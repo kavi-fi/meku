@@ -130,6 +130,8 @@
       'tt:mm:ss': 'tt:mm:ss',
       'Julkiset kommentit': 'Offentliga kommentarer',
       'KAVI:n sisäiset kommentit näkyvät vain KAVI:n työntekijöille.': 'KAVI:s interna kommentarer kan ses bara av KAVI:s anställda',
+      'Diaarinumero': 'Dagboknummer',
+      'Asianosaiset': 'Intresserade parter',
       'Luokittelun kriteerit': 'Kriterier för klassificering',
       'Ei sisällä lapsille haitallista materiaalia': 'Innehåller inte material som är skadligt för barn',
       'Väkivalta': 'Våld',

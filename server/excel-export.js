@@ -8,7 +8,7 @@ const i18n = require('../shared/i18n')
 
 const dateFormat = 'DD.MM.YYYY'
 
-exports.constructProgramExportData = function constructProgramExportData(docs, showClassificationAuthor, filename, lang) {
+exports.constructProgramExportData = function constructProgramExportData(docs, showClassificationAuthor, ext, lang) {
   function translate(txt) { return i18n.translations[lang] ? i18n.translations[lang][txt] || txt : txt }
   const columnsOrig = ["Alkuperäinen nimi", "Suomenkielinen nimi", "Ruotsinkielinen nimi", "Jakso", "Jakson alkuperäinen nimi", "Rekisteröintipäivä", "Kesto", "Luokittelun tilaaja", "Luokittelija", "Uudelleenluokittelija", "Ikäraja", "Luokittelun kriteerit", "Perustelu", "Varoitukset", "Ohjelman tyyppi", "Maa", "Valmistumisvuosi", "Ohjaaja", "Tuotantoyhtiö", "Synopsis", "Id"]
   const columns = _.map(columnsOrig, translate)
@@ -41,12 +41,11 @@ exports.constructProgramExportData = function constructProgramExportData(docs, s
     }
 
     function removeNewlinesIfCsv(orig) {
-      const ext = filename.substring(filename.lastIndexOf('.'))
       if (orig && ext === '.csv') return orig.replace(/\n/g, ' ')
       return orig
     }
   })
-  return write(xlsData, columnWidths)
+  return write(xlsData, columnWidths, ext)
 }
 
 exports.constructProviderExportData = function (providers) {
@@ -102,8 +101,8 @@ exports.constructUserExportData = function (users) {
   }
 }
 
-function write(xlsData, columnWidths) {
-  const tmpFile = '' + Math.random()
+function write(xlsData, columnWidths, ext) {
+  const tmpFile = '' + Math.random() + (ext || '.xlsx')
   excelWriter.write(tmpFile, xlsData, _.map(columnWidths, (c) => ({wch: c})))
   const fileData = fs.readFileSync(tmpFile)
   fs.unlinkSync(tmpFile)

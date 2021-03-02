@@ -248,7 +248,7 @@ function sendOrExport (query, queryData, sortBy, filename, lang, res, next) {
       if (err) return next(err)
       const ext = filename.substring(filename.lastIndexOf('.'))
       const contentType = ext === '.csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      const result = excelExport.constructProgramExportData(docs, showClassificationAuthor, filename, lang)
+      const result = excelExport.constructProgramExportData(docs, showClassificationAuthor, ext, lang)
       res.setHeader('Content-Disposition', 'attachment; filename=' + filename)
       res.setHeader('Content-Type', contentType)
       res.send(result)

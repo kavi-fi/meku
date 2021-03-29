@@ -281,7 +281,7 @@ const ProviderSchema = new Schema({
   customerNumber: String,
   name: String,
   address: {street: String, city: String, zip: String, country: String},
-  billing: {address: {street: String, city: String, zip: String}, invoiceText: String, customerNumber: String},
+  billing: {address: {street: String, city: String, zip: String, country: String}, invoiceText: String, customerNumber: String},
   eInvoice: {address: String, operator: String},
   billingPreference: String, // '' || 'address' || 'eInvoice'
   contactName: String,

@@ -9,11 +9,11 @@ const srvUtils = require('./server-utils')
 const dateFormat = 'DD.MM.YYYY'
 
 exports.createProviderRegistration = function (filename, accountRows) {
-  return createBilling(accountRows, _.curry(providerBillingHeader)(null), providerRowDescription, _.curry(providerBillingFooter)(accountRows), filename)
+  return createBilling(filename, accountRows, _.curry(providerBillingHeader)(null), providerRowDescription, _.curry(providerBillingFooter)(accountRows), filename)
 }
 
 exports.createYearlyProviderRegistration = function (filename, year, accountRows) {
-  return createBilling(accountRows, _.curry(providerBillingHeader)(moment().year()), providerRowDescription, _.curry(providerBillingFooter)(accountRows), filename)
+  return createBilling(filename, accountRows, _.curry(providerBillingHeader)(moment().year()), providerRowDescription, _.curry(providerBillingFooter)(accountRows), filename)
 }
 
 function t(txt, lang) { return i18n.translations[lang] ? i18n.translations[lang][txt] || txt : txt }

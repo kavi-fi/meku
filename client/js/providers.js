@@ -413,6 +413,7 @@ window.providerPage = function () {
 
     $providerDetails
       .find('input[name="address.country"]').select2({data: meku.select2DataFromEnumObject(window.enums.countries)}).end()
+      .find('input[name="billing.address.country"]').select2({data: meku.select2DataFromEnumObject(window.enums.countries)}).end()
       .find('input[name=emailAddresses]').select2({tags: [], multiple: true, tokenSeparators: [' ']}).end()
       .find('input[name=billing-extra]').prop('checked', provider && !!provider.billingPreference).end()
       .find('input[name=billing-extra-type][value=' + (provider && provider.billingPreference || 'address') + ']').prop('checked', true).end()

@@ -95,7 +95,7 @@
     return {
       recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(utils.hasRole(user, 'root') ? [] : user.email)),
       from: 'kirjaamo@kavi.fi',
-      subject: _.template('Luokittelupäätös: <%= name %>, <%- year %>, <%- classificationShort %>')(fiData),
+      subject: _.template('Luokittelupäätös: <%= name %><%= programType %>, <%- year %>, <%- classificationShort %>')(fiData),
       body: '<div style="text-align: right; margin-top: 8px;"><img src="' + hostName + '/images/logo.png" /></div>' +
         _.template('<p><%- date %><br/><%- buyer %></p>')(fiData) +
         _.template(generateText('fi'))(fiData) + '<br>' + _.template(generateText('sv'))(svData) +
@@ -114,6 +114,7 @@
         date: dateFormat(classification.registrationDate ? new Date(classification.registrationDate) : new Date()),
         buyer: classification.buyer ? classification.buyer.name : '',
         name: programName(),
+        programType: programType(),
         nameLink: programLink(),
         year: program.year || '',
         classification: classificationText(classificationSummary.age, significantWarnings, extraCriteria),
@@ -143,20 +144,27 @@
           return program.series.name + ': ' + season + t('jakso') + ' ' + program.episode + ', ' + name
         }
         return name
+      }
 
+      function programType() {
+        if (enums.util.isExtra(program) || enums.util.isTrailer(program)) {
+          const programTypeName = enums.util.programTypeName(program.programType)
+          return programTypeName ? ' (' + t(enums.util.programTypeName(program.programType)) + ')' : ''
+        }
+        return ''
       }
 
       function programLink() {
         const link = hostName + '/public.html#haku/' + program.sequenceId + '//' + program._id
-        return '<a href="' + link + '">' + programName() + '</a>'
+        return '<a href="' + link + '">' + programName() + programType() + '</a>'
       }
 
       function classificationText(age, warnings, extra) {
         if (age === 0 && warnings.length > 0) {
-          const subejct = isFi
+          const subject = isFi
             ? 'Kuvaohjelma on sallittu ja ' + (warnings.length > 1 ? 'haitallisuuskriteerit' : 'haitallisuuskriteeri') + ' '
             : 'Bildprogrammet är tillåtet och det skadliga innehållet '
-          return subejct + criteriaText(warnings) + '. ' + extraCriteriaText(extra)
+          return subject + criteriaText(warnings) + '. ' + extraCriteriaText(extra)
         } else if (age === 0) {
           return isFi ? 'Kuvaohjelma on sallittu.' : 'Bildprogrammet är tillåtet.'
         } else if (warnings.length === 0) {

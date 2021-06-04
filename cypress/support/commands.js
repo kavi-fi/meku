@@ -75,13 +75,12 @@ Cypress.Commands.add('assertSearchResult', (rowSelector, expectedRow, expectedPr
   cy.assertProgramBox('search-page results program-box', expectedProgram)
 })
 
-Cypress.Commands.add('assertLatestEmail', (expectedEmail) => {
-  axios.get('http://localhost:4000/emails/latest').then((response) => {
-    const msg = JSON.parse(response.data)
-    expect(msg.to).to.equal(Array.isArray(expectedEmail.to) ? expectedEmail.to : [expectedEmail.to])
-    expect(msg.subject).to.equal(expectedEmail.subject)
-    expect(stripTags(msg.html)).to.equal(expectedEmail.body)
-  })
+Cypress.Commands.add('assertLatestEmail', async (expectedEmail) => {
+  const response = await axios.get('http://localhost:4000/emails/latest')
+  const msg = response.data
+  expect(msg.to.join(':')).to.equal(Array.isArray(expectedEmail.to) ? expectedEmail.to.join(':') : expectedEmail.to)
+  expect(msg.subject).to.equal(expectedEmail.subject)
+  expect(stripTags(msg.html)).to.equal(expectedEmail.body)
 })
 
 function stripTags(emailHtml) {

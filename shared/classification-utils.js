@@ -275,11 +275,11 @@
           '<%= extraInfoLink %>' +
           '<%= appendixLink %>'
       } else if (lang === 'sv') {
-        return '<p>Meddelande om ' + (reclassification ? 'om' : '') + 'klassificering av bildprogram</p>' +
+        return '<p>Beslut om ' + (reclassification ? 'om' : '') + 'klassificering av bildprogram</p>' +
           '<p><%- classifier %> har <%- date %> ' + (reclassification ? 'om' : '') + 'klassificerat bildprogrammet <%= nameLink %>. <%- classification %></p>' +
           '<%= icons("sv") %>' +
           '<p>' + (reclassification ? ' <%- previous.author %> hade <%- previous.date %> <%- previous.criteriaText %>' : '') + '</p>' +
-          (utils.hasRole(user, 'kavi') && reclassification ? '<p>Orsak till omklassificering: <%- reason %>.<br/>Grunder: <%- publicComments %></p>' : '') +
+          (utils.hasRole(user, 'kavi') && reclassification ? '<p>Orsak till omklassificering: <%- reason %>.<br/>Beslutets motivering: <%- publicComments %></p>' : '') +
           '<%= diaryNumber %>' +
           '<%= participants %>' +
           '<%= extraInfoLink %>' +

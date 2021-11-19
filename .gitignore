@@ -4,3 +4,6 @@ node_modules/
 /tables/
 scripts/data.staging.js
 *.DS_Store
+cypress/screenshots/
+cypress/videos/
+

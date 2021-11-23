@@ -32,7 +32,7 @@
     "xmlbuilder": "15.1.1"
   },
   "devDependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "cypress": "7.4.0",
     "eslint": "7.27.0",
     "livereload": "0.9.3",

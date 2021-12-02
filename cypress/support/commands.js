@@ -18,16 +18,18 @@ Cypress.Commands.add('login', (user, password) => {
 
 Cypress.Commands.add('select2one', (selector, query) => {
   cy.get(selector + ' a').click()
-  cy.get('#select2-drop input[type=text]').type(query + '{enter}')
-  cy.wait(100)
+  cy.get('#select2-drop input[type=text]').type(query)
+  cy.get('#select2-drop input[type=text]').type('{enter}')
+  cy.wait(10)
 })
 
 Cypress.Commands.add('select2', (selector, query) => {
   const queryArray = typeof query === 'string' ? [query] : query
   cy.get(selector + ' input').click()
-  queryArray.forEach((q, index) => {
-    cy.get(selector + ' input').type(q + '{enter}')
-    cy.wait(100)
+  queryArray.forEach((q) => {
+    cy.get(selector + ' input').type(q)
+    cy.get(selector + ' input').type('{enter}')
+    cy.wait(10)
   })
 })
 

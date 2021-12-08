@@ -1,5 +1,6 @@
 window.subscriberManagementPage = function () {
   const $page = $('#subscriber-management-page')
+  const $search = $page.find('.search')
   const $subscribers = $page.find('.subscribers-list')
   const $subscriberNameQuery = $page.find('#subscriber-name-query')
 
@@ -27,6 +28,7 @@ window.subscriberManagementPage = function () {
       const name = $(this).children('.name').text().toLowerCase()
       $(this).toggle(_.includes(name, searchString))
     })
+    $search.find('.result-count .num').text($subscribers.find('.result:visible').length)
     closeDetails()
   })
 
@@ -209,6 +211,7 @@ window.subscriberManagementPage = function () {
   function updateLocationHash(subscriberId) {
     shared.setLocation('#tilaajat/' + subscriberId)
   }
+
 
   function renderSubscribers(subscribers) {
     $subscribers.empty()

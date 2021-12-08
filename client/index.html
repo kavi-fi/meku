@@ -158,13 +158,17 @@
         <div class="search">
           <label for="subscriber-name-query" class="search-label">Nimi</label>
           <input class="query" name="query" type="search" id="subscriber-name-query" placeholder="Hae nimellä...">
+                <div class="filters">
+                    <label><input type="checkbox" name="Classifier">Työnantaja/Luokitteluyritys</label>
+                    <label><input type="checkbox" name="Subscriber">Tilaaja</label>
+                    <div class="result-count"><label>Hakutuloksia</label> <span class="num" data-cy="subcriber-result-count"></span></div>
+                </div>
+
         </div>
-        <div class="filters">
-          <label><input type="checkbox" name="Classifier">Työnantaja/Luokitteluyritys</label>
-          <label><input type="checkbox" name="Subscriber">Tilaaja</label>
-        </div>
-        <input type="hidden" name="_csrf">
+          <div>
+            <input type="hidden" name="_csrf">
         <button type="button" class="button export">Lataa Excel -tiedosto</button>
+      </div>
       </div>
       <div class="subscribers-list results"></div>
     </form>

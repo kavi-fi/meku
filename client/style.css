@@ -804,6 +804,8 @@ textarea.invalid:disabled,
 
 #subscriber-management-page .result { display: -webkit-flex; display: flex; }
 #subscriber-management-page .result span { width: 50%; box-sizing: border-box; }
+#subscriber-management-page .filters .result-count label {min-width: 0px; font-weight: bold; padding-right: 0px;}
+#subscriber-management-page .result-count { float: right; }
 #subscriber-management-page .subscriber-details .emails { float: right; margin-right: 34px; }
 #subscriber-management-page .subscriber-details .emails .select2-choices { overflow: auto; }
 #subscriber-management-page .subscriber-details .roles label { width: auto; }

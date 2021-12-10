@@ -796,6 +796,7 @@ textarea.invalid:disabled,
 .detail-box .form input[type=checkbox], .detail-box .form input[type=radio] { width: 16px; }
 .detail-box .form button { float: right; }
 .detail-box .form button[name=remove] { margin-right: 15px; }
+.detail-box .form button[name=inactivate] { margin-right: 15px; }
 .detail-box .form .fa-spinner { margin-left: -20px; }
 .detail-box .form .double-margin { margin-top: 18px; }
 .detail-box .form textarea { width: 100%; height: 100px; margin-top: 4px; box-sizing: border-box; }

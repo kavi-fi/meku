@@ -28,7 +28,7 @@ window.subscriberManagementPage = function () {
       const name = $(this).children('.name').text().toLowerCase()
       $(this).toggle(_.includes(name, searchString))
     })
-    $search.find('.result-count .num').text($subscribers.find('.result:visible').length)
+    updateResultCount()
     closeDetails()
   })
 
@@ -73,6 +73,8 @@ window.subscriberManagementPage = function () {
 
     $subscriberDetails.find('.new-only').remove()
     $subscriberDetails.find('button[name=remove]').toggle(shared.hasRole('root'))
+    $subscriberDetails.find('button[name=inactivate]').toggle(shared.hasRole('root'))
+    if (subscriber.inactive) $subscriberDetails.find('button[name=inactivate]').prop('disabled', true)
 
     if (shared.hasRole('root')) $subscriberDetails.append(meku.changeLog(subscriber).render())
 
@@ -189,6 +191,27 @@ window.subscriberManagementPage = function () {
         $.ajax('/accounts/' + subscriber._id, {type: 'DELETE'}).done(function () { shared.closeDialog()
           closeDetails()
           $selected.slideUp(function () { $(this).remove() })
+          updateResultCount()
+        })
+      }
+    })
+
+    $subscriberDetails.find('button[name=inactivate]').click(function () { const $selected = $page.find('.result.selected')
+      const subscriber = $selected.data('subscriber')
+      shared.showDialog($('#templates').find('.inactivate-subscriber-dialog').clone()
+        .attr('data-cy', 'inactivate-subscriber-dialog')
+        .find('.subscriber-name').text(subscriber.name).end()
+        .find('button[name=inactivate]').one('click', inactivateSubscriber).end()
+        .find('button[name=cancel]').one('click', shared.closeDialog).end())
+
+      function inactivateSubscriber() {
+        subscriber.inactive = true
+        subscriber.users = []
+        subscriber.users = []
+        $.ajax('/accounts/' + subscriber._id, {type: 'PUT', data: JSON.stringify(subscriber)}).done(function () { shared.closeDialog()
+          closeDetails()
+          $selected.toggleClass('inactive', subscriber.inactive)
+          updateResultCount()
         })
       }
     })
@@ -208,6 +231,10 @@ window.subscriberManagementPage = function () {
     updateLocationHash('')
   }
 
+  function updateResultCount() {
+    $search.find('.result-count .num').text($subscribers.find('.result:not(.inactive):visible').length)
+  }
+
   function updateLocationHash(subscriberId) {
     shared.setLocation('#tilaajat/' + subscriberId)
   }
@@ -219,10 +246,11 @@ window.subscriberManagementPage = function () {
   }
 
   function renderSubscriber(subscriber) {
-    return $('<div>', {class: 'result', 'data-id': subscriber._id})
+    return $('<div>', {class: 'result', 'data-id': subscriber._id, 'data-cy': 'result'})
       .data('subscriber', subscriber)
       .append($('<span>', {class: 'name'}).text(subscriber.name))
       .append($('<span>', {class: 'roles'}).html(renderRoles(subscriber.roles)))
+      .toggleClass('inactive', !!subscriber.inactive)
 
     function renderRoles(roles) {
       if (_.isEmpty(roles)) return '<i class="fa fa-warning"></i>'
@@ -238,7 +266,7 @@ window.subscriberManagementPage = function () {
     const $subscriberDetails = $('#templates').find('.subscriber-details').clone()
     $subscriberDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, subscriber))
     $subscriberDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
-
+    $subscriberDetails.toggleClass('inactive', !!subscriber.inactive)
     shared.select2Autocomplete({
       $el: $subscriberDetails.find('input[name=classifiers]'),
       path: function (term) { return '/users/search?q=' + encodeURIComponent(term) },

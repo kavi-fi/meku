@@ -243,6 +243,7 @@ const AccountSchema = new Schema({
   contactName: String,
   phoneNumber: String,
   isKavi: Boolean,
+  inactive: Boolean,
   deleted: Boolean,
   message: String
 })

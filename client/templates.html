@@ -340,10 +340,10 @@
   </div>
 </div>
 
-<div class="subscriber-details detail-box clearfix">
-  <form class="form">
+<div class="subscriber-details detail-box clearfix" data-cy="subscriber-details">
+    <form class="form">
         <button name="save" type="submit" disabled class="button">Tallenna</button>
-        <button name="inactivate" type="submit" class="button">Inaktivoi</button>
+        <button name="inactivate" type="button" class="button" data-cy="inactivate-subscriber-button">Inaktivoi</button>
         <button name="remove" type="button" class="button modify-only">Poista</button>
     <div class="roles">
       <label>Uusi</label>
@@ -397,7 +397,7 @@
       <label class="message double">Kommentit <textarea name="message"></textarea></label>
     </div>
 
-    <label class="full">Luokittelijat <input type="text" name="classifiers"></label>
+    <label class="full">Luokittelijat <input type="text" id="classifiers" name="classifiers" data-cy="classifiers"></label>
     <label class="full apiToken">XML-rajapinnan avain
       <div><input type="text" disabled name="apiToken" /><a href="#">Generoi</a>.</div>
     </label>
@@ -410,6 +410,14 @@
     <button class="button" name="remove">Poista</button><button class="button" name="cancel">Peruuta</button>
   </div>
 </div>
+
+<div class="inactivate-subscriber-dialog remove-dialog dialog" data-cy="inactivate-subscriber-dialog">
+    <p>Haluatko varmasti inaktivoida tilaajan <span class="subscriber-name"></span>?</p>
+    <div class="buttons" data-cy="buttons" >
+        <button class="button" name="inactivate" data-cy="confirm-inactivate">Inaktivoi</button><button class="button" name="cancel">Peruuta</button>
+    </div>
+</div>
+
 
 <div class="provider-row">
   <div>

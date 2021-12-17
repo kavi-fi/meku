@@ -1159,7 +1159,7 @@ app.delete('/providers/:pid/locations/:lid', requireRole('kavi'), (req, res, nex
 
 app.get('/accounts/search', (req, res, next) => {
   const roles = req.query.roles ? req.query.roles.split(',') : []
-  const q = {roles: {$in: roles}, deleted: {$ne: true}}
+  const q = {roles: {$in: roles}, deleted: {$ne: true}, inactive: {$ne: true}}
   if (!utils.hasRole(req.user, 'kavi')) {
     q['users._id'] = req.user._id
   }

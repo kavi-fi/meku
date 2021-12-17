@@ -23,6 +23,10 @@ Cypress.Commands.add('select2one', (selector, query) => {
   cy.wait(10)
 })
 
+Cypress.Commands.add('closeSelect2',  () => {
+  cy.get('#select2-drop input[type=text]').type('{esc}')
+})
+
 Cypress.Commands.add('select2', (selector, query) => {
   const queryArray = typeof query === 'string' ? [query] : query
   cy.get(selector + ' input').click()

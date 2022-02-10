@@ -55,6 +55,7 @@ window.subscriberManagementPage = function () {
         const $subscriber = renderSubscriber(subscriber).css('display', 'none')
         $subscribers.prepend($subscriber)
         $subscriber.slideToggle()
+        updateResultCount()
         closeDetails()
       })
     })
@@ -266,7 +267,7 @@ window.subscriberManagementPage = function () {
     const $subscriberDetails = $('#templates').find('.subscriber-details').clone()
     $subscriberDetails.find('input[name], textarea[name]').each(_.partial(setInputValWithProperty, subscriber))
     $subscriberDetails.find('input[name=billing-extra], input[name=billing-extra-type]').on('click', toggleBillingExtra)
-    $subscriberDetails.toggleClass('inactive', !!subscriber.inactive)
+    $subscriberDetails.toggleClass('inactive', subscriber && !!subscriber.inactive)
     shared.select2Autocomplete({
       $el: $subscriberDetails.find('input[name=classifiers]'),
       path: function (term) { return '/users/search?q=' + encodeURIComponent(term) },

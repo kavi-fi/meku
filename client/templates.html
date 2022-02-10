@@ -342,33 +342,32 @@
 
 <div class="subscriber-details detail-box clearfix" data-cy="subscriber-details">
     <form class="form">
-        <button name="save" type="submit" disabled class="button">Tallenna</button>
-        <button name="inactivate" type="button" class="button" data-cy="inactivate-subscriber-button">Inaktivoi</button>
+        <button name="save" type="submit" disabled class="button" data-cy="save-subscriber-button">Tallenna</button>
+        <button name="inactivate" type="button" class="button modify-only" data-cy="inactivate-subscriber-button">Inaktivoi</button>
         <button name="remove" type="button" class="button modify-only">Poista</button>
     <div class="roles">
       <label>Uusi</label>
-      <label><input type="checkbox" name="roles" value="Subscriber"> Tilaaja</label>
+      <label><input type="checkbox" name="roles" value="Subscriber" data-cy="subscriber-checkbox"> Tilaaja</label>
       <label><input type="checkbox" name="roles" value="Classifier"> Työnantaja/Luokitteluyritys</label>
     </div>
 
-    <label>Kieku-asiakasnumero <input type="text" name="customerNumber" required></label>
-    <label>Toiminimi <input type="text" name="name" required></label>
-
-    <label>Y-tunnus <input type="text" name="yTunnus" required></label>
-    <label>Hetu <input type="text" name="ssn" required></label>
+    <label>Kieku-asiakasnumero <input type="text" name="customerNumber" required data-cy="kieku-number-input"></label>
+    <label>Toiminimi <input type="text" name="name" required data-cy="name-input"></label>
+    <label>Y-tunnus <input type="text" name="yTunnus" required data-cy="ytunnus-input"></label>
+    <label>Hetu <input type="text" name="ssn" required data-cy="ssn-input"></label>
 
     <div class="address">
-      <label>Lähiosoite <input type="text" name="address.street" required></label>
-      <label>Postinumero <input type="text" name="address.zip" required></label>
-      <label>Kaupunki <input type="text" name="address.city" required></label>
-      <label>Maa <input type="text" name="address.country" required class="required invalid"></label>
+      <label>Lähiosoite <input type="text" name="address.street" required data-cy="address-input"></label>
+      <label>Postinumero <input type="text" name="address.zip" required data-cy="zip-input"></label>
+      <label>Kaupunki <input type="text" name="address.city" required data-cy="city-input"></label>
+      <label>Maa <input type="text" name="address.country" required data-cy="country-input" class="x-country required invalid"></label>
     </div>
 
     <label>Yhteyshenkilö <input type="text" name="contactName"></label>
 
-    <label>Puhelinnumero <input type="text" name="phoneNumber" required></label>
+    <label>Puhelinnumero <input type="text" name="phoneNumber" required data-cy="phoneNumber-input"></label>
 
-    <label class="emails">Sähköpostit <input type="text" name="emailAddresses" required multiple class="required invalid"></label>
+    <label class="emails">Sähköpostit <input type="text" name="emailAddresses" required multiple  cy-data="emailAddress-input" class="x-emailaddresses required invalid"></label>
 
     <div class="billing-extra">
       <label class="full"><input type="checkbox" name="billing-extra"> Laskutus eri osoitteeseen tai verkkolaskulla</label>

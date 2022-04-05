@@ -655,6 +655,7 @@ textarea.invalid:disabled,
   font-weight: Normal;
   color: #666666;
   line-height: 17px;
+  white-space: pre-line;
 }
 
 .classification-criteria .category .criteria.selected p,

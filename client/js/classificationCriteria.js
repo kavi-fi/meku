@@ -28,7 +28,7 @@ window.classificationCriteria = function () {
       setStored($criteria.find(".stored"), criteria.date)
       return $criteria
     }))
-    if (shared.hasRole('kavi')) {
+    if (shared.hasRole('root')) {
       $('#criteria-page').append($('<div>').addClass('category').append($criteriaBlock))
     } else {
       $('#criteria-page').append($('<div>').text('Kirjaudu järjestelmään pääkäyttäjänä ja yritä uudelleen.'))

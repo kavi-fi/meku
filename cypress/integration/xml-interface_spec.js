@@ -60,5 +60,5 @@ const expectedProgram = {
   buyer: 'DEMO tilaaja 3',
   billing: 'DEMO tilaaja 3',
   ageAndWarnings: '18 violence',
-  criteria: ['Väkivalta (1)', 'hieman väkivaltaista', 'Väkivalta (3)', 'Seksi (19)', 'lievää seksiä']
+  criteria: ['Seksi (19)', 'Väkivalta (3)', 'Väkivalta (1)']
 }

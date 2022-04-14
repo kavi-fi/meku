@@ -48,6 +48,8 @@ Cypress.Commands.add('assertAgelimitAndWarnings', {prevSubject: true}, (subject,
   })
 })
 
+const extractInnerTextToArray = ($els) => Cypress._.map(Cypress.$.makeArray($els), 'innerText')
+
 Cypress.Commands.add('assertProgramBox', (parent, program) => {
   cy.getDataCy(parent + ' primary-name').should('have.text', program.name)
   cy.getDataCy(parent + ' name').should('have.text', program.name)
@@ -61,7 +63,7 @@ Cypress.Commands.add('assertProgramBox', (parent, program) => {
   cy.getDataCy(parent + ' actors').should('have.text', program.actors || '')
   cy.getDataCy(parent + ' current-format').should('have.text', program.format)
   cy.getDataCy(parent + ' current-duration').should('have.text', program.duration)
-//  cy.getDataCy(parent + ' criteria').should('have.text', program.criteria.join('\n'))
+  cy.getDataCy(parent + ' criteria criteria-label').then(extractInnerTextToArray).should('be.an', 'array').and('deep.equal', program.criteria)
   cy.getDataCy(parent + ' author').should('have.text', program.author)
   cy.getDataCy(parent + ' buyer').should('have.text', program.buyer)
   cy.getDataCy(parent + ' billing').should('have.text', program.billing)

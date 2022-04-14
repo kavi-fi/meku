@@ -195,7 +195,7 @@ window.programBox = function () {
       const category = window.enums.classificationCategoriesFI[enumCriteria.category]
 
       return $('<div>')
-        .append($('<label>', {title: cr[lang].title + ': ' + $('<div>').html(cr[lang].description).text()}).text(shared.i18nText(category) + ' (' + cr.id + ')'))
+        .append($('<label>', {'data-cy': 'criteria-label', title: cr[lang].title + ': ' + $('<div>').html(cr[lang].description).text()}).text(shared.i18nText(category) + ' (' + cr.id + ')'))
         .append($('<p>').text(renderCriteriaComments()))
 
       function renderCriteriaComments() {

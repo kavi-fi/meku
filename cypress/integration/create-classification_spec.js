@@ -121,7 +121,7 @@ const expectedProgramBox = {
   buyer: 'DEMO tilaaja 1',
   billing: 'DEMO tilaaja 1',
   ageAndWarnings: '7 violence sex',
-  criteria: ['Väkivalta (12)', 'Komediaväkivaltaa...', 'Seksi (19)']
+  criteria: ['Väkivalta (12)', 'Seksi (19)']
 }
 
 const expectedClassificationEmail = {

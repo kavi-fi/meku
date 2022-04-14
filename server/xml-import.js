@@ -81,7 +81,7 @@ const validateProgram = map(compose([
         })(c).errors))
       if (errors.length > 0) return function () { return {program: {}, errors: errors} }
       const criteriaComments = _.zipObject(p.criteria.map((c) => c.$.KRITEERI), p.criteria.map((c) => c.$.KOMMENTTI))
-      return function () { return ok({safe: _.isEmpty(criteriaComments), criteria: _.keys(criteriaComments), criteriaComments: criteriaComments}) }
+      return function () { return ok({safe: _.isEmpty(criteriaComments), criteria: p.criteria.map((c) => c.$.KRITEERI), criteriaComments: criteriaComments}) }
     })
   ])
 ]), (p) => { p.classifications = [p.classification]; delete p.classification; return p })

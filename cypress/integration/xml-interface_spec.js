@@ -13,6 +13,14 @@ describe('XML interface', function () {
     cy.assertSearchResult('search-page results result:first', expectedRow, expectedProgram)
   })
 
+  it('preserves order of criteria when registering classification', () => {
+    cy.task('sendXML', './cypress/integration/movie2-program.xml')
+    cy.wait(10)
+    cy.get('a[href="#haku"].active').should('be.visible')
+    cy.getDataCy('search-page controls query').type('Star Warx XX')
+    cy.assertSearchResult('search-page results result:first', expectedRow2, expectedProgram2)
+  })
+
   it('registers a classification for deleted program', () => {
     cy.get('a[href="#haku"].active').should('be.visible')
     cy.getDataCy('search-page controls query').type('Deleted program')
@@ -62,3 +70,33 @@ const expectedProgram = {
   ageAndWarnings: '18 violence',
   criteria: ['Seksi (19)', 'Väkivalta (3)', 'Väkivalta (1)']
 }
+
+const expectedRow2 = {
+  name: 'Star Warx XX',
+  duration: '1 t 12 min 34 s',
+  ageAndWarnings: '18 violence',
+  countryYearDate: '(' + date + ', Suomi, Ruotsi, 2014)',
+  type: 'Elokuva'
+}
+
+const expectedProgram2 = {
+  name: 'Star Warx XX',
+  nameFi: 'Star Warx XX - fi',
+  nameSv: 'Star Warx XX - sv',
+  nameOther: 'cypress-test-5',
+  country: 'Suomi, Ruotsi',
+  year: '2014',
+  productionCompanies: 'First Films Oy, Second Films Oy',
+  genre: 'Romantiikka, Draama',
+  directors: 'David Silverman',
+  actors: 'John First, Jack Second',
+  format: 'DVD',
+  duration: '1:12:34',
+  synopsis: 'synopsis',
+  author: 'kavi (KAVI)',
+  buyer: 'DEMO tilaaja 3',
+  billing: 'DEMO tilaaja 3',
+  ageAndWarnings: '18 violence',
+  criteria: ['Väkivalta (1)', 'Väkivalta (3)', 'Seksi (19)']
+}
+

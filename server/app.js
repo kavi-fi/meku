@@ -520,6 +520,12 @@ app.post('/programs/:id/register', (req, res, next) => {
     if (newClassification.isReclassification && !utils.hasRole(req.user, 'kavi')) {
       newClassification.reason = 4
     }
+
+    // prevent user from registering classifications in the past
+    if (utils.hasRole(req.user, 'user')) {
+      newClassification.registrationDate = new Date()
+    }
+    
     Program.updateClassificationSummary(newClassification)
 
     program.draftClassifications = {}

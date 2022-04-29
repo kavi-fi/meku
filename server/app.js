@@ -525,7 +525,7 @@ app.post('/programs/:id/register', (req, res, next) => {
     if (utils.hasRole(req.user, 'user')) {
       newClassification.registrationDate = new Date()
     }
-    
+
     Program.updateClassificationSummary(newClassification)
 
     program.draftClassifications = {}

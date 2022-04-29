@@ -667,7 +667,7 @@
         <h2 class="main" data-i18n data-cy="classification">Luokittelu</h2>
         <div class="classification-author-field">
           <label data-i18n>Luokittelijan nimi</label><span class="author textified-field"></span>
-          <label data-i18n>Rekisteröintipäivä</label><input type="text" name="classification.registrationDate" />
+          <label data-i18n>Rekisteröintipäivä</label><input type="text" name="classification.registrationDate" data-cy="classification-registrationDate" />
         </div>
         <div class="left author-and-reason-fields">
           <label class="select2-label" data-i18n>Peruste</label><input name="classification.reason" class="required x-classificationReason" type="hidden"/>
@@ -698,7 +698,7 @@
           <span class="field-hint" data-i18n>KAVI:n sisäiset kommentit näkyvät vain KAVI:n työntekijöille.</span>
         </div>
         <div class="user-comments">
-          <label class="text-area-label" data-i18n>Luokittelijan sisäiset kommentit</label><textarea placeholder="Luokittelijan kommentit" data-i18n-placeholder name="classification.userComments" class="throttledInput"></textarea>
+          <label class="text-area-label" data-i18n>Luokittelijan sisäiset kommentit</label><textarea placeholder="Luokittelijan kommentit" data-i18n-placeholder name="classification.userComments" class="throttledInput" data-cy="user-comments"></textarea>
           <span class="field-hint" data-i18n>Luokittelijan kommentit näkyvät vain tekijälle itselleen ja KAVI:n työntekijöille.</span>
         </div>
         <br>

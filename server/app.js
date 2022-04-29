@@ -521,8 +521,8 @@ app.post('/programs/:id/register', (req, res, next) => {
       newClassification.reason = 4
     }
 
-    // prevent user from registering classifications in the past
-    if (utils.hasRole(req.user, 'user')) {
+    // prevent user and kavi role from registering classifications in the past
+    if (!utils.hasRole(req.user, 'root')) {
       newClassification.registrationDate = new Date()
     }
 

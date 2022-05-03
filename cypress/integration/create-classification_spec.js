@@ -6,7 +6,7 @@ describe('Classification', () => {
     cy.login('kavi', 'kavi')
   })
 
-  it('registers a classification as KAVI', () => {
+  it('registers a classification as KAVI with registration date as today', () => {
     cy.get('a[href="#haku"].active').should('be.visible')
     cy.getDataCy('search-page controls create').click()
     cy.getDataCy('classification-page program-info title').should('have.text', 'Uusi kuvaohjelma - Elokuva')
@@ -16,6 +16,10 @@ describe('Classification', () => {
     cy.getDataCy('classification-page program-info name-other').type('cypress-test')
     cy.select2('#classification-page .select2-container.country', 'su')
     cy.getDataCy('classification-page program-info year').type('2014')
+    cy.getDataCy('classification-registrationDate').invoke('removeAttr', 'disabled')
+    cy.getDataCy('classification-registrationDate:first').clear()
+    cy.getDataCy('classification-registrationDate:first').type("30.11.2020")
+    cy.getDataCy('classification-registrationDate:first').type("{enter}{esc}")
     cy.select2('#classification-page .select2-container.x-productionCompanies', 'Warner Sisters Oy.')
     cy.select2('#classification-page .select2-container.x-genre', 'ko')
     cy.select2('#classification-page .select2-container.x-directors', 'Ivan Reitman')

@@ -14,6 +14,7 @@ Cypress.Commands.add('login', (user, password) => {
   cy.get('[data-cy=username]').type(user)
   cy.get('[data-cy=password]').type(password)
   cy.get('[data-cy=login]').click()
+  cy.getDataCy('search-page')
 })
 
 Cypress.Commands.add('select2one', (selector, query) => {

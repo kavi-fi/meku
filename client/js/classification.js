@@ -357,10 +357,14 @@ function classificationFormUtils() {
       const $criteria = classificationCriteria.map(function (c) {
         const isVet = c.category === 'vet'
         const age = shared.langCookie() === 'sv' && c.age === 0 ? 't' : c.age
-        return $('<div>', {class: 'criteria agelimit agelimit-' + age, 'data-id': c.id, 'data-cy': 'criteria' + c.id})
+        const $div = $('<div>', {class: 'criteria agelimit agelimit-' + age, 'data-id': c.id, 'data-cy': 'criteria' + c.id})
           .append($('<h5>').text(c[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + c.id + ')')))
-          .append($('<p>').html(isVet ? '' : c[lang].description))
-          .append(isVet ? '' : $('<textarea>', {name: 'classification.criteriaComments.' + c.id, placeholder: shared.i18nText('Kommentit...'), class: 'throttledInput', 'data-cy': 'criteria-text'}))
+        if (!isVet) {
+          $div.append($('<p>').html(c[lang].description))
+              .append(shared.criteriaInstructionsSection(c[lang].instructions))
+              .append($('<textarea>', {name: 'classification.criteriaComments.' + c.id, placeholder: shared.i18nText('Kommentit...'), class: 'throttledInput', 'data-cy': 'criteria-text'}))
+        }
+        return $div
       })
       $form.find('.category-container .' + category).append($criteria)
     })
@@ -373,8 +377,19 @@ function classificationFormUtils() {
         const i = window.enums.classificationCriteria.map(function (c) { return c.id }).indexOf(criteria.id)
         const isVet = i !== -1 && window.enums.classificationCriteria[i].category === 'vet'
         const $div = $form.find('div[data-id=' + criteria.id + ']')
-        $div.find('h5').empty().append($('<h5>').text(criteria[lang].title + ' ').append($('<span>').text(isVet ? '' : '(' + criteria.id + ')')))
-        $div.find('p').html(isVet ? '' : criteria[lang].description)
+        $div.find('h5')
+            .text(criteria[lang].title + ' ')
+            .append($('<span>')
+                .text(isVet ? '' : '(' + criteria.id + ')'))
+        if (!isVet) {
+          if (criteria[lang].description) {
+            $div.find('p').first().html(criteria[lang].description)
+          }
+          if (criteria[lang].instructions) {
+            $div.find('p').last().html(criteria[lang].instructions)
+            $div.find('.instructions-section').css('display', 'block')
+          }
+        }
       })
     })
   }

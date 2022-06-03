@@ -505,11 +505,13 @@ const ClassificationCriteriaSchema = new Schema({
   age: Number,
   fi: {
     title: String,
-    description: String
+    description: String,
+    instructions: String
   },
   sv: {
     title: String,
-    description: String
+    description: String,
+    instructions: String
   },
   date: Date
 })

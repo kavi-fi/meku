@@ -46,15 +46,25 @@ window.classificationCriteria = function () {
   }
 
   function criteriaSaved(stored, age, category) {
+    const isVet = category === 'vet'
     const $fi = $('<div>').addClass('criteria agelimit agelimit-' + age)
     $fi.append($('<h5>'))
     $fi.append($('<p>'))
-    const $id = $('<span>').html('&nbsp;' + (category === 'vet' ? '' : '(' + stored.id + ')'))
+    const $id = $('<span>').html('&nbsp;' + (isVet ? '' : '(' + stored.id + ')'))
     const $sv = $fi.clone()
+
+    if (!isVet && stored.fi.instructions) {
+      $fi.append(shared.criteriaInstructionsSection(stored.fi.instructions))
+    }
     $fi.find('h5').text(stored.fi.title).append($id)
-    $fi.find('p').html(stored.fi.description)
+    $fi.find('p').first().html(stored.fi.description)
+
     $sv.find('h5').text(stored.sv.title).append($id.clone())
-    $sv.find('p').html(stored.sv.description)
+    $sv.find('p').first().html(stored.sv.description)
+    if (!isVet && stored.sv.instructions) {
+      $sv.append(shared.criteriaInstructionsSection(stored.sv.instructions))
+    }
+
     const $buttons = $('<div>').addClass('buttons').append($('<button>').addClass('ok  button').text('Ok'))
     $buttons.find('button.ok').click(shared.closeDialog)
     shared.showDialog($('<div>').addClass('dialog').append($('<div>').addClass('classification-criteria').append($('<div>').addClass('category').text('Tallennettu').append($fi, $sv, $buttons))))

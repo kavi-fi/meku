@@ -149,6 +149,7 @@
       'Tarkenna hakua luodaksesi Excel-tiedoston': 'Specificera sökning',
       'Vastuuvapauslauseke': 'Ansvarsfriskrivning',
       'Hakuohje': 'Sökning Hjälp',
+      "Näytä ohje": 'Visa hjälp',
 
       // public.html:
 

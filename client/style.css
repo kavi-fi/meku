@@ -650,7 +650,7 @@ textarea.invalid:disabled,
 
 .classification-criteria .category .criteria p {
   padding: 0;
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   font-size: 12px;
   font-weight: Normal;
   color: #666666;
@@ -662,6 +662,10 @@ textarea.invalid:disabled,
 .classification-criteria .category .criteria.selected h5,
 .classification-criteria .category .criteria.selected h5 span {
   color: #fff;
+}
+
+.classification-criteria .instructions-section h6 {
+  margin: 0 0 0.5em 0;
 }
 
 .classification-criteria .category .criteria textarea {
@@ -944,6 +948,22 @@ textarea.invalid:disabled,
     -o-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
+}
+
+.rotating2.fa-play {
+  margin-right: 7px;
+  margin-left: 1px;
+  -webkit-transition: .3s linear;
+  -moz-transition: .3s linear;
+  -o-transition: .3s linear;
+  transition: .3s linear;
+}
+.opened .rotating2.fa-play {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .change-log a { color: #00BB88; cursor: pointer; margin-top: 10px; display: inline-block; }

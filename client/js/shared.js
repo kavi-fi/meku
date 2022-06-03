@@ -222,5 +222,21 @@ window.shared = {
       const data = optsMerged.multiple ? arr : arr[0] && arr[0] || ''
       $(this).select2('data', data).trigger('validate')
     })
+  },
+  criteriaInstructionsSection: (content) => {
+    const $template = $('#templates > .instructions-section').clone()
+
+    $template.on('click', '> h6', function (e) {
+      e.stopPropagation()
+      $(this).toggleClass('opened').next().slideToggle()
+    })
+
+    if (_.isEmpty(content)) {
+      $template.css('display', 'none')
+    } else {
+      $template.find('p').text(content)
+    }
+
+    return $template
   }
 }

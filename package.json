@@ -10,7 +10,7 @@
     "eslint": "./node_modules/.bin/eslint client/js server shared cypress/integration"
   },
   "engines": {
-    "node": "12.x"
+    "node": "16.x"
   },
   "dependencies": {
     "@sendgrid/mail": "7.4.4",

@@ -882,17 +882,17 @@
   <label><span data-i18n>Id</span> <input disabled type="text" name="id" /></label>
   <label><span data-i18n>Kategoria</span> <input disabled type="text" name="category" /></label>
   <label><span data-i18n>Ikä</span> <input disabled type="text" name="age" /></label>
-  <label><span data-i18n>Otsikko suomeksi</span> <input type="text" name="fi.title" /></label>
-  <label><span data-i18n>Kuvaus suomeksi</span> <textarea name="fi.description"></textarea></label>
-  <label><span data-i18n>Ohje suomeksi</span> <textarea name="fi.instructions"></textarea></label>
-  <label><span data-i18n>Otsikko ruotsiksi</span> <input type="text" name="sv.title" /></label>
-  <label><span data-i18n>Kuvaus ruotsiksi</span> <textarea name="sv.description"></textarea></label>
-  <label><span data-i18n>Ohje ruotsiksi</span> <textarea name="sv.instructions"></textarea></label>
-  <label><span></span><button class="button" data-i18n>Tallenna</button> <i class="stored"></i></label>
+  <label><span data-i18n>Otsikko suomeksi</span> <input type="text" name="fi.title" data-cy="title-fi" /></label>
+  <label><span data-i18n>Kuvaus suomeksi</span> <textarea name="fi.description" data-cy="description-fi"></textarea></label>
+  <label><span data-i18n>Ohje suomeksi</span> <textarea name="fi.instructions" data-cy="instructions-fi"></textarea></label>
+  <label><span data-i18n>Otsikko ruotsiksi</span> <input type="text" name="sv.title" data-cy="title-sv" /></label>
+  <label><span data-i18n>Kuvaus ruotsiksi</span> <textarea name="sv.description" data-cy="description-sv"></textarea></label>
+  <label><span data-i18n>Ohje ruotsiksi</span> <textarea name="sv.instructions" data-cy="instructions-sv"></textarea></label>
+  <label><span></span><button class="button" data-i18n data-cy="save-btn">Tallenna</button> <i class="stored"></i></label>
 </div>
 
 <div class="instructions-section">
-  <h6><i class="rotating2 fa fa-play"></i><span data-i18n="">Näytä ohje</span></h6>
+  <h6 data-cy="show-instructions"><i class="rotating2 fa fa-play"></i><span data-i18n="">Näytä ohje</span></h6>
   <p class="instructions-content" style="display: none">
   </p>
 </div>

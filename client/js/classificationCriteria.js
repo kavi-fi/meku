@@ -12,6 +12,7 @@ window.classificationCriteria = function () {
       const storedCriteria = _.find(result, function (c) { return c.id === enumCriteria.id })
       const criteria = storedCriteria ? storedCriteria : enumCriteria
       const $criteria = $('#templates .classification-criteria-edit').clone()
+      $criteria.attr('data-cy', `criteria-${criteria.id}`)
       $criteria
         .find('input[name="id"]').val(criteria.id).end()
         .find('input[name="category"]').val(enumCriteria.category).end()
@@ -49,16 +50,18 @@ window.classificationCriteria = function () {
     const isVet = category === 'vet'
     const $fi = $('<div>').addClass('criteria agelimit agelimit-' + age)
     $fi.append($('<h5>'))
-    $fi.append($('<p>'))
+    $fi.append($('<p>').attr('data-cy', 'description-content'))
     const $id = $('<span>').html('&nbsp;' + (isVet ? '' : '(' + stored.id + ')'))
     const $sv = $fi.clone()
 
+    $fi.attr('data-cy', 'saved-criteria-' + stored.id + '-fi')
     if (!isVet && stored.fi.instructions) {
       $fi.append(shared.criteriaInstructionsSection(stored.fi.instructions))
     }
     $fi.find('h5').text(stored.fi.title).append($id)
     $fi.find('p').first().html(stored.fi.description)
 
+    $sv.attr('data-cy', 'saved-criteria-' + stored.id + '-sv')
     $sv.find('h5').text(stored.sv.title).append($id.clone())
     $sv.find('p').first().html(stored.sv.description)
     if (!isVet && stored.sv.instructions) {

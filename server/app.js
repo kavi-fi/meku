@@ -1509,7 +1509,7 @@ app.post('/classification/criteria/:id', requireRole('root'), (req, res, next) =
   const id = parseInt(req.params.id)
   ClassificationCriteria.findOneAndUpdate({id: id}, {
     $set: {id: id, fi: req.body.fi, sv: req.body.sv, date: new Date()}
-  }, {upsert: true}, respond(res, next))
+  }, {upsert: true, new: true}, respond(res, next))
 })
 
 app.get('/agelimit/:q?', (req, res, next) => {

@@ -19,11 +19,16 @@ until $(curl --output /dev/null --silent --head http://localhost:4000); do
     sleep 2
 done
 
+cypress_cmd="run"
+if [ "$1" = "watch" ]; then
+  cypress_cmd="open"
+fi
+
 echo "Importing test fixtures..."
 NODE_ENV=test node cypress/fixtures
 if [ "$?" = 0 ]; then
   echo "Starting Cypress run..."
-  CYPRESS_BASE_URL=http://localhost:$PORT/ node_modules/.bin/cypress run
+  CYPRESS_BASE_URL=http://localhost:$PORT/ node_modules/.bin/cypress $cypress_cmd
 fi
 
 kill $APP_PID

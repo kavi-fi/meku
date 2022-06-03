@@ -6,6 +6,7 @@
     "start": "node server/app.js",
     "postinstall": "date +%s > build.revision",
     "test": "./scripts/test.sh",
+    "cypress-open": "./scripts/test.sh watch",
     "eslint": "./node_modules/.bin/eslint client/js server shared cypress/integration"
   },
   "engines": {

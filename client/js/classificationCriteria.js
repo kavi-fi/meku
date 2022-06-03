@@ -18,8 +18,10 @@ window.classificationCriteria = function () {
         .find('input[name="age"]').val(enumCriteria.age).end()
         .find('input[name="fi.title"]').val(criteria.fi.title).end()
         .find('textarea[name="fi.description"]').val(criteria.fi.description).end()
+        .find('textarea[name="fi.instructions"]').val(criteria.fi.instructions).end()
         .find('input[name="sv.title"]').val(criteria.sv.title).end()
         .find('textarea[name="sv.description"]').val(criteria.sv.description).end()
+        .find('textarea[name="sv.instructions"]').val(criteria.sv.instructions).end()
         .find('button').on('click', function (e) {
           const $target = $(e.target).closest('.form')
           $.post('/classification/criteria/' + criteria.id, postData($target), function (c) { setStored($target.find(".stored"), c.date) })
@@ -38,8 +40,8 @@ window.classificationCriteria = function () {
 
   function postData($criteria) {
     return JSON.stringify({
-      fi: {title: $criteria.find('input[name="fi.title"]').val(), description: $criteria.find('textarea[name="fi.description"]').val()},
-      sv: {title: $criteria.find('input[name="sv.title"]').val(), description: $criteria.find('textarea[name="sv.description"]').val()}
+      fi: {title: $criteria.find('input[name="fi.title"]').val(), description: $criteria.find('textarea[name="fi.description"]').val(), instructions: $criteria.find('textarea[name="fi.instructions"]').val()},
+      sv: {title: $criteria.find('input[name="sv.title"]').val(), description: $criteria.find('textarea[name="sv.description"]').val(), instructions: $criteria.find('textarea[name="sv.instructions"]').val()}
     })
   }
 

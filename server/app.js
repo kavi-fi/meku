@@ -1994,7 +1994,7 @@ if (env.isDev) {
 let server
 
 exports.start = function (callback) {
-  mongoose.connect(process.env.MONGOHQ_URL || env.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false, retryWrites: false, keepAlive: 300000})
+  mongoose.connect(process.env.MONGOHQ_URL || env.mongoUrl, {useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false, retryWrites: false, keepAlive: 300000, useUnifiedTopology: true})
     .then(() => {
       checkExpiredCerts.start()
       checkCertsExpiringSoon.start()

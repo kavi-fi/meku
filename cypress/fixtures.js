@@ -12,7 +12,7 @@ if (!env || !env.isTest) {
 
 function connect() {
   const mongoUrl = process.env.MONGOHQ_URL || env.mongoUrl
-  return mongoose.connect(mongoUrl, {poolSize: 10, keepAlive: 300000, useUnifiedTopology: true})
+  return mongoose.connect(mongoUrl, {poolSize: 10, keepAlive: 300000, useUnifiedTopology: true, useNewUrlParser: true})
 }
 
 function disconnect() {

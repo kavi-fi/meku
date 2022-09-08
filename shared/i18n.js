@@ -183,6 +183,7 @@
       'Alueellinen televisio-ohjelmisto': 'Regionalt tv-programutbud',
       'Ulkomailta välitetty ohjelmisto': 'Programutbud förmdelat från utlandet',
       'Tilausohjelmapalvelu': 'Beställ-tv',
+      'Videonjakoalustapalvelu': 'Service för videodelningsplattform',
 
       // Dynamic UI-texts:
 

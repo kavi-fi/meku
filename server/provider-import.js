@@ -57,6 +57,7 @@ const fieldNames = {
   'address.street': 'lähiosoite',
   'address.zip': 'postinro',
   'address.city': 'postitoimipaikka',
+  'address.country': 'maa',
   'language': 'asiointikieli',
   'contactName': 'yhteyshenkilö',
   'emailAddresses': 'sähköposti',

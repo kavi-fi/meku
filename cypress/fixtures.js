@@ -4,6 +4,7 @@ const env = require('../server/env').get()
 const users = require('./fixtures/users')
 const programs = require('./fixtures/programs')
 const accounts = require('./fixtures/accounts')
+const providers = require('./fixtures/providers')
 
 if (!env || !env.isTest) {
   console.error('Not a test env, adding fixtures failed')
@@ -60,6 +61,7 @@ async function addFixturesData() {
     await persist(accounts.slice(1), schema.Account)
     await persist([programs[0]], schema.Program)
     await persist(programs.slice(1), schema.Program)
+    await persist([providers[0]], schema.Provider)
     await disconnect(db)
   } catch (err) {
     console.error(err)

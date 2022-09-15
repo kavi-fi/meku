@@ -1,3 +1,4 @@
+import 'cypress-file-upload';
 const axios = require('axios')
 
 const selector = (datacy) => {

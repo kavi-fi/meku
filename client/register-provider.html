@@ -96,18 +96,18 @@
         <label for="message" data-i18n>Viesti Kaville</label>
         <p class="help" data-i18n>Tähän kenttään voit tarvittaessa kirjoittaa kommentit tai pyynnöt Kaville. Esim. Milloin kuvaohjelmien tarjonta aloitetaan?</p>
         <textarea name="message" id="message"></textarea></label>
-        <label><span data-i18n>Valitse taulukko-tiedosto</span><input type="file" name="providerFile" /></label>
+        <label><span data-i18n>Valitse taulukko-tiedosto</span><input type="file" name="providerFile" data-cy="providerFile" /></label>
       </div>
       <div>
-        <button class="button" disabled data-i18n>Lähetä tiedosto</button>
+        <button class="button" data-cy="providerFile-submit"  disabled data-i18n>Lähetä tiedosto</button>
       </div>
     </div>
     <div class="feedback">
-      <p class="success hidden"></p>
-      <p class="error hidden" data-i18n>Tiedoston lähettäminen ei onnistunut.</p>
-      <div class="invalid hidden">
+      <p class="success hidden" data-cy="success"></p>
+      <p class="error hidden" data-cy="error" data-i18n>Tiedoston lähettäminen ei onnistunut.</p>
+      <div class="invalid hidden" data-cy="validation-feedback">
         <p data-i18n>Tarjoajan tai tarjoajan tiedoista puuttui pakollisia tietoja. Ole hyvä, täytä puuttuvat tiedot ja lähetä tiedosto uudelleen.</p>
-        <ul></ul>
+        <ul data-cy="validation-errors"></ul>
       </div>
     </div>
   </form>

@@ -1,5 +1,6 @@
 (function (exports) {
   exports.util = {}
+  const _ = typeof window === 'undefined' ? require('lodash') : window._
 
   exports.criteriaCategories = ['violence', 'sex', 'fear', 'drugs', 'vet']
   exports.classificationCategoriesFI = {violence: 'väkivalta', fear: 'ahdistus', sex: 'seksi', drugs: 'päihteet', vet: 'vet'}

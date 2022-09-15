@@ -1488,7 +1488,10 @@ app.post('/files/provider-import', upload.single('providerFile'), (req, res) => 
     if (err) return res.send({error: err})
     const providerData = utils.merge(provider, {message: req.body.message ? req.body.message : undefined})
     new schema.Provider(providerData).save((saveErr) => {
-      if (saveErr) return res.send({error: saveErr})
+      if (saveErr) {
+        console.error(saveErr)
+        return res.send({error: saveErr})
+      }
       res.send({message: 'Ilmoitettu tarjoaja sekä ' + provider.locations.length + ' tarjoamispaikkaa.'})
     })
   })

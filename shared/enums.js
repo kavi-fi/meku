@@ -67,7 +67,8 @@
     'National_TV': 'Valtakunnallinen televisio-ohjelmisto',
     'Regional_TV': 'Alueellinen televisio-ohjelmisto',
     'Transmitted_abroad_program': 'Ulkomailta välitetty ohjelmisto',
-    'Subscription_of_program': 'Tilausohjelmapalvelu'
+    'Subscription_of_program': 'Tilausohjelmapalvelu',
+    'Video_sharing_service': 'Videonjakoalustapalvelu'
   }
 
   exports.providingTypeName = function(type) {
@@ -81,7 +82,8 @@
     'National_TV': '1873',
     'Regional_TV': '1874',
     'Transmitted_abroad_program': '1875',
-    'Subscription_of_program': '1876'
+    'Subscription_of_program': '1876',
+    'Video_sharing_service': '6611'
   }
 
   exports.defaultPrices = { // Up-to-date prices should be set in PRICES_<year> config variable (i.e. PRICES_2016)
@@ -112,7 +114,8 @@
     'National_TV': 600,
     'Regional_TV': 100,
     'Transmitted_abroad_program': 400,
-    'Subscription_of_program': 400
+    'Subscription_of_program': 400,
+    'Video_sharing_service': 400
   }
 
   exports.programType = {

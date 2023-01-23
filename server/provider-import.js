@@ -47,6 +47,7 @@ const locationFieldMap = [
   'Regional_TV',
   'Transmitted_abroad_program',
   'Subscription_of_program',
+  'Video_sharing_service',
   'url',
   'adultContent'
 ]

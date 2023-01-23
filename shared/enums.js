@@ -83,7 +83,7 @@
     'Regional_TV': '1874',
     'Transmitted_abroad_program': '1875',
     'Subscription_of_program': '1876',
-    'Video_sharing_service': 'xxx' //TODO fiksaa oikeaksi
+    'Video_sharing_service': '6611'
   }
 
   exports.defaultPrices = { // Up-to-date prices should be set in PRICES_<year> config variable (i.e. PRICES_2016)

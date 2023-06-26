@@ -279,7 +279,7 @@
   exports.authorOrganizationIsKHO = function(c) { return c.authorOrganization === 3 }
   exports.authorOrganizationIsElokuvalautakunta = function(c) { return c.authorOrganization === 5 }
 
-  exports.fixedKaviRecipients = ['leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'milja.laitinen@kavi.fi']
+  exports.fixedKaviRecipients = ['leo.pekkala@kavi.fi', 'leena.karjalainen@kavi.fi', 'milja.lampinen@kavi.fi']
 
   exports.invoiceRowType = {
     registration: 'Kuvaohjelman rekisteröinti',

@@ -410,6 +410,21 @@
   </div>
 </div>
 
+<!-- TODO JESSE: ADD STUFF TO THIS MODAL -->
+<div class="send-hearing-requests-dialog remove-dialog dialog">
+  <h2>Haluatko lähettää kuulemispyynnöt?</h2>
+  <ul>
+    <li>Item1</li>
+    <li>Item2</li>
+    <li>Item3</li>
+    <li>Item4</li>
+  </ul>
+  <div class="buttons">
+    <button class="send button" name="send">Lähetä</button>
+    <button class="cancel button" name="cancel">Peruuta</button>
+  </div>
+</div>
+
 <div class="inactivate-subscriber-dialog remove-dialog dialog" data-cy="inactivate-subscriber-dialog">
     <p>Haluatko varmasti inaktivoida tilaajan <span class="subscriber-name"></span>?</p>
     <div class="buttons" data-cy="buttons" >
@@ -709,6 +724,14 @@
       <div>
         <div class="kavi-diary-number">
           <label class="select2-label" data-i18n>Diaarinumero</label><input name="classification.kaviDiaryNumber" type="text" class="throttledInput"/>
+
+          <!-- TODO JESSE: ADD SWEDISH TRANSLATIONS AND MAKE BUTTON ACTIVE ONLY AFTER DIARY NUMBER IS ADDED -->
+          <button name="open-hearing-requests-dialog" class="button open-hearing-requests-dialog" data-i18n data-cy="">Kuulemispyyntöjen lähetys</button>
+          <!-- TODO JESSE: ADD SWEDISH TRANSLATION -->
+          <input name="classification.sendMaterialsRequest" type="checkbox" data-cy=""/><span data-i18n>Materiaalin toimituspyyntö</span>
+
+        </div>
+        <div class="kavi-diary-number">
         </div>
       </div>
     </div>

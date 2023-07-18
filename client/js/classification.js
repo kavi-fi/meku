@@ -84,6 +84,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('textarea[name="classification.publicComments"]').val(c.publicComments).end()
       .find('input[name="classification.kaviDiaryNumber"]').val(c.kaviDiaryNumber).end()
       .find('input[name="classification.safe"]').prop('checked', !!c.safe).end()
+      // TODO ADD CLASSIFICATION.sendMaterialsRequest
       .find('input[name="classification.vet"]').prop('checked', isVetClassification).end()
       .find('.category-container').toggle(!c.safe).end()
       .find('.vet').toggle(isVetClassification).end()
@@ -160,6 +161,16 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         $('#classification-page').trigger('show', [p._id, 'edit', selectedClassification._id]).show()
         shared.showDialog($('#templates').find('.modify-success-dialog').clone().find('button.ok').click(shared.closeDialog).end())
       })
+    })
+    $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
+      e.preventDefault()
+      shared.showDialog($('#templates').find('.send-hearing-requests-dialog').clone()
+        // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN SENDING
+        // TODO JESSE: CHECK IF THE CHECKBOX IS CHECKED AND SEND MATERIAL REQUEST ALSO
+        // $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
+        .find('button.send').click(shared.closeDialog).end()
+        .find('button.cancel').click(shared.closeDialog).end()
+      )
     })
     $form.on('click', '.back-to-search', function (e) {
       e.preventDefault()

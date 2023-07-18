@@ -130,6 +130,8 @@
       'tt:mm:ss': 'tt:mm:ss',
       'Julkiset kommentit': 'Offentliga kommentarer',
       'KAVI:n sisäiset kommentit näkyvät vain KAVI:n työntekijöille.': 'KAVI:s interna kommentarer kan ses bara av KAVI:s anställda',
+      'Kuulemispyyntöjen lähetys': 'Kuulemispyyntöjen lähetys (svenska)',
+      'Materiaalin toimituspyyntö': 'Materiaalin toimituspyyntö (svenska)',
       'Diaarinumero': 'Diarienummer',
       'Asianosaiset': 'Parter',
       'Luokittelun kriteerit': 'Kriterier för klassificering',

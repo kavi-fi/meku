@@ -84,7 +84,6 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       .find('textarea[name="classification.publicComments"]').val(c.publicComments).end()
       .find('input[name="classification.kaviDiaryNumber"]').val(c.kaviDiaryNumber).end()
       .find('input[name="classification.safe"]').prop('checked', !!c.safe).end()
-      // TODO ADD CLASSIFICATION.sendMaterialsRequest
       .find('input[name="classification.vet"]').prop('checked', isVetClassification).end()
       .find('.category-container').toggle(!c.safe).end()
       .find('.vet').toggle(isVetClassification).end()
@@ -170,7 +169,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
     }
 
-    $form.find('input[name="classification.kaviDiaryNumber"]').on('blur', function (e) {
+    $form.find('input[name="classification.kaviDiaryNumber"]').on('keyup', function (e) {
       if($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
         $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
       } else {
@@ -178,6 +177,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       }
     })
     
+    // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN SENDING
+    // TODO JESSE: CHECK IF THE CHECKBOX IS CHECKED AND SEND MATERIAL REQUEST ALSO
     $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
       e.preventDefault()
       const date = new Date(Date.now()).toLocaleString()
@@ -186,11 +187,8 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       if($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
         shared.showDialog($('#templates')
         .find('.send-hearing-requests-dialog').clone()
-        // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN SENDING
-        // TODO JESSE: CHECK IF THE CHECKBOX IS CHECKED AND SEND MATERIAL REQUEST ALSO
         .find('button.send').click(shared.closeDialog).end()
         .find('button.cancel').click(shared.closeDialog).end()
-        
         .find('span[name=classification-date]').text(date).end()
         .find('span[name=classifier-name]').text($form.find('span.author').text()).end()
         .find('span[name=diary-number]').text($form.find('input[name="classification.kaviDiaryNumber"]').val()).end()
@@ -198,7 +196,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         .find('span[name=program-release-date]').text(program.year).end()
         .find('span[name=program-release-country]').text(program.country).end()
         .find('span[name=program-duration]').text($form.find('input[name="classification.duration"]').val()).end()
-        .find('span[name=material-order-request]').text($('#materialRequest').is(':checked')).end()
+        // .find('span[name=material-order-request]').text($('#materialRequest').is(':checked')).end() // TODO JESSE: FOR CHECKING MATERIAL REQUEST, NOT WORKING ATM
         .find('.dialog-warnings').append(warningOrders[0]).end()
         )
       }

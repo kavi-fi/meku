@@ -410,23 +410,9 @@
   </div>
 </div>
 
-<style>
-  .jesse {
-    display: flex;
-    flex-direction: column;
-  }
-  .jesse div > label {
-    width: 200px;
-    padding: 0 10px 20px 0;
-  }
-</style>
-
-<!-- TODO JESSE: ADD STUFF TO THIS MODAL -->
 <div class="send-hearing-requests-dialog remove-dialog dialog">
-    <h2>Haluatko lähettää kuulemispyynnöt?</h2>
-    <!-- TODO JESSE: ADD CSS SHIT TO MAKE IT LOOK BETTER -->
-    <!-- TODO JESSE: ADD SWEDISH SHIT -->
-    <div class="jesse classification-details">
+    <h2 data-i18n>Haluatko lähettää kuulemispyynnöt?</h2>
+    <div class="hearing-requests-dialog-styling classification-details">
       <div>
         <label data-i18n>Päivämäärä</label><span class="textified-field" name="classification-date"></span>
       </div>
@@ -434,15 +420,15 @@
         <label data-i18n>Luokittelijan nimi</label><span class="author textified-field" name="classifier-name"></span>
       </div>
       <div>
-        <label>Luokittelijan sähköposti</label><input name="classifier-email" required type="email"></input>
+        <label data-i18n>Luokittelijan sähköposti</label><input name="classifier-email" required type="email"></input>
       </div>
       <div>
-        <label>Tilaajan nimi</label><input name="orderer-name" required type="text"></input>
+        <label data-i18n>Tilaajan nimi</label><input name="orderer-name" required type="text"></input>
       </div>
       <div>
-        <label>Tilaajan sähköposti</label><input name="orderer-email" required type="email"></input>
+        <label data-i18n>Tilaajan sähköposti</label><input name="orderer-email" required type="email"></input>
       </div>
-      <h3>Kuvaohjelman tiedot</h3>
+      <h3 data-i18n>Kuvaohjelman tiedot</h3>
       <div>
         <label data-i18n>Diaarinumero</label><span class="textified-field" name="diary-number"></span>
       </div>
@@ -466,8 +452,8 @@
       </div>
     </div>
   <div class="buttons">
-    <button class="cancel button" name="cancel">Peruuta</button>
-    <button class="send button" name="send">Lähetä</button>
+    <button class="cancel button" name="cancel" data-i18n>Peruuta</button>
+    <button class="send button" name="send" data-i18n>Lähetä</button>
   </div>
 </div>
 
@@ -727,7 +713,7 @@
       <div class="form content clearfix">
         <h2 class="main" data-i18n data-cy="classification">Luokittelu</h2>
         <div class="classification-author-field">
-          <label data-i18n>Luokittelijan nimi1</label><span class="author textified-field"></span>
+          <label data-i18n>Luokittelijan nimi</label><span class="author textified-field"></span>
           <label data-i18n>Rekisteröintipäivä</label><input type="text" name="classification.registrationDate" data-cy="classification-registrationDate" />
         </div>
         <div class="left author-and-reason-fields">
@@ -770,12 +756,8 @@
       <div>
         <div class="kavi-diary-number">
           <label class="select2-label" data-i18n>Diaarinumero</label><input name="classification.kaviDiaryNumber" type="text" class="throttledInput"/>
-
-          <!-- TODO JESSE: ADD SWEDISH TRANSLATIONS AND MAKE BUTTON ACTIVE ONLY AFTER DIARY NUMBER IS ADDED -->
-          <button name="open-hearing-requests-dialog" disabled class="button open-hearing-requests-dialog" data-i18n data-cy="kakka">Kuulemispyyntöjen lähetys</button>
-          <!-- TODO JESSE: ADD SWEDISH TRANSLATION -->
-          <input id="materialRequest" name="classification.sendMaterialsRequest" type="checkbox" data-cy=""/><span data-i18n> Materiaalin toimituspyyntö</span>
-
+          <button name="open-hearing-requests-dialog" disabled class="button open-hearing-requests-dialog" data-i18n>Kuulemispyyntöjen lähetys</button>
+          <input id="materialRequest" name="classification.sendMaterialsRequest" type="checkbox"/><span data-i18n> Materiaalin toimituspyyntö</span>
         </div>
         <div class="kavi-diary-number">
         </div>

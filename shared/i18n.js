@@ -122,6 +122,7 @@
       'Näyttelijät': 'Skådespelare',
       'Synopsis': 'Synopsis',
       'Luokittelijan nimi': 'Klassificerarens namn',
+      'Luokittelijan sähköposti': 'Klassificerarens epost',
       'Peruste': 'Grund',
       'Luokittelun tilaaja': 'Klassificeringens beställare',
       'Rekisteröinnistä laskutetaan': 'För registreringen faktureras',
@@ -152,6 +153,17 @@
       'Vastuuvapauslauseke': 'Ansvarsfriskrivning',
       'Hakuohje': 'Sökning Hjälp',
       "Näytä ohje": 'Visa hjälp',
+      'Haluatko lähettää kuulemispyynnöt?': '(sv) Haluatko lähettää kuulemispyynnöt?',
+      'Kuulemispyyntöjen lähetys': '(sv) Kuulemispyyntöjen lähetys',
+      'Materiaalin toimituspyyntö': '(sv) Materiaalin toimituspyyntö',
+      'Päivämäärä': '(sv) Päivämäärä',
+      'Tilaajan nimi': '(sv) Tilaajan nimi',
+      'Tilaajan sähköposti': '(sv) Tilaajan sähköposti',
+      'Vuosi': 'År',
+      'Luokittelu': 'Klassificering',
+      'Lähetä': 'Sänd',
+      'Peruuta': 'Avbryt',
+
 
       // public.html:
 

@@ -143,17 +143,20 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       const registrationDate = $form.find('input[name="classification.registrationDate"]').val()
       $form.find('button[name=register]').prop('disabled', true)
       e.preventDefault()
-      $.post('/programs/' + program._id + '/register', JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})).done(function (savedProgram) {
-        $form.hide()
-        $("#search-page").trigger('show').show()
-        shared.showDialog($('<div>', {class: 'registration-confirmation dialog', 'data-cy': 'registration-confirmation-dialog'})
-          .append($('<span>', {class: 'name'}).text(savedProgram.name))
-          .append(shared.renderWarningSummary(window.classificationUtils.fullSummary(savedProgram)))
-          .append($('<p>', {class: 'registration-date'}).text(shared.i18nText('Rekisteröity') + ' ' + registrationDate))
-          .append($('<p>', {class: 'buttons'}).html($('<button>', {click: shared.closeDialog, class: 'button', 'data-cy': 'button'}).i18nText('Sulje'))))
-        $(window).scrollTop(0)
+      $.post('/programs/' + program._id + '/register',
+      JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})).done(
+        function (savedProgram) {
+          $form.hide()
+          $("#search-page").trigger('show').show()
+          shared.showDialog($('<div>', {class: 'registration-confirmation dialog', 'data-cy': 'registration-confirmation-dialog'})
+            .append($('<span>', {class: 'name'}).text(savedProgram.name))
+            .append(shared.renderWarningSummary(window.classificationUtils.fullSummary(savedProgram)))
+            .append($('<p>', {class: 'registration-date'}).text(shared.i18nText('Rekisteröity') + ' ' + registrationDate))
+            .append($('<p>', {class: 'buttons'}).html($('<button>', {click: shared.closeDialog, class: 'button', 'data-cy': 'button'}).i18nText('Sulje'))))
+          $(window).scrollTop(0)
       })
     })
+
     $form.find('button[name=save]').on('click', function (e) {
       $form.find('button[name=save]').prop('disabled', true)
       e.preventDefault()
@@ -162,16 +165,45 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         shared.showDialog($('#templates').find('.modify-success-dialog').clone().find('button.ok').click(shared.closeDialog).end())
       })
     })
+
+    if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
+      $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
+    }
+
+    $form.find('input[name="classification.kaviDiaryNumber"]').on('blur', function (e) {
+      if($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
+        $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
+      } else {
+        $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
+      }
+    })
+    
     $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
       e.preventDefault()
-      shared.showDialog($('#templates').find('.send-hearing-requests-dialog').clone()
+      const date = new Date(Date.now()).toLocaleString()
+      const warningOrders = $('.warning-order').clone()
+      
+      if($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
+        shared.showDialog($('#templates')
+        .find('.send-hearing-requests-dialog').clone()
         // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN SENDING
         // TODO JESSE: CHECK IF THE CHECKBOX IS CHECKED AND SEND MATERIAL REQUEST ALSO
-        // $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
         .find('button.send').click(shared.closeDialog).end()
         .find('button.cancel').click(shared.closeDialog).end()
-      )
+        
+        .find('span[name=classification-date]').text(date).end()
+        .find('span[name=classifier-name]').text($form.find('span.author').text()).end()
+        .find('span[name=diary-number]').text($form.find('input[name="classification.kaviDiaryNumber"]').val()).end()
+        .find('span[name=program-name]').text(program.name).end()
+        .find('span[name=program-release-date]').text(program.year).end()
+        .find('span[name=program-release-country]').text(program.country).end()
+        .find('span[name=program-duration]').text($form.find('input[name="classification.duration"]').val()).end()
+        .find('span[name=material-order-request]').text($('#materialRequest').is(':checked')).end()
+        .find('.dialog-warnings').append(warningOrders[0]).end()
+        )
+      }
     })
+
     $form.on('click', '.back-to-search', function (e) {
       e.preventDefault()
       $form.hide()

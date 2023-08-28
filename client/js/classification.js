@@ -176,27 +176,31 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
       }
     })
-    
+
     // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN SENDING
     // TODO JESSE: CHECK IF THE CHECKBOX IS CHECKED AND SEND MATERIAL REQUEST ALSO
     $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
       e.preventDefault()
       const date = new Date(Date.now()).toLocaleString()
       const warningOrders = $('.warning-order').clone()
-      
+
       if($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
         shared.showDialog($('#templates')
         .find('.send-hearing-requests-dialog').clone()
-        .find('button.send').click(shared.closeDialog).end()
+        //.find('button.send').click(sendHearingRequests(date, $form.find('input[name=classifier-email]'),"","")).end()
+        .find('button.send').on('click', () => {
+          // TODO JESSE: input form validation before sending
+          sendHearingRequests(date, $form.find('classification-details.input[name=classifier-email]').val(),"test1","test2")
+        }).end() // TODO JESSE: not working
         .find('button.cancel').click(shared.closeDialog).end()
-        .find('span[name=classification-date]').text(date).end()
+        .find('span[name=classification-date]').text(date).end() // TODO JESSE: format date string
         .find('span[name=classifier-name]').text($form.find('span.author').text()).end()
         .find('span[name=diary-number]').text($form.find('input[name="classification.kaviDiaryNumber"]').val()).end()
         .find('span[name=program-name]').text(program.name).end()
         .find('span[name=program-release-date]').text(program.year).end()
         .find('span[name=program-release-country]').text(program.country).end()
         .find('span[name=program-duration]').text($form.find('input[name="classification.duration"]').val()).end()
-        // .find('span[name=material-order-request]').text($('#materialRequest').is(':checked')).end() // TODO JESSE: FOR CHECKING MATERIAL REQUEST, NOT WORKING ATM
+        .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end()
         .find('.dialog-warnings').append(warningOrders[0]).end()
         )
       }
@@ -296,6 +300,28 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         $container[isInitial ? 'hide' : 'slideUp']()
       }
     }
+  }
+
+  function sendHearingRequests(date, classifierEmail, buyerName, buyerEmail) {
+    console.log('Clicked on sendHearingRequests()')
+    const data = {
+      date: date,
+      classifierName: $form.find('span.author').text(),
+      classifierEmail: classifierEmail,
+      buyerName: buyerName,
+      buyerEmail: buyerEmail,
+      drnro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),
+      programName: program.name.toString(),
+      programReleaseYear: program.year,
+      programReleaseCountry: program.country.toString(),
+      programDuration: $form.find('input[name="classification.duration"]').val(),
+      programClassification: "",
+      sendMaterialRequest: $form.find('#materialRequest').is(':checked')
+    }
+    console.log(data)
+//    $.post('/reclassificationhearingrequests', JSON.stringify(data)).done(function (p) {
+//      console.log('Sent hearing request')
+//    })
   }
 
   function saveRegistrationDate($registrationDate) {

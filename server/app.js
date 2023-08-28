@@ -1221,6 +1221,45 @@ app.post('/users/new', requireRole('root'), (req, res, next) => {
   })
 })
 
+app.post('/reclassificationhearingrequests', requireRole('kavi'), (req, res, next) => {
+  console.log('Running app.post')
+  console.log(req.body)
+  srvUtils.getTemplateWithVars('reclassification-hearing-request-for-classifier.tpl.html', vars, (templErr, template) => {
+    if (templErr) return next(templErr)
+    // Sähköpostin lähetys
+    const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
+    console.log('Next running sendReclassificationHearingRequestEmails()')
+    sendReclassificationHearingRequestEmails(req.user, emailSubject, template, respond(res, next))
+  })
+})
+
+function sendReclassificationHearingRequestEmails(user, emailSubject, template, callback) {
+  //const url = env.hostname + '/reset-password.html#' + user.resetHash
+  const emailData = {
+    recipients: 'jesse.saarimaa@orangit.fi',
+    subject: emailSubject,
+    body: _.template(template)({
+      //link: url,
+      //username: user.username
+    })
+  }
+  sendEmail(emailData, user, callback)
+}
+
+// TODO JESSE: Luo uusi endpoint jossa kutsutaan sähköpostin lähettävää funktiota.
+// email/reclassification.js
+// Endpoint(
+//  Validoi()
+//    Vars = {}
+//    srvUtils.getTemplateWithVars()
+// )
+
+const vars = {
+  header: 'Ilmoittautuminen tarjoajaksi',
+}
+
+
+
 app.post('/users/:id', requireRole('root'), (req, res, next) => {
   User.findById(req.params.id, (err, user) => {
     if (err) return next(err)
@@ -1741,6 +1780,10 @@ function logErrorOrSendEmail (user) {
 }
 
 function sendEmail (opts, user, callback) {
+  console.log('NODE_ENV', process.env.NODE_ENV)
+  console.log('EMAIL_TO', process.env.EMAIL_TO)
+  console.log('opts', opts)
+  console.log('user', user)
   const msg = {
     from: opts.from || 'no-reply@kavi.fi',
     to: opts.recipients,
@@ -1755,6 +1798,7 @@ function sendEmail (opts, user, callback) {
   }
 
   if (env.sendEmail || process.env.EMAIL_TO !== undefined) {
+    console.log('sending the email', msg)
     sendgrid.send(msg, callback)
   } else if (env.isTest) {
     testEnvEmailQueue.push(msg)

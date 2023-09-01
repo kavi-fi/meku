@@ -1224,10 +1224,11 @@ app.post('/users/new', requireRole('root'), (req, res, next) => {
 app.post('/sendemail/hearingrequest/classifier', requireRole('kavi'), (req, res, next) => {
   const vars = req.body
   vars['hostName'] = env.hostname
+  vars['classifierEmail'] = req.user.email
   srvUtils.getTemplateWithVars('reclassification-hearing-request-for-classifier.tpl.html', vars, (templErr, template) => {
     if (templErr) return next(templErr)
     const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
-    const emailRecipients = [req.body.classifierEmail]
+    const emailRecipients = [req.user.email]
     sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
   })
 })
@@ -1235,6 +1236,7 @@ app.post('/sendemail/hearingrequest/classifier', requireRole('kavi'), (req, res,
 app.post('/sendemail/hearingrequest/buyer', requireRole('kavi'), (req, res, next) => {
   const vars = req.body
   vars['hostName'] = env.hostname
+  vars['classifierEmail'] = req.user.email
   srvUtils.getTemplateWithVars('reclassification-hearing-request-for-buyer.tpl.html', vars, (templErr, template) => {
     if (templErr) return next(templErr)
     const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
@@ -1245,6 +1247,7 @@ app.post('/sendemail/hearingrequest/buyer', requireRole('kavi'), (req, res, next
 app.post('/sendemail/materialrequest', requireRole('kavi'), (req, res, next) => {
   const vars = req.body
   vars['hostName'] = env.hostname
+  vars['classifierEmail'] = req.user.email
   srvUtils.getTemplateWithVars('reclassification-material-request.tpl.html', vars, (templErr, template) => {
     if (templErr) return next(templErr)
     const emailSubject = 'Materiaalin toimituspyyntö'
@@ -1256,8 +1259,7 @@ app.post('/sendemail/materialrequest', requireRole('kavi'), (req, res, next) => 
 function sendReclassificationHearingRequestEmails(user, emailRecipients, emailSubject, template, callback) {
   const emailData = {
     recipients: emailRecipients,
-    bcc: 'mewwbae@gmail.com',
-    //bcc: ['ville.sohn@kavi.fi', 'hallinto@kavi.fi'], TODO JESSE: Enable this
+    bcc: ['ville.sohn@kavi.fi', 'hallinto@kavi.fi'],
     subject: emailSubject,
     body: _.template(template)({
     })

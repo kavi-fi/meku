@@ -20,7 +20,6 @@ exports.getTemplate = (function () {
 
 exports.getTemplateWithVars = (function() {
   return function(templateName, vars, cb) {
-    console.log('Vars are:', vars)
     this.getTemplate(templateName, (templateError, tpl) => {
       if (templateError) return cb(templateError)
       return cb(null, _.template(tpl)(vars))

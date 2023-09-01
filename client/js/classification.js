@@ -205,20 +205,24 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       return check.test(email);
     }
 
-    function submitRequestEmail(date) {
+    function handleDialogAfterSent(shared, isButtonDisabled, isCheckboxDisabled) {
+      shared.closeDialog()
+      $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', isButtonDisabled).text('Kuulemispyynnöt lähetetty')
+      $form.find('#materialRequest').prop('disabled', isCheckboxDisabled)
+    }
+
+    function submitRequestEmail(date, shared) {
       const dialog = $('#dialog')
       const dueDate = formatDate(date, 'dd.mm.yyyy', true)
       const formattedDate = formatDate(date, 'dd.mm.yyyy', false)
-      const classifierEmail = dialog.find('input[name=classifier-email]').val()
       const buyerName = dialog.find('input[name=buyer-name]').val()
       const buyerEmail = dialog.find('input[name=buyer-email]').val()
 
-      if (!(validateEmail(classifierEmail) && buyerName && validateEmail(buyerEmail))) {
+      if (!(buyerName && validateEmail(buyerEmail))) {
         alert('Tarkista kentät!')
       } else {
-        sendHearingRequests(formattedDate, dueDate, classifierEmail, buyerName, buyerEmail, "LUOKITTELU")
-        // TODO JESSE: Send luokittelut
-        // TODO JESSE: Close dialog after sending
+        sendHearingRequests(formattedDate, dueDate, buyerName, buyerEmail, "LUOKITTELU") // TODO JESSE: Send luokittelut
+        handleDialogAfterSent(shared, true, true)
       }
     }
 
@@ -231,7 +235,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
         shared.showDialog($('#templates')
         .find('.send-hearing-requests-dialog').clone()
-        .find('button.send').on('click', () => { submitRequestEmail(date) }).end()
+        .find('button.send').on('click', () => { submitRequestEmail(date, shared) }).end()
         .find('button.cancel').click(shared.closeDialog).end()
         .find('span[name=classification-date]').text(formatDate(date, 'dd.mm.yyyy', false)).end()
         .find('span[name=classifier-name]').text($form.find('span.author').text()).end()
@@ -340,14 +344,13 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     }
   }
 
-  function sendHearingRequests(date, dueDate, classifierEmail, buyerName, buyerEmail, classifications) {
+  function sendHearingRequests(date, dueDate, buyerName, buyerEmail, classifications) {
     const isSendMaterialRequestChecked = $form.find('#materialRequest').is(':checked')
     const data = {
       hostName: "",
       date: date,
       dueDate: dueDate,
       classifierName: $form.find('span.author').text(),
-      classifierEmail: classifierEmail,
       buyerName: buyerName,
       buyerEmail: buyerEmail,
       drNro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),

@@ -1807,9 +1807,8 @@ function sendEmail (opts, user, callback) {
     testEnvEmailQueue.push(msg)
     return callback()
   } else {
-    sendgrid.send(msg, callback)
     console.log('email (suppressed) to: ', opts.recipients, msg)
-//    return callback()
+    return callback()
   }
 }
 

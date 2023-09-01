@@ -1221,44 +1221,49 @@ app.post('/users/new', requireRole('root'), (req, res, next) => {
   })
 })
 
-app.post('/reclassificationhearingrequests', requireRole('kavi'), (req, res, next) => {
-  console.log('Running app.post')
-  console.log(req.body)
+app.post('/sendemail/hearingrequest/classifier', requireRole('kavi'), (req, res, next) => {
+  const vars = req.body
+  vars['hostName'] = env.hostname
   srvUtils.getTemplateWithVars('reclassification-hearing-request-for-classifier.tpl.html', vars, (templErr, template) => {
     if (templErr) return next(templErr)
-    // Sähköpostin lähetys
     const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
-    console.log('Next running sendReclassificationHearingRequestEmails()')
-    sendReclassificationHearingRequestEmails(req.user, emailSubject, template, respond(res, next))
+    const emailRecipients = [req.body.classifierEmail]
+    sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
   })
 })
 
-function sendReclassificationHearingRequestEmails(user, emailSubject, template, callback) {
-  //const url = env.hostname + '/reset-password.html#' + user.resetHash
+app.post('/sendemail/hearingrequest/buyer', requireRole('kavi'), (req, res, next) => {
+  const vars = req.body
+  vars['hostName'] = env.hostname
+  srvUtils.getTemplateWithVars('reclassification-hearing-request-for-buyer.tpl.html', vars, (templErr, template) => {
+    if (templErr) return next(templErr)
+    const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
+    const emailRecipients = [req.body.buyerEmail]
+    sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+  })
+})
+app.post('/sendemail/materialrequest', requireRole('kavi'), (req, res, next) => {
+  const vars = req.body
+  vars['hostName'] = env.hostname
+  srvUtils.getTemplateWithVars('reclassification-material-request.tpl.html', vars, (templErr, template) => {
+    if (templErr) return next(templErr)
+    const emailSubject = 'Materiaalin toimituspyyntö'
+    const emailRecipients = [req.body.buyerEmail]
+    sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+  })
+})
+
+function sendReclassificationHearingRequestEmails(user, emailRecipients, emailSubject, template, callback) {
   const emailData = {
-    recipients: 'jesse.saarimaa@orangit.fi',
+    recipients: emailRecipients,
+    bcc: 'mewwbae@gmail.com',
+    //bcc: ['ville.sohn@kavi.fi', 'hallinto@kavi.fi'], TODO JESSE: Enable this
     subject: emailSubject,
     body: _.template(template)({
-      //link: url,
-      //username: user.username
     })
   }
   sendEmail(emailData, user, callback)
 }
-
-// TODO JESSE: Luo uusi endpoint jossa kutsutaan sähköpostin lähettävää funktiota.
-// email/reclassification.js
-// Endpoint(
-//  Validoi()
-//    Vars = {}
-//    srvUtils.getTemplateWithVars()
-// )
-
-const vars = {
-  header: 'Ilmoittautuminen tarjoajaksi',
-}
-
-
 
 app.post('/users/:id', requireRole('root'), (req, res, next) => {
   User.findById(req.params.id, (err, user) => {
@@ -1780,13 +1785,10 @@ function logErrorOrSendEmail (user) {
 }
 
 function sendEmail (opts, user, callback) {
-  console.log('NODE_ENV', process.env.NODE_ENV)
-  console.log('EMAIL_TO', process.env.EMAIL_TO)
-  console.log('opts', opts)
-  console.log('user', user)
   const msg = {
     from: opts.from || 'no-reply@kavi.fi',
     to: opts.recipients,
+    bcc: opts.bcc,
     subject: opts.subject,
     html: opts.body
   }
@@ -1798,14 +1800,14 @@ function sendEmail (opts, user, callback) {
   }
 
   if (env.sendEmail || process.env.EMAIL_TO !== undefined) {
-    console.log('sending the email', msg)
     sendgrid.send(msg, callback)
   } else if (env.isTest) {
     testEnvEmailQueue.push(msg)
     return callback()
   } else {
+    sendgrid.send(msg, callback)
     console.log('email (suppressed) to: ', opts.recipients, msg)
-    return callback()
+//    return callback()
   }
 }
 

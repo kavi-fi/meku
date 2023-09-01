@@ -1,3 +1,5 @@
+// noinspection BadExpressionStatementJS
+
 window.classificationPage = function () {
   const $root = $('#classification-page')
 
@@ -142,9 +144,10 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       const registrationDate = $form.find('input[name="classification.registrationDate"]').val()
       $form.find('button[name=register]').prop('disabled', true)
       e.preventDefault()
-      $.post('/programs/' + program._id + '/register',
-      JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})).done(
-        function (savedProgram) {
+      $.post(
+'/programs/' + program._id + '/register',
+      JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})
+).done(function (savedProgram) {
           $form.hide()
           $("#search-page").trigger('show').show()
           shared.showDialog($('<div>', {class: 'registration-confirmation dialog', 'data-cy': 'registration-confirmation-dialog'})
@@ -170,30 +173,67 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     }
 
     $form.find('input[name="classification.kaviDiaryNumber"]').on('keyup', function (e) {
-      if($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
+      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
         $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
       } else {
         $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
       }
     })
 
-    // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN SENDING
-    // TODO JESSE: CHECK IF THE CHECKBOX IS CHECKED AND SEND MATERIAL REQUEST ALSO
+    function formatDate(date, format, isDueDate) {
+      let map = {}
+      if (isDueDate) {
+        const dueDate = new Date(date)
+        dueDate.setDate(dueDate.getDate() + 6)
+        map = {
+          mm: dueDate.getMonth() + 1,
+          dd: dueDate.getDate(),
+          yyyy: dueDate.getFullYear()
+        }
+      } else {
+        map = {
+          mm: date.getMonth() + 1,
+          dd: date.getDate(),
+          yyyy: date.getFullYear()
+        }
+      }
+      return format.replace(/mm|dd|yyyy/gi, (matched) => map[matched])
+    }
+
+    function validateEmail(email) {
+      const check = /\S+@\S+\.\S+/;
+      return check.test(email);
+    }
+
+    function submitRequestEmail(date) {
+      const dialog = $('#dialog')
+      const dueDate = formatDate(date, 'dd.mm.yyyy', true)
+      const formattedDate = formatDate(date, 'dd.mm.yyyy', false)
+      const classifierEmail = dialog.find('input[name=classifier-email]').val()
+      const buyerName = dialog.find('input[name=buyer-name]').val()
+      const buyerEmail = dialog.find('input[name=buyer-email]').val()
+
+      if (!(validateEmail(classifierEmail) && buyerName && validateEmail(buyerEmail))) {
+        alert('Tarkista kentät!')
+      } else {
+        sendHearingRequests(formattedDate, dueDate, classifierEmail, buyerName, buyerEmail, "LUOKITTELU")
+        // TODO JESSE: Send luokittelut
+        // TODO JESSE: Close dialog after sending
+      }
+    }
+
+    // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN/AFTER SENDING
     $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
       e.preventDefault()
-      const date = new Date(Date.now()).toLocaleString()
+      const date = new Date(Date.now())
       const warningOrders = $('.warning-order').clone()
 
-      if($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
+      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
         shared.showDialog($('#templates')
         .find('.send-hearing-requests-dialog').clone()
-        //.find('button.send').click(sendHearingRequests(date, $form.find('input[name=classifier-email]'),"","")).end()
-        .find('button.send').on('click', () => {
-          // TODO JESSE: input form validation before sending
-          sendHearingRequests(date, $form.find('classification-details.input[name=classifier-email]').val(),"test1","test2")
-        }).end() // TODO JESSE: not working
+        .find('button.send').on('click', () => { submitRequestEmail(date) }).end()
         .find('button.cancel').click(shared.closeDialog).end()
-        .find('span[name=classification-date]').text(date).end() // TODO JESSE: format date string
+        .find('span[name=classification-date]').text(formatDate(date, 'dd.mm.yyyy', false)).end()
         .find('span[name=classifier-name]').text($form.find('span.author').text()).end()
         .find('span[name=diary-number]').text($form.find('input[name="classification.kaviDiaryNumber"]').val()).end()
         .find('span[name=program-name]').text(program.name).end()
@@ -201,9 +241,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         .find('span[name=program-release-country]').text(program.country).end()
         .find('span[name=program-duration]').text($form.find('input[name="classification.duration"]').val()).end()
         .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end()
-        .find('.dialog-warnings').append(warningOrders[0]).end()
-        )
-      }
+        .find('.dialog-warnings').append(warningOrders[0]).end()) }
     })
 
     $form.on('click', '.back-to-search', function (e) {
@@ -302,26 +340,35 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     }
   }
 
-  function sendHearingRequests(date, classifierEmail, buyerName, buyerEmail) {
-    console.log('Clicked on sendHearingRequests()')
+  function sendHearingRequests(date, dueDate, classifierEmail, buyerName, buyerEmail, classifications) {
+    const isSendMaterialRequestChecked = $form.find('#materialRequest').is(':checked')
     const data = {
+      hostName: "",
       date: date,
+      dueDate: dueDate,
       classifierName: $form.find('span.author').text(),
       classifierEmail: classifierEmail,
       buyerName: buyerName,
       buyerEmail: buyerEmail,
-      drnro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),
-      programName: program.name.toString(),
+      drNro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),
+      programNameFi: program.nameFi.toString(),
+      programOriginalName: program.name.toString(),
+      programType: window.enums.util.programTypeName(program.programType),
       programReleaseYear: program.year,
       programReleaseCountry: program.country.toString(),
       programDuration: $form.find('input[name="classification.duration"]').val(),
-      programClassification: "",
-      sendMaterialRequest: $form.find('#materialRequest').is(':checked')
+      programClassification: classifications,
+      sendMaterialRequest: isSendMaterialRequestChecked
     }
-    console.log(data)
-//    $.post('/reclassificationhearingrequests', JSON.stringify(data)).done(function (p) {
-//      console.log('Sent hearing request')
-//    })
+     $.post('/sendemail/hearingrequest/classifier', JSON.stringify(data)).done(function (p) {
+     })
+      $.post('/sendemail/hearingrequest/buyer', JSON.stringify(data)).done(function (p) {
+    })
+
+    if(isSendMaterialRequestChecked) {
+      $.post('/sendemail/materialrequest', JSON.stringify(data)).done(function (p) {
+      })
+    }
   }
 
   function saveRegistrationDate($registrationDate) {

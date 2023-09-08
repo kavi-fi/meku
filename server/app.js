@@ -1618,6 +1618,10 @@ const checkExpiredCerts = new CronJob('0 */30 * * * *', () => {
   })
 })
 
+/**
+ *  A cron job that fetches all the users that have an expiring certificate within 6 months or less and to who
+ *  have not been sent a reminder for over a month. These users are then sent a reminder
+ */
 const checkCertsExpiringSoon = new CronJob('0 */30 * * * *', () => {
   User.find({$and: [
     {certificateEndDate: {$lt: moment().add(6, 'months').toDate(), $gt: new Date()}},

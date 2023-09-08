@@ -1619,7 +1619,7 @@ const checkExpiredCerts = new CronJob('0 */30 * * * *', () => {
 })
 
 /**
- *  A cron job that fetches all the users that have an expiring certificate within 6 months or less and to who
+ *  A cron job that fetches all the users that have an expiring certificate within 6 months or less, and to whom
  *  a reminder has not been sent for over a month. These users are then sent a reminder.
  */
 const checkCertsExpiringSoon = new CronJob('0 */30 * * * *', () => {

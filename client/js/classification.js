@@ -1,4 +1,5 @@
 // noinspection BadExpressionStatementJS
+const buyerEmails = []
 
 window.classificationPage = function () {
   const $root = $('#classification-page')
@@ -200,9 +201,14 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       return format.replace(/mm|dd|yyyy/gi, (matched) => map[matched])
     }
 
-    function validateEmail(email) {
+    function validateEmail(emails) {
       const check = /\S+@\S+\.\S+/;
-      return check.test(email);
+      const emailArray = emails.split(',')
+      emailArray.forEach((email) => {
+        const isValid = check.test(email);
+        if (!isValid) return false
+      })
+      return true
     }
 
     function handleDialogAfterSent(shared, isButtonDisabled, isCheckboxDisabled) {
@@ -215,7 +221,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       const dialog = $('#dialog')
       const dueDate = formatDate(date, 'dd.mm.yyyy', true)
       const formattedDate = formatDate(date, 'dd.mm.yyyy', false)
-      const buyerName = dialog.find('input[name=buyer-name]').val()
+      const buyerName = dialog.find('span[name=buyer-name]').text()
       const buyerEmail = dialog.find('input[name=buyer-email]').val()
 
       if (!(buyerName && validateEmail(buyerEmail))) {
@@ -230,7 +236,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
       e.preventDefault()
       const date = new Date(Date.now())
-      const warningOrders = $('.warning-order').clone()
+      console.log(program)
 
       if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
         shared.showDialog($('#templates')
@@ -239,13 +245,16 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         .find('button.cancel').click(shared.closeDialog).end()
         .find('span[name=classification-date]').text(formatDate(date, 'dd.mm.yyyy', false)).end()
         .find('span[name=classifier-name]').text($form.find('span.author').text()).end()
+        .find('span[name=buyer-name]').text($form.find('input[name="classification.buyer"]').select2("data").text).end()
+        .find('input[name=buyer-email]').val(buyerEmails).end()
         .find('span[name=diary-number]').text($form.find('input[name="classification.kaviDiaryNumber"]').val()).end()
         .find('span[name=program-name]').text(program.name).end()
         .find('span[name=program-release-date]').text(program.year).end()
         .find('span[name=program-release-country]').text(program.country).end()
         .find('span[name=program-duration]').text($form.find('input[name="classification.duration"]').val()).end()
-        .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end()
-        .find('.dialog-warnings').append(warningOrders[0]).end()) }
+        .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end())
+        cfu.updateWarningOrdering($('#dialog'), program.classifications[1])
+      }
     })
 
     $form.on('click', '.back-to-search', function (e) {
@@ -586,6 +595,13 @@ function classificationFormUtils() {
     const warnings = [$('<span>', {class: 'drop-target'})].concat(summary.warnings.map(function (w) {
       return $('<span>', {'data-id': w.category, class: 'warning ' + w.category, draggable: true}).add($('<span>', {class: 'drop-target'}))
     }))
+    console.log("form", $form)
+    console.log("summary", summary)
+    console.log("warnings", warnings)
+    console.log("form.find('.warning-order')", $form.find('.warning-order'))
+    console.log('$form.find(\'.warning-order\'):', $form.find('.warning-order'))
+    console.log('$form.find(\'.warning-order\').find(\'.agelimit img\'):', $form.find('.warning-order').find('.agelimit img'))
+    console.log('$form.find(\'.warning-order\').find(\'.agelimit img\').find(\'.warnings\'):', $form.find('.warning-order').find('.agelimit img').find('.warnings'))
     $form.find('.warning-order')
       .find('.agelimit img').attr('src', shared.ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
@@ -652,6 +668,11 @@ function classificationFormUtils() {
         const buyer = source === 'buyer' ? emails.map(toOption('buyer', true)) : current.filter(bySource('buyer'))
         const manual = source === 'manual' ? emails.map(toOption('manual', false)) : current.filter(bySource('manual'))
         $input.select2('data', sent.concat(buyer).concat(manual).concat(kavi)).trigger('validate')
+        if(source === 'buyer') {
+          console.log("emails", emails)
+          buyerEmails.splice(0, buyerEmails.length)
+          buyerEmails.push(...emails)
+        }
       }
 
       function getCurrentEmailSelection() {

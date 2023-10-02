@@ -1,5 +1,3 @@
-// noinspection BadExpressionStatementJS
-
 window.classificationPage = function () {
   const $root = $('#classification-page')
 
@@ -172,11 +170,11 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
     }
 
-    $form.find('input[name="classification.kaviDiaryNumber"]').on('keyup', function (e) {
-      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() !== '') {
-        $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
-      } else {
+    $form.find('input[name="classification.kaviDiaryNumber"]').on('keyup', function () {
+      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() === '') {
         $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
+      } else {
+        $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
       }
     })
 

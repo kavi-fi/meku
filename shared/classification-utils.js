@@ -89,6 +89,14 @@
     return _.max(classification.criteria.map(function(id) { return enums.classificationCriteria[id - 1].age }))
   }
 
+  const iconHtml = function(summary, lang, hostName) {
+    const warningHtml = summary.warnings.map(function(w) { return img(w.category) }).join('')
+    const age = lang === 'sv' && summary.age === 0 ? 't' : summary.age
+    return '<div style="margin: 10px 0;">' + img('agelimit-' + age) + warningHtml + '</div>'
+    function img(fileName) { return '<img src="' + hostName + '/images/' + fileName + '.png" style="width: 40px; height: 40px; padding-right: 8px;"/>' }
+  }
+  exports.iconHtml = iconHtml
+
   exports.registrationEmail = function(program, classification, user, hostName) {
     const fiData = generateData('fi')
     const svData = generateData('sv')
@@ -127,7 +135,7 @@
         extraInfoLink: extraInfoLink(),
         appendixLink: appendixLink(),
         previous: previous(),
-        icons: function (lng) { return iconHtml(classificationSummary, lng) },
+        icons: function (lng) { return iconHtml(classificationSummary, lng, hostName) },
         reclassification: exports.isReclassification(program, classification)
       }
 
@@ -302,12 +310,6 @@
 
     function dateFormat(d) { return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear() }
 
-    function iconHtml(summary, lang) {
-      const warningHtml = summary.warnings.map(function(w) { return img(w.category) }).join('')
-      const age = lang === 'sv' && summary.age === 0 ? 't' : summary.age
-      return '<div style="margin: 10px 0;">' + img('agelimit-' + age) + warningHtml + '</div>'
-      function img(fileName) { return '<img src="' + hostName + '/images/' + fileName + '.png" style="width: 40px; height: 40px; padding-right: 8px;"/>' }
-    }
   }
 
   exports.ageAsText = function(age) { return age && age.toString() || 'S' }

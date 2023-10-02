@@ -425,6 +425,9 @@
       <div>
         <label data-i18n>Tilaajan sähköposti(t)</label><input name="buyer-email" required type="email"></input>
       </div>
+      <div>
+        <label data-i18n>Toimitettava viimeistään</label><span name="due-date"></span>
+      </div>
       <h3 data-i18n>Kuvaohjelman tiedot</h3>
       <div>
         <label data-i18n>Diaarinumero</label><span class="textifield-field" name="diary-number"></span>
@@ -445,7 +448,9 @@
         <label data-i18n>Materiaalin toimituspyyntö</label><span class="textifield-field" name="material-order-request"></span>
       </div>
       <div class="warning-summary" data-cy="warning-summary">
-        <img class="agelimit" src="images/empty.png" data-cy="agelimit"/><div class="warnings"></div>
+        <span>Warnings here</span>
+        <img class="agelimit" src="images/empty.png" data-cy="agelimit"/>
+        <div class="warnings"></div>
       </div>
     </div>
   <div class="buttons">

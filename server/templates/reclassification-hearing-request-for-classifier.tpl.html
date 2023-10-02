@@ -1,24 +1,33 @@
-<p><img src="<%- hostName %>/images/logo.png" alt="MEKU/KAVI" title="undefined" width="306" height="60" style="padding: 20px 0 15px 20px;"></p>
-<p><%- classifierName %></p>
-<p><%- classifierEmail %></p>
-<p>Dnro <%- drNro %></p>
-<p>Pvä <%- date %></p>
+<div style="background-color: #ffffff; padding: 25px;">
+  <p style="text-align: right;"><img src="<%- hostName %>/images/logo.png" alt="MEKU/KAVI" title="undefined" width="306" height="60" style="padding: 20px 0 15px 20px;"></p>
+  <p><%- classifierName %><br>
+  <%- classifierEmail %><br>
+  Dnro <%- drNro %><br>
+  Pvä <%- date %></p>
 
-<h3>ASIANOSAISEN KUULEMINEN KUVAOHJELMAN UUDELLEENLUOKITTELUN JOHDOSTA</h3>
-<p>Kuvaohjelmaluokittelija: <%- classifierName %></p>
-<p>Kuvaohjelma, joka otetaan luokiteltavaksi: <strong><%- programNameFi %></strong> <em><%- programOriginalName %></em></p>
-<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on päättänyt ottaa uudelleenluokiteltavakseen seuraavan
-  kuvaohjelman kuvaohjelmaluokittelijoiden toiminnan lainmukaisuuden valvomiseksi.</p>
-<p><%- programNameFi %> <%- programReleaseYear %>, <%- programReleaseCountry %>, <%- programReleaseYear %> <%- programDuration %> <%- programType %> <%- programClassification %></p>
-<p>Luokittelipäätöksen tehneenä kuvaohjelmaluokittelijana olet asianosainen, minkä johdosta sinulle varataan hallintolain 34 §:n nojalla tilaisuus lausua mielipiteesi
-  asiasta sekä esittää luokittelupäätöksesi perusteet sekä selitys sellaisista vaatimuksista ja selvityksistä, jotka saattavat vaikuttaa asian ratkaisuun.</p>
-<p>KAVI pyytää, että mahdollinen selitys toimitetaan <strong>viimeistään <%- dueDate %></strong>. Määräajan noudattamatta
-  jättäminen tai kuulemispyyntöön vastaamatta jättäminen ei estä asian ratkaisua.</p>
-<p>Perustelut luokittelupäätökselle sekä mahdollinen selitys pyydetään toimittamaan joko sähköpostitse osoitteeseen <a href="mailto:<%- classifierEmail %>"><%- classifierEmail %></a> tai postitse osoitteeseen <%- classifierName %> / Kansallinen
-  audiovisuaalinen instituutti / MEKU, Sörnäisten rantatie 25 A, PL 16, 00501 Helsinki.</p>
-<p>Lisätietoja asiasta antaa erityisasiantuntija <%- classifierName %>, puh: {luokittelijan puhnum.}.</p>
-<br>
-<p>Leo Pekkala</p>
-<p>Apulaisjohtaja / tulosaluepäällikkö</p>
-<p>Kansallinen audiovisuaalinen instituutti</p>
-<p>Mediakasvatus- ja kuvaohjelmayksikkö</p>
+  <p><strong><span style="font-size: 14pt; line-height: 21px">ASIANOSAISEN KUULEMINEN KUVAOHJELMAN UUDELLEENLUOKITTELUN JOHDOSTA</span></strong></p>
+
+  <p>Kuvaohjelmaluokittelija: <%- classifierName %><br>
+  Kuvaohjelma, joka otetaan luokiteltavaksi: <strong><%- programNameFi %></strong> <em><%- programOriginalName %></em></p>
+
+  <p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö on päättänyt ottaa uudelleenluokiteltavakseen seuraavan
+    kuvaohjelman kuvaohjelmaluokittelijoiden toiminnan lainmukaisuuden valvomiseksi.</p>
+
+  <p><%- programNameFi %> <%- programReleaseYear %>, <%- programReleaseCountry %>, <%- programReleaseYear %> <%- programDuration %> <%- programType %> <%= icons %></p>
+
+  <p>Luokittelipäätöksen tehneenä kuvaohjelmaluokittelijana olet asianosainen, minkä johdosta sinulle varataan hallintolain 34 §:n nojalla tilaisuus lausua mielipiteesi
+    asiasta sekä esittää luokittelupäätöksesi perusteet sekä selitys sellaisista vaatimuksista ja selvityksistä, jotka saattavat vaikuttaa asian ratkaisuun.</p>
+
+  <p>KAVI pyytää, että mahdollinen selitys toimitetaan <strong>viimeistään <%- dueDate %></strong>. Määräajan noudattamatta
+    jättäminen tai kuulemispyyntöön vastaamatta jättäminen ei estä asian ratkaisua.</p>
+
+  <p>Perustelut luokittelupäätökselle sekä mahdollinen selitys pyydetään toimittamaan joko sähköpostitse osoitteeseen <a href="mailto:<%- classifierEmail %>"><%- classifierEmail %></a> tai postitse osoitteeseen <%- classifierName %> / Kansallinen
+    audiovisuaalinen instituutti / MEKU, Sörnäisten rantatie 25 A, PL 16, 00501 Helsinki.</p>
+
+  <p>Lisätietoja asiasta antaa erityisasiantuntija <%- classifierName %>, puh: <%- classifierPhone %>.</p>
+  <br>
+  <p>Leo Pekkala<br>
+  Apulaisjohtaja / tulosaluepäällikkö<br>
+  Kansallinen audiovisuaalinen instituutti<br>
+  Mediakasvatus- ja kuvaohjelmayksikkö</p>
+</div>

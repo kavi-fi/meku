@@ -1,20 +1,25 @@
-<p><img src="<%- hostName %>/images/logo.png" alt="MEKU/KAVI" title="undefined" width="306" height="60" style="padding: 20px 0 15px 20px;"></p>
-<p><%- buyerName %></p>
-<p><%- buyerEmail %></p>
-<p>Dnro <%- drNro %></p>
-<p>Pvä <%- date %></p>
+<div style="background-color: #ffffff; padding: 25px;">
+    <p style="text-align: right;"><img src="<%- hostName %>/images/logo.png" alt="MEKU/KAVI" title="undefined" width="306" height="60" style="padding: 20px 0 15px 20px;"></p>
+    <p><%- buyerName %><br>
+    <%- buyerEmail %><br>
+    Dnro <%- drNro %><br>
+    Pvä <%- date %></p>
 
-<h3>Materiaalin toimituspyyntö</h3>
-<p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö ottaa kuvaohjelmalain (710/2011) 21 §:n nojalla luokiteltavaksi
-kuvaohjelman</p>
-<p><strong><%- programNameFi %></strong></p>
-<p><%- programNameFi %> (<%- programReleaseYear %>, <%- programReleaseCountry %>, <%- programReleaseYear %>) <%- programDuration %> <%- programType %> <%- programClassification %></p>
-<p>KAVI pyytää toimittamaan kyseisen materiaalin <strong>viimeistään <%- dueDate %></strong> osoitteeseen <%- classifierName %> / Kansallinen audiovisuaalinen instituutti / MEKU, Sörnäisten
-rantatie 25 A, PL 16, 00500 Helsinki tai sähköpostitse osoitteeseen <a href="mailto:<%- classifierEmail %>"><%- classifierEmail %></a>.</p>
-<p>Lisätietoja asiasta antaa erityisasiantuntija <%- classifierName %>, puhelin: {classifierPuhNum}.</p>
+    <p><strong><span style="font-size: 14pt; line-height: 21px">MATERIAALIN TOIMITUSPYYNTÖ</span></strong></p>
 
-<br>
-<p>Leo Pekkala</p>
-<p>Apulaisjohtaja / tulosaluepäällikkö</p>
-<p>Kansallinen audiovisuaalinen instituutti</p>
-<p>Mediakasvatus- ja kuvaohjelmayksikkö</p>
+    <p>Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö ottaa kuvaohjelmalain (710/2011) 21 §:n nojalla luokiteltavaksi
+    kuvaohjelman<br>
+    <strong><%- programNameFi %></strong></p>
+
+    <p><%- programNameFi %> (<%- programReleaseYear %>, <%- programReleaseCountry %>, <%- programReleaseYear %>) <%- programDuration %> <%- programType %> <%= icons %></p>
+
+    <p>KAVI pyytää toimittamaan kyseisen materiaalin <strong>viimeistään <%- dueDate %></strong> osoitteeseen <%- classifierName %> / Kansallinen audiovisuaalinen instituutti / MEKU, Sörnäisten
+    rantatie 25 A, PL 16, 00500 Helsinki tai sähköpostitse osoitteeseen <a href="mailto:<%- classifierEmail %>"><%- classifierEmail %></a>.</p>
+
+    <p>Lisätietoja asiasta antaa erityisasiantuntija <%- classifierName %>, puhelin: <%- classifierPhone %>.</p>
+    <br>
+    <p>Leo Pekkala<br>
+    Apulaisjohtaja / tulosaluepäällikkö<br>
+    Kansallinen audiovisuaalinen instituutti<br>
+    Mediakasvatus- ja kuvaohjelmayksikkö</p>
+</div>

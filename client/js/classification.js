@@ -1,5 +1,4 @@
 // noinspection BadExpressionStatementJS
-const buyerEmails = []
 
 window.classificationPage = function () {
   const $root = $('#classification-page')
@@ -169,12 +168,12 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       })
     })
 
-    if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
+    if ($form.find('input[name="classification.kaviDiaryNumber"]').val() !== '') {
       $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
     }
 
     $form.find('input[name="classification.kaviDiaryNumber"]').on('keyup', function (e) {
-      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
+      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() !== '') {
         $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
       } else {
         $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
@@ -211,50 +210,71 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       return true
     }
 
-    function handleDialogAfterSent(shared, isButtonDisabled, isCheckboxDisabled) {
+    function handleDialogAfterSent(isButtonDisabled, isCheckboxDisabled) {
       shared.closeDialog()
       $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', isButtonDisabled).text('Kuulemispyynnöt lähetetty')
       $form.find('#materialRequest').prop('disabled', isCheckboxDisabled)
     }
 
-    function submitRequestEmail(date, shared) {
-      const dialog = $('#dialog')
-      const dueDate = formatDate(date, 'dd.mm.yyyy', true)
-      const formattedDate = formatDate(date, 'dd.mm.yyyy', false)
-      const buyerName = dialog.find('span[name=buyer-name]').text()
-      const buyerEmail = dialog.find('input[name=buyer-email]').val()
-
-      if (!(buyerName && validateEmail(buyerEmail))) {
+    function submitRequestEmail(hearingRequestData) {
+      if (!(hearingRequestData.buyerName && validateEmail(hearingRequestData.buyerEmail))) {
         alert('Tarkista kentät!')
       } else {
-        sendHearingRequests(formattedDate, dueDate, buyerName, buyerEmail, "LUOKITTELU") // TODO JESSE: Send luokittelut
-        handleDialogAfterSent(shared, true, true)
+        sendHearingRequests(hearingRequestData)
+        handleDialogAfterSent(true, true)
       }
     }
 
-    // TODO JESSE: ADD EMAIL SENDING FUNCTIONALITY HERE AND DISABLE BUTTON WHEN/AFTER SENDING
     $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
       e.preventDefault()
       const date = new Date(Date.now())
-      console.log(program)
+      const previousClassification = program.classifications[0]
+      const buyerId = previousClassification.buyer._id
+      const warningSummary = window.classificationUtils.summary(previousClassification)
+      const warningSummaryElement = shared.renderWarningSummary(warningSummary)
 
-      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() != '') {
-        shared.showDialog($('#templates')
-        .find('.send-hearing-requests-dialog').clone()
-        .find('button.send').on('click', () => { submitRequestEmail(date, shared) }).end()
-        .find('button.cancel').click(shared.closeDialog).end()
-        .find('span[name=classification-date]').text(formatDate(date, 'dd.mm.yyyy', false)).end()
-        .find('span[name=classifier-name]').text($form.find('span.author').text()).end()
-        .find('span[name=buyer-name]').text($form.find('input[name="classification.buyer"]').select2("data").text).end()
-        .find('input[name=buyer-email]').val(buyerEmails).end()
-        .find('span[name=diary-number]').text($form.find('input[name="classification.kaviDiaryNumber"]').val()).end()
-        .find('span[name=program-name]').text(program.name).end()
-        .find('span[name=program-release-date]').text(program.year).end()
-        .find('span[name=program-release-country]').text(program.country).end()
-        .find('span[name=program-duration]').text($form.find('input[name="classification.duration"]').val()).end()
-        .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end())
-        cfu.updateWarningOrdering($('#dialog'), program.classifications[1])
-      }
+      $.get('/accounts/' + buyerId + '/emailAddresses').done(function (account) {
+        const hearingRequestData = {
+          date: formatDate(date, 'dd.mm.yyyy', false),
+          dueDate: formatDate(date, 'dd.mm.yyyy', true),
+          classifierName: $form.find('span.author').text(),
+          buyerName: previousClassification.buyer.name,
+          buyerEmail: account.emailAddresses,
+          drNro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),
+          programNameFi: program.nameFi.toString(),
+          programOriginalName: program.name.toString(),
+          programType: window.enums.util.programTypeName(program.programType),
+          programReleaseYear: program.year,
+          programReleaseCountry: program.country.toString(),
+          programDuration: previousClassification.duration,
+          programWarningSummary: warningSummary
+        }
+
+        const onSubmitRequestEmail = () => {
+          // Update emails in case they have been modified in the form
+          hearingRequestData.buyerEmail = $('#dialog').find('input[name=buyer-email]').val()
+          submitRequestEmail(hearingRequestData)
+        }
+
+        if ($form.find('input[name="classification.kaviDiaryNumber"]').val() !== '') {
+          shared.showDialog($('#templates')
+          .find('.send-hearing-requests-dialog').clone()
+          .find('button.send').on('click', onSubmitRequestEmail).end()
+          .find('button.cancel').click(shared.closeDialog).end()
+          .find('span[name=classification-date]').text(hearingRequestData.date).end()
+          .find('span[name=classifier-name]').text(hearingRequestData.classifierName).end()
+          .find('span[name=buyer-name]').text(hearingRequestData.buyerName).end()
+          .find('input[name=buyer-email]').val(hearingRequestData.buyerEmail).end()
+          .find('span[name=due-date]').text(hearingRequestData.dueDate).end()
+          .find('span[name=diary-number]').text(hearingRequestData.drNro).end()
+          .find('span[name=program-name]').text(hearingRequestData.programNameFi).end()
+          .find('span[name=program-release-date]').text(hearingRequestData.programReleaseYear).end()
+          .find('span[name=program-release-country]').text(hearingRequestData.programReleaseCountry).end()
+          .find('span[name=program-duration]').text(hearingRequestData.programDuration).end()
+          .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end()
+          .find('.warning-summary').html(warningSummaryElement).end())
+        }
+      })
     })
 
     $form.on('click', '.back-to-search', function (e) {
@@ -353,33 +373,13 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     }
   }
 
-  function sendHearingRequests(date, dueDate, buyerName, buyerEmail, classifications) {
+  function sendHearingRequests(hearingRequestData) {
     const isSendMaterialRequestChecked = $form.find('#materialRequest').is(':checked')
-    const data = {
-      hostName: "",
-      date: date,
-      dueDate: dueDate,
-      classifierName: $form.find('span.author').text(),
-      buyerName: buyerName,
-      buyerEmail: buyerEmail,
-      drNro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),
-      programNameFi: program.nameFi.toString(),
-      programOriginalName: program.name.toString(),
-      programType: window.enums.util.programTypeName(program.programType),
-      programReleaseYear: program.year,
-      programReleaseCountry: program.country.toString(),
-      programDuration: $form.find('input[name="classification.duration"]').val(),
-      programClassification: classifications,
-      sendMaterialRequest: isSendMaterialRequestChecked
-    }
-     $.post('/sendemail/hearingrequest/classifier', JSON.stringify(data)).done(function (p) {
-     })
-      $.post('/sendemail/hearingrequest/buyer', JSON.stringify(data)).done(function (p) {
-    })
+    $.post('/sendemail/hearingrequest/classifier', JSON.stringify(hearingRequestData)).done(() => console.log("Post to /sendemail/hearingrequest/classifier done."))
+    $.post('/sendemail/hearingrequest/buyer', JSON.stringify(hearingRequestData)).done(() => console.log("Post to /sendemail/hearingrequest/buyer done."))
 
-    if(isSendMaterialRequestChecked) {
-      $.post('/sendemail/materialrequest', JSON.stringify(data)).done(function (p) {
-      })
+    if (isSendMaterialRequestChecked) {
+      $.post('/sendemail/materialrequest', JSON.stringify(hearingRequestData)).done(() => console.log("Post to /sendemail/materialrequest done."))
     }
   }
 
@@ -595,13 +595,6 @@ function classificationFormUtils() {
     const warnings = [$('<span>', {class: 'drop-target'})].concat(summary.warnings.map(function (w) {
       return $('<span>', {'data-id': w.category, class: 'warning ' + w.category, draggable: true}).add($('<span>', {class: 'drop-target'}))
     }))
-    console.log("form", $form)
-    console.log("summary", summary)
-    console.log("warnings", warnings)
-    console.log("form.find('.warning-order')", $form.find('.warning-order'))
-    console.log('$form.find(\'.warning-order\'):', $form.find('.warning-order'))
-    console.log('$form.find(\'.warning-order\').find(\'.agelimit img\'):', $form.find('.warning-order').find('.agelimit img'))
-    console.log('$form.find(\'.warning-order\').find(\'.agelimit img\').find(\'.warnings\'):', $form.find('.warning-order').find('.agelimit img').find('.warnings'))
     $form.find('.warning-order')
       .find('.agelimit img').attr('src', shared.ageLimitIcon(summary)).end()
       .find('.warnings').html(warnings).end()
@@ -668,11 +661,6 @@ function classificationFormUtils() {
         const buyer = source === 'buyer' ? emails.map(toOption('buyer', true)) : current.filter(bySource('buyer'))
         const manual = source === 'manual' ? emails.map(toOption('manual', false)) : current.filter(bySource('manual'))
         $input.select2('data', sent.concat(buyer).concat(manual).concat(kavi)).trigger('validate')
-        if(source === 'buyer') {
-          console.log("emails", emails)
-          buyerEmails.splice(0, buyerEmails.length)
-          buyerEmails.push(...emails)
-        }
       }
 
       function getCurrentEmailSelection() {

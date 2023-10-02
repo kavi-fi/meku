@@ -1223,36 +1223,52 @@ app.post('/users/new', requireRole('root'), (req, res, next) => {
 
 app.post('/sendemail/hearingrequest/classifier', requireRole('kavi'), (req, res, next) => {
   const vars = req.body
-  vars['hostName'] = env.hostname
-  vars['classifierEmail'] = req.user.email
-  srvUtils.getTemplateWithVars('reclassification-hearing-request-for-classifier.tpl.html', vars, (templErr, template) => {
-    if (templErr) return next(templErr)
-    const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
-    const emailRecipients = [req.user.email]
-    sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+  User.findById(req.user._id, (err, user) => {
+    if (err) return next(err)
+    vars.hostName = env.hostname
+    vars.classifierEmail = req.user.email
+    vars.classifierPhone = user.phoneNumber
+    vars.icons = classificationUtils.iconHtml(vars.programWarningSummary, 'fi', vars.hostName)
+    srvUtils.getTemplateWithVars('reclassification-hearing-request-for-classifier.tpl.html', vars, (templErr, template) => {
+      if (templErr) return next(templErr)
+      const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
+      const emailRecipients = [req.user.email]
+      sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+    })
   })
 })
 
 app.post('/sendemail/hearingrequest/buyer', requireRole('kavi'), (req, res, next) => {
   const vars = req.body
-  vars['hostName'] = env.hostname
-  vars['classifierEmail'] = req.user.email
-  srvUtils.getTemplateWithVars('reclassification-hearing-request-for-buyer.tpl.html', vars, (templErr, template) => {
-    if (templErr) return next(templErr)
-    const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
-    const emailRecipients = [req.body.buyerEmail]
-    sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+  User.findById(req.user._id, (err, user) => {
+    if (err) return next(err)
+    vars.hostName = env.hostname
+    vars.classifierEmail = req.user.email
+    vars.classifierPhone = user.phoneNumber
+    vars.icons = classificationUtils.iconHtml(vars.programWarningSummary, 'fi', vars.hostName)
+    srvUtils.getTemplateWithVars('reclassification-hearing-request-for-buyer.tpl.html', vars, (templErr, template) => {
+      if (templErr) return next(templErr)
+      const emailSubject = 'Asianosaisen kuuleminen kuvaohjelman luokittelun johdosta'
+      const emailRecipients = [req.body.buyerEmail]
+      sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+    })
   })
 })
+
 app.post('/sendemail/materialrequest', requireRole('kavi'), (req, res, next) => {
   const vars = req.body
-  vars['hostName'] = env.hostname
-  vars['classifierEmail'] = req.user.email
-  srvUtils.getTemplateWithVars('reclassification-material-request.tpl.html', vars, (templErr, template) => {
-    if (templErr) return next(templErr)
-    const emailSubject = 'Materiaalin toimituspyyntö'
-    const emailRecipients = [req.body.buyerEmail]
-    sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+  User.findById(req.user._id, (err, user) => {
+    if (err) return next(err)
+    vars.hostName = env.hostname
+    vars.classifierEmail = req.user.email
+    vars.classifierPhone = user.phoneNumber
+    vars.icons = classificationUtils.iconHtml(vars.programWarningSummary, 'fi', vars.hostName)
+    srvUtils.getTemplateWithVars('reclassification-material-request.tpl.html', vars, (templErr, template) => {
+      if (templErr) return next(templErr)
+      const emailSubject = 'Materiaalin toimituspyyntö'
+      const emailRecipients = [req.body.buyerEmail]
+      sendReclassificationHearingRequestEmails(req.user, emailRecipients, emailSubject, template, respond(res, next, {}))
+    })
   })
 })
 

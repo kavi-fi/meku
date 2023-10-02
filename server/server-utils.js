@@ -18,6 +18,15 @@ exports.getTemplate = (function () {
   }
 })()
 
+exports.getTemplateWithVars = (function() {
+  return function(templateName, vars, cb) {
+    this.getTemplate(templateName, (templateError, tpl) => {
+      if (templateError) return cb(templateError)
+      return cb(null, _.template(tpl)(vars))
+    })
+  }
+})()
+
 exports.currentPrices = function currentPrices() {
   const pricesExistingYear = _.find(_.range(moment().year(), 2015, -1), (y) => process.env['PRICES_' + y] !== undefined)
   if (!pricesExistingYear) console.warn('Cannot find prices from config variable, using (possibly outdated) defaults')

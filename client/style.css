@@ -573,6 +573,16 @@ textarea.invalid:disabled,
   margin-right: 15px;
 }
 
+.hearing-requests-dialog-styling {
+  display: flex;
+  flex-direction: column;
+}
+
+.hearing-requests-dialog-styling div > label {
+  width: 200px;
+  padding: 0 10px 20px 0;
+}
+
 .classification-criteria .category .heading {
   outline: 1px solid #D3D3D3;
   background-color: #fff;

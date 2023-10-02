@@ -142,17 +142,21 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       const registrationDate = $form.find('input[name="classification.registrationDate"]').val()
       $form.find('button[name=register]').prop('disabled', true)
       e.preventDefault()
-      $.post('/programs/' + program._id + '/register', JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})).done(function (savedProgram) {
-        $form.hide()
-        $("#search-page").trigger('show').show()
-        shared.showDialog($('<div>', {class: 'registration-confirmation dialog', 'data-cy': 'registration-confirmation-dialog'})
-          .append($('<span>', {class: 'name'}).text(savedProgram.name))
-          .append(shared.renderWarningSummary(window.classificationUtils.fullSummary(savedProgram)))
-          .append($('<p>', {class: 'registration-date'}).text(shared.i18nText('Rekisteröity') + ' ' + registrationDate))
-          .append($('<p>', {class: 'buttons'}).html($('<button>', {click: shared.closeDialog, class: 'button', 'data-cy': 'button'}).i18nText('Sulje'))))
-        $(window).scrollTop(0)
+      $.post(
+'/programs/' + program._id + '/register',
+      JSON.stringify({preventSendingEmail: $form.find('input[name="classification.preventSendingEmail"]:checked').length})
+).done(function (savedProgram) {
+          $form.hide()
+          $("#search-page").trigger('show').show()
+          shared.showDialog($('<div>', {class: 'registration-confirmation dialog', 'data-cy': 'registration-confirmation-dialog'})
+            .append($('<span>', {class: 'name'}).text(savedProgram.name))
+            .append(shared.renderWarningSummary(window.classificationUtils.fullSummary(savedProgram)))
+            .append($('<p>', {class: 'registration-date'}).text(shared.i18nText('Rekisteröity') + ' ' + registrationDate))
+            .append($('<p>', {class: 'buttons'}).html($('<button>', {click: shared.closeDialog, class: 'button', 'data-cy': 'button'}).i18nText('Sulje'))))
+          $(window).scrollTop(0)
       })
     })
+
     $form.find('button[name=save]').on('click', function (e) {
       $form.find('button[name=save]').prop('disabled', true)
       e.preventDefault()
@@ -161,6 +165,116 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         shared.showDialog($('#templates').find('.modify-success-dialog').clone().find('button.ok').click(shared.closeDialog).end())
       })
     })
+
+    if ($form.find('input[name="classification.kaviDiaryNumber"]').val() !== '') {
+      $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
+    }
+
+    $form.find('input[name="classification.kaviDiaryNumber"]').on('keyup', function () {
+      if ($form.find('input[name="classification.kaviDiaryNumber"]').val() === '') {
+        $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', true)
+      } else {
+        $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', false)
+      }
+    })
+
+    function formatDate(date, format, isDueDate) {
+      let map = {}
+      if (isDueDate) {
+        const dueDate = new Date(date)
+        dueDate.setDate(dueDate.getDate() + 6)
+        map = {
+          mm: dueDate.getMonth() + 1,
+          dd: dueDate.getDate(),
+          yyyy: dueDate.getFullYear()
+        }
+      } else {
+        map = {
+          mm: date.getMonth() + 1,
+          dd: date.getDate(),
+          yyyy: date.getFullYear()
+        }
+      }
+      return format.replace(/mm|dd|yyyy/gi, (matched) => map[matched])
+    }
+
+    function validateEmail(emails) {
+      const check = /\S+@\S+\.\S+/;
+      const emailArray = emails.split(',')
+      emailArray.forEach((email) => {
+        const isValid = check.test(email);
+        if (!isValid) return false
+      })
+      return true
+    }
+
+    function handleDialogAfterSent(isButtonDisabled, isCheckboxDisabled) {
+      shared.closeDialog()
+      $form.find('button[name=open-hearing-requests-dialog]').prop('disabled', isButtonDisabled).text('Kuulemispyynnöt lähetetty')
+      $form.find('#materialRequest').prop('disabled', isCheckboxDisabled)
+    }
+
+    function submitRequestEmail(hearingRequestData) {
+      if (!(hearingRequestData.buyerName && validateEmail(hearingRequestData.buyerEmail))) {
+        alert('Tarkista kentät!')
+      } else {
+        sendHearingRequests(hearingRequestData)
+        handleDialogAfterSent(true, true)
+      }
+    }
+
+    $form.find('button[name=open-hearing-requests-dialog]').on('click', function (e) {
+      e.preventDefault()
+      const date = new Date(Date.now())
+      const previousClassification = program.classifications[0]
+      const buyerId = previousClassification.buyer._id
+      const warningSummary = window.classificationUtils.summary(previousClassification)
+      const warningSummaryElement = shared.renderWarningSummary(warningSummary)
+
+      $.get('/accounts/' + buyerId + '/emailAddresses').done(function (account) {
+        const hearingRequestData = {
+          date: formatDate(date, 'dd.mm.yyyy', false),
+          dueDate: formatDate(date, 'dd.mm.yyyy', true),
+          classifierName: $form.find('span.author').text(),
+          buyerName: previousClassification.buyer.name,
+          buyerEmail: account.emailAddresses,
+          drNro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),
+          programNameFi: program.nameFi.toString(),
+          programOriginalName: program.name.toString(),
+          programType: window.enums.util.programTypeName(program.programType),
+          programReleaseYear: program.year,
+          programReleaseCountry: program.country.toString(),
+          programDuration: previousClassification.duration,
+          programWarningSummary: warningSummary
+        }
+
+        const onSubmitRequestEmail = () => {
+          // Update emails in case they have been modified in the form
+          hearingRequestData.buyerEmail = $('#dialog').find('input[name=buyer-email]').val()
+          submitRequestEmail(hearingRequestData)
+        }
+
+        if ($form.find('input[name="classification.kaviDiaryNumber"]').val() !== '') {
+          shared.showDialog($('#templates')
+          .find('.send-hearing-requests-dialog').clone()
+          .find('button.send').on('click', onSubmitRequestEmail).end()
+          .find('button.cancel').click(shared.closeDialog).end()
+          .find('span[name=classification-date]').text(hearingRequestData.date).end()
+          .find('span[name=classifier-name]').text(hearingRequestData.classifierName).end()
+          .find('span[name=buyer-name]').text(hearingRequestData.buyerName).end()
+          .find('input[name=buyer-email]').val(hearingRequestData.buyerEmail).end()
+          .find('span[name=due-date]').text(hearingRequestData.dueDate).end()
+          .find('span[name=diary-number]').text(hearingRequestData.drNro).end()
+          .find('span[name=program-name]').text(hearingRequestData.programNameFi).end()
+          .find('span[name=program-release-date]').text(hearingRequestData.programReleaseYear).end()
+          .find('span[name=program-release-country]').text(hearingRequestData.programReleaseCountry).end()
+          .find('span[name=program-duration]').text(hearingRequestData.programDuration).end()
+          .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end()
+          .find('.warning-summary').html(warningSummaryElement).end())
+        }
+      })
+    })
+
     $form.on('click', '.back-to-search', function (e) {
       e.preventDefault()
       $form.hide()
@@ -254,6 +368,16 @@ function classificationForm(program, classificationFinder, rootEditMode) {
         $inputs.prop('disabled', true).removeClass('touched').val('').trigger('validate')
         $container[isInitial ? 'hide' : 'slideUp']()
       }
+    }
+  }
+
+  function sendHearingRequests(hearingRequestData) {
+    const isSendMaterialRequestChecked = $form.find('#materialRequest').is(':checked')
+    $.post('/sendemail/hearingrequest/classifier', JSON.stringify(hearingRequestData)).done(() => console.log("Post to /sendemail/hearingrequest/classifier done."))
+    $.post('/sendemail/hearingrequest/buyer', JSON.stringify(hearingRequestData)).done(() => console.log("Post to /sendemail/hearingrequest/buyer done."))
+
+    if (isSendMaterialRequestChecked) {
+      $.post('/sendemail/materialrequest', JSON.stringify(hearingRequestData)).done(() => console.log("Post to /sendemail/materialrequest done."))
     }
   }
 

@@ -410,6 +410,55 @@
   </div>
 </div>
 
+<div class="send-hearing-requests-dialog remove-dialog dialog">
+    <h2 data-i18n>Haluatko lähettää kuulemispyynnöt?</h2>
+    <div class="hearing-requests-dialog-styling classification-details">
+      <div>
+        <label data-i18n>Päivämäärä</label><span class="textifield-field" name="classification-date"></span>
+      </div>
+      <div>
+        <label data-i18n>Luokittelijan nimi</label><span class="author textifield-field" name="classifier-name"></span>
+      </div>
+      <div>
+        <label data-i18n>Tilaajan nimi</label><span class="buyer textifield-field" name="buyer-name"></span>
+      </div>
+      <div>
+        <label data-i18n>Tilaajan sähköposti(t)</label><input name="buyer-email" required type="email"></input>
+      </div>
+      <div>
+        <label data-i18n>Toimitettava viimeistään</label><span name="due-date"></span>
+      </div>
+      <h3 data-i18n>Kuvaohjelman tiedot</h3>
+      <div>
+        <label data-i18n>Diaarinumero</label><span class="textifield-field" name="diary-number"></span>
+      </div>
+      <div>
+        <label data-i18n>Nimi</label><span class="textifield-field" name="program-name"></span>
+      </div>
+      <div>
+        <label data-i18n>Vuosi</label><span class="textifield-field" name="program-release-date"></span>
+      </div>
+      <div>
+        <label data-i18n>Maa</label><span class="textifield-field" name="program-release-country"></span>
+      </div>
+      <div>
+        <label data-i18n>Kesto</label><span class="textifield-field" name="program-duration"></span>
+      </div>
+      <div>
+        <label data-i18n>Materiaalin toimituspyyntö</label><span class="textifield-field" name="material-order-request"></span>
+      </div>
+      <div class="warning-summary" data-cy="warning-summary">
+        <span>Warnings here</span>
+        <img class="agelimit" src="images/empty.png" data-cy="agelimit"/>
+        <div class="warnings"></div>
+      </div>
+    </div>
+  <div class="buttons">
+    <button class="cancel button" name="cancel" data-i18n>Peruuta</button>
+    <button class="send button" name="send" data-i18n>Lähetä</button>
+  </div>
+</div>
+
 <div class="inactivate-subscriber-dialog remove-dialog dialog" data-cy="inactivate-subscriber-dialog">
     <p>Haluatko varmasti inaktivoida tilaajan <span class="subscriber-name"></span>?</p>
     <div class="buttons" data-cy="buttons" >
@@ -709,6 +758,10 @@
       <div>
         <div class="kavi-diary-number">
           <label class="select2-label" data-i18n>Diaarinumero</label><input name="classification.kaviDiaryNumber" type="text" class="throttledInput"/>
+          <button name="open-hearing-requests-dialog" disabled class="button open-hearing-requests-dialog" data-i18n>Kuulemispyyntöjen lähetys</button>
+          <input id="materialRequest" name="classification.sendMaterialsRequest" type="checkbox"/><span data-i18n> Materiaalin toimituspyyntö</span>
+        </div>
+        <div class="kavi-diary-number">
         </div>
       </div>
     </div>
@@ -748,6 +801,7 @@
       <h2 class="main" data-i18n>Ikärajat.fi-näkymä</h2>
       <div class="program-box-container"></div>
     </div>
+
     <div class="classification-email row" data-cy="classification-email">
       <div class="content preview">
         <h3 class="main" data-i18n>Lähetä luokittelupäätös</h3>

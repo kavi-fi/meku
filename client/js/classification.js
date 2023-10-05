@@ -215,7 +215,7 @@ function classificationForm(program, classificationFinder, rootEditMode) {
     }
 
     function submitRequestEmail(hearingRequestData) {
-      if (!(hearingRequestData.buyerName && validateEmail(hearingRequestData.buyerEmail))) {
+      if (!validateEmail(hearingRequestData.buyerEmail)) {
         alert('Tarkista kentät!')
       } else {
         sendHearingRequests(hearingRequestData)
@@ -227,24 +227,24 @@ function classificationForm(program, classificationFinder, rootEditMode) {
       e.preventDefault()
       const date = new Date(Date.now())
       const previousClassification = program.classifications[0]
-      const buyerId = previousClassification.buyer._id
+      const buyerId = previousClassification.buyer ? previousClassification.buyer._id : ""
       const warningSummary = window.classificationUtils.summary(previousClassification)
       const warningSummaryElement = shared.renderWarningSummary(warningSummary)
 
-      $.get('/accounts/' + buyerId + '/emailAddresses').done(function (account) {
+      const handleFormData = function (account) {
         const hearingRequestData = {
           date: formatDate(date, 'dd.mm.yyyy', false),
           dueDate: formatDate(date, 'dd.mm.yyyy', true),
           classifierName: $form.find('span.author').text(),
-          buyerName: previousClassification.buyer.name,
-          buyerEmail: account.emailAddresses,
+          buyerName: previousClassification.buyer ? previousClassification.buyer.name : "",
+          buyerEmail: account ? account.emailAddresses : "",
           drNro: $form.find('input[name="classification.kaviDiaryNumber"]').val(),
           programNameFi: program.nameFi.toString(),
           programOriginalName: program.name.toString(),
           programType: window.enums.util.programTypeName(program.programType),
           programReleaseYear: program.year,
           programReleaseCountry: program.country.toString(),
-          programDuration: previousClassification.duration,
+          programDuration: previousClassification.duration ? previousClassification.duration : "",
           programWarningSummary: warningSummary
         }
 
@@ -256,23 +256,29 @@ function classificationForm(program, classificationFinder, rootEditMode) {
 
         if ($form.find('input[name="classification.kaviDiaryNumber"]').val() !== '') {
           shared.showDialog($('#templates')
-          .find('.send-hearing-requests-dialog').clone()
-          .find('button.send').on('click', onSubmitRequestEmail).end()
-          .find('button.cancel').click(shared.closeDialog).end()
-          .find('span[name=classification-date]').text(hearingRequestData.date).end()
-          .find('span[name=classifier-name]').text(hearingRequestData.classifierName).end()
-          .find('span[name=buyer-name]').text(hearingRequestData.buyerName).end()
-          .find('input[name=buyer-email]').val(hearingRequestData.buyerEmail).end()
-          .find('span[name=due-date]').text(hearingRequestData.dueDate).end()
-          .find('span[name=diary-number]').text(hearingRequestData.drNro).end()
-          .find('span[name=program-name]').text(hearingRequestData.programNameFi).end()
-          .find('span[name=program-release-date]').text(hearingRequestData.programReleaseYear).end()
-          .find('span[name=program-release-country]').text(hearingRequestData.programReleaseCountry).end()
-          .find('span[name=program-duration]').text(hearingRequestData.programDuration).end()
-          .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end()
-          .find('.warning-summary').html(warningSummaryElement).end())
+              .find('.send-hearing-requests-dialog').clone()
+              .find('button.send').on('click', onSubmitRequestEmail).end()
+              .find('button.cancel').click(shared.closeDialog).end()
+              .find('span[name=classification-date]').text(hearingRequestData.date).end()
+              .find('span[name=classifier-name]').text(hearingRequestData.classifierName).end()
+              .find('span[name=buyer-name]').text(hearingRequestData.buyerName).end()
+              .find('input[name=buyer-email]').val(hearingRequestData.buyerEmail).end()
+              .find('span[name=due-date]').text(hearingRequestData.dueDate).end()
+              .find('span[name=diary-number]').text(hearingRequestData.drNro).end()
+              .find('span[name=program-name]').text(hearingRequestData.programNameFi).end()
+              .find('span[name=program-release-date]').text(hearingRequestData.programReleaseYear).end()
+              .find('span[name=program-release-country]').text(hearingRequestData.programReleaseCountry).end()
+              .find('span[name=program-duration]').text(hearingRequestData.programDuration).end()
+              .find('span[name=material-order-request]').text($form.find('#materialRequest').is(':checked') ? 'Kyllä' : 'Ei').end()
+              .find('.warning-summary').html(warningSummaryElement).end()
+              .find('span[name=missing-info-warning]').css('display', !account || !previousClassification.duration ? 'flex' : 'none').end())
         }
-      })
+      }
+
+      if (buyerId)
+        $.get('/accounts/' + buyerId + '/emailAddresses').done(handleFormData)
+      else
+        handleFormData()
     })
 
     $form.on('click', '.back-to-search', function (e) {

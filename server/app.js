@@ -1273,13 +1273,13 @@ app.post('/sendemail/materialrequest', requireRole('kavi'), (req, res, next) => 
 })
 
 function sendReclassificationHearingRequestEmails(user, emailRecipients, emailSubject, template, callback) {
-  const getBccBasedOnEnvironment = () => process.env.NODE_ENV === 'training'
+  const getBccBasedOnEnvironment = process.env.NODE_ENV === 'training'
       ? ['ville.sohn@kavi.fi']
       : ['ville.sohn@kavi.fi', 'hallinto@kavi.fi'];
 
   const emailData = {
     recipients: emailRecipients,
-    bcc: getBccBasedOnEnvironment(),
+    bcc: getBccBasedOnEnvironment,
     subject: emailSubject,
     body: _.template(template)({
     })

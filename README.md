@@ -78,7 +78,7 @@ In Meku the `master` branch is the one that should be used for deployments.
 
 Run the following command to deploy the master branch to heroku
 ```
-git push <remote-alias> master
+git push <remote-alias> master:main
 ```
 Change `<remote-alias>` to the alias of the environment you want to deploy to. To check your aliases use `git remote -v`.
 

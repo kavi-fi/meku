@@ -72,6 +72,8 @@ First make sure everything is working as intended in the training environment an
   * Check with `git remote -v`
 
 ### Manual deployment steps
+Login to Heroku first. See Prerequisites section.
+
 In Meku the `master` branch is the one that should be used for deployments.
 
 Run the following command to deploy the master branch to heroku

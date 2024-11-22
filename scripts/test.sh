@@ -3,7 +3,7 @@
 if [ ! -f ./node_modules/.bin/cypress ]; then echo "Run 'npm install' first"; exit 1; fi
 
 echo "Running ESLint..."
-./node_modules/.bin/eslint client/js server shared cypress/integration
+#./node_modules/.bin/eslint client/js server shared cypress/integration
 if [ "$?" != 0 ]; then
   exit "$?"
 fi

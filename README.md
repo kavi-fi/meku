@@ -23,6 +23,13 @@ Install dependencies
 $ npm install
 ```
 
+If `npm i` returns errors about `node-gyp`, you need to install some missing tools. This happened at least on Ubuntu 24.
+
+```
+sudo apt install python3-setuptools
+sudo apt install build-essential
+```
+
 Start the Mongo DB (only needed if Mongo's been shutdown after creation)
 ```
 docker start kavi-mongo

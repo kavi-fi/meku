@@ -93,4 +93,3 @@ To deploy from another branch use
 ```
 git push <remote-alias> mybranch:master
 ```
-

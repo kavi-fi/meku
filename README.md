@@ -2,7 +2,7 @@
 Kansallinen audiovisuaalinen instituutti Kuvaohjelmien luokittelu- ja valvontajärjestelmä.
 
 ## Setting up the development environment
-Clone the repository and run the following commands. Note: The project runs well with `Node v16`.
+Clone the repository and run the following commands.
 
 ### First time setup
 
@@ -17,6 +17,11 @@ $ cd scripts && node add-demo-users.js && cd ..
 ```
 
 ### Starting the local development environment
+
+Use the version of Node required by the project
+```
+nvm use
+```
 
 Install dependencies
 ```

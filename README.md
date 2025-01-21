@@ -2,7 +2,7 @@
 Kansallinen audiovisuaalinen instituutti Kuvaohjelmien luokittelu- ja valvontajärjestelmä.
 
 ## Setting up the development environment
-Clone the repository called "meku" and run the following commands.
+Clone this repository and run the following commands.
 
 ### First time setup
 
@@ -18,7 +18,9 @@ $ cd scripts && node add-demo-users.js && cd ..
 
 ### Starting the local development environment
 
-Use the version of Node required by the project
+Use the version of Node required by the project. The version of Node is defined in the .package.json file.
+
+If you have nvm installed, you can use the correct version by running
 ```
 nvm use
 ```
@@ -28,7 +30,7 @@ Install dependencies
 $ npm install
 ```
 
-If `npm i` returns errors about `node-gyp`, you need to install some missing tools. This happened at least on Ubuntu 24.
+If using Ubuntu 24, you may need to install some missing tools. See below.
 
 ```
 sudo apt install python3-setuptools

@@ -2,7 +2,7 @@
 Kansallinen audiovisuaalinen instituutti Kuvaohjelmien luokittelu- ja valvontajärjestelmä.
 
 ## Setting up the development environment
-Clone the repository and run the following commands.
+Clone the repository called "meku" and run the following commands.
 
 ### First time setup
 

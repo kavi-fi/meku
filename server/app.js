@@ -1607,8 +1607,12 @@ app.get('/agelimit/:q?', (req, res, next) => {
     const agelimit = classsification.agelimit || classsification.legacyAgeLimit || 0
     const countryCode = trimmedList(program.country)
     const durationInSeconds = classificationUtils.durationToSeconds(classsification.duration)
-    const warnings = _.isEmpty(classsification.warningOrder) ? trimmedList(classsification.warnings) : trimmedList(classsification.warningOrder)
-    return {
+    const programType = enums.programType[program.programType]
+    let warnings = _.isEmpty(classsification.warningOrder) ? trimmedList(classsification.warnings) : trimmedList(classsification.warningOrder)
+    if (programType && programType.type === 'series') {
+      warnings = trimmedList(classsification.warnings)
+    }
+     return {
       id: program.sequenceId,
       type: enums.programType[program.programType].type,
       name: firstTrimmedFrom(program.name),

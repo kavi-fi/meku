@@ -218,7 +218,7 @@
 
       function extraInfoLink() {
         if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification) || enums.authorOrganizationIsKHO(classification)) return ''
-        if (utils.hasRole(user, 'kavi') && !utils.hasRole(user, 'root')) return '<p>' + t('Lisätietoja') + ': ' + user.name + ', <a href="mailto:kirjaamo@kavi.fi">kirjaamo@kavi.fi</a></p>'
+        if (utils.hasRole(user, 'kavi') && !utils.hasRole(user, 'root')) return '<p>' + t('Lisätietoja') + ': ' + user.name + ', <a href="mailto:kirjaamo@kuvi.fi">kirjaamo@kuvi.fi</a></p>'
         return ''
       }
 

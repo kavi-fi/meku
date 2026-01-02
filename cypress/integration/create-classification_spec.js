@@ -69,7 +69,7 @@ describe('Classification', () => {
     cy.getDataCy('classification-page classification-details comments').type('POW2! by Cypress.io')
     cy.getDataCy('classification-page classification-criteria safe').click()
     cy.getDataCy('classification-page classification-criteria').find('.criteria').should('be.not.visible')
-    cy.getDataCy('classification-page classification-email registration-emails').should('have.value', 'kavi@fake-meku.fi,demo.1@email.org,leo.pekkala@kavi.fi,ville.sohn@kavi.fi,milja.lampinen@kavi.fi')
+    cy.getDataCy('classification-page classification-email registration-emails').should('have.value', 'kavi@fake-meku.fi,demo.1@email.org,leo.pekkala@kuvi.fi,ville.sohn@kuvi.fi,milja.lampinen@kuvi.fi')
     cy.getDataCy('classification-page classification-email register').click()
     cy.getDataCy('registration-confirmation-dialog').should('be.visible')
     cy.getDataCy('registration-confirmation-dialog warning-summary').assertAgelimitAndWarnings('0')
@@ -129,7 +129,7 @@ const expectedProgramBox = {
 }
 
 const expectedClassificationEmail = {
-  to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'ville.sohn@kavi.fi', 'milja.lampinen@kavi.fi'],
+  to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kuvi.fi', 'ville.sohn@kuvi.fi', 'milja.lampinen@kuvi.fi'],
   subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta (12), seksi (19)',
   body: [
     date,
@@ -141,7 +141,7 @@ const expectedClassificationEmail = {
     'Diaarinumero: -',
     'Asianosaiset: kavi, DEMO tilaaja 1',
     'Lisätietoja: kavi, ',
-    'kirjaamo@kavi.fi',
+    'kirjaamo@kuvi.fi',
     'Liitteet:',
     'Valitusosoitus',
     'Beslut om klassificering av bildprogram',
@@ -151,7 +151,7 @@ const expectedClassificationEmail = {
     'Diarienummer: -',
     'Parter: kavi, DEMO tilaaja 1',
     'Mera information: kavi, ',
-    'kirjaamo@kavi.fi',
+    'kirjaamo@kuvi.fi',
     'Bilaga:',
     'Besvärsanvisning',
     'Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)',
@@ -160,7 +160,7 @@ const expectedClassificationEmail = {
 }
 
 const expectedReclassificationEmail = {
-  to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kavi.fi', 'ville.sohn@kavi.fi', 'milja.lampinen@kavi.fi'],
+  to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kuvi.fi', 'ville.sohn@kuvi.fi', 'milja.lampinen@kuvi.fi'],
   subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, S ',
   body: [
     date,

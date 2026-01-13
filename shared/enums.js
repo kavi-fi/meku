@@ -92,7 +92,8 @@
     reclassificationFee: 9000,
     gameFeePerHalfHour: 4000,
     gameMinimumFee: 9000,
-    gameMaximumFee: 41000
+    gameMaximumFee: 41000,
+    dcpClassificationFee: 10000,
   }
 
   exports.invoiceItem = function (item) {
@@ -284,7 +285,8 @@
   exports.invoiceRowType = {
     registration: 'Kuvaohjelman rekisteröinti',
     classification: 'KAVI:n luokittelu',
-    reclassification: 'KAVI:n uudelleenluokittelu'
+    reclassification: 'KAVI:n uudelleenluokittelu',
+    dcpClassification: 'DCP-formaatin luokittelu',
   }
 
   exports.countries = {

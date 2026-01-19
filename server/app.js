@@ -583,12 +583,9 @@ app.post('/programs/:id/register', (req, res, next) => {
 
         if (utils.hasRole(req.user, 'kavi')) {
           if (currentClassification.format === 'DCP') {
-            const baseFee = srvUtils.currentPrices().dcpClassificationFee;
-            const vatRate = 0.255;
-            const vat = Math.round(baseFee * vatRate);
-            const totalFee = baseFee + vat;
+            const dcpFee = srvUtils.currentPrices().dcpClassificationFee;
 
-            InvoiceRow.fromProgram(program, 'dcpClassification', 0, totalFee).save((dcpErr) => {
+            InvoiceRow.fromProgram(program, 'dcpClassification', 0, dcpFee).save((dcpErr) => {
               if (dcpErr) return callback(dcpErr);
               const classificationPrice = classificationUtils.price(program, seconds, srvUtils.currentPrices());
               InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback);

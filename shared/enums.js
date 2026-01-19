@@ -83,7 +83,8 @@
     'Regional_TV': '1874',
     'Transmitted_abroad_program': '1875',
     'Subscription_of_program': '1876',
-    'Video_sharing_service': '6611'
+    'Video_sharing_service': '6611',
+    'dcpClassification': '9402'
   }
 
   exports.defaultPrices = { // Up-to-date prices should be set in PRICES_<year> config variable (i.e. PRICES_2016)
@@ -98,6 +99,9 @@
 
   exports.invoiceItem = function (item) {
     const type = item.providingType ? item.providingType : item.type
+    if (type === 'dcpClassification') {
+      return { itemCode: exports.invoiceItemCodes.dcpClassification, itemUnit: 'kpl', itemCount: 1, pricePerMinute: false };
+    }
     if (type === 'classification' || type === 'reclassification') {
       const short = item.duration <= 30 * 60
       const code = exports.util.isGameType(item) ? short ? '4692' : '4693' : short ? '4690' : '4691'
@@ -286,7 +290,7 @@
     registration: 'Kuvaohjelman rekisteröinti',
     classification: 'KAVI:n luokittelu',
     reclassification: 'KAVI:n uudelleenluokittelu',
-    dcpClassification: 'DCP-formaatin luokittelu',
+    dcpClassification: 'DCP-lisämaksu',
   }
 
   exports.countries = {

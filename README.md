@@ -1,5 +1,5 @@
 # meku
-Kansallinen audiovisuaalinen instituutti Kuvaohjelmien luokittelu- ja valvontajärjestelmä.
+Taide- ja kulttuuriviraston Kuvaohjelmien luokittelu- ja valvontajärjestelmä.
 
 ## Setting up the development environment
 Clone the repository and run the following commands. Note: The project runs well with `Node v16`.

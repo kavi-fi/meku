@@ -427,7 +427,7 @@ background-image: -webkit-gradient(
 	  <h3>XML-skeema: "https://luokittelu.kavi.fi/xml/schema/VETschema.xsd"</h3>
 	  </div>
 			<div class="sugar_tab">
-				KAVIn kuvaohjelmien rekisteröintijärjestelmä valmistautuu vastaanottamaan seuraavanmuotoista XML-dataa. XML-datan koodaus tulee olla UTF-8 joka ilmoitetaan XML-deklaraatiossa. Sen jälkeen tiedosto koostuu yhdestä ASIAKAS-elementistä sekä yhdestä tai useammasta KUVAOHJELMA-elementistä.
+				KUVIn kuvaohjelmien rekisteröintijärjestelmä valmistautuu vastaanottamaan seuraavanmuotoista XML-dataa. XML-datan koodaus tulee olla UTF-8 joka ilmoitetaan XML-deklaraatiossa. Sen jälkeen tiedosto koostuu yhdestä ASIAKAS-elementistä sekä yhdestä tai useammasta KUVAOHJELMA-elementistä.
 				<div>
 					<span class="elements">&lt;?XML </span><span class="attributes">version</span>="1.0" <span class="attributes">encoding</span>="UTF-8" <span class="elements">?&gt;</span>
 				</div>

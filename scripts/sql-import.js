@@ -517,7 +517,7 @@ function accounts(callback) {
   }
 
   function userRoles(callback) {
-    // KAVI Turvaryhmät: 6f6ec169-9572-c2d2-0363-4e3663b9e3ed Meku-pääluokittelija, 8d4ad931-1055-a4f5-96da-4e3664911855 Meku-toimistohenkilö, b02cf3e0-cf10-f827-766c-4e36641b1d78 Meku-luokittelija
+    // KUVI Turvaryhmät: 6f6ec169-9572-c2d2-0363-4e3663b9e3ed Meku-pääluokittelija, 8d4ad931-1055-a4f5-96da-4e3664911855 Meku-toimistohenkilö, b02cf3e0-cf10-f827-766c-4e36641b1d78 Meku-luokittelija
     var kaviUsers = "select distinct u.id from securitygroups_users sgu join users u on (u.id = sgu.user_id) where sgu.securitygroup_id in ('6f6ec169-9572-c2d2-0363-4e3663b9e3ed', '8d4ad931-1055-a4f5-96da-4e3664911855', 'b02cf3e0-cf10-f827-766c-4e36641b1d78') and u.user_name not like 'Y%' and u.user_name not like '2%' and sgu.deleted != '1' and u.deleted != '1'"
     conn.query(kaviUsers, function(err, rows) {
       if (err) return callback(err)
@@ -548,8 +548,8 @@ function accounts(callback) {
 
   function markKavi(callback) {
     var kaviNames = [
-      'Kansallinen audiovisuaalinen instituutti',
-      'Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikkö'
+      'Taide- ja kulttuurivirasto',
+      'Taide- ja kulttuuriviraston mediakasvatus- ja ikärajat -osasto'
     ]
     async.forEach(kaviNames, function(n, callback) { schema.Account.update({ name: n }, { isKavi: true }, callback) }, callback)
   }

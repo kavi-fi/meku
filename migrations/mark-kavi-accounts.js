@@ -5,7 +5,7 @@ var schema = require('../server/schema')
 u.mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost/meku')
 
 var kaviNames = [
-  'Kansallinen audiovisuaalinen instituutti',
-  'Kansallisen audiovisuaalisen instituutin mediakasvatus- ja kuvaohjelmayksikkö'
+  'Taide- ja kulttuurivirasto',
+  'Taide- ja kulttuuriviraston mediakasvatus- ja ikärajat -osasto'
 ]
 async.forEach(kaviNames, function(n, callback) { schema.Account.update({ name: n }, { isKavi: true }, callback) }, u.done)

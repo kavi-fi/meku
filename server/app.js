@@ -563,31 +563,41 @@ app.post('/programs/:id/register', (req, res, next) => {
       updateMetadataIndexes(p, callback)
     }
 
-    function addInvoicerows (currentClassification, callback) {
-      if (utils.hasRole(req.user, 'root')) return process.nextTick(callback)
+    function addInvoicerows(currentClassification, callback) {
+      if (utils.hasRole(req.user, 'root')) return process.nextTick(callback);
 
-      const seconds = classificationUtils.durationToSeconds(currentClassification.duration)
+      const seconds = classificationUtils.durationToSeconds(currentClassification.duration);
 
       if (classificationUtils.isReclassification(program, currentClassification)) {
         if (enums.isOikaisupyynto(currentClassification.reason) && enums.authorOrganizationIsKavi(currentClassification)) {
-          InvoiceRow.fromProgram(program, 'reclassification', seconds, srvUtils.currentPrices().reclassificationFee).save(callback)
+          return InvoiceRow.fromProgram(program, 'reclassification', seconds, srvUtils.currentPrices().reclassificationFee).save(callback);
         } else if (utils.hasRole(req.user, 'kavi')) {
-          callback()
+          return callback();
         } else {
-          InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(callback)
+          return InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save(callback);
         }
-      } else {
-        InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save((saveErr) => {
-          if (saveErr) return next(saveErr)
-          if (utils.hasRole(req.user, 'kavi')) {
-            // duraation mukaan laskutus
-            const classificationPrice = classificationUtils.price(program, seconds, srvUtils.currentPrices())
-            InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback)
-          } else {
-            callback()
-          }
-        })
       }
+
+      InvoiceRow.fromProgram(program, 'registration', seconds, srvUtils.currentPrices().registrationFee).save((saveErr) => {
+        if (saveErr) return callback(saveErr);
+
+        if (utils.hasRole(req.user, 'kavi')) {
+          if (currentClassification.format === 'DCP') {
+            const dcpFee = srvUtils.currentPrices().dcpClassificationFee;
+
+            InvoiceRow.fromProgram(program, 'dcpClassification', 0, dcpFee).save((dcpErr) => {
+              if (dcpErr) return callback(dcpErr);
+              const classificationPrice = classificationUtils.price(program, seconds, srvUtils.currentPrices());
+              InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback);
+            });
+          } else {
+            const classificationPrice = classificationUtils.price(program, seconds, srvUtils.currentPrices());
+            InvoiceRow.fromProgram(program, 'classification', seconds, classificationPrice).save(callback);
+          }
+        } else {
+          return callback();
+        }
+      });
     }
 
     function populateSentRegistrationEmailAddresses (prg, callback) {

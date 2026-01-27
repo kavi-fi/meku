@@ -91,5 +91,5 @@ Change `<remote-alias>` to the alias of the environment you want to deploy to. T
 
 To deploy from another branch use
 ```
-git push <remote-alias> mybranch:master
+git push <remote-alias> mybranch:main
 ```

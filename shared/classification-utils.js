@@ -102,13 +102,16 @@
     const svData = generateData('sv')
     return {
       recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(utils.hasRole(user, 'root') ? [] : user.email)),
-      from: 'kirjaamo@kavi.fi',
+      from: 'kirjaamo@kuvi.fi',
       subject: _.template('Luokittelupäätös: <%= name %><%= programType %>, <%- year %>, <%- classificationShort %>')(fiData),
-      body: '<div style="text-align: right; margin-top: 8px;"><img src="' + hostName + '/images/logo.png" /></div>' +
+      body: '<div style="text-align: right; margin-top: 8px;"><!-- <img src="' + hostName + '/images/logo.png" />-->' +
+          'TAIDE- JA KULTTUURIVIRASTO<br>' +
+          'KONST- OCH KULTURMYNDIGHETEN<br>' +
+          'FINNISH ARTS AND CULTURE AGENCY</div>' +
         _.template('<p><%- date %><br/><%- buyer %></p>')(fiData) +
         _.template(generateText('fi'))(fiData) + '<br>' + _.template(generateText('sv'))(svData) +
-        '<br><p>Kansallinen audiovisuaalinen instituutti (KAVI) / Nationella audiovisuella institutet (KAVI)<br>' +
-        'Mediakasvatus- ja kuvaohjelmayksikkö / Enheten för mediefostran och bildprogram</p>'
+        '<br><p>Taide- ja kulttuurivirasto (KUVI) / Konst- och kulturmyndigheten (KUVI)<br>' +
+        'Mediakasvatus- ja ikärajat -osasto / Avdelningen för mediefostran och åldersgränser</p>'
     }
 
     function generateData(lang) {
@@ -197,7 +200,7 @@
       function classifierName() {
         if (enums.authorOrganizationIsKHO(classification)) return t('Korkein hallinto-oikeus')
         if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return t('Kuvaohjelmalautakunta')
-        if (utils.hasRole(user, 'kavi')) return t('Kansallisen audiovisuaalisen instituutin (KAVI) mediakasvatus- ja kuvaohjelmayksikkö')
+        if (utils.hasRole(user, 'kavi')) return t('Taide- ja kulttuuriviraston (KUVI) mediakasvatus- ja ikärajat -osasto')
         return _([user.employerName, user.name]).compact().join(', ')
       }
 

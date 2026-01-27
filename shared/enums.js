@@ -253,7 +253,7 @@
   ]
 
   exports.reclassificationReason = {
-    0: {emailText: 'KAVI:n oma aloite', uiText: 'KAVI:n oma aloite'},
+    0: {emailText: 'KUVI:n oma aloite', uiText: 'KUVI:n oma aloite'},
     1: {emailText: 'Yleisöpalaute', uiText: 'Yleisöpalaute'},
     2: {emailText: 'Valitus', uiText: 'Valitus'},
     3: {emailText: 'Oikaisupyyntö', uiText: 'Oikaisuvaatimus'},
@@ -263,7 +263,7 @@
   }
 
   exports.kaviType = {
-    0: {emailText: 'KKAVI:n esitystoiminta', uiText: 'KAVI:n esitystoiminta'},
+    0: {emailText: 'KUVI:n esitystoiminta', uiText: 'KUVI:n esitystoiminta'},
     1: {emailText: 'Maksullinen luokittelu', uiText: 'Maksullinen luokittelu'},
     2: {emailText: 'Muu', uiText: 'Muu'}
   }
@@ -272,7 +272,7 @@
 
   exports.authorOrganization = {
     0: 'Ulkopuolinen',
-    1: 'KAVI',
+    1: 'KUVI',
     2: 'Kuvaohjelmalautakunta',
     3: 'KHO',
     4: '-',
@@ -288,9 +288,9 @@
 
   exports.invoiceRowType = {
     registration: 'Kuvaohjelman rekisteröinti',
-    classification: 'KAVI:n luokittelu',
-    reclassification: 'KAVI:n uudelleenluokittelu',
     dcpClassification: 'DCP-lisämaksu',
+    classification: 'KUVI:n luokittelu',
+    reclassification: 'KUVI:n uudelleenluokittelu'
   }
 
   exports.countries = {

@@ -110,8 +110,8 @@
           'FINNISH ARTS AND CULTURE AGENCY</div>' +
         _.template('<p><%- date %><br/><%- buyer %></p>')(fiData) +
         _.template(generateText('fi'))(fiData) + '<br>' + _.template(generateText('sv'))(svData) +
-        '<br><p>Taide- ja kulttuurivirasto (KUVI) / Konst- och kulturmyndigheten (KUVI)<br>' +
-        'Mediakasvatus- ja ikärajat -osasto / Avdelningen för mediefostran och åldersgränser</p>'
+        '<br><p>Taide- ja kulttuurivirasto (Kuvi) / Konst- och kulturmyndigheten (Kuvi)<br>' +
+        'Mediakasvatus ja ikärajat -osasto / Avdelningen för mediefostran och åldersgränser</p>'
     }
 
     function generateData(lang) {
@@ -200,7 +200,7 @@
       function classifierName() {
         if (enums.authorOrganizationIsKHO(classification)) return t('Korkein hallinto-oikeus')
         if (enums.authorOrganizationIsKuvaohjelmalautakunta(classification)) return t('Kuvaohjelmalautakunta')
-        if (utils.hasRole(user, 'kavi')) return t('Taide- ja kulttuuriviraston (KUVI) mediakasvatus- ja ikärajat -osasto')
+        if (utils.hasRole(user, 'kavi')) return t('Taide- ja kulttuuriviraston (Kuvi) mediakasvatus ja ikärajat -osasto')
         return _([user.employerName, user.name]).compact().join(', ')
       }
 

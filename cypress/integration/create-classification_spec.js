@@ -135,7 +135,7 @@ const expectedClassificationEmail = {
     date,
     'DEMO tilaaja 1',
     'Päätös kuvaohjelman luokittelusta',
-    'Taide- ja kulttuuriviraston (KUVI) mediakasvatus- ja ikärajat -osasto on ' + date + '  luokitellut kuvaohjelman ',
+    'Taide- ja kulttuuriviraston (Kuvi) mediakasvatus ja ikärajat -osasto on ' + date + '  luokitellut kuvaohjelman ',
     'Ghostbusters XVI',
     '. Kuvaohjelman ikäraja on 7 ja haitallisuuskriteerit väkivalta (12), seksi (19). ',
     'Diaarinumero: -',
@@ -145,7 +145,7 @@ const expectedClassificationEmail = {
     'Liitteet:',
     'Valitusosoitus',
     'Beslut om klassificering av bildprogram',
-    'Konst- och kulturmyndighetens (KUVI) avdelningen för mediefostran och åldersgränser har ' + date + ' klassificerat bildprogrammet ',
+    'Konst- och kulturmyndighetens (Kuvi) avdelningen för mediefostran och åldersgränser har ' + date + ' klassificerat bildprogrammet ',
     'Ghostbusters XVI',
     '. Bildprogrammet har åldersgränsen 7 och det skadliga innehållet våld (12), sexuellt innehåll (19). ',
     'Diarienummer: -',
@@ -154,8 +154,8 @@ const expectedClassificationEmail = {
     'kirjaamo@kuvi.fi',
     'Bilaga:',
     'Besvärsanvisning',
-    'Taide- ja kulttuurivirasto (KUVI) / Konst- och kulturmyndigheten (KUVI)',
-    'Mediakasvatus- ja ikärajat -osasto / Avdelningen för mediefostran och åldersgränser'
+    'Taide- ja kulttuurivirasto (Kuvi) / Konst- och kulturmyndigheten (Kuvi)',
+    'Mediakasvatus ja ikärajat -osasto / Avdelningen för mediefostran och åldersgränser'
   ].join('\n')
 }
 
@@ -186,7 +186,7 @@ const expectedReclassificationEmail = {
     'Parter: kavi',
     'Bilaga:',
     'Besvärsanvisning',
-    'Taide- ja kulttuurivirasto (KUVI) / Konst- och kulturmyndigheten (KUVI)',
-    'Mediakasvatus- ja ikärajat -osasto / Avdelningen för mediefostran och åldersgränser'
+    'Taide- ja kulttuurivirasto (Kuvi) / Konst- och kulturmyndigheten (Kuvi)',
+    'Mediakasvatus ja ikärajat -osasto / Avdelningen för mediefostran och åldersgränser'
   ].join('\n')
 }

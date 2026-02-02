@@ -1691,8 +1691,8 @@ const checkExpiredCerts = new CronJob('0 */30 * * * *', () => {
         recipients: [user.emails[0]],
         subject: 'Luokittelusertifikaattisi on vanhentunut',
         body: '<p>Luokittelusertifikaattisi on vanhentunut ja sisäänkirjautuminen tunnuksellasi on estetty.<br/>' +
-          '<p>Lisätietoja voit kysyä KUVI:lta: <a href="mailto:meku@kuvi.fi">meku@kuvi.fi</a></p>' +
-          '<p>Terveisin,<br/>KUVI</p>'
+          '<p>Lisätietoja voit kysyä Kuvilta: <a href="mailto:meku@kuvi.fi">meku@kuvi.fi</a></p>' +
+          '<p>Terveisin,<br/>Kuvi</p>'
       }, undefined, logError)
     })
   })
@@ -1716,15 +1716,15 @@ const checkCertsExpiringSoon = new CronJob('0 */30 * * * *', () => {
       sendEmail({
         recipients: [user.emails[0]],
         subject: 'Luokittelusertifikaattisi on vanhentumassa',
-        body: '<p>Tämä on KUVIn kuvaohjelmaluokittelujärjestelmästä (IKLU) lähetetty automaattinen muistutusviesti luokitteluoikeutesi päättymisestä. Luokitteluoikeutesi päättyy ' + moment(user.certificateEndDate).format('DD.MM.YYYY') + '.</p>' +
-          '<p>Jos haluat jatkaa kuvaohjelmien luokittelua, on sinun osallistuttava KUVIn järjestämään kertauskoulutukseen ennen luokitteluoikeutesi viimeistä voimassaolopäivää. Tietoja kertauskoulutuksesta: https://kavi.fi/koulutukset-ja-tapahtumat/ tai meku@kuvi.fi</p>' +
+        body: '<p>Tämä on Kuvin kuvaohjelmaluokittelujärjestelmästä (IKLU) lähetetty automaattinen muistutusviesti luokitteluoikeutesi päättymisestä. Luokitteluoikeutesi päättyy ' + moment(user.certificateEndDate).format('DD.MM.YYYY') + '.</p>' +
+          '<p>Jos haluat jatkaa kuvaohjelmien luokittelua, on sinun osallistuttava Kuvin järjestämään kertauskoulutukseen ennen luokitteluoikeutesi viimeistä voimassaolopäivää. Tietoja kertauskoulutuksesta: https://kavi.fi/koulutukset-ja-tapahtumat/ tai meku@kuvi.fi</p>' +
           '<p>Kun kertauskoulutus on suoritettu hyväksytysti, jatketaan luokittelijatunnuksen (käyttäjätunnuksen) voimassaoloaikaa viidellä vuodella.</p>' +
           '<p>Jos kertauskoulutusta ei suoriteta luokittelijaoikeuden voimassaoloaikana, tunnus lakkaa toimimasta voimassaoloajan päätyttyä. Voit uusia luokittelulupasi käymällä kertauskoulutuksen myös sen jälkeen, kun luokittelijaoikeutesi on ehtinyt päättyä.</p>' +
           '<p>Tähän viestiin ei tarvitse reagoida, jos olet jo ilmoittautunut kertauskoulutukseen, olet äskettäin osallistunut kertauskoulutukseen tai et halua uusia luokittelulupaasi.</p>' +
           '<p>Älä vastaa tähän viestiin, vaan lähetä mahdolliset kysymykset osoitteeseen meku@kuvi.fi</p>' +
 
-          '<p>Detta är en automatisk påminnelse om att dina klassificeringsrättigheter upphör från KUVIs system för klassificering av bilder (IKLU). Dina klassificeringsrättigheter upphör ' + moment(user.certificateEndDate).format('DD.MM.YYYY') + '.</p>' +
-          '<p>Om du vill fortsätta att klassificera bildprogram ska du delta i KUVIs fortbildning innan dina klassificeringsrättigheter går ut. Information om fortbildningen: https://kavi.fi/koulutukset-ja-tapahtumat/ tai meku@kuvi.fi.</p>' +
+          '<p>Detta är en automatisk påminnelse om att dina klassificeringsrättigheter upphör från Kuvis system för klassificering av bilder (IKLU). Dina klassificeringsrättigheter upphör ' + moment(user.certificateEndDate).format('DD.MM.YYYY') + '.</p>' +
+          '<p>Om du vill fortsätta att klassificera bildprogram ska du delta i Kuvis fortbildning innan dina klassificeringsrättigheter går ut. Information om fortbildningen: https://kavi.fi/koulutukset-ja-tapahtumat/ tai meku@kuvi.fi.</p>' +
           '<p>Efter fortbildningen förlängs klassificeringsrättigheterna (användarnamnet) med fem år.</p>' +
           '<p>Om du inte slutför fortbildningen under klassificeringsrättigheternas giltighetstid slutar användarnamnet att fungera när giltighetstiden går ut.  Du kan fönya din behörighet genom att delta i fortbildningen även efter att din klassificeringsbehörighet upphört.</p>' +
           '<p>Du behöver inte reagera på detta meddelande om du redan anmält dig till fortbildning, nyligen har deltagit i fortbildning eller inte vill förnya din klassificeringsbehörighet.</p>' +

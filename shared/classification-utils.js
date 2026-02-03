@@ -102,7 +102,7 @@
     const svData = generateData('sv')
     return {
       recipients: _.uniq(program.sentRegistrationEmailAddresses.concat(utils.hasRole(user, 'root') ? [] : user.email)),
-      from: 'kirjaamo@kuvi.fi',
+      from: 'kirjaamo@kavi.fi',
       subject: _.template('Luokittelupäätös: <%= name %><%= programType %>, <%- year %>, <%- classificationShort %>')(fiData),
       body: '<div style="text-align: right; margin-top: 8px;"><!-- <img src="' + hostName + '/images/logo.png" />-->' +
           'TAIDE- JA KULTTUURIVIRASTO<br>' +

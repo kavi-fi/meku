@@ -114,9 +114,10 @@ function createBilling(filename, accounts, billingDescription, rowDescription, b
     })
   }))
   const columns = [
+    // A-Z
     {name: 'T', value: invoiceValue('first'), repeatable: true, width: 2},
     {name: 'Tilauslaji', value: constantValue('Z001')},
-    {name: 'Myyntiorg', value: constantValue('6008')},
+    {name: 'Myyntiorg', value: constantValue('6040')},
     {name: 'Jakelutie', value: constantValue('02')},
     {name: 'Sektori', value: constantValue('01')},
     {name: 'Myyntitsto', value: constantValue('')},
@@ -140,6 +141,7 @@ function createBilling(filename, accounts, billingDescription, rowDescription, b
     {name: 'Maksaja-asiakas nimi', value: constantValue('')},
     {name: 'Toimitusasiakasnro', value: constantValue('')},
     {name: 'Toimitusasiakas nimi', value: constantValue('')},
+    // AA-AZ
     {name: 'Palvelun luontipvm', value: constantValue('')},
     {name: 'Hinnoittelupvm', value: constantValue('')},
     {name: 'Laskun pvm', value: constantValue('')},
@@ -152,6 +154,7 @@ function createBilling(filename, accounts, billingDescription, rowDescription, b
     {name: 'Tiliöintiviite', value: constantValue('')},
     {name: 'Työmaa-avain', value: constantValue('')},
     {name: 'Poikk. veron määrämaa', value: constantValue('')},
+    {name: 'Turvaluokitus', value: constantValue('')},
     {name: 'Otsikkoteksti: Otsikkomuistio 1 (tekstilaji 0002) tulostuu ennen rivejä. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingDescription, width: 20},
     {name: 'Otsikkoteksti: Maksuperusteteksti (tekstilaji Z000) tulostuu laskun loppuun. Huom. Kirjoita teksti katkeamattomasti, ei rivivaihtoja eikä alt+enter painikkeita', value: billingFooter, width: 20},
     {name: 'Nimike', value: invoiceValue('invoiceItemCode'), repeatable: true},
@@ -165,6 +168,7 @@ function createBilling(filename, accounts, billingDescription, rowDescription, b
     {name: 'Riviteksti: Rivimuistio (tekstilaji 0002), tulostuu laskulle rivin jälkeen', value: rowDescription, width: 30, repeatable: true},
     {name: 'PRR-osa', value: constantValue('')},
     {name: 'TaKP-tili', value: constantValue('')},
+    // BA-BF
     {name: 'Suorite', value: constantValue('')},
     {name: 'Toiminto', value: constantValue('')},
     {name: 'Alue /  kunta', value: constantValue('')},

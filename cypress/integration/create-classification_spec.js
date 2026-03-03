@@ -132,6 +132,9 @@ const expectedClassificationEmail = {
   to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kuvi.fi', 'ville.sohn@kuvi.fi', 'milja.lampinen@kuvi.fi'],
   subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, 7 väkivalta (12), seksi (19)',
   body: [
+    '-->TAIDE- JA KULTTUURIVIRASTO', // NB! This line starts with the end of the HTML comment around the old logo.
+    'KONST- OCH KULTURMYNDIGHETEN',
+    'FINNISH ARTS AND CULTURE AGENCY',
     date,
     'DEMO tilaaja 1',
     'Päätös kuvaohjelman luokittelusta',
@@ -163,6 +166,9 @@ const expectedReclassificationEmail = {
   to: ['kavi@fake-meku.fi', 'demo.1@email.org', 'leo.pekkala@kuvi.fi', 'ville.sohn@kuvi.fi', 'milja.lampinen@kuvi.fi'],
   subject: 'Luokittelupäätös: Ghostbusters XVI, 2014, S ',
   body: [
+    '-->TAIDE- JA KULTTUURIVIRASTO', // NB! This line starts with the end of the HTML comment around the old logo.
+    'KONST- OCH KULTURMYNDIGHETEN',
+    'FINNISH ARTS AND CULTURE AGENCY',
     date,
     'Päätös kuvaohjelman uudelleenluokittelusta',
     'Kuvaohjelmalautakunta on ' + date + ' uudelleenluokitellut kuvaohjelman ',

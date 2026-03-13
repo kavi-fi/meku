@@ -227,8 +227,8 @@
 
       function appendixLink() {
         if (enums.authorOrganizationIsKHO(classification)) return ''
-        const linkOther = {url: "http://kavi.fi/wp-content/uploads/2023/07/Oikaisuvaatimusohje__kuvaohjelmaluokittelijan-luokittelupaatos.pdf", name: t('Oikaisuvaatimusohje')}
-        const linkKavi = {url: "http://kavi.fi/wp-content/uploads/2024/01/Valitusosoitus-kuvaohjelmalautakunta.pdf", name: t('Valitusosoitus')}
+        const linkOther = {url: "https://kavi.fi/wp-content/uploads/2026/02/Oikaisuvaatimusohje-Taide-ja-kulttuurivirasto.pdf", name: t('Oikaisuvaatimusohje')}
+        const linkKavi = {url: "https://kavi.fi/wp-content/uploads/2026/02/Valitusosoitus-kuvaohjelmalautakuntaan.pdf", name: t('Valitusosoitus')}
         const link = user.role === 'kavi' ? linkKavi : linkOther
         return '<p>' + t('Liitteet') + ':<br/><a href="' + link.url + '">' + link.name + '</a></p>'
       }

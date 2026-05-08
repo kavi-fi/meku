@@ -177,7 +177,7 @@ exports.payingLocationsWithoutEmail = function (locations) {
 function providerEmail(fields) {
   return {
     recipients: ['tarjoajarekisteri@kuvi.fi'].concat(fields.recipients),
-    from: 'tarjoajarekisteri@kavi.fi',
+    from: 'tarjoajarekisteri@kuvi.fi',
     subject: fields.subject,
     body: fields.body
   }

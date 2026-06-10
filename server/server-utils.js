@@ -30,5 +30,5 @@ exports.getTemplateWithVars = (function() {
 exports.currentPrices = function currentPrices() {
   const pricesExistingYear = _.find(_.range(moment().year(), 2015, -1), (y) => process.env['PRICES_' + y] !== undefined)
   if (!pricesExistingYear) console.warn('Cannot find prices from config variable, using (possibly outdated) defaults')
-  return pricesExistingYear ? JSON.parse(process.env['PRICES_' + pricesExistingYear]) : enums.defaultPrices
+  return pricesExistingYear ? {...enums.defaultPrices, ...JSON.parse(process.env['PRICES_' + pricesExistingYear])} : enums.defaultPrices
 }

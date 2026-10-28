@@ -2,7 +2,7 @@
 Taide- ja kulttuuriviraston Kuvaohjelmien luokittelu- ja valvontajärjestelmä.
 
 ## Setting up the development environment
-Clone the repository and run the following commands. Note: The project runs well with `Node v16`.
+Clone the repository and run the following commands.
 
 ### First time setup
 
@@ -21,6 +21,30 @@ $ cd scripts && node add-demo-users.js && cd ..
 Install dependencies
 ```
 $ npm install
+```
+
+### After updating Node.js
+
+This project uses the Node.js version specified in `.nvmrc` (currently Node 22).
+When changing Node.js versions, reinstall dependencies so native modules are
+compiled for the active Node.js version:
+
+```
+$ nvm use
+$ rm -rf node_modules
+$ npm ci
+```
+
+If `node-expat` still reports a `NODE_MODULE_VERSION` mismatch, rebuild it:
+
+```
+$ npm rebuild node-expat --build-from-source
+```
+
+Run the test suite after reinstalling:
+
+```
+$ npm test
 ```
 
 If `npm i` returns errors about `node-gyp`, you need to install some missing tools. This happened at least on Ubuntu 24.

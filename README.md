@@ -22,31 +22,6 @@ Install dependencies
 ```
 $ npm install
 ```
-
-### After updating Node.js
-
-This project uses the Node.js version specified in `.nvmrc` (currently Node 22).
-When changing Node.js versions, reinstall dependencies so native modules are
-compiled for the active Node.js version:
-
-```
-$ nvm use
-$ rm -rf node_modules
-$ npm ci
-```
-
-If `node-expat` still reports a `NODE_MODULE_VERSION` mismatch, rebuild it:
-
-```
-$ npm rebuild node-expat --build-from-source
-```
-
-Run the test suite after reinstalling:
-
-```
-$ npm test
-```
-
 If `npm i` returns errors about `node-gyp`, you need to install some missing tools. This happened at least on Ubuntu 24.
 
 ```
@@ -65,6 +40,30 @@ $ npm start
 ```
 
 Demo user is `kavi:kavi`
+
+### After updating Node.js
+
+This project uses the Node.js version specified in `.nvmrc` (currently Node 22).
+When changing Node.js versions, reinstall dependencies so native modules are
+compiled for the active Node.js version:
+
+```
+$ nvm use
+$ rm -rf node_modules
+$ npm_config_ignore_scripts=false npm ci --foreground-scripts
+```
+
+If `node-expat` still reports a `NODE_MODULE_VERSION` mismatch, rebuild it:
+
+```
+$ npm rebuild node-expat --build-from-source
+```
+
+Run the test suite after reinstalling:
+
+```
+$ npm test
+```
 
 ## Making changes
 1. Create a new branch for your changes

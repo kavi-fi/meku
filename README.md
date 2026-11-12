@@ -41,6 +41,46 @@ $ npm start
 
 Demo user is `kavi:kavi`
 
+## Maintenance scripts
+
+### Soft-delete zero-duration programs
+
+`scripts/soft-delete-zero-duration-programs.js` deletes programs through the
+existing authenticated `DELETE /programs/:id` endpoint.
+
+1. Put the JSON export of programs in the repository root. The script reads
+   the top-level `._id.$oid` value from every entry.
+2. Set `EXPECTED_ID_COUNT` in
+   `scripts/soft-delete-zero-duration-programs.js` to the number of program
+   IDs in that export. The explicit confirmation flag must use the same number.
+3. Run a dry run first; it validates the input and makes no HTTP requests or
+   changes:
+
+```
+node scripts/soft-delete-zero-duration-programs.js --input programs-to-delete.json
+```
+
+To delete the programs, provide root-user credentials through environment
+variables (the password is never accepted as a command argument) and confirm
+the expected count:
+
+```
+MEKU_BASE_URL="https://luokittelu.kavi.fi" MEKU_USERNAME="root-user" MEKU_PASSWORD="..." \
+  node scripts/soft-delete-zero-duration-programs.js --input programs-to-delete.json --execute --confirm-delete-<ID_COUNT>
+```
+
+Replace `<ID_COUNT>` with the same value as `EXPECTED_ID_COUNT`; for example,
+`--confirm-delete-653`. The base URL must be the HTTPS production or training
+hostname. The script sends deletions sequentially and stops at the first
+failed deletion.
+
+The maintenance script's Node unit tests run as part of `npm test` before the
+Cypress workflow. Run them with coverage separately using:
+
+```
+npm run test:unit:coverage
+```
+
 ### After updating Node.js
 
 This project uses the Node.js version specified in `.nvmrc` (currently Node 22).

@@ -6,6 +6,8 @@
     "start": "node server/app.js",
     "postinstall": "date +%s > build.revision",
     "test": "./scripts/test.sh",
+    "test:unit": "node --test scripts/soft-delete-zero-duration-programs.test.js",
+    "test:unit:coverage": "node --test --experimental-test-coverage scripts/soft-delete-zero-duration-programs.test.js",
     "cypress-open": "./scripts/test.sh watch",
     "eslint": "./node_modules/.bin/eslint client/js server shared cypress/integration"
   },
